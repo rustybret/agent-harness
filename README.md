@@ -1,121 +1,6 @@
-> [!TIP]
-> **Building in Public**
->
-> The maintainer builds and maintains oh-my-opencode in real-time with Jobdori, an AI assistant built on a heavily customized fork of OpenClaw.
-> Every feature, every fix, every issue triage — live in our Discord.
->
-> [![Building in Public](./.github/assets/building-in-public.png)](https://discord.gg/PUwSMR9XNk)
->
-> [**→ Watch it happen in #building-in-public**](https://discord.gg/PUwSMR9XNk)
+# Oh My Openagent
 
-> [!NOTE]
->
-> [![Sisyphus Labs - Sisyphus is the agent that codes like your team.](./.github/assets/sisyphuslabs.png?v=2)](https://sisyphuslabs.ai)
-> > **We're building a fully productized version of Sisyphus to define the future of frontier agents. <br />Join the waitlist [here](https://sisyphuslabs.ai).**
-
-> [!TIP]
-> Be with us!
->
-> | [<img alt="Discord link" src="https://img.shields.io/discord/1452487457085063218?color=5865F2&label=discord&labelColor=black&logo=discord&logoColor=white&style=flat-square" width="156px" />](https://discord.gg/PUwSMR9XNk) | Join our [Discord community](https://discord.gg/PUwSMR9XNk) to connect with contributors and fellow `oh-my-opencode` users. |
-> | :-----| :----- |
-> | [<img alt="X link" src="https://img.shields.io/badge/Follow-%40justsisyphus-00CED1?style=flat-square&logo=x&labelColor=black" width="156px" />](https://x.com/justsisyphus) | News and updates for `oh-my-opencode` used to be posted on my X account. <br /> Since it was suspended mistakenly, [@justsisyphus](https://x.com/justsisyphus) now posts updates on my behalf. |
-> | [<img alt="GitHub Follow" src="https://img.shields.io/github/followers/code-yeongyu?style=flat-square&logo=github&labelColor=black&color=24292f" width="156px" />](https://github.com/code-yeongyu) | Follow [@code-yeongyu](https://github.com/code-yeongyu) on GitHub for more projects. |
-
-<!-- <CENTERED SECTION FOR GITHUB DISPLAY> -->
-
-<div align="center">
-
-[![Oh My OpenCode](./.github/assets/hero.jpg)](https://github.com/code-yeongyu/oh-my-openagent#oh-my-opencode)
-
-[![Preview](./.github/assets/omo.png)](https://github.com/code-yeongyu/oh-my-openagent#oh-my-opencode)
-
-
-</div>
-
-> Anthropic [**blocked OpenCode because of us.**](https://x.com/thdxr/status/2010149530486911014) **Yes this is true.**
-> They want you locked in. Claude Code's a nice prison, but it's still a prison.
->
-> We don't do lock-in here. We ride every model. Claude / Kimi / GLM for orchestration. GPT for reasoning. Minimax for speed. Gemini for creativity.
-> The future isn't picking one winner—it's orchestrating them all. Models get cheaper every month. Smarter every month. No single provider will dominate. We're building for that open market, not their walled gardens.
-
-<div align="center">
-
-[![GitHub Release](https://img.shields.io/github/v/release/code-yeongyu/oh-my-openagent?color=369eff&labelColor=black&logo=github&style=flat-square)](https://github.com/code-yeongyu/oh-my-openagent/releases)
-[![npm downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fohmyopenagent.com%2Fapi%2Fnpm-downloads&style=flat-square)](https://www.npmjs.com/package/oh-my-opencode)
-[![GitHub Contributors](https://img.shields.io/github/contributors/code-yeongyu/oh-my-openagent?color=c4f042&labelColor=black&style=flat-square)](https://github.com/code-yeongyu/oh-my-openagent/graphs/contributors)
-[![GitHub Forks](https://img.shields.io/github/forks/code-yeongyu/oh-my-openagent?color=8ae8ff&labelColor=black&style=flat-square)](https://github.com/code-yeongyu/oh-my-openagent/network/members)
-[![GitHub Stars](https://img.shields.io/github/stars/code-yeongyu/oh-my-openagent?color=ffcb47&labelColor=black&style=flat-square)](https://github.com/code-yeongyu/oh-my-openagent/stargazers)
-[![GitHub Issues](https://img.shields.io/github/issues/code-yeongyu/oh-my-openagent?color=ff80eb&labelColor=black&style=flat-square)](https://github.com/code-yeongyu/oh-my-openagent/issues)
-[![License](https://img.shields.io/badge/license-SUL--1.0-white?labelColor=black&style=flat-square)](https://github.com/code-yeongyu/oh-my-openagent/blob/dev/LICENSE.md)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/code-yeongyu/oh-my-openagent)
-
-[English](README.md) | [한국어](README.ko.md) | [日本語](README.ja.md) | [简体中文](README.zh-cn.md)
-
-</div>
-
-<!-- </CENTERED SECTION FOR GITHUB DISPLAY> -->
-
-## Reviews
-
-> "It made me cancel my Cursor subscription. Unbelievable things are happening in the open source community." - [Arthur Guiot](https://x.com/arthur_guiot/status/2008736347092382053?s=20)
-
-> "If Claude Code does in 7 days what a human does in 3 months, Sisyphus does it in 1 hour. It just works until the task is done. It is a discipline agent." <br/>- B, Quant Researcher
-
-> "Knocked out 8000 eslint warnings with Oh My Opencode, just in a day" <br/>- [Jacob Ferrari](https://x.com/jacobferrari_/status/2003258761952289061)
-
-> "I converted a 45k line tauri app into a SaaS web app overnight using Ohmyopencode and ralph loop. Started with interview me prompt, asked it for ratings and recommendations on the questions. It was amazing to watch it work and to wake up this morning to a mostly working website!" - [James Hargis](https://x.com/hargabyte/status/2007299688261882202)
-
-> "use oh-my-opencode, you will never go back" <br/>- [d0t3ch](https://x.com/d0t3ch/status/2001685618200580503)
-
-> "I haven't really been able to articulate exactly what makes it so great yet, but the development experience has reached a completely different dimension." - [
-苔硯:こけすずり](https://x.com/kokesuzuri/status/2008532913961529372?s=20)
-
-> "Experimenting with open code, oh my opencode and supermemory this weekend to build some minecraft/souls-like abomination."
-> "Asking it to add crouch animations while I go take my post-lunch walk. [Video]" - [MagiMetal](https://x.com/MagiMetal/status/2005374704178373023)
-
-> "You guys should pull this into core and recruit him. Seriously. It's really, really, really good." <br/>- Henning Kilset
-
-> "Hire @yeon_gyu_kim if you can convince him, this dude has revolutionized opencode." <br/>- [mysticaltech](https://x.com/mysticaltech/status/2001858758608376079)
-
-> "Oh My OpenCode Is Actually Insane" - [YouTube - Darren Builds AI](https://www.youtube.com/watch?v=G_Snfh2M41M)
-
----
-
-# Oh My OpenCode
-
-You're juggling Claude Code, Codex, random OSS models. Configuring workflows. Debugging agents.
-
-We did the work. Tested everything. Kept what actually shipped.
-
-Install OmO. Type `ultrawork`. Done.
-
-
-## Installation
-
-### For Humans
-
-Copy and paste this prompt to your LLM agent (Claude Code, AmpCode, Cursor, etc.):
-
-```
-Install and configure oh-my-opencode by following the instructions here:
-https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/refs/heads/dev/docs/guide/installation.md
-```
-
-Or read the [Installation Guide](docs/guide/installation.md), but seriously, let an agent do it. Humans fat-finger configs.
-
-### For LLM Agents
-
-Fetch the installation guide and follow it:
-
-```bash
-curl -s https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/refs/heads/dev/docs/guide/installation.md
-```
-
-**Note**: Use the published package and binary name `oh-my-opencode`. Inside `opencode.json`, the compatibility layer now prefers the plugin entry `oh-my-openagent`, while legacy `oh-my-opencode` entries still load with a warning. Plugin config files still commonly use `oh-my-opencode.json` or `oh-my-opencode.jsonc`, and both legacy and renamed basenames are recognized during the transition.
-
-Anonymous telemetry is enabled by default to help improve install and runtime reliability. It uses PostHog with a hashed installation identifier, never the raw hostname, and can be disabled with `OMO_SEND_ANONYMOUS_TELEMETRY=0` or `OMO_DISABLE_POSTHOG=1`. See [Privacy Policy](docs/legal/privacy-policy.md) and [Terms of Service](docs/legal/terms-of-service.md).
-
----
+Enable ultrawork!
 
 ## Skip This README
 
@@ -131,14 +16,13 @@ Read this and tell me why it's not just another boilerplate: https://raw.githubu
 
 You're actually reading this? Wild.
 
-Install. Type `ultrawork` (or `ulw`). Done.
+Install. Type `/ulw`. Done.
 
 Everything below, every feature, every optimization, you don't need to know it. It just works.
 
 Even only with following subscriptions, ultrawork will work well (this project is not affiliated, this is just personal recommendation):
 - [ChatGPT Subscription ($20)](https://chatgpt.com/)
-- [Kimi Code Subscription ($0.99) (*only this month)](https://www.kimi.com/kimiplus/sale)
-- [GLM Coding Plan ($10)](https://z.ai/subscribe)
+- Opencode Zen free modela
 - If you are eligible for pay-per-token, using kimi and gemini models won't cost you that much.
 
 |       | Feature                                                  | What it does                                                                                                                                                                                                     |
@@ -166,17 +50,13 @@ Even only with following subscriptions, ultrawork will work well (this project i
 <td align="center"><img src=".github/assets/hephaestus.png" height="300" /></td>
 </tr></table>
 
-**Sisyphus** (`claude-opus-4-7` / **`kimi-k2.5`** / **`glm-5`** ) is your main orchestrator. He plans, delegates to specialists, and drives tasks to completion with aggressive parallel execution. He does not stop halfway.
+**Sisyphus** (`claude-opus-4-7` / GPT-5.4 xhigh / **`kimi-k2.5`** / **`glm-5.1`** ) is your main orchestrator. He plans, delegates to specialists, and drives tasks to completion with aggressive parallel execution. He does not stop halfway.
 
 **Hephaestus** (`gpt-5.4`) is your autonomous deep worker. Give him a goal, not a recipe. He explores the codebase, researches patterns, and executes end-to-end without hand-holding. *The Legitimate Craftsman.*
 
-**Prometheus** (`claude-opus-4-7` / **`kimi-k2.5`** / **`glm-5`** ) is your strategic planner. Interview mode: it questions, identifies scope, and builds a detailed plan before a single line of code is touched.
+**Prometheus** (`claude-opus-4-7` / **`kimi-k2.5`** / **`glm-5.1`** ) is your strategic planner. Interview mode: it questions, identifies scope, and builds a detailed plan before a single line of code is touched.
 
 Every agent is tuned to its model's specific strengths. No manual model-juggling. [Learn more →](docs/guide/overview.md)
-
-> Anthropic [blocked OpenCode because of us.](https://x.com/thdxr/status/2010149530486911014) That's why Hephaestus is called "The Legitimate Craftsman." The irony is intentional.
->
-> We run best on Opus, but Kimi K2.5 + GPT-5.4 already beats vanilla Claude Code. Zero config needed.
 
 ### Agent Orchestration
 
@@ -193,8 +73,6 @@ Agent says what kind of work. Harness picks the right model. `ultrabrain` now ro
 
 ### Claude Code Compatibility
 
-You dialed in your Claude Code setup. Good.
-
 Every hook, command, skill, MCP, plugin works here unchanged. Full compatibility, including plugins.
 
 ### World-Class Tools for Your Agents
@@ -204,7 +82,7 @@ LSP, AST-Grep, Tmux, MCP actually integrated, not duct-taped together.
 - **LSP**: `lsp_rename`, `lsp_goto_definition`, `lsp_find_references`, `lsp_diagnostics`. IDE precision for every agent
 - **AST-Grep**: Pattern-aware code search and rewriting across 25 languages
 - **Tmux**: Full interactive terminal. REPLs, debuggers, TUI apps. Your agent stays in session
-- **MCP**: Web search, official docs, GitHub code search. All baked in
+- **MCP**: Web search, official docs, GitHub code search. All baked in.
 
 ### Skill-Embedded MCPs
 
@@ -230,8 +108,6 @@ Inspired by [oh-my-pi](https://github.com/can1357/oh-my-pi), we implemented **Ha
 
 The agent edits by referencing those tags. If the file changed since the last read, the hash won't match and the edit is rejected before corruption. No whitespace reproduction. No stale-line errors.
 
-Grok Code Fast 1: **6.7% → 68.3%** success rate. Just from changing the edit tool.
-
 ### Deep Initialization. `/init-deep`
 
 Run `/init-deep`. It generates hierarchical `AGENTS.md` files:
@@ -244,14 +120,6 @@ project/
 │   └── components/
 │       └── AGENTS.md      ← component-specific context
 ```
-
-Agents auto-read relevant context. Zero manual management.
-
-### Planning. Prometheus
-
-Complex task? Don't prompt and pray.
-
-`/start-work` calls Prometheus. **Interviews you like a real engineer**, identifies scope and ambiguities, builds a verified plan before touching code. Agent knows what it's building before it starts.
 
 ### Skills
 
@@ -277,7 +145,7 @@ To remove oh-my-opencode:
 
 1. **Remove the plugin from your OpenCode config**
 
-   Edit `~/.config/opencode/opencode.json` (or `opencode.jsonc`) and remove either `"oh-my-openagent"` or the legacy `"oh-my-opencode"` entry from the `plugin` array:
+   Edit `~/.config/opencode/opencode.json` (or `opencode.jsonc`) and remove either `"oh-my-openagent"` entry from the `plugin` array:
 
    ```bash
    # Using jq
@@ -334,7 +202,7 @@ Opinionated defaults, adjustable if you insist.
 See [Configuration Documentation](docs/reference/configuration.md).
 
 **Quick Overview:**
-- **Config Locations**: The compatibility layer recognizes both `oh-my-openagent.json[c]` and legacy `oh-my-opencode.json[c]` plugin config files. Existing installs still commonly use the legacy basename.
+
 - **JSONC Support**: Comments and trailing commas supported
 - **Agents**: Override models, temperatures, prompts, and permissions for any agent
 - **Built-in Skills**: `playwright` (browser automation), `git-master` (atomic commits)
@@ -344,52 +212,3 @@ See [Configuration Documentation](docs/reference/configuration.md).
 - **Hooks**: 25+ built-in hooks, all configurable via `disabled_hooks`
 - **MCPs**: Built-in websearch (Exa), context7 (docs), grep_app (GitHub search)
 - **LSP**: Full LSP support with refactoring tools
-- **Experimental**: Aggressive truncation, auto-resume, and more
-
-
-## Author's Note
-
-**Want the philosophy?** Read the [Ultrawork Manifesto](docs/manifesto.md).
-
----
-
-I burned through $24K in LLM tokens on personal projects. Tried every tool. Configured everything to death. OpenCode won.
-
-Every problem I hit, the fix is baked into this plugin. Install and go.
-
-If OpenCode is Debian/Arch, OmO is Ubuntu/[Omarchy](https://omarchy.org/).
-
-Heavy influence from [AmpCode](https://ampcode.com) and [Claude Code](https://code.claude.com/docs/overview). Features ported, often improved. Still building. It's **Open**Code.
-
-Other harnesses promise multi-model orchestration. We ship it. Stability too. And features that actually work.
-
-I'm this project's most obsessive user:
-- Which model has the sharpest logic?
-- Who's the debugging god?
-- Who writes the best prose?
-- Who dominates frontend?
-- Who owns backend?
-- What's fastest for daily driving?
-- What are competitors shipping?
-
-This plugin is the distillation. Take the best. Got improvements? PRs welcome.
-
-**Stop agonizing over harness choices.**
-**I'll research, steal the best, and ship it here.**
-
-Sounds arrogant? Have a better way? Contribute. You're welcome.
-
-No affiliation with any project/model mentioned. Just personal experimentation.
-
-99% of this project was built with OpenCode. I don't really know TypeScript. **But I personally reviewed and largely rewrote this doc.**
-
-## Loved by professionals at
-
-- [Indent](https://indentcorp.com)
-  - Making Spray - influencer marketing solution, vovushop - crossborder commerce platform, vreview - ai commerce review marketing solution
-- [Google](https://google.com)
-- [Microsoft](https://microsoft.com)
-- [ELESTYLE](https://elestyle.jp)
-  - Making elepay - multi-mobile payment gateway, OneQR - mobile application SaaS for cashless solutions
-
-*Special thanks to [@junhoyeo](https://github.com/junhoyeo) for this amazing hero image.*
