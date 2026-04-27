@@ -27,6 +27,10 @@ Even only with following subscriptions, ultrawork will work well (this project i
 - Google Gemini [Plus, new Google Cloud customers get $300 in free credits on signup.](https://cloud.google.com/free)
 - Openrouter, Groq(Not Grok), Ollama cloud, lots of free sources for small amounts of model evaluation. 
 - Once you see the value, paying a few dollars a day for pay-per-token Kimi and Gemini models can fill in when you hit your quota limits. 
+- [ChatGPT Subscription ($20)](https://chatgpt.com/)
+- [Kimi Code Subscription ($19)](https://www.kimi.com/code)
+- [GLM Coding Plan ($10)](https://z.ai/subscribe)
+- If you are eligible for pay-per-token, using kimi and gemini models won't cost you that much.
 
 |       | Feature                                                  | What it does                                                                                                                                                                                                     |
 | :---: | :------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
