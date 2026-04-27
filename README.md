@@ -28,8 +28,12 @@ Even only with following subscriptions, ultrawork will work well (this project i
 - Openrouter, Groq(Not Grok), Ollama cloud, lots of free sources for small amounts of model evaluation. 
 - Once you see the value, paying a few dollars a day for pay-per-token Kimi and Gemini models can fill in when you hit your quota limits. 
 - [ChatGPT Subscription ($20)](https://chatgpt.com/)
-- Opencode Zen free models
-- If you are eligible for pay-per-token, using kimi and gemini models won't cost you that much.
+- [Anthropic Pro plan ($20)](https://claude.com/pricing) Use claude directly to write plans for Atlas. No need for flaky ToS violating OAuth connection!
+- [Nvidia NIM](https://build.nvidia.com/models) 
+- [Opencode Zen free tier models](https://opencode.ai/zen)
+- Google Gemini [Plus, new Google Cloud customers get $300 in free credits on signup.](https://cloud.google.com/free)
+- Openrouter, Groq(Not Grok), Ollama cloud, lots of free sources for small amounts of model evaluation. 
+- Once you see the value, paying a few dollars a day for pay-per-token Kimi and Gemini models can fill in when you hit your quota limits. 
 
 |       | Feature                                                  | What it does                                                                                                                                                                                                     |
 | :---: | :------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
