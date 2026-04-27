@@ -38,3 +38,6 @@ oauth-success.html
 *.bun-build
 .omx/
 .dori-sync/
+
+#Utils output
+utils/temp/
