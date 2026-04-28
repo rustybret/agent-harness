@@ -1,0 +1,52 @@
+models.sh — pull the opencode model catalog and reformat it into structured JSON
+
+USAGE
+  models.sh [output-dir] [-p|--provider [filter]] [-s|--sort date|name] [-f|--free]
+  models.sh -h | --help
+
+OPTIONS
+  output-dir              Destination directory for generated JSON.
+                          Defaults to ./temp (relative to the current working dir).
+
+  -p, --provider [arg]    Split the catalog into one file per provider.
+                          Optional arg narrows the split:
+                            -p nvidia               only nvidia
+                            -p "[nvidia, openai]"   only the listed providers
+                          Quote the bracket form so the shell doesn't split it.
+
+  -s, --sort MODE         Sort order for the output.
+                            date  (default) release_date descending — latest first
+                            name             alphabetical by model key
+
+  -f, --free              Restrict the slim companion file to models whose
+                          cost.input == 0. Has no effect on the rich JSON.
+
+  -h, --help              Print this help and exit.
+
+EXAMPLES
+  ./models.sh                          # writes temp/models-<DATE>.json
+  ./models.sh out/                     # writes out/models-<DATE>.json
+  ./models.sh -p                       # one file per provider
+  ./models.sh -p nvidia                # only nvidia
+  ./models.sh -p "[nvidia, openai]"    # only listed providers
+  ./models.sh out/ -p nvidia           # custom dir + provider split
+  ./models.sh -s name                  # alphabetical instead of date-desc
+  ./models.sh -f                       # slim companion limited to free models
+
+OUTPUT
+  For every run, in <output-dir>:
+    models-verbose-<DATE>.raw.txt      raw opencode output (kept for debugging)
+    models-<DATE>.json                 rich JSON, all providers       (no -p)
+    models-<provider>-<DATE>.json      rich JSON, one per provider    (with -p)
+    models-...-slim.json               slim companion of each rich file:
+                                       only keys and variant names
+
+  Always, alongside the script (overwritten each run):
+    models+variants.json               slim catalog: model keys + variant
+                                       names only, all providers,
+                                       default sort (release_date desc)
+
+REQUIREMENTS
+  opencode CLI on PATH       (source of the model catalog)
+  python3                    (JSON parsing and reshaping)
+  jq                         (slim companion; skipped with a warning if missing)
