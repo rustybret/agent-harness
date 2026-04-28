@@ -1,0 +1,4 @@
+.claude/
+models+variants.json
+models-slim.json
+models-super-slim.json
