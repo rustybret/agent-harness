@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test"
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "fs"
-import { tmpdir } from "os"
-import { join } from "path"
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
 
 import { inferExtensionFromDirectory } from "./infer-extension"
 
@@ -43,6 +43,21 @@ describe("inferExtensionFromDirectory", () => {
       it("#then returns .py as the most common extension", () => {
         const result = inferExtensionFromDirectory(tmpDir)
         expect(result).toBe(".py")
+      })
+    })
+  })
+
+  describe("#given a directory with just files", () => {
+    beforeEach(() => {
+      writeFileSync(join(tmpDir, "deploy.just"), "deploy:\n\tjust --version\n")
+      writeFileSync(join(tmpDir, "ops.just"), "status:\n\tjust --list\n")
+    })
+
+    describe("#when inferring extension", () => {
+      it("#then returns .just as a supported extension", () => {
+        const result = inferExtensionFromDirectory(tmpDir)
+
+        expect(result).toBe(".just")
       })
     })
   })

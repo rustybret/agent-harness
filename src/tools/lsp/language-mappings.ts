@@ -157,6 +157,7 @@ export const EXT_TO_LANG: Record<string, string> = {
   ".kt": "kotlin",
   ".kts": "kotlin",
   ".prisma": "prisma",
+  ".just": "just",
   // Additional extensions not in OpenCode
   ".h": "c",
   ".hpp": "cpp",
