@@ -1,10 +1,20 @@
-import { describe, it, expect } from "bun:test"
-import { writeFileSync, unlinkSync, mkdirSync, rmSync } from "fs"
-import { join } from "path"
-import { tmpdir } from "os"
-import { loadJsonFile, getConfigPaths, getMergedServers } from "./server-config-loader"
+import { describe, expect, it } from "bun:test"
+import { mkdirSync, rmSync, unlinkSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import { getMergedServers, loadJsonFile } from "./server-config-loader"
 
 describe("loadJsonFile", () => {
+  it("includes just-lsp as the built-in server for .just files", () => {
+    const servers = getMergedServers()
+
+    const server = servers.find((s) => s.id === "just")
+
+    expect(server?.command).toEqual(["just-lsp"])
+    expect(server?.extensions).toContain(".just")
+    expect(server?.source).toBe("opencode")
+  })
+
   it("parses JSONC config files with comments correctly", () => {
     // given
     const testData = {
