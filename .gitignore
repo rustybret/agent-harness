@@ -20,6 +20,7 @@ packages/*/bin/*.map
 # IDE
 .idea/
 .vscode/
+agent-harness.code-workspace
 *.swp
 *.swo
 
