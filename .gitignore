@@ -50,4 +50,6 @@ oauth-success.html
 .debugging
 .debug-journal*.md
 session-ses_*.md
-plans/
+
+#Utils output
+utils/temp/
