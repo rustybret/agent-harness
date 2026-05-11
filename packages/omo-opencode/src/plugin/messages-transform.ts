@@ -247,6 +247,15 @@ export function createMessagesTransformHandler(args: {
       )
     }
 
+    await runMessagesTransformHookSafely(
+      "providerQuirksNormalizer",
+      args.hooks.providerQuirksNormalizer?.[
+        "experimental.chat.messages.transform"
+      ],
+      input,
+      output,
+    )
+
     ensureUserTurnAfterAssistantTail(output)
   }
 }
