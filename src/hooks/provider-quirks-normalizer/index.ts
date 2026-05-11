@@ -1,0 +1,1 @@
+export { createProviderQuirksNormalizerHook } from "./hook"
