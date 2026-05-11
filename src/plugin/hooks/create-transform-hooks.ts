@@ -5,6 +5,7 @@ import type { RalphLoopHook } from "../../hooks/ralph-loop"
 import {
   createClaudeCodeHooksHook,
   createKeywordDetectorHook,
+  createProviderQuirksNormalizerHook,
   createTeamMailboxInjector,
   createTeamModeStatusInjector,
   createThinkingBlockValidatorHook,
@@ -24,6 +25,7 @@ export type TransformHooks = {
   teamMailboxInjector: ReturnType<typeof createTeamMailboxInjector> | null
   thinkingBlockValidator: ReturnType<typeof createThinkingBlockValidatorHook> | null
   toolPairValidator: ReturnType<typeof createToolPairValidatorHook> | null
+  providerQuirksNormalizer: ReturnType<typeof createProviderQuirksNormalizerHook> | null
 }
 
 export function createTransformHooks(args: {
@@ -103,6 +105,14 @@ export function createTransformHooks(args: {
       )
     : null
 
+  const providerQuirksNormalizer = isHookEnabled("provider-quirks-normalizer")
+    ? safeCreateHook(
+        "provider-quirks-normalizer",
+        () => createProviderQuirksNormalizerHook(),
+        { enabled: safeHookEnabled },
+      )
+    : null
+
   return {
     claudeCodeHooks,
     keywordDetector,
@@ -111,5 +121,6 @@ export function createTransformHooks(args: {
     teamMailboxInjector,
     thinkingBlockValidator,
     toolPairValidator,
+    providerQuirksNormalizer,
   }
 }
