@@ -38,7 +38,14 @@ export function createProviderQuirksNormalizerHook(): MessagesTransformHook {
       if (providerID === "cerebras") {
         for (let i = 0; i < messages.length; i++) {
           const msg = messages[i]
-          if (msg.info.role !== "assistant" || !msg.parts) continue
+          if (msg.info.role !== "assistant") continue
+          
+          // Strip reasoning_content if it exists on the info object
+          if ("reasoning_content" in msg.info) {
+            delete (msg.info as any).reasoning_content
+          }
+
+          if (!msg.parts) continue
 
           // Filter out reasoning parts
           msg.parts = msg.parts.filter((part) => part.type !== "reasoning")
