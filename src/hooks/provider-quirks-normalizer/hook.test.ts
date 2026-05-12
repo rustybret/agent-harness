@@ -14,7 +14,11 @@ type TestPart = {
 }
 
 type TestMessage = {
-  info: { role: "assistant" | "user"; model?: { providerID: string } }
+  info: { 
+    role: "assistant" | "user"; 
+    model?: { providerID: string }; 
+    [key: string]: any // Allow additional properties like reasoning_content
+  }
   parts: TestPart[]
 }
 
@@ -242,6 +246,32 @@ describe("createProviderQuirksNormalizerHook", () => {
     await runTransform(messages)
 
     //#then
+    expect(messages[1]?.parts).toEqual([{ type: "text", text: "response" }])
+  })
+
+  it("Cerebras strips reasoning_content from info object", async () => {
+    //#given
+    const messages = [
+      {
+        info: { role: "user", model: { providerID: "cerebras" } },
+        parts: [{ type: "text", text: "hello" }],
+      },
+      {
+        info: { 
+          role: "assistant",
+          reasoning_content: "This is the reasoning content that should be stripped"
+        },
+        parts: [
+          { type: "text", text: "response" },
+        ],
+      },
+    ] satisfies TestMessage[]
+
+    //#when
+    await runTransform(messages)
+
+    //#then
+    expect("reasoning_content" in messages[1]?.info).toBe(false)
     expect(messages[1]?.parts).toEqual([{ type: "text", text: "response" }])
   })
 })
