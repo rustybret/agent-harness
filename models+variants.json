@@ -20,12 +20,8 @@
     {
       "key": "anthropic/claude-3-7-sonnet-20250219",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
@@ -43,244 +39,142 @@
     {
       "key": "anthropic/claude-haiku-4-5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "anthropic/claude-haiku-4-5-20251001",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "anthropic/claude-opus-4-0",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "anthropic/claude-opus-4-1",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "anthropic/claude-opus-4-1-20250805",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "anthropic/claude-opus-4-20250514",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "anthropic/claude-opus-4-5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "anthropic/claude-opus-4-5-20251101",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "anthropic/claude-opus-4-6",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "max",
+        "medium"
       ]
     },
     {
       "key": "anthropic/claude-opus-4-6-fast",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "max",
+        "medium"
       ]
     },
     {
       "key": "anthropic/claude-opus-4-7",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "max",
+        "medium",
+        "xhigh"
       ]
     },
     {
       "key": "anthropic/claude-opus-4-7-fast",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "max",
+        "medium",
+        "xhigh"
       ]
     },
     {
       "key": "anthropic/claude-sonnet-4-0",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "anthropic/claude-sonnet-4-20250514",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "anthropic/claude-sonnet-4-5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "anthropic/claude-sonnet-4-5-20250929",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "anthropic/claude-sonnet-4-6",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "max",
+        "medium"
       ]
     },
     {
       "key": "cerebras/gpt-oss-120b",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -306,35 +200,19 @@
     {
       "key": "deepseek/deepseek-v4-flash",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "max",
+        "medium"
       ]
     },
     {
       "key": "deepseek/deepseek-v4-pro",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "max",
+        "medium"
       ]
     },
     {
@@ -360,100 +238,64 @@
     {
       "key": "google/gemini-2.5-flash",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "google/gemini-2.5-flash-image",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "google/gemini-2.5-flash-image-preview",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "google/gemini-2.5-flash-lite",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "google/gemini-2.5-flash-lite-preview-06-17",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "google/gemini-2.5-flash-lite-preview-09-2025",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "google/gemini-2.5-flash-preview-04-17",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "google/gemini-2.5-flash-preview-05-20",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "google/gemini-2.5-flash-preview-09-2025",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
@@ -463,34 +305,22 @@
     {
       "key": "google/gemini-2.5-pro",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "google/gemini-2.5-pro-preview-05-06",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "google/gemini-2.5-pro-preview-06-05",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
@@ -500,105 +330,59 @@
     {
       "key": "google/gemini-3-flash-preview",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal"
       ]
     },
     {
       "key": "google/gemini-3-pro-preview",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "google/gemini-3.1-flash-image-preview",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "minimal"
-        }
+        "high",
+        "minimal"
       ]
     },
     {
       "key": "google/gemini-3.1-flash-lite",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal"
       ]
     },
     {
       "key": "google/gemini-3.1-flash-lite-preview",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal"
       ]
     },
     {
       "key": "google/gemini-3.1-pro-preview",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "google/gemini-3.1-pro-preview-customtools",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -608,45 +392,29 @@
     {
       "key": "google/gemini-flash-latest",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        }
+        "high",
+        "low"
       ]
     },
     {
       "key": "google/gemini-flash-lite-latest",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        }
+        "high",
+        "low"
       ]
     },
     {
       "key": "google/gemini-live-2.5-flash",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "google/gemini-live-2.5-flash-preview-native-audio",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
@@ -672,23 +440,15 @@
     {
       "key": "google/gemma-4-26b-a4b-it",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        }
+        "high",
+        "low"
       ]
     },
     {
       "key": "google/gemma-4-31b-it",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        }
+        "high",
+        "low"
       ]
     },
     {
@@ -706,35 +466,19 @@
     {
       "key": "groq/groq/compound",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        }
+        "high",
+        "low",
+        "medium",
+        "none"
       ]
     },
     {
       "key": "groq/groq/compound-mini",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        }
+        "high",
+        "low",
+        "medium",
+        "none"
       ]
     },
     {
@@ -764,52 +508,28 @@
     {
       "key": "groq/openai/gpt-oss-120b",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        }
+        "high",
+        "low",
+        "medium",
+        "none"
       ]
     },
     {
       "key": "groq/openai/gpt-oss-20b",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        }
+        "high",
+        "low",
+        "medium",
+        "none"
       ]
     },
     {
       "key": "groq/openai/gpt-oss-safeguard-20b",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        }
+        "high",
+        "low",
+        "medium",
+        "none"
       ]
     },
     {
@@ -827,15 +547,9 @@
     {
       "key": "lmstudio/openai/gpt-oss-20b",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -913,35 +627,19 @@
     {
       "key": "nvidia/deepseek-ai/deepseek-v4-flash",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "max",
+        "medium"
       ]
     },
     {
       "key": "nvidia/deepseek-ai/deepseek-v4-pro",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "max",
+        "medium"
       ]
     },
     {
@@ -951,15 +649,9 @@
     {
       "key": "nvidia/google/gemma-3-27b-it",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -973,15 +665,9 @@
     {
       "key": "nvidia/google/gemma-4-31b-it",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -1035,15 +721,9 @@
     {
       "key": "nvidia/microsoft/phi-4-mini-instruct",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -1061,15 +741,9 @@
     {
       "key": "nvidia/mistralai/devstral-2-123b-instruct-2512",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -1155,29 +829,17 @@
     {
       "key": "nvidia/nvidia/llama-3_3-nemotron-super-49b-v1",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "nvidia/nvidia/llama-3_3-nemotron-super-49b-v1_5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -1199,57 +861,33 @@
     {
       "key": "nvidia/nvidia/nemotron-3-nano-30b-a3b",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "nvidia/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "nvidia/nvidia/nemotron-3-super-120b-a12b",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "nvidia/nvidia/nemotron-content-safety-reasoning-4b",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -1271,15 +909,9 @@
     {
       "key": "nvidia/nvidia/nvidia-nemotron-nano-9b-v2",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -1317,29 +949,17 @@
     {
       "key": "nvidia/openai/gpt-oss-120b",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "nvidia/openai/gpt-oss-20b",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -1385,15 +1005,9 @@
     {
       "key": "nvidia/stepfun-ai/step-3.5-flash",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -1411,35 +1025,19 @@
     {
       "key": "opencode-go/deepseek-v4-flash",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "max",
+        "medium"
       ]
     },
     {
       "key": "opencode-go/deepseek-v4-pro",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "max",
+        "medium"
       ]
     },
     {
@@ -1461,29 +1059,17 @@
     {
       "key": "opencode-go/mimo-v2.5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "opencode-go/mimo-v2.5-pro",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -1509,161 +1095,91 @@
     {
       "key": "opencode/claude-haiku-4-5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "opencode/claude-opus-4-1",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "opencode/claude-opus-4-5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "opencode/claude-opus-4-6",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "max",
+        "medium"
       ]
     },
     {
       "key": "opencode/claude-opus-4-7",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "max",
+        "medium",
+        "xhigh"
       ]
     },
     {
       "key": "opencode/claude-sonnet-4",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "opencode/claude-sonnet-4-5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "max"
-        }
+        "high",
+        "max"
       ]
     },
     {
       "key": "opencode/claude-sonnet-4-6",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "max",
+        "medium"
       ]
     },
     {
       "key": "opencode/deepseek-v4-flash-free",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "max"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "max",
+        "medium"
       ]
     },
     {
       "key": "opencode/gemini-3-flash",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal"
       ]
     },
     {
       "key": "opencode/gemini-3.1-pro",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -1677,296 +1193,156 @@
     {
       "key": "opencode/gpt-5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal"
       ]
     },
     {
       "key": "opencode/gpt-5-codex",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "opencode/gpt-5-nano",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal"
       ]
     },
     {
       "key": "opencode/gpt-5.1",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        }
+        "high",
+        "low",
+        "medium",
+        "none"
       ]
     },
     {
       "key": "opencode/gpt-5.1-codex",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "opencode/gpt-5.1-codex-max",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "xhigh"
       ]
     },
     {
       "key": "opencode/gpt-5.1-codex-mini",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "opencode/gpt-5.2",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "opencode/gpt-5.2-codex",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "xhigh"
       ]
     },
     {
       "key": "opencode/gpt-5.3-codex",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "opencode/gpt-5.3-codex-spark",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "opencode/gpt-5.4",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "opencode/gpt-5.4-mini",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "opencode/gpt-5.4-nano",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "opencode/gpt-5.4-pro",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "medium",
+        "xhigh"
       ]
     },
     {
       "key": "opencode/gpt-5.5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "opencode/gpt-5.5-pro",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "medium",
+        "xhigh"
       ]
     },
     {
@@ -1992,15 +1368,9 @@
     {
       "key": "opencode/nemotron-3-super-free",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -2014,15 +1384,9 @@
     {
       "key": "opencode/ring-2.6-1t-free",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
@@ -2032,231 +1396,111 @@
     {
       "key": "openrouter/anthropic/claude-3.7-sonnet",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/anthropic/claude-haiku-4.5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/anthropic/claude-opus-4",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/anthropic/claude-opus-4.1",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/anthropic/claude-opus-4.5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/anthropic/claude-opus-4.6",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/anthropic/claude-opus-4.7",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/anthropic/claude-sonnet-4",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/anthropic/claude-sonnet-4.5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/anthropic/claude-sonnet-4.6",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
@@ -2366,139 +1610,67 @@
     {
       "key": "openrouter/google/gemini-3-flash-preview",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/google/gemini-3-pro-preview",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/google/gemini-3.1-flash-image-preview",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/google/gemini-3.1-flash-lite-preview",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/google/gemini-3.1-pro-preview",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/google/gemini-3.1-pro-preview-customtools",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
@@ -2732,304 +1904,162 @@
     {
       "key": "openrouter/openai/gpt-5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5-codex",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5-image",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5-mini",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5-nano",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5-pro",
       "variants": [
-        {
-          "name": "high"
-        }
+        "high"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5.1",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        }
+        "high",
+        "low",
+        "medium",
+        "none"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5.1-chat",
       "variants": [
-        {
-          "name": "medium"
-        }
+        "medium"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5.1-codex",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5.1-codex-max",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5.1-codex-mini",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5.2",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5.2-chat",
       "variants": [
-        {
-          "name": "medium"
-        }
+        "medium"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5.2-codex",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5.2-pro",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "medium",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5.3-codex",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5.4",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5.4-mini",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
       ]
     },
     {
@@ -3039,187 +2069,93 @@
     {
       "key": "openrouter/openai/gpt-5.4-pro",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "medium",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5.5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-5.5-pro",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "medium",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-oss-120b",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-oss-120b:exacto",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-oss-120b:free",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-oss-20b",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-oss-20b:free",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/openai/gpt-oss-safeguard-20b",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        },
-        {
-          "name": "minimal"
-        },
-        {
-          "name": "none"
-        },
-        {
-          "name": "xhigh"
-        }
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
       ]
     },
     {
@@ -3365,23 +2301,15 @@
     {
       "key": "openrouter/x-ai/grok-3-mini",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        }
+        "high",
+        "low"
       ]
     },
     {
       "key": "openrouter/x-ai/grok-3-mini-beta",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        }
+        "high",
+        "low"
       ]
     },
     {
@@ -3479,71 +2407,41 @@
     {
       "key": "xiaomi/mimo-v2-flash",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "xiaomi/mimo-v2-omni",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "xiaomi/mimo-v2-pro",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "xiaomi/mimo-v2.5",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     },
     {
       "key": "xiaomi/mimo-v2.5-pro",
       "variants": [
-        {
-          "name": "high"
-        },
-        {
-          "name": "low"
-        },
-        {
-          "name": "medium"
-        }
+        "high",
+        "low",
+        "medium"
       ]
     }
   ]
