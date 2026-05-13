@@ -11,7 +11,7 @@ set -euo pipefail
 OUTPUT_DIR="${1:-.}"
 DATE_ID=$(date +"%Y%m%d-%H%M%S")
 RAW_FILE="${OUTPUT_DIR}/models-verbose-${DATE_ID}.raw.txt"
-OUT_FILE="${OUTPUT_DIR}/models+variants.json"
+OUT_FILE="${OUTPUT_DIR}/models-verbose.json"
 SCHEMA="https://json-schema.org/draft-04/schema#"
 
 # ---------------------------------------------------------------------------
@@ -88,12 +88,12 @@ if python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$OUT_FILE" 2>/dev
   echo "✓  Valid JSON written to: $OUT_FILE"
 
 # Write slim versions (overwrite if they exist)
-SUPER_SLIM="${OUTPUT_DIR}/models-super-slim.json"
-SLIM="${OUTPUT_DIR}/models-slim.json"
-# Create super-slim version: keep only model keys and variant names, remove any data fields
-jq '{"$schema": ."$schema", models: (.models | to_entries | map({key: .key, variants: (.value.variants | keys | map({name: .}) )}) )}' "$OUT_FILE" > "$SUPER_SLIM"
-# Create slim version: only list model keys
-jq '{"$schema": ."$schema", models: (.models | to_entries | map({key: .key}) )}' "$OUT_FILE" > "$SLIM"
+MODELS_PLUS_VARIANTS="${OUTPUT_DIR}/models+variants.json"
+MODELS="${OUTPUT_DIR}/models.json"
+# Create models+variants.json: keep only model keys and variant names, remove any data fields
+jq '{"$schema": ."$schema", models: (.models | to_entries | map({key: .key, variants: (.value.variants | keys | map({name: .}) )}) )}' "$OUT_FILE" > "$MODELS_PLUS_VARIANTS"
+# Create models.json: only list model keys
+jq '{"$schema": ."$schema", models: (.models | to_entries | map({key: .key}) )}' "$OUT_FILE" > "$MODELS"
 
 else
   echo "✗  Output file failed JSON validation — check $RAW_FILE for issues." >&2
