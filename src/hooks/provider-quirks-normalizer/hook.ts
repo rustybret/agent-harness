@@ -21,14 +21,18 @@ export function createProviderQuirksNormalizerHook(): MessagesTransformHook {
         return
       }
 
-      // Find the last user message to get the providerID
+      // providerID lives on assistant messages (flat `providerID` in OpenCode API,
+      // nested `model.providerID` in some SDK shapes). User messages never carry it.
       let providerID: string | undefined
       for (let i = messages.length - 1; i >= 0; i--) {
-        const msg = messages[i]
-        if (msg.info.role === "user") {
-          providerID = msg.info.model?.providerID
-          break
+        const info = messages[i].info as {
+          role: string
+          model?: { providerID?: string }
+          providerID?: string
         }
+        if (info.role !== "assistant") continue
+        providerID = info.model?.providerID ?? info.providerID
+        if (providerID) break
       }
 
       if (!providerID) {
