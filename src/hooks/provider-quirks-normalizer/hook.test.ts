@@ -14,10 +14,11 @@ type TestPart = {
 }
 
 type TestMessage = {
-  info: { 
-    role: "assistant" | "user"; 
-    model?: { providerID: string }; 
-    [key: string]: any // Allow additional properties like reasoning_content
+  info: {
+    role: "assistant" | "user"
+    model?: { providerID: string }
+    providerID?: string
+    [key: string]: any
   }
   parts: TestPart[]
 }
@@ -34,15 +35,15 @@ async function runTransform(messages: TestMessage[]): Promise<void> {
 }
 
 describe("createProviderQuirksNormalizerHook", () => {
-  it("Cerebras strips reasoning parts", async () => {
+  it("Cerebras strips reasoning parts (nested model.providerID)", async () => {
     //#given
     const messages = [
       {
-        info: { role: "user", model: { providerID: "cerebras" } },
+        info: { role: "user" },
         parts: [{ type: "text", text: "hello" }],
       },
       {
-        info: { role: "assistant" },
+        info: { role: "assistant", model: { providerID: "cerebras" } },
         parts: [
           { type: "reasoning", text: "thinking" },
           { type: "text", text: "response" },
@@ -57,15 +58,73 @@ describe("createProviderQuirksNormalizerHook", () => {
     expect(messages[1]?.parts).toEqual([{ type: "text", text: "response" }])
   })
 
+  it("Cerebras strips reasoning parts (flat providerID — OpenCode API shape)", async () => {
+    //#given
+    const messages = [
+      {
+        info: { role: "user" },
+        parts: [{ type: "text", text: "hello" }],
+      },
+      {
+        info: { role: "assistant", providerID: "cerebras" },
+        parts: [
+          { type: "reasoning", text: "thinking" },
+          { type: "text", text: "response" },
+        ],
+      },
+    ] satisfies TestMessage[]
+
+    //#when
+    await runTransform(messages)
+
+    //#then
+    expect(messages[1]?.parts).toEqual([{ type: "text", text: "response" }])
+  })
+
+  it("Cerebras strips reasoning across the full history (not just the latest)", async () => {
+    //#given
+    const messages = [
+      {
+        info: { role: "user" },
+        parts: [{ type: "text", text: "hi" }],
+      },
+      {
+        info: { role: "assistant", providerID: "cerebras" },
+        parts: [
+          { type: "reasoning", text: "old thinking" },
+          { type: "text", text: "old response" },
+        ],
+      },
+      {
+        info: { role: "user" },
+        parts: [{ type: "text", text: "more" }],
+      },
+      {
+        info: { role: "assistant", providerID: "cerebras" },
+        parts: [
+          { type: "reasoning", text: "newer thinking" },
+          { type: "text", text: "newer response" },
+        ],
+      },
+    ] satisfies TestMessage[]
+
+    //#when
+    await runTransform(messages)
+
+    //#then
+    expect(messages[1]?.parts).toEqual([{ type: "text", text: "old response" }])
+    expect(messages[3]?.parts).toEqual([{ type: "text", text: "newer response" }])
+  })
+
   it("Cerebras injects text when all parts stripped", async () => {
     //#given
     const messages = [
       {
-        info: { role: "user", model: { providerID: "cerebras" } },
+        info: { role: "user" },
         parts: [{ type: "text", text: "hello" }],
       },
       {
-        info: { role: "assistant" },
+        info: { role: "assistant", providerID: "cerebras" },
         parts: [{ type: "reasoning", text: "thinking" }],
       },
     ] satisfies TestMessage[]
@@ -83,11 +142,11 @@ describe("createProviderQuirksNormalizerHook", () => {
     //#given
     const messages = [
       {
-        info: { role: "user", model: { providerID: "groq" } },
+        info: { role: "user" },
         parts: [{ type: "text", text: "hello" }],
       },
       {
-        info: { role: "assistant" },
+        info: { role: "assistant", providerID: "groq" },
         parts: [{ type: "tool_use" }],
       },
     ] satisfies TestMessage[]
@@ -106,11 +165,11 @@ describe("createProviderQuirksNormalizerHook", () => {
     //#given
     const messages = [
       {
-        info: { role: "user", model: { providerID: "moonshot" } },
+        info: { role: "user" },
         parts: [{ type: "text", text: "hello" }],
       },
       {
-        info: { role: "assistant" },
+        info: { role: "assistant", providerID: "moonshot" },
         parts: [{ type: "tool_use" }],
       },
     ] satisfies TestMessage[]
@@ -129,11 +188,11 @@ describe("createProviderQuirksNormalizerHook", () => {
     //#given
     const messages = [
       {
-        info: { role: "user", model: { providerID: "groq" } },
+        info: { role: "user" },
         parts: [{ type: "text", text: "hello" }],
       },
       {
-        info: { role: "assistant" },
+        info: { role: "assistant", providerID: "groq" },
         parts: [
           { type: "reasoning", text: "thinking" },
           { type: "tool_use" },
@@ -155,11 +214,11 @@ describe("createProviderQuirksNormalizerHook", () => {
     //#given
     const messages = [
       {
-        info: { role: "user", model: { providerID: "anthropic" } },
+        info: { role: "user" },
         parts: [{ type: "text", text: "hello" }],
       },
       {
-        info: { role: "assistant" },
+        info: { role: "assistant", providerID: "anthropic" },
         parts: [
           { type: "reasoning", text: "thinking" },
           { type: "tool_use" },
@@ -181,11 +240,11 @@ describe("createProviderQuirksNormalizerHook", () => {
     //#given
     const messages = [
       {
-        info: { role: "user", model: { providerID: "openai" } },
+        info: { role: "user" },
         parts: [{ type: "text", text: "hello" }],
       },
       {
-        info: { role: "assistant" },
+        info: { role: "assistant", providerID: "openai" },
         parts: [
           { type: "reasoning", text: "thinking" },
           { type: "tool_use" },
@@ -233,11 +292,11 @@ describe("createProviderQuirksNormalizerHook", () => {
     //#given
     const messages = [
       {
-        info: { role: "user", model: { providerID: "groq" } },
+        info: { role: "user" },
         parts: [{ type: "text", text: "hello" }],
       },
       {
-        info: { role: "assistant" },
+        info: { role: "assistant", providerID: "groq" },
         parts: [{ type: "text", text: "response" }],
       },
     ] satisfies TestMessage[]
@@ -253,17 +312,16 @@ describe("createProviderQuirksNormalizerHook", () => {
     //#given
     const messages = [
       {
-        info: { role: "user", model: { providerID: "cerebras" } },
+        info: { role: "user" },
         parts: [{ type: "text", text: "hello" }],
       },
       {
-        info: { 
+        info: {
           role: "assistant",
-          reasoning_content: "This is the reasoning content that should be stripped"
+          providerID: "cerebras",
+          reasoning_content: "This is the reasoning content that should be stripped",
         },
-        parts: [
-          { type: "text", text: "response" },
-        ],
+        parts: [{ type: "text", text: "response" }],
       },
     ] satisfies TestMessage[]
 
