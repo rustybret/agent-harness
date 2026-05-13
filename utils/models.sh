@@ -91,7 +91,7 @@ if python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$OUT_FILE" 2>/dev
 MODELS_PLUS_VARIANTS="${OUTPUT_DIR}/models+variants.json"
 MODELS="${OUTPUT_DIR}/models.json"
 # Create models+variants.json: keep only model keys and variant names, remove any data fields
-jq '{"$schema": ."$schema", models: (.models | to_entries | map({key: .key, variants: (.value.variants | keys | map({name: .}) )}) )}' "$OUT_FILE" > "$MODELS_PLUS_VARIANTS"
+jq '{"$schema": ."$schema", models: (.models | to_entries | map({key: .key, variants: (.value.variants | keys)}))}' "$OUT_FILE" > "$MODELS_PLUS_VARIANTS"
 # Create models.json: only list model keys
 jq '{"$schema": ."$schema", models: (.models | to_entries | map({key: .key}) )}' "$OUT_FILE" > "$MODELS"
 
