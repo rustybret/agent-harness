@@ -10,7 +10,9 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 OUTPUT_DIR="${1:-.}"
 DATE_ID=$(date +"%Y%m%d-%H%M%S")
-RAW_FILE="${OUTPUT_DIR}/models-verbose-${DATE_ID}.raw.txt"
+TEMP_DIR="$(dirname "$0")/temp"
+mkdir -p "$TEMP_DIR"
+RAW_FILE="${TEMP_DIR}/models-verbose-${DATE_ID}.raw.txt"
 OUT_FILE="${OUTPUT_DIR}/models-verbose.json"
 SCHEMA="https://json-schema.org/draft-04/schema#"
 
