@@ -1,8 +1,8 @@
 import { readFileSync } from "fs"
-import { extname, resolve } from "path"
+import { resolve } from "path"
 import { pathToFileURL } from "node:url"
 
-import { getLanguageId } from "./config"
+import { getLanguageIdForPath } from "./config"
 import { LSPClientConnection } from "./lsp-client-connection"
 import type { Diagnostic } from "./types"
 
@@ -18,8 +18,7 @@ export class LSPClient extends LSPClientConnection {
     const text = readFileSync(absPath, "utf-8")
 
     if (!this.openedFiles.has(absPath)) {
-      const ext = extname(absPath)
-      const languageId = getLanguageId(ext)
+      const languageId = getLanguageIdForPath(absPath)
       const version = 1
 
       this.sendNotification("textDocument/didOpen", {
