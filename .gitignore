@@ -62,4 +62,4 @@ plans/
 
 # Utils output
 utils/temp/
-models-verbose.json
+utils/models-verbose.json
