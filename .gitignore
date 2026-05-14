@@ -53,4 +53,4 @@ session-ses_*.md
 
 #Utils output
 utils/temp/
-models-verbose.json
+utils/models-verbose.json
