@@ -1024,6 +1024,104 @@
       "variants": []
     },
     {
+      "key": "openai/gpt-5.2",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.3-codex",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.3-codex-spark",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.4",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.4-fast",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.4-mini",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.4-mini-fast",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.5",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.5-fast",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.5-pro",
+      "variants": [
+        "high",
+        "medium",
+        "xhigh"
+      ]
+    },
+    {
       "key": "opencode-go/deepseek-v4-flash",
       "variants": [
         "high",
@@ -1380,6 +1478,10 @@
     },
     {
       "key": "opencode/qwen3.6-plus",
+      "variants": []
+    },
+    {
+      "key": "opencode/qwen3.6-plus-free",
       "variants": []
     },
     {

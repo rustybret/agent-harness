@@ -573,6 +573,36 @@
       "key": "nvidia/z-ai/glm4.7"
     },
     {
+      "key": "openai/gpt-5.2"
+    },
+    {
+      "key": "openai/gpt-5.3-codex"
+    },
+    {
+      "key": "openai/gpt-5.3-codex-spark"
+    },
+    {
+      "key": "openai/gpt-5.4"
+    },
+    {
+      "key": "openai/gpt-5.4-fast"
+    },
+    {
+      "key": "openai/gpt-5.4-mini"
+    },
+    {
+      "key": "openai/gpt-5.4-mini-fast"
+    },
+    {
+      "key": "openai/gpt-5.5"
+    },
+    {
+      "key": "openai/gpt-5.5-fast"
+    },
+    {
+      "key": "openai/gpt-5.5-pro"
+    },
+    {
       "key": "opencode-go/deepseek-v4-flash"
     },
     {
@@ -724,6 +754,9 @@
     },
     {
       "key": "opencode/qwen3.6-plus"
+    },
+    {
+      "key": "opencode/qwen3.6-plus-free"
     },
     {
       "key": "openrouter/anthropic/claude-3.5-haiku"
