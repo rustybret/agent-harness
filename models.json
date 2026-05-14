@@ -1,5 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft-04/schema#",
+  "version": "2025.05.13",
   "models": [
     {
       "key": "anthropic/claude-3-5-haiku-20241022"
@@ -723,9 +724,6 @@
     },
     {
       "key": "opencode/qwen3.6-plus"
-    },
-    {
-      "key": "opencode/ring-2.6-1t-free"
     },
     {
       "key": "openrouter/anthropic/claude-3.5-haiku"
