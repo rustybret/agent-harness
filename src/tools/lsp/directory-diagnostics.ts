@@ -1,13 +1,15 @@
 import { existsSync, lstatSync, readdirSync, type Stats } from "fs"
 import { extname, join, resolve } from "path"
 
-import { findServerForExtension } from "./config"
+import { findServerForPath } from "./config"
 import { findWorkspaceRoot, formatServerLookupError } from "./lsp-client-wrapper"
 import { filterDiagnosticsBySeverity, formatDiagnostic } from "./lsp-formatters"
 import { LSPClient } from "./lsp-client"
 import { lspManager } from "./lsp-server"
 import { DEFAULT_MAX_DIAGNOSTICS, DEFAULT_MAX_DIRECTORY_FILES } from "./constants"
 import type { Diagnostic } from "./types"
+
+type ServerLookupServer = Extract<ReturnType<typeof findServerForPath>, { status: "found" }>["server"]
 
 const SKIP_DIRECTORIES = new Set(["node_modules", ".git", "dist", "build", ".next", "out"])
 
@@ -50,7 +52,7 @@ function collectFilesWithExtension(dir: string, extension: string, maxFiles: num
           walk(fullPath)
         }
       } else if (stat.isFile()) {
-        if (extname(fullPath) === extension) {
+        if (extname(fullPath) === extension || fullPath.endsWith(extension)) {
           files.push(fullPath)
         }
       }
@@ -79,12 +81,6 @@ export async function aggregateDiagnosticsForDirectory(
     throw new Error(`Directory does not exist: ${absDir}`)
   }
 
-  const serverResult = findServerForExtension(extension)
-  if (serverResult.status !== "found") {
-    throw new Error(formatServerLookupError(serverResult))
-  }
-
-  const server = serverResult.server
   const allFiles = collectFilesWithExtension(absDir, extension, maxFiles + 1)
   const wasCapped = allFiles.length > maxFiles
   const filesToProcess = allFiles.slice(0, maxFiles)
@@ -103,29 +99,52 @@ export async function aggregateDiagnosticsForDirectory(
   const allDiagnostics: FileDiagnostic[] = []
   const fileErrors: { file: string; error: string }[] = []
 
-  let client: LSPClient
-  try {
-    client = await lspManager.getClient(root, server)
+  const filesByServer = new Map<string, { server: ServerLookupServer; files: string[] }>()
 
-    for (const file of filesToProcess) {
-      try {
-        const result = await client.diagnostics(file)
-        const filtered = filterDiagnosticsBySeverity(result.items, severity)
-        allDiagnostics.push(
-          ...filtered.map((diagnostic) => ({
-            filePath: file,
-            diagnostic,
-          }))
-        )
-      } catch (e) {
-        fileErrors.push({
-          file,
-          error: e instanceof Error ? e.message : String(e),
-        })
+  for (const file of filesToProcess) {
+    const serverResult = findServerForPath(file)
+    if (serverResult.status !== "found") {
+      fileErrors.push({
+        file,
+        error: formatServerLookupError(serverResult),
+      })
+      continue
+    }
+
+    const serverId = serverResult.server.id
+    if (!filesByServer.has(serverId)) {
+      filesByServer.set(serverId, { server: serverResult.server, files: [] })
+    }
+    filesByServer.get(serverId)?.files.push(file)
+  }
+
+  for (const { server, files } of filesByServer.values()) {
+    let client: LSPClient | undefined
+    try {
+      client = await lspManager.getClient(root, server)
+
+      for (const file of files) {
+        try {
+          const result = await client.diagnostics(file)
+          const filtered = filterDiagnosticsBySeverity(result.items, severity)
+          allDiagnostics.push(
+            ...filtered.map((diagnostic) => ({
+              filePath: file,
+              diagnostic,
+            }))
+          )
+        } catch (e) {
+          fileErrors.push({
+            file,
+            error: e instanceof Error ? e.message : String(e),
+          })
+        }
+      }
+    } finally {
+      if (client) {
+        lspManager.releaseClient(root, server.id)
       }
     }
-  } finally {
-    lspManager.releaseClient(root, server.id)
   }
 
   const displayDiagnostics = allDiagnostics.slice(0, DEFAULT_MAX_DIAGNOSTICS)
