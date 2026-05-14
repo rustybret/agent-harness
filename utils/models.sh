@@ -8,9 +8,9 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
-OUTPUT_DIR="${1:-.}"
+OUTPUT_DIR="${1:-$(dirname "$0")}"
 DATE_ID=$(date +"%Y%m%d-%H%M%S")
- TEMP_DIR="$(dirname "$0")/temp"
+TEMP_DIR="$(dirname "$0")/temp"
 mkdir -p "$TEMP_DIR"
 RAW_FILE="${TEMP_DIR}/models-verbose-${DATE_ID}.raw.txt"
 OUT_FILE="${OUTPUT_DIR}/models-verbose.json"
@@ -107,7 +107,7 @@ print(f'  Parsed {len(sorted_models)} model(s)  ({errors} error(s)).')
 if python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$OUT_FILE" 2>/dev/null; then
   echo "✓  Valid JSON written to: $OUT_FILE"
 
-  OLD_OUT_FILE="${OUT_FILE}.bak"
+  OLD_OUT_FILE="${TEMP_DIR}/models-verbose.json.bak"
   if [[ -f "$OLD_OUT_FILE" ]]; then
     echo "→ Comparing with previous version..."
     CHANGES=$(jq -n --slurpfile a "$OLD_OUT_FILE" --slurpfile b "$OUT_FILE" '
