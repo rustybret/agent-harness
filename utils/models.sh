@@ -10,11 +10,28 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 OUTPUT_DIR="${1:-.}"
 DATE_ID=$(date +"%Y%m%d-%H%M%S")
-TEMP_DIR="$(dirname "$0")/temp"
+ TEMP_DIR="$(dirname "$0")/temp"
 mkdir -p "$TEMP_DIR"
 RAW_FILE="${TEMP_DIR}/models-verbose-${DATE_ID}.raw.txt"
 OUT_FILE="${OUTPUT_DIR}/models-verbose.json"
 SCHEMA="https://json-schema.org/draft-04/schema#"
+SCHEMA_VERSION="2025.05.13"
+KEEP_RAW_FILES=5
+
+cleanup_interrupt() {
+  echo "Interrupted. Temporary files preserved."
+  exit 130
+}
+trap cleanup_interrupt INT TERM
+
+if [[ ! -d "$OUTPUT_DIR" ]]; then
+  echo "✗  Output directory does not exist: $OUTPUT_DIR" >&2
+  exit 1
+fi
+if [[ ! -w "$OUTPUT_DIR" ]]; then
+  echo "✗  Output directory is not writable: $OUTPUT_DIR" >&2
+  exit 1
+fi
 
 # ---------------------------------------------------------------------------
 # 1. Capture raw output
@@ -41,6 +58,7 @@ import sys, json, re
 raw_path = sys.argv[1]
 out_path  = sys.argv[2]
 schema    = sys.argv[3]
+version   = sys.argv[4]
 
 with open(raw_path, 'r', encoding='utf-8') as f:
     content = f.read()
@@ -75,13 +93,13 @@ for i, m in enumerate(key_matches):
     models[key] = dict(sorted(obj.items()))
 
 sorted_models = dict(sorted(models.items()))
-output = {'\$schema': schema, 'models': sorted_models}
+output = {'\$schema': schema, 'version': version, 'models': sorted_models}
 
 with open(out_path, 'w', encoding='utf-8') as f:
     json.dump(output, f, indent=2, ensure_ascii=False)
 
 print(f'  Parsed {len(sorted_models)} model(s)  ({errors} error(s)).')
-" "$RAW_FILE" "$OUT_FILE" "$SCHEMA"
+" "$RAW_FILE" "$OUT_FILE" "$SCHEMA" "$SCHEMA_VERSION"
 
 # ---------------------------------------------------------------------------
 # 3. Validate the output is well-formed JSON
@@ -89,20 +107,37 @@ print(f'  Parsed {len(sorted_models)} model(s)  ({errors} error(s)).')
 if python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$OUT_FILE" 2>/dev/null; then
   echo "✓  Valid JSON written to: $OUT_FILE"
 
-# Write slim versions (overwrite if they exist)
-MODELS_PLUS_VARIANTS="${OUTPUT_DIR}/models+variants.json"
-MODELS="${OUTPUT_DIR}/models.json"
-# Create models+variants.json: keep only model keys and variant names, remove any data fields
-jq '{"$schema": ."$schema", models: (.models | to_entries | map({key: .key, variants: (.value.variants | keys)}))}' "$OUT_FILE" > "$MODELS_PLUS_VARIANTS"
-# Create models.json: only list model keys
-jq '{"$schema": ."$schema", models: (.models | to_entries | map({key: .key}) )}' "$OUT_FILE" > "$MODELS"
+  OLD_OUT_FILE="${OUT_FILE}.bak"
+  if [[ -f "$OLD_OUT_FILE" ]]; then
+    echo "→ Comparing with previous version..."
+    CHANGES=$(jq -n --slurpfile a "$OLD_OUT_FILE" --slurpfile b "$OUT_FILE" '
+      ($a[0].models | keys | sort) as $a_keys | ($b[0].models | keys | sort) as $b_keys |
+      {
+        added: ($b_keys - $a_keys | length),
+        removed: ($a_keys - $b_keys | length)
+      }
+    ')
+    ADDED=$(echo "$CHANGES" | jq '.added')
+    REMOVED=$(echo "$CHANGES" | jq '.removed')
+    if [[ "$ADDED" -gt 0 ]] || [[ "$REMOVED" -gt 0 ]]; then
+      echo "  Models added: $ADDED, removed: $REMOVED"
+    else
+      echo "  No model list changes detected."
+    fi
+  fi
+  cp "$OUT_FILE" "$OLD_OUT_FILE"
+
+  MODELS_PLUS_VARIANTS="${OUTPUT_DIR}/models+variants.json"
+  MODELS="${OUTPUT_DIR}/models.json"
+
+  jq "{\"\$schema\": .\"\$schema\", \"version\": \"$SCHEMA_VERSION\", models: (.models | to_entries | map({key: .key, variants: (.value.variants | keys)}))}" "$OUT_FILE" > "$MODELS_PLUS_VARIANTS"
+  jq "{\"\$schema\": .\"\$schema\", \"version\": \"$SCHEMA_VERSION\", models: (.models | to_entries | map({key: .key}) )}" "$OUT_FILE" > "$MODELS"
+
+  ls -t "$TEMP_DIR"/models-verbose-*.raw.txt 2>/dev/null | tail -n +$((KEEP_RAW_FILES + 1)) | xargs -r rm -f 2>/dev/null || true
 
 else
   echo "✗  Output file failed JSON validation — check $RAW_FILE for issues." >&2
   exit 1
 fi
-
-# Uncomment to remove the raw capture file after a successful run:
-# rm "$RAW_FILE"
 
 echo "Done."
