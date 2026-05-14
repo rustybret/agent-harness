@@ -1,3 +1,6 @@
+import { extname } from "path"
+
+import { detectAnsibleFile } from "./ansible-detection"
 import { BUILTIN_SERVERS, LSP_INSTALL_HINTS } from "./constants"
 import { getConfigPaths, getMergedServers, loadAllConfigs } from "./server-config-loader"
 import { isServerInstalled } from "./server-installation"
@@ -43,6 +46,16 @@ export function findServerForExtension(ext: string): ServerLookupResult {
     extension: ext,
     availableServers,
   }
+}
+
+export function findServerForPath(filePath: string): ServerLookupResult {
+  const ext = extname(filePath)
+
+  if ((ext === ".yml" || ext === ".yaml") && detectAnsibleFile(filePath)) {
+    return findServerForExtension(".ansible.yml")
+  }
+
+  return findServerForExtension(ext)
 }
 
 export function getAllServers(): Array<{
