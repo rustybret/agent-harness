@@ -1,9 +1,9 @@
-import { extname, resolve } from "path"
+import { resolve } from "path"
 import { fileURLToPath } from "node:url"
 import { existsSync, statSync } from "fs"
 
 import { LSPClient, lspManager } from "./client"
-import { findServerForExtension } from "./config"
+import { findServerForPath } from "./config"
 import type { ServerLookupResult } from "./types"
 import { CONFIG_BASENAME } from "../../shared/plugin-identity"
 
@@ -86,8 +86,7 @@ export async function withLspClient<T>(filePath: string, fn: (client: LSPClient)
     )
   }
 
-  const ext = extname(absPath)
-  const result = findServerForExtension(ext)
+  const result = findServerForPath(absPath)
 
   if (result.status !== "found") {
     throw new Error(formatServerLookupError(result))
