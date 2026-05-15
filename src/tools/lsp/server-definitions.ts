@@ -43,6 +43,11 @@ export const LSP_INSTALL_HINTS: Record<string, string> = {
   bash: "npm install -g bash-language-server",
   "kotlin-ls": "See https://github.com/Kotlin/kotlin-lsp",
   just: "brew install terror/tap/just-lsp",
+  "opencode-godot-lsp": "npm install -g opencode-godot-lsp",
+  "glsl_analyzer": "See https://github.com/nolanderc/glsl-analyzer",
+  "wgsl_analyzer": "cargo install wgsl_analyzer",
+  "lemminx": "See https://github.com/eclipse/lemminx",
+  "cmake-language-server": "pip install cmake-language-server",
 }
 
 // Synced with OpenCode's server.ts
@@ -92,4 +97,9 @@ export const BUILTIN_SERVERS: Record<string, Omit<LSPServerConfig, "id">> = {
   "haskell-language-server": { command: ["haskell-language-server-wrapper", "--lsp"], extensions: [".hs", ".lhs"] },
   "kotlin-ls": { command: ["kotlin-lsp"], extensions: [".kt", ".kts"] },
   just: { command: ["just-lsp"], extensions: [".just"] },
+  gdscript: { command: ["opencode-godot-lsp", "--stdio"], extensions: [".gd", ".gdscript"] },
+  glsl: { command: ["glsl_analyzer"], extensions: [".glsl", ".vert", ".frag", ".geom", ".tesc", ".tese", ".comp"] },
+  wgsl: { command: ["wgsl_analyzer"], extensions: [".wgsl"] },
+  lemminx: { command: ["lemminx"], extensions: [".xml", ".xsl"] },
+  cmake: { command: ["cmake-language-server"], extensions: [".cmake", "CMakeLists.txt"] },
 }
