@@ -1,4 +1,4 @@
-import { extname } from "path"
+import { basename, extname } from "path"
 
 import { detectAnsibleFile } from "./ansible-detection"
 import { BUILTIN_SERVERS, LSP_INSTALL_HINTS } from "./constants"
@@ -53,6 +53,11 @@ export function findServerForPath(filePath: string): ServerLookupResult {
 
   if ((ext === ".yml" || ext === ".yaml") && detectAnsibleFile(filePath)) {
     return findServerForExtension(".ansible.yml")
+  }
+
+  const base = basename(filePath)
+  if (base === "CMakeLists.txt") {
+    return findServerForExtension("CMakeLists.txt")
   }
 
   return findServerForExtension(ext)

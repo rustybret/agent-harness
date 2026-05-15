@@ -41,4 +41,40 @@ describe("findServerForPath", () => {
       expect(result.server.id).toBe("yaml-ls")
     }
   })
+
+  it("#given a CMakeLists.txt file #when resolving server #then selects cmake", () => {
+    const filePath = join(tmpDir, "CMakeLists.txt")
+    writeFileSync(filePath, "cmake_minimum_required(VERSION 3.0)\n")
+
+    const result = findServerForPath(filePath)
+
+    expect(result.status).not.toBe("not_configured")
+    if (result.status === "found" || result.status === "not_installed") {
+      expect(result.server.id).toBe("cmake")
+    }
+  })
+
+  it("#given a GDScript file #when resolving server #then selects gdscript", () => {
+    const filePath = join(tmpDir, "player.gd")
+    writeFileSync(filePath, "extends Node2D\n")
+
+    const result = findServerForPath(filePath)
+
+    expect(result.status).not.toBe("not_configured")
+    if (result.status === "found" || result.status === "not_installed") {
+      expect(result.server.id).toBe("gdscript")
+    }
+  })
+
+  it("#given an XML file #when resolving server #then selects lemminx", () => {
+    const filePath = join(tmpDir, "AndroidManifest.xml")
+    writeFileSync(filePath, "<?xml version=\"1.0\"?>\n")
+
+    const result = findServerForPath(filePath)
+
+    expect(result.status).not.toBe("not_configured")
+    if (result.status === "found" || result.status === "not_installed") {
+      expect(result.server.id).toBe("lemminx")
+    }
+  })
 })
