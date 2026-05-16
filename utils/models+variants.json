@@ -2015,7 +2015,7 @@
       "variants": []
     },
     {
-      "key": "openrouter/inclusionai/ring-2.6-1t:free",
+      "key": "openrouter/inclusionai/ring-2.6-1t",
       "variants": []
     },
     {
@@ -3068,40 +3068,6 @@
       "variants": []
     },
     {
-      "key": "openrouter/x-ai/grok-3",
-      "variants": []
-    },
-    {
-      "key": "openrouter/x-ai/grok-3-beta",
-      "variants": []
-    },
-    {
-      "key": "openrouter/x-ai/grok-3-mini",
-      "variants": [
-        "high",
-        "low"
-      ]
-    },
-    {
-      "key": "openrouter/x-ai/grok-3-mini-beta",
-      "variants": [
-        "high",
-        "low"
-      ]
-    },
-    {
-      "key": "openrouter/x-ai/grok-4",
-      "variants": []
-    },
-    {
-      "key": "openrouter/x-ai/grok-4-fast",
-      "variants": []
-    },
-    {
-      "key": "openrouter/x-ai/grok-4.1-fast",
-      "variants": []
-    },
-    {
       "key": "openrouter/x-ai/grok-4.20",
       "variants": []
     },
@@ -3111,10 +3077,6 @@
     },
     {
       "key": "openrouter/x-ai/grok-4.3",
-      "variants": []
-    },
-    {
-      "key": "openrouter/x-ai/grok-code-fast-1",
       "variants": []
     },
     {

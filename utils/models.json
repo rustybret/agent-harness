@@ -1062,7 +1062,7 @@
       "key": "openrouter/inclusionai/ling-2.6-flash"
     },
     {
-      "key": "openrouter/inclusionai/ring-2.6-1t:free"
+      "key": "openrouter/inclusionai/ring-2.6-1t"
     },
     {
       "key": "openrouter/inflection/inflection-3-pi"
@@ -1737,27 +1737,6 @@
       "key": "openrouter/writer/palmyra-x5"
     },
     {
-      "key": "openrouter/x-ai/grok-3"
-    },
-    {
-      "key": "openrouter/x-ai/grok-3-beta"
-    },
-    {
-      "key": "openrouter/x-ai/grok-3-mini"
-    },
-    {
-      "key": "openrouter/x-ai/grok-3-mini-beta"
-    },
-    {
-      "key": "openrouter/x-ai/grok-4"
-    },
-    {
-      "key": "openrouter/x-ai/grok-4-fast"
-    },
-    {
-      "key": "openrouter/x-ai/grok-4.1-fast"
-    },
-    {
       "key": "openrouter/x-ai/grok-4.20"
     },
     {
@@ -1765,9 +1744,6 @@
     },
     {
       "key": "openrouter/x-ai/grok-4.3"
-    },
-    {
-      "key": "openrouter/x-ai/grok-code-fast-1"
     },
     {
       "key": "openrouter/xiaomi/mimo-v2-flash"
