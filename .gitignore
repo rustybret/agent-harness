@@ -54,3 +54,5 @@ session-ses_*.md
 utils/temp/
 utils/models-verbose.json
 .opencode/oh-my-openagent.json
+utils/models.json
+utils/models+variants.json
