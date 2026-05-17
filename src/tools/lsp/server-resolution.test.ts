@@ -42,16 +42,14 @@ describe("findServerForPath", () => {
     }
   })
 
-  it("#given a CMakeLists.txt file #when resolving server #then selects cmake", () => {
+  it("#given a CMakeLists.txt file #when cmake server is disabled #then returns not_configured", () => {
     const filePath = join(tmpDir, "CMakeLists.txt")
     writeFileSync(filePath, "cmake_minimum_required(VERSION 3.0)\n")
 
     const result = findServerForPath(filePath)
 
-    expect(result.status).not.toBe("not_configured")
-    if (result.status === "found" || result.status === "not_installed") {
-      expect(result.server.id).toBe("cmake")
-    }
+    // cmake-language-server is disabled (Python-based, Bun segfault risk)
+    expect(result.status).toBe("not_configured")
   })
 
   it("#given a GDScript file #when resolving server #then selects gdscript", () => {

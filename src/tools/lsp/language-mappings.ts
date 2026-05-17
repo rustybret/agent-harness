@@ -179,6 +179,6 @@ export const EXT_TO_LANG: Record<string, string> = {
   ".tese": "glsl",
   ".comp": "glsl",
   ".wgsl": "wgsl",
-  ".cmake": "cmake",
-  "CMakeLists.txt": "cmake",
+  // ".cmake": "cmake",        // cmake-language-server is Python-based; disabled pending Bun subprocess fix
+  // "CMakeLists.txt": "cmake", // cmake-language-server is Python-based; disabled pending Bun subprocess fix
 }

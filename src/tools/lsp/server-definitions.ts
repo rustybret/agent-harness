@@ -42,11 +42,13 @@ export const LSP_INSTALL_HINTS: Record<string, string> = {
   bash: "brew install bash-language-server",
   "kotlin-ls": "See https://github.com/Kotlin/kotlin-lsp",
   just: "brew install terror/tap/just-lsp",
-  "opencode-godot-lsp": "bun add -g opencode-godot-lsp",
-  "glsl_analyzer": "See https://github.com/nolanderc/glsl-analyzer",
-  "wgsl_analyzer": "cargo install wgsl_analyzer",
-  "lemminx": "See https://github.com/eclipse/lemminx",
-  "cmake-language-server": "brew install cmake-language-server",
+  gdscript: "bun add -g opencode-godot-lsp",
+  glsl: "See https://github.com/nolanderc/glsl-analyzer",
+  wgsl: "cargo install wgsl_analyzer",
+  lemminx: "See https://github.com/eclipse/lemminx",
+  // cmake-language-server is Python-based; Python subprocess spawning is unstable under Bun (stdio buffering → segfault).
+  // Re-enable once we have a safe subprocess spawn strategy for Python LSPs.
+  // cmake: "brew install cmake-language-server",
 }
 
 // Synced with OpenCode's server.ts
@@ -100,5 +102,7 @@ export const BUILTIN_SERVERS: Record<string, Omit<LSPServerConfig, "id">> = {
   glsl: { command: ["glsl_analyzer"], extensions: [".glsl", ".vert", ".frag", ".geom", ".tesc", ".tese", ".comp"] },
   wgsl: { command: ["wgsl_analyzer"], extensions: [".wgsl"] },
   lemminx: { command: ["lemminx"], extensions: [".xml", ".xsl"] },
-  cmake: { command: ["cmake-language-server"], extensions: [".cmake", "CMakeLists.txt"] },
+  // cmake-language-server is Python-based; Python subprocess spawning is unstable under Bun (stdio buffering → segfault).
+  // Re-enable once we have a safe subprocess spawn strategy for Python LSPs.
+  // cmake: { command: ["cmake-language-server"], extensions: [".cmake", "CMakeLists.txt"] },
 }
