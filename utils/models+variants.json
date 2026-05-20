@@ -387,6 +387,15 @@
       ]
     },
     {
+      "key": "google/gemini-3.5-flash",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal"
+      ]
+    },
+    {
       "key": "google/gemini-embedding-001",
       "variants": []
     },
