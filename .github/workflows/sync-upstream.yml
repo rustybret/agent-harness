@@ -2,7 +2,7 @@ name: Sync Upstream
 
 on:
   schedule:
-    - cron: "0 10 * * 1" # 10:00 UTC every Monday
+    - cron: "0 10 * * 1"
   workflow_dispatch:
     inputs:
       upstream_branch:
@@ -115,7 +115,7 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: merge upstream/${{ inputs.upstream_branch || 'dev' }}" -- continue manually
+          commit-message: "chore: merge upstream/${{ inputs.upstream_branch || 'dev' }} -- continue manually"
           title: "chore: merge upstream/${{ env.UPSTREAM_BRANCH }} (manual resolution needed)"
           body: |
             Auto-merge from upstream/${{ env.UPSTREAM_BRANCH }} had conflicts that could not be resolved automatically.
