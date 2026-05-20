@@ -102,15 +102,6 @@
       "key": "deepseek/deepseek-v4-pro"
     },
     {
-      "key": "google/gemini-1.5-flash"
-    },
-    {
-      "key": "google/gemini-1.5-flash-8b"
-    },
-    {
-      "key": "google/gemini-1.5-pro"
-    },
-    {
       "key": "google/gemini-2.0-flash"
     },
     {
@@ -123,37 +114,13 @@
       "key": "google/gemini-2.5-flash-image"
     },
     {
-      "key": "google/gemini-2.5-flash-image-preview"
-    },
-    {
       "key": "google/gemini-2.5-flash-lite"
-    },
-    {
-      "key": "google/gemini-2.5-flash-lite-preview-06-17"
-    },
-    {
-      "key": "google/gemini-2.5-flash-lite-preview-09-2025"
-    },
-    {
-      "key": "google/gemini-2.5-flash-preview-04-17"
-    },
-    {
-      "key": "google/gemini-2.5-flash-preview-05-20"
-    },
-    {
-      "key": "google/gemini-2.5-flash-preview-09-2025"
     },
     {
       "key": "google/gemini-2.5-flash-preview-tts"
     },
     {
       "key": "google/gemini-2.5-pro"
-    },
-    {
-      "key": "google/gemini-2.5-pro-preview-05-06"
-    },
-    {
-      "key": "google/gemini-2.5-pro-preview-06-05"
     },
     {
       "key": "google/gemini-2.5-pro-preview-tts"
@@ -190,27 +157,6 @@
     },
     {
       "key": "google/gemini-flash-lite-latest"
-    },
-    {
-      "key": "google/gemini-live-2.5-flash"
-    },
-    {
-      "key": "google/gemini-live-2.5-flash-preview-native-audio"
-    },
-    {
-      "key": "google/gemma-3-12b-it"
-    },
-    {
-      "key": "google/gemma-3-27b-it"
-    },
-    {
-      "key": "google/gemma-3-4b-it"
-    },
-    {
-      "key": "google/gemma-3n-e2b-it"
-    },
-    {
-      "key": "google/gemma-3n-e4b-it"
     },
     {
       "key": "google/gemma-4-26b-a4b-it"
@@ -678,6 +624,9 @@
       "key": "opencode/gemini-3.1-pro"
     },
     {
+      "key": "opencode/gemini-3.5-flash"
+    },
+    {
       "key": "opencode/glm-5"
     },
     {
@@ -1012,6 +961,9 @@
     },
     {
       "key": "openrouter/google/gemini-3.1-pro-preview-customtools"
+    },
+    {
+      "key": "openrouter/google/gemini-3.5-flash"
     },
     {
       "key": "openrouter/google/gemma-2-27b-it"
