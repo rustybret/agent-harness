@@ -1361,6 +1361,10 @@
       ]
     },
     {
+      "key": "opencode/grok-build-0.1",
+      "variants": []
+    },
+    {
       "key": "opencode/kimi-k2.5",
       "variants": []
     },
@@ -1370,10 +1374,6 @@
     },
     {
       "key": "opencode/minimax-m2.5",
-      "variants": []
-    },
-    {
-      "key": "opencode/minimax-m2.5-free",
       "variants": []
     },
     {
@@ -1394,10 +1394,6 @@
     },
     {
       "key": "opencode/qwen3.6-plus",
-      "variants": []
-    },
-    {
-      "key": "opencode/qwen3.6-plus-free",
       "variants": []
     },
     {
@@ -1595,10 +1591,6 @@
     },
     {
       "key": "openrouter/arcee-ai/spotlight",
-      "variants": []
-    },
-    {
-      "key": "openrouter/arcee-ai/trinity-large-preview",
       "variants": []
     },
     {
@@ -2911,6 +2903,10 @@
       "variants": []
     },
     {
+      "key": "openrouter/qwen/qwen3.7-max",
+      "variants": []
+    },
+    {
       "key": "openrouter/rekaai/reka-edge",
       "variants": []
     },
@@ -3000,6 +2996,10 @@
     },
     {
       "key": "openrouter/x-ai/grok-4.3",
+      "variants": []
+    },
+    {
+      "key": "openrouter/x-ai/grok-build-0.1",
       "variants": []
     },
     {

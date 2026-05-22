@@ -684,6 +684,9 @@
       "key": "opencode/gpt-5.5-pro"
     },
     {
+      "key": "opencode/grok-build-0.1"
+    },
+    {
       "key": "opencode/kimi-k2.5"
     },
     {
@@ -691,9 +694,6 @@
     },
     {
       "key": "opencode/minimax-m2.5"
-    },
-    {
-      "key": "opencode/minimax-m2.5-free"
     },
     {
       "key": "opencode/minimax-m2.7"
@@ -706,9 +706,6 @@
     },
     {
       "key": "opencode/qwen3.6-plus"
-    },
-    {
-      "key": "opencode/qwen3.6-plus-free"
     },
     {
       "key": "openrouter/ai21/jamba-large-1.7"
@@ -799,9 +796,6 @@
     },
     {
       "key": "openrouter/arcee-ai/spotlight"
-    },
-    {
-      "key": "openrouter/arcee-ai/trinity-large-preview"
     },
     {
       "key": "openrouter/arcee-ai/trinity-large-thinking"
@@ -1629,6 +1623,9 @@
       "key": "openrouter/qwen/qwen3.6-plus"
     },
     {
+      "key": "openrouter/qwen/qwen3.7-max"
+    },
+    {
       "key": "openrouter/rekaai/reka-edge"
     },
     {
@@ -1696,6 +1693,9 @@
     },
     {
       "key": "openrouter/x-ai/grok-4.3"
+    },
+    {
+      "key": "openrouter/x-ai/grok-build-0.1"
     },
     {
       "key": "openrouter/xiaomi/mimo-v2-flash"
