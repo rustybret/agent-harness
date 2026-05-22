@@ -1,17 +1,17 @@
 # Standard Operating Procedure: Upstream Fork Maintenance
 
-This guide defines the standard setup for maintaining private or customized forks of upstream open-source repositories (e.g., `agent-harness`, `opencode`). 
+This guide defines the standard setup for maintaining private or customized forks of upstream open-source repositories. 
 
-It is designed for both human engineers and AI agents to execute consistently.
+It is designed for both human engineers and AI agents to execute consistently across any repository.
 
 ## 1. Core Conventions
 
-- **Default Local Branch:** `main` (Always use `main` for our fork's default branch, even if upstream uses `master` or `dev`).
-- **Upstream Tracking Branch:** `upstream/dev` or `upstream/main` (Depends on the upstream project's active development branch).
-- **Submodule Customization Branch:** `local/enhancements` (If we fork a submodule, all our custom changes go here).
+- **Default Local Branch:** Matches the upstream's primary active branch (typically `dev` or `main`). Ensure your local fork's default branch aligns with what the upstream project expects, and that it is configured to track **`origin/<default_branch>`** rather than upstream (to simplify status checks and push/pull behavior).
+- **Upstream Tracking Branch:** `upstream/<default_branch>` (The upstream project's default branch, e.g., `upstream/dev` or `upstream/main`). For fetching and rebasing updates only.
+- **Submodule Customization Branch:** `local/enhancements` (If a submodule is forked, all custom changes are developed on this branch).
 - **GitHub Remote Names:**
-  - `origin`: Our fork (e.g., `https://github.com/rustybret/opencode.git`).
-  - `upstream`: The original repo (e.g., `https://github.com/opencode-ai/opencode.git`).
+  - `origin`: Our private fork (e.g., `https://github.com/rustybret/<repo_name>.git`).
+  - `upstream`: The original upstream repository (e.g., `https://github.com/<upstream-org>/<repo_name>.git`).
 
 ## 2. Standard Setup Process
 
@@ -19,12 +19,15 @@ When initializing a new fork, execute these steps exactly.
 
 ### Step 2.1: Configure Remotes and Defaults
 ```bash
-# Set default GitHub CLI repo to our fork to avoid prompts
+# Set default GitHub CLI repo to our fork to avoid interactive prompts
 gh repo set-default rustybret/<REPO_NAME>
 
 # Add upstream remote
 git remote add upstream <UPSTREAM_REPO_URL>
 git fetch upstream
+
+# Ensure local default branch tracks origin (our fork) rather than upstream
+git branch --set-upstream-to=origin/<default_branch> <default_branch>
 ```
 
 ### Step 2.2: Handle Submodules (If Applicable)
@@ -43,26 +46,26 @@ git push -u origin local/enhancements
 ```
 
 ### Step 2.3: Overwrite Upstream Workflows
-Upstream repositories contain workflows for publishing to npm, creating releases, and blocking PRs. **These must be purged from our private forks** to prevent CI failures and unwanted publishes.
+Upstream repositories contain workflows for publishing to package registries, creating releases, and blocking PRs. **These must be purged from our private forks** to prevent CI failures and unwanted publishes.
 
 1. Delete existing upstream workflows that are not needed:
 ```bash
 rm -f .github/workflows/publish*.yml
 rm -f .github/workflows/release*.yml
 ```
-2. Copy our standard templates from another standardized repo (or use the templates provided in `.github/fork-templates/`):
+2. Copy standard templates from the repository's `.github/fork-templates/` directory (creating the directory and copying templates from a reference fork repository if they do not yet exist):
 ```bash
 cp .github/fork-templates/ci-private-fork.yml .github/workflows/ci.yml
 cp .github/fork-templates/sync-upstream.yml .github/workflows/sync-upstream.yml
 cp .github/fork-templates/local-build.yml .github/workflows/local-build.yml
 ```
-3. Modify the templates to match the current repo (e.g., fixing build steps in `ci.yml`, replacing `<UPSTREAM_REPO_URL>` in `sync-upstream.yml`).
+3. Customize the copied templates to match the current repository (e.g., matching build steps in `ci.yml`, replacing `<UPSTREAM_REPO_URL>` in `sync-upstream.yml`, and setting target branches to `dev` or `main` depending on the repository).
 
 ## 3. Standard Operations (Command Cheatsheet)
 
 ### Triggering an Upstream Sync
 ```bash
-gh workflow run "Sync Upstream" -f upstream_branch=dev
+gh workflow run "Sync Upstream" -f upstream_branch=<default_branch>
 ```
 
 ### Triggering a Local Build (via Self-Hosted or Local Dispatch)
@@ -84,6 +87,6 @@ gh pr merge <PR_NUMBER> --merge --delete-branch
 **When an AI agent is tasked with "setting up this fork to match our standard setup":**
 1. Read this document.
 2. Check `.github/workflows/` and rigorously delete publishing/release artifacts inherited from upstream.
-3. Apply the `Sync Upstream` workflow. Ensure the `UPSTREAM_REPO_URL` is hardcoded correctly in the `.yml` file.
+3. Apply the `Sync Upstream` workflow. Ensure the `UPSTREAM_REPO_URL` is hardcoded correctly in the `.yml` file and the target branches are matched to the current repository's default branch.
 4. Ensure `.gitmodules` points to `rustybret/` forks if the submodules are customized.
 5. Commit with message: `ci: standardize fork configuration and upstream sync`.
