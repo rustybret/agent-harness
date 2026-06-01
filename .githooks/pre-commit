@@ -1,0 +1,4 @@
+#!/bin/sh
+echo "→ Running utils/models.sh before commit..."
+./utils/models.sh utils
+git add utils/models.json utils/models+variants.json
