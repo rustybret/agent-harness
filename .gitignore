@@ -13,6 +13,7 @@ dist/
 packages/omo-codex/plugin/skills/
 
 # Platform binaries (built, not committed)
+/packages/oh-my-opencode-*/bin/
 packages/*/bin/oh-my-opencode
 packages/*/bin/oh-my-opencode.exe
 packages/*/bin/*.map
