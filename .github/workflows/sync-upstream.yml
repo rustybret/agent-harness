@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       upstream_branch:
-        description: "Upstream branch to merge"
+        description: "Upstream branch to sync from"
         required: true
         default: dev
         type: choice
@@ -25,110 +25,83 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          submodules: recursive
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configure upstream remote
-        run: |
-          git remote add upstream https://github.com/code-yeongyu/oh-my-openagent.git
-          git fetch upstream
-          echo "UPSTREAM_BRANCH=${{ inputs.upstream_branch || 'dev' }}" >> $GITHUB_ENV
-
-      - name: Attempt merge
-        id: merge
+      - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          BRANCH="${{ env.UPSTREAM_BRANCH }}"
-          echo "Merging upstream/${BRANCH} into main..."
+      - name: Fetch upstream and all branches
+        run: |
+          git remote add upstream https://github.com/code-yeongyu/oh-my-openagent.git
+          git fetch upstream
+          git fetch origin
+          echo "UPSTREAM_BRANCH=${{ inputs.upstream_branch || 'dev' }}" >> $GITHUB_ENV
 
-          if git merge "upstream/${BRANCH}" --no-edit --no-ff 2>&1; then
-            echo "result=clean" >> $GITHUB_OUTPUT
+      - name: Fast-forward dev to upstream/dev
+        id: ff_dev
+        run: |
+          git checkout dev
+          git merge --ff-only upstream/${{ env.UPSTREAM_BRANCH }}
+          git push origin dev
+          echo "DEV_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+          echo "dev fast-forwarded to upstream/${{ env.UPSTREAM_BRANCH }}"
+
+      - name: Rebase fork/local onto new dev
+        id: rebase
+        run: |
+          git checkout fork/local
+          if git rebase dev; then
+            git push origin fork/local --force-with-lease
+            echo "REBASE_STATUS=success" >> $GITHUB_ENV
+            echo "fork/local rebased successfully onto dev"
           else
-            echo "result=conflict" >> $GITHUB_OUTPUT
+            echo "REBASE_STATUS=conflict" >> $GITHUB_ENV
+            git rebase --abort || true
+            echo "Rebase had conflicts - will open PR"
           fi
 
-      - name: Resolve protected file conflicts
-        if: steps.merge.outputs.result == 'conflict'
-        id: resolve
+      - name: Create conflict PR
+        if: env.REBASE_STATUS == 'conflict'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # These files we always keep our (fork) version
-          PROTECTED_FILES=".gitmodules .github/workflows/ci.yml .github/workflows/sync-upstream.yml"
+          DATE=$(date +%Y-%m-%d)
+          BRANCH="fork/local-conflict-${DATE}"
 
-          for f in $PROTECTED_FILES; do
-            if git diff --name-only --diff-filter=U | grep -qxF "$f"; then
-              echo "Resolving $f in favor of ours (fork)"
-              git checkout --ours "$f"
-              git add "$f"
-            fi
-          done
+          # Create a merge-based resolution branch
+          git checkout -b "$BRANCH" fork/local
+          git merge dev --no-edit --strategy-option=ours || true
+          git push origin "$BRANCH"
 
-          # For branch-specific CI references, keep ours
-          if git diff --name-only --diff-filter=U | grep -qF ".github/workflows"; then
-            echo "Resolving any remaining workflow conflicts in favor of fork"
-            for f in $(git diff --name-only --diff-filter=U | grep "^.github/workflows/"); do
-              git checkout --ours "$f"
-              git add "$f"
-            done
-          fi
+          gh pr create \
+            --base fork/local \
+            --head "$BRANCH" \
+            --title "chore(sync): resolve upstream rebase conflicts (${DATE})" \
+            --body "Automated sync from upstream/${{ env.UPSTREAM_BRANCH }} hit rebase conflicts.
 
-          REMAINING=$(git diff --name-only --diff-filter=U)
-          if [ -n "$REMAINING" ]; then
-            echo "UNRESOLVED CONFLICTS:"
-            echo "$REMAINING"
-            echo "result=unresolved" >> $GITHUB_OUTPUT
-          else
-            echo "All conflicts resolved, committing..."
-            git commit --no-edit
-            echo "result=resolved" >> $GITHUB_OUTPUT
-          fi
+          ## What happened
+          - \`dev\` was fast-forwarded to \`upstream/${{ env.UPSTREAM_BRANCH }}\` ✅
+          - Rebase of \`fork/local\` onto new \`dev\` had conflicts ❌
 
-      - name: Handle submodule after merge
-        if: steps.merge.outputs.result == 'clean' || steps.resolve.outputs.result == 'resolved'
+          ## What to do
+          1. Check out this branch: \`git checkout ${BRANCH}\`
+          2. Resolve conflicts manually
+          3. \`git add .\` then \`git rebase --continue\`
+          4. Force-push to \`origin/fork/local\`
+          5. Close this PR
+
+          ## Upstream commits added to dev
+          See the diff between old and new dev."
+
+          echo "PR created for branch ${BRANCH}"
+          exit 1
+
+      - name: Summary
+        if: always()
         run: |
-          # Try to sync submodule to new URL
-          git submodule sync packages/lsp-tools-mcp
-          git submodule update --init --recursive packages/lsp-tools-mcp 2>&1 || {
-            echo "Submodule update failed (commit may not exist on fork)"
-            echo "Fetching from upstream's submodule repository..."
-            git -C packages/lsp-tools-mcp remote add upstream https://github.com/code-yeongyu/lsp-tools-mcp.git 2>/dev/null || true
-            git -C packages/lsp-tools-mcp fetch upstream 2>&1 || true
-
-            # Try to find the commit and cherry-pick or track it
-            if git -C packages/lsp-tools-mcp show --no-patch HEAD 2>/dev/null; then
-              echo "Submodule commit is valid"
-            else
-              echo "WARNING: Submodule commit not found. Pinning to fork branch."
-              # Fetch from fork
-              git -C packages/lsp-tools-mcp fetch origin 2>&1 || true
-              # Try checking out the fork branch
-              if git -C packages/lsp-tools-mcp rev-parse origin/local/enhancements >/dev/null 2>&1; then
-                git -C packages/lsp-tools-mcp checkout origin/local/enhancements
-                git add packages/lsp-tools-mcp
-              fi
-            fi
-          }
-
-      - name: Create PR for unresolved conflicts
-        if: steps.resolve.outputs.result == 'unresolved'
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: merge upstream/${{ inputs.upstream_branch || 'dev' }} -- continue manually"
-          title: "chore: merge upstream/${{ env.UPSTREAM_BRANCH }} (manual resolution needed)"
-          body: |
-            Auto-merge from upstream/${{ env.UPSTREAM_BRANCH }} had conflicts that could not be resolved automatically.
-
-            Unresolved files:
-            $(git diff --name-only --diff-filter=U)
-
-            Please resolve these conflicts and merge manually.
-          branch: auto-sync/upstream-${{ env.UPSTREAM_BRANCH }}-${{ github.run_id }}
-          delete-branch: true
-
-      - name: Push clean merge to main
-        if: steps.merge.outputs.result == 'clean' || steps.resolve.outputs.result == 'resolved'
-        run: |
-          git push origin main
-          echo "Merge pushed to main. CI will build automatically."
+          echo "=== Sync Summary ==="
+          echo "dev SHA: $(git rev-parse origin/dev 2>/dev/null || echo 'unknown')"
+          echo "fork/local SHA: $(git rev-parse origin/fork/local 2>/dev/null || echo 'unknown')"
+          echo "upstream/${{ env.UPSTREAM_BRANCH }} SHA: $(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }} 2>/dev/null || echo 'unknown')"
