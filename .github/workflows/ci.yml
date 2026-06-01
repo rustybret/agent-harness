@@ -2,53 +2,15 @@ name: CI
 
 on:
   push:
-    branches: [master, dev]
+    branches: [fork/local]
   pull_request:
-    branches: [master, dev]
+    branches: [fork/local]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # Block PRs targeting master branch (comment + auto-close, then fail the check)
-  block-master-pr:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    permissions:
-      pull-requests: write
-    steps:
-      - name: Check PR target branch
-        env:
-          BASE_REF: ${{ github.base_ref }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
-        run: |
-          if [ "$BASE_REF" != "master" ]; then
-            echo "PR targets '${BASE_REF}' branch - OK"
-            exit 0
-          fi
-
-          echo "::error::PRs to master branch are not allowed. Please target the 'dev' branch instead."
-
-          gh pr comment "$PR_URL" --body "$(cat <<EOF
-          Hi @${PR_AUTHOR}, thanks for the contribution!
-
-          This repository does not accept pull requests that target the \`master\` branch, so this PR is being closed automatically.
-
-          **What to do instead:**
-          1. Re-target (or recreate) this PR against the \`dev\` branch.
-          2. All changes land on \`dev\` first; \`master\` is updated only by the release workflow.
-
-          No worries, nothing is lost. Just open a new PR against \`dev\` and we'll take it from there. Thanks again!
-          EOF
-          )"
-
-          gh pr close "$PR_URL"
-
-          echo "PR was auto-closed because it targeted 'master'."
-          exit 1
 
   test:
     runs-on: ${{ matrix.os }}
@@ -277,6 +239,7 @@ jobs:
         run: bun run build
 
       - name: Auto-commit schema changes
+        if: github.event_name == 'push' && github.ref == 'refs/heads/fork/local'
         run: |
           if git diff --quiet assets/oh-my-opencode.schema.json; then
             echo "No schema changes to commit"
@@ -290,8 +253,8 @@ jobs:
 
   draft-release:
     runs-on: ubuntu-latest
-    needs: [test, typecheck, codex-compatibility, build]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    needs: [build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/fork/local'
     permissions:
       contents: write
     steps:

@@ -8,7 +8,7 @@ on:
         required: false
         default: ""
   push:
-    branches: [master, dev]
+    branches: [fork/local]
     paths:
       - "packages/web/**"
       - "docs/**"
