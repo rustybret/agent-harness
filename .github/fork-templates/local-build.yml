@@ -1,4 +1,6 @@
 name: Build (local trigger)
+# Trigger locally via:
+#   gh repo dispatch <owner>/<repo> --event local-build
 
 on:
   repository_dispatch:
