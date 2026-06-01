@@ -31,6 +31,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
 
       - name: Fetch upstream and all branches
         run: |
@@ -42,7 +43,7 @@ jobs:
       - name: Fast-forward dev to upstream/dev
         id: ff_dev
         run: |
-          git checkout dev
+          git checkout -B dev origin/dev
           git merge --ff-only upstream/${{ env.UPSTREAM_BRANCH }}
           git push origin dev
           echo "DEV_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
@@ -51,7 +52,7 @@ jobs:
       - name: Rebase fork/local onto new dev
         id: rebase
         run: |
-          git checkout fork/local
+          git checkout -B fork/local origin/fork/local
           if git rebase dev; then
             git push origin fork/local --force-with-lease
             echo "REBASE_STATUS=success" >> $GITHUB_ENV
