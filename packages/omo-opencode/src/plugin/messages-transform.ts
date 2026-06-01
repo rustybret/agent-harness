@@ -35,6 +35,7 @@ type MessagesTransformHooks = {
   teamMailboxInjector?: CreatedHooks["teamMailboxInjector"]
   toolPairValidator?: CreatedHooks["toolPairValidator"]
   monitorStatusInjector?: CreatedHooks["monitorStatusInjector"]
+  providerQuirksNormalizer?: CreatedHooks["providerQuirksNormalizer"]
 }
 type MessagesTransformHookKey = keyof MessagesTransformHooks
 type MessagesTransformHookEntry = {
