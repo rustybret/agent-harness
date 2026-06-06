@@ -3,38 +3,7 @@
   "version": "2025.05.13",
   "models": [
     {
-      "key": "anthropic/claude-3-5-haiku-20241022",
-      "variants": []
-    },
-    {
       "key": "anthropic/claude-3-5-haiku-latest",
-      "variants": []
-    },
-    {
-      "key": "anthropic/claude-3-5-sonnet-20240620",
-      "variants": []
-    },
-    {
-      "key": "anthropic/claude-3-5-sonnet-20241022",
-      "variants": []
-    },
-    {
-      "key": "anthropic/claude-3-7-sonnet-20250219",
-      "variants": [
-        "high",
-        "max"
-      ]
-    },
-    {
-      "key": "anthropic/claude-3-haiku-20240307",
-      "variants": []
-    },
-    {
-      "key": "anthropic/claude-3-opus-20240229",
-      "variants": []
-    },
-    {
-      "key": "anthropic/claude-3-sonnet-20240229",
       "variants": []
     },
     {
@@ -210,14 +179,6 @@
       "variants": []
     },
     {
-      "key": "google/gemini-2.0-flash",
-      "variants": []
-    },
-    {
-      "key": "google/gemini-2.0-flash-lite",
-      "variants": []
-    },
-    {
       "key": "google/gemini-2.5-flash",
       "variants": [
         "high",
@@ -243,6 +204,10 @@
       "variants": []
     },
     {
+      "key": "google/gemini-2.5-flash-tts",
+      "variants": []
+    },
+    {
       "key": "google/gemini-2.5-pro",
       "variants": [
         "high",
@@ -263,11 +228,9 @@
       ]
     },
     {
-      "key": "google/gemini-3-pro-preview",
+      "key": "google/gemini-3-pro-image-preview",
       "variants": [
-        "high",
-        "low",
-        "medium"
+        "high"
       ]
     },
     {
@@ -279,15 +242,6 @@
     },
     {
       "key": "google/gemini-3.1-flash-lite",
-      "variants": [
-        "high",
-        "low",
-        "medium",
-        "minimal"
-      ]
-    },
-    {
-      "key": "google/gemini-3.1-flash-lite-preview",
       "variants": [
         "high",
         "low",
@@ -932,26 +886,6 @@
       "variants": []
     },
     {
-      "key": "openai/gpt-5.2",
-      "variants": [
-        "high",
-        "low",
-        "medium",
-        "none",
-        "xhigh"
-      ]
-    },
-    {
-      "key": "openai/gpt-5.3-codex",
-      "variants": [
-        "high",
-        "low",
-        "medium",
-        "none",
-        "xhigh"
-      ]
-    },
-    {
       "key": "openai/gpt-5.3-codex-spark",
       "variants": [
         "high",
@@ -1347,7 +1281,7 @@
       "variants": []
     },
     {
-      "key": "opencode/nemotron-3-super-free",
+      "key": "opencode/nemotron-3-ultra-free",
       "variants": [
         "high",
         "low",

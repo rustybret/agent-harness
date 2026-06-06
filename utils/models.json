@@ -3,28 +3,7 @@
   "version": "2025.05.13",
   "models": [
     {
-      "key": "anthropic/claude-3-5-haiku-20241022"
-    },
-    {
       "key": "anthropic/claude-3-5-haiku-latest"
-    },
-    {
-      "key": "anthropic/claude-3-5-sonnet-20240620"
-    },
-    {
-      "key": "anthropic/claude-3-5-sonnet-20241022"
-    },
-    {
-      "key": "anthropic/claude-3-7-sonnet-20250219"
-    },
-    {
-      "key": "anthropic/claude-3-haiku-20240307"
-    },
-    {
-      "key": "anthropic/claude-3-opus-20240229"
-    },
-    {
-      "key": "anthropic/claude-3-sonnet-20240229"
     },
     {
       "key": "anthropic/claude-haiku-4-5"
@@ -93,12 +72,6 @@
       "key": "cerebras/zai-glm-4.7"
     },
     {
-      "key": "google/gemini-2.0-flash"
-    },
-    {
-      "key": "google/gemini-2.0-flash-lite"
-    },
-    {
       "key": "google/gemini-2.5-flash"
     },
     {
@@ -111,6 +84,9 @@
       "key": "google/gemini-2.5-flash-preview-tts"
     },
     {
+      "key": "google/gemini-2.5-flash-tts"
+    },
+    {
       "key": "google/gemini-2.5-pro"
     },
     {
@@ -120,16 +96,13 @@
       "key": "google/gemini-3-flash-preview"
     },
     {
-      "key": "google/gemini-3-pro-preview"
+      "key": "google/gemini-3-pro-image-preview"
     },
     {
       "key": "google/gemini-3.1-flash-image-preview"
     },
     {
       "key": "google/gemini-3.1-flash-lite"
-    },
-    {
-      "key": "google/gemini-3.1-flash-lite-preview"
     },
     {
       "key": "google/gemini-3.1-pro-preview"
@@ -516,12 +489,6 @@
       "key": "nvidia/z-ai/glm4.7"
     },
     {
-      "key": "openai/gpt-5.2"
-    },
-    {
-      "key": "openai/gpt-5.3-codex"
-    },
-    {
       "key": "openai/gpt-5.3-codex-spark"
     },
     {
@@ -669,7 +636,7 @@
       "key": "opencode/minimax-m3-free"
     },
     {
-      "key": "opencode/nemotron-3-super-free"
+      "key": "opencode/nemotron-3-ultra-free"
     },
     {
       "key": "opencode/qwen3.5-plus"
