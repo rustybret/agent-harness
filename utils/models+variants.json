@@ -7,6 +7,13 @@
       "variants": []
     },
     {
+      "key": "anthropic/claude-fable-5",
+      "variants": [
+        "high",
+        "max"
+      ]
+    },
+    {
       "key": "anthropic/claude-haiku-4-5",
       "variants": [
         "high",
@@ -171,11 +178,112 @@
       ]
     },
     {
-      "key": "cerebras/llama3.1-8b",
+      "key": "cerebras/zai-glm-4.7",
       "variants": []
     },
     {
-      "key": "cerebras/zai-glm-4.7",
+      "key": "google/antigravity-chat_20706",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-chat_23310",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-claude-opus-4-6-thinking",
+      "variants": [
+        "high",
+        "low",
+        "max"
+      ]
+    },
+    {
+      "key": "google/antigravity-claude-sonnet-4-6",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-gemini-2.5-flash",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-gemini-2.5-flash-lite",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-gemini-2.5-flash-thinking",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-gemini-2.5-pro",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-gemini-3-flash",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal"
+      ]
+    },
+    {
+      "key": "google/antigravity-gemini-3-flash-agent",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-gemini-3.1-flash-image",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-gemini-3.1-flash-lite",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-gemini-3.1-pro",
+      "variants": [
+        "high",
+        "low"
+      ]
+    },
+    {
+      "key": "google/antigravity-gemini-3.1-pro-high",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-gemini-3.1-pro-low",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-gemini-3.5-flash",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal"
+      ]
+    },
+    {
+      "key": "google/antigravity-gemini-3.5-flash-extra-low",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-gemini-3.5-flash-low",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-gemini-pro-agent",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-gpt-oss-120b-medium",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-tab_flash_lite_preview",
+      "variants": []
+    },
+    {
+      "key": "google/antigravity-tab_jump_flash_lite_preview",
       "variants": []
     },
     {
@@ -201,10 +309,6 @@
     },
     {
       "key": "google/gemini-2.5-flash-preview-tts",
-      "variants": []
-    },
-    {
-      "key": "google/gemini-2.5-flash-tts",
       "variants": []
     },
     {
@@ -248,6 +352,10 @@
         "medium",
         "minimal"
       ]
+    },
+    {
+      "key": "google/gemini-3.1-pro",
+      "variants": []
     },
     {
       "key": "google/gemini-3.1-pro-preview",
@@ -307,10 +415,6 @@
       ]
     },
     {
-      "key": "groq/allam-2-7b",
-      "variants": []
-    },
-    {
       "key": "groq/canopylabs/orpheus-arabic-saudi",
       "variants": []
     },
@@ -320,21 +424,11 @@
     },
     {
       "key": "groq/groq/compound",
-      "variants": [
-        "high",
-        "low",
-        "medium",
-        "none"
-      ]
+      "variants": []
     },
     {
       "key": "groq/groq/compound-mini",
-      "variants": [
-        "high",
-        "low",
-        "medium",
-        "none"
-      ]
+      "variants": []
     },
     {
       "key": "groq/llama-3.1-8b-instant",
@@ -354,10 +448,6 @@
     },
     {
       "key": "groq/meta-llama/llama-prompt-guard-2-86m",
-      "variants": []
-    },
-    {
-      "key": "groq/moonshotai/kimi-k2-instruct-0905",
       "variants": []
     },
     {
@@ -444,6 +534,10 @@
       "variants": []
     },
     {
+      "key": "moonshotai/kimi-k2.7-code",
+      "variants": []
+    },
+    {
       "key": "nvidia/abacusai/dracarys-llama-3_1-70b-instruct",
       "variants": []
     },
@@ -472,14 +566,6 @@
       "variants": []
     },
     {
-      "key": "nvidia/deepseek-ai/deepseek-v3.1-terminus",
-      "variants": []
-    },
-    {
-      "key": "nvidia/deepseek-ai/deepseek-v3.2",
-      "variants": []
-    },
-    {
       "key": "nvidia/deepseek-ai/deepseek-v4-flash",
       "variants": [
         "high",
@@ -500,14 +586,6 @@
     {
       "key": "nvidia/google/gemma-2-2b-it",
       "variants": []
-    },
-    {
-      "key": "nvidia/google/gemma-3-27b-it",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
     },
     {
       "key": "nvidia/google/gemma-3n-e2b-it",
@@ -575,31 +653,15 @@
     },
     {
       "key": "nvidia/microsoft/phi-4-mini-instruct",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "nvidia/microsoft/phi-4-multimodal-instruct",
       "variants": []
     },
     {
-      "key": "nvidia/minimaxai/minimax-m2.5",
-      "variants": []
-    },
-    {
       "key": "nvidia/minimaxai/minimax-m2.7",
       "variants": []
-    },
-    {
-      "key": "nvidia/mistralai/devstral-2-123b-instruct-2512",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
     },
     {
       "key": "nvidia/mistralai/magistral-small-2506",
@@ -623,7 +685,11 @@
     },
     {
       "key": "nvidia/mistralai/mistral-small-4-119b-2603",
-      "variants": []
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
     },
     {
       "key": "nvidia/mistralai/mixtral-8x22b-instruct",
@@ -634,15 +700,7 @@
       "variants": []
     },
     {
-      "key": "nvidia/moonshotai/kimi-k2-instruct",
-      "variants": []
-    },
-    {
       "key": "nvidia/moonshotai/kimi-k2-instruct-0905",
-      "variants": []
-    },
-    {
-      "key": "nvidia/moonshotai/kimi-k2-thinking",
       "variants": []
     },
     {
@@ -682,22 +740,6 @@
       "variants": []
     },
     {
-      "key": "nvidia/nvidia/llama-3_3-nemotron-super-49b-v1",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
-    },
-    {
-      "key": "nvidia/nvidia/llama-3_3-nemotron-super-49b-v1_5",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
-    },
-    {
       "key": "nvidia/nvidia/llama-nemotron-embed-vl-1b-v2",
       "variants": []
     },
@@ -731,6 +773,14 @@
     },
     {
       "key": "nvidia/nvidia/nemotron-3-super-120b-a12b",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "key": "nvidia/nvidia/nemotron-3-ultra-550b-a55b",
       "variants": [
         "high",
         "low",
@@ -842,10 +892,6 @@
       "variants": []
     },
     {
-      "key": "nvidia/qwen/qwen3-next-80b-a3b-thinking",
-      "variants": []
-    },
-    {
       "key": "nvidia/qwen/qwen3.5-122b-a10b",
       "variants": []
     },
@@ -879,10 +925,6 @@
     },
     {
       "key": "nvidia/z-ai/glm-5.1",
-      "variants": []
-    },
-    {
-      "key": "nvidia/z-ai/glm4.7",
       "variants": []
     },
     {
@@ -966,6 +1008,13 @@
     {
       "key": "opencode/big-pickle",
       "variants": []
+    },
+    {
+      "key": "opencode/claude-fable-5",
+      "variants": [
+        "high",
+        "max"
+      ]
     },
     {
       "key": "opencode/claude-haiku-4-5",
@@ -1052,6 +1101,15 @@
     },
     {
       "key": "opencode/deepseek-v4-flash-free",
+      "variants": [
+        "high",
+        "low",
+        "max",
+        "medium"
+      ]
+    },
+    {
+      "key": "opencode/deepseek-v4-pro",
       "variants": [
         "high",
         "low",
@@ -1277,11 +1335,15 @@
       "variants": []
     },
     {
-      "key": "opencode/minimax-m3-free",
-      "variants": []
+      "key": "opencode/nemotron-3-ultra-free",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
     },
     {
-      "key": "opencode/nemotron-3-ultra-free",
+      "key": "opencode/north-mini-code-free",
       "variants": [
         "high",
         "low",
@@ -1330,6 +1392,14 @@
     },
     {
       "key": "xiaomi/mimo-v2.5-pro",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "key": "xiaomi/mimo-v2.5-pro-ultraspeed",
       "variants": [
         "high",
         "low",

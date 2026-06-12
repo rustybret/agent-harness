@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T16:16:30.302Z",
+  "generatedAt": "2026-06-10T16:52:17.633Z",
   "sourceUrl": "https://models.dev/api.json",
   "models": {
     "solar-mini": {
@@ -404,6 +404,25 @@
       "limit": {
         "context": 262144,
         "output": 65536
+      }
+    },
+    "nemotron-3-ultra": {
+      "id": "nemotron-3-ultra",
+      "family": "nemotron",
+      "reasoning": true,
+      "temperature": true,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 262144,
+        "output": 128000
       }
     },
     "kimi-k2-thinking": {
@@ -1502,16 +1521,15 @@
       "modalities": {
         "input": [
           "text",
-          "image",
-          "video"
+          "image"
         ],
         "output": [
           "text"
         ]
       },
       "limit": {
-        "context": 262144,
-        "output": 262144
+        "context": 262000,
+        "output": 262000
       }
     },
     "neuralmagic/meta-llama-3.1-8b-instruct-fp8": {
@@ -3272,8 +3290,6 @@
         "input": [
           "text",
           "image",
-          "audio",
-          "video",
           "pdf"
         ],
         "output": [
@@ -3281,11 +3297,10 @@
         ]
       },
       "limit": {
-        "context": 1048576,
+        "context": 1048756,
         "output": 65536,
         "input": 1048756
-      },
-      "family": "gemini-flash"
+      }
     },
     "glm-5v-turbo": {
       "id": "glm-5v-turbo",
@@ -3790,7 +3805,7 @@
         ]
       },
       "limit": {
-        "context": 65536,
+        "context": 131072,
         "output": 32768,
         "input": 1048756
       },
@@ -4913,7 +4928,7 @@
     "command-a-plus-05-2026": {
       "id": "command-a-plus-05-2026",
       "reasoning": true,
-      "toolCall": false,
+      "toolCall": true,
       "modalities": {
         "input": [
           "text",
@@ -4927,7 +4942,9 @@
         "context": 128000,
         "input": 128000,
         "output": 64000
-      }
+      },
+      "family": "command-a",
+      "temperature": true
     },
     "qwen3.7-plus:thinking": {
       "id": "qwen3.7-plus:thinking",
@@ -7674,8 +7691,7 @@
       "modalities": {
         "input": [
           "text",
-          "image",
-          "video"
+          "image"
         ],
         "output": [
           "text"
@@ -7684,9 +7700,9 @@
       "limit": {
         "context": 1000000,
         "input": 991808,
-        "output": 65536
+        "output": 64000
       },
-      "family": "qwen3.7-plus",
+      "family": "qwen",
       "temperature": true
     },
     "gemini-2.5-flash-preview-05-20:thinking": {
@@ -8356,8 +8372,7 @@
         "input": 202800,
         "output": 128000
       },
-      "temperature": true,
-      "family": "glm"
+      "temperature": true
     },
     "z-ai/glm-5-turbo": {
       "id": "z-ai/glm-5-turbo",
@@ -9030,11 +9045,12 @@
     },
     "mistralai/mistral-small-4-119b-2603": {
       "id": "mistralai/mistral-small-4-119b-2603",
-      "reasoning": false,
+      "reasoning": true,
       "toolCall": true,
       "modalities": {
         "input": [
-          "text"
+          "text",
+          "image"
         ],
         "output": [
           "text"
@@ -9050,8 +9066,8 @@
     "mistralai/devstral-2-123b-instruct-2512": {
       "id": "mistralai/devstral-2-123b-instruct-2512",
       "family": "devstral",
-      "reasoning": true,
-      "toolCall": true,
+      "reasoning": false,
+      "toolCall": false,
       "modalities": {
         "input": [
           "text"
@@ -9063,9 +9079,8 @@
       "limit": {
         "context": 262144,
         "input": 262144,
-        "output": 262144
-      },
-      "temperature": true
+        "output": 65536
+      }
     },
     "deepseek/deepseek-v3.2:thinking": {
       "id": "deepseek/deepseek-v3.2:thinking",
@@ -9112,14 +9127,16 @@
       "toolCall": false,
       "modalities": {
         "input": [
-          "text"
+          "text",
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
         ]
       },
       "limit": {
-        "context": 163842,
+        "context": 128000,
         "input": 163000,
         "output": 8000
       },
@@ -9225,7 +9242,9 @@
       "toolCall": true,
       "modalities": {
         "input": [
-          "text"
+          "text",
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -9245,7 +9264,8 @@
       "toolCall": true,
       "modalities": {
         "input": [
-          "text"
+          "text",
+          "pdf"
         ],
         "output": [
           "text"
@@ -9500,9 +9520,9 @@
         ]
       },
       "limit": {
-        "context": 204800,
+        "context": 200000,
         "input": 200000,
-        "output": 131072
+        "output": 200000
       },
       "temperature": true
     },
@@ -10063,7 +10083,7 @@
         "input": 1000000,
         "output": 128000
       },
-      "temperature": false,
+      "temperature": true,
       "family": "claude-opus"
     },
     "anthropic/claude-opus-4.8:thinking": {
@@ -10425,8 +10445,7 @@
         "input": [
           "text",
           "image",
-          "audio",
-          "video"
+          "pdf"
         ],
         "output": [
           "text"
@@ -10466,7 +10485,9 @@
       "toolCall": true,
       "modalities": {
         "input": [
-          "text"
+          "text",
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -11653,9 +11674,9 @@
         ]
       },
       "limit": {
-        "context": 262144,
+        "context": 262000,
         "input": 256000,
-        "output": 262144
+        "output": 262000
       },
       "temperature": true
     },
@@ -12075,7 +12096,8 @@
       "modalities": {
         "input": [
           "text",
-          "image"
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -12137,7 +12159,8 @@
       "modalities": {
         "input": [
           "text",
-          "image"
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -12367,11 +12390,11 @@
       }
     },
     "nvidia/llama-3_3-nemotron-super-49b-v1_5": {
-      "id": "nvidia/llama-3_3-nemotron-super-49b-v1_5",
+      "id": "nvidia/Llama-3_3-Nemotron-Super-49B-v1_5",
       "family": "nemotron",
-      "reasoning": true,
+      "reasoning": false,
       "temperature": true,
-      "toolCall": true,
+      "toolCall": false,
       "modalities": {
         "input": [
           "text"
@@ -12381,9 +12404,9 @@
         ]
       },
       "limit": {
-        "context": 131072,
+        "context": 128000,
         "input": 128000,
-        "output": 131072
+        "output": 16384
       }
     },
     "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning": {
@@ -13699,9 +13722,9 @@
         ]
       },
       "limit": {
-        "context": 262144,
+        "context": 262000,
         "input": 262144,
-        "output": 65536
+        "output": 65000
       },
       "family": "ring",
       "temperature": true
@@ -14932,7 +14955,7 @@
       },
       "limit": {
         "context": 131072,
-        "input": 98304,
+        "input": 122880,
         "output": 131072
       },
       "temperature": true
@@ -14977,7 +15000,7 @@
         "input": 100000,
         "output": 100000
       },
-      "temperature": false
+      "temperature": true
     },
     "openai/o3-mini-low": {
       "id": "openai/o3-mini-low",
@@ -15435,18 +15458,18 @@
         "input": [
           "text",
           "image",
-          "video"
+          "pdf"
         ],
         "output": [
           "text"
         ]
       },
       "limit": {
-        "context": 524288,
+        "context": 1000000,
         "input": 512000,
-        "output": 512000
+        "output": 1000000
       },
-      "family": "minimax",
+      "family": "minimax-m3",
       "temperature": true
     },
     "minimax/minimax-01": {
@@ -15515,9 +15538,7 @@
       "toolCall": true,
       "modalities": {
         "input": [
-          "text",
-          "image",
-          "pdf"
+          "text"
         ],
         "output": [
           "text"
@@ -18016,8 +18037,8 @@
         ]
       },
       "limit": {
-        "context": 164000,
-        "output": 131000
+        "context": 163840,
+        "output": 163840
       }
     },
     "qwen/qwen3-coder-480b-a35b-instruct-fp8": {
@@ -18344,7 +18365,7 @@
     },
     "deepseek/deepseek-v3.2-exp": {
       "id": "deepseek/deepseek-v3.2-exp",
-      "reasoning": true,
+      "reasoning": false,
       "temperature": true,
       "toolCall": true,
       "modalities": {
@@ -18356,8 +18377,8 @@
         ]
       },
       "limit": {
-        "context": 163840,
-        "output": 163840
+        "context": 128000,
+        "output": 32000
       },
       "family": "deepseek"
     },
@@ -18477,7 +18498,7 @@
     "zai-org/glm-4.6": {
       "id": "zai-org/GLM-4.6",
       "family": "glm",
-      "reasoning": false,
+      "reasoning": true,
       "temperature": true,
       "toolCall": true,
       "modalities": {
@@ -18489,8 +18510,8 @@
         ]
       },
       "limit": {
-        "context": 200000,
-        "output": 200000
+        "context": 202752,
+        "output": 131072
       }
     },
     "zai-org/glm-4.5v": {
@@ -18706,7 +18727,7 @@
       }
     },
     "qwen/qwen3.7-max": {
-      "id": "Qwen/Qwen3.7-Max",
+      "id": "qwen/qwen3.7-max",
       "family": "qwen",
       "reasoning": true,
       "temperature": true,
@@ -18721,7 +18742,7 @@
       },
       "limit": {
         "context": 1000000,
-        "output": 500000
+        "output": 65536
       }
     },
     "qwen/qwen3-omni-30b-a3b-thinking": {
@@ -18926,7 +18947,7 @@
       "family": "kimi",
       "reasoning": false,
       "temperature": true,
-      "toolCall": false,
+      "toolCall": true,
       "modalities": {
         "input": [
           "text"
@@ -18936,8 +18957,8 @@
         ]
       },
       "limit": {
-        "context": 131072,
-        "output": 16384
+        "context": 256000,
+        "output": 100000
       }
     },
     "meta-llama/llama-4-scout-17b-16e-instruct": {
@@ -19235,8 +19256,7 @@
       "toolCall": true,
       "modalities": {
         "input": [
-          "text",
-          "image"
+          "text"
         ],
         "output": [
           "text"
@@ -19262,8 +19282,8 @@
         ]
       },
       "limit": {
-        "context": 262114,
-        "output": 262114
+        "context": 205000,
+        "output": 205000
       }
     },
     "minimax/minimax-m2.5-highspeed": {
@@ -19281,8 +19301,8 @@
         ]
       },
       "limit": {
-        "context": 0,
-        "output": 0
+        "context": 204800,
+        "output": 131000
       }
     },
     "z-ai/glm-4.7": {
@@ -19319,9 +19339,8 @@
       },
       "limit": {
         "context": 128000,
-        "output": 128000
-      },
-      "family": "glm"
+        "output": 32768
+      }
     },
     "z-ai/glm-4.6v": {
       "id": "z-ai/glm-4.6v",
@@ -19456,7 +19475,7 @@
         "context": 131072,
         "output": 131072
       },
-      "family": "intellect"
+      "family": "glm"
     },
     "alfredpros/codellama-7b-instruct-solidity": {
       "id": "alfredpros/codellama-7b-instruct-solidity",
@@ -20409,10 +20428,10 @@
         ]
       },
       "limit": {
-        "context": 262140,
-        "output": 262140
+        "context": 131072,
+        "output": 131072
       },
-      "family": "qwen3.6"
+      "family": "qwen"
     },
     "qwen/qwen3.5-plus-20260420": {
       "id": "qwen/qwen3.5-plus-20260420",
@@ -20570,7 +20589,7 @@
         "context": 262144,
         "output": 65536
       },
-      "family": "qwen3.6"
+      "family": "qwen"
     },
     "qwen/qwen-2.5-7b-instruct": {
       "id": "qwen/qwen-2.5-7b-instruct",
@@ -20684,8 +20703,8 @@
         ]
       },
       "limit": {
-        "context": 262144,
-        "output": 262144
+        "context": 262142,
+        "output": 262142
       },
       "family": "kimi"
     },
@@ -20906,7 +20925,7 @@
       },
       "limit": {
         "context": 131072,
-        "output": 16384
+        "output": 32768
       },
       "family": "kimi"
     },
@@ -20936,16 +20955,16 @@
       "toolCall": false,
       "modalities": {
         "input": [
-          "text",
-          "image"
+          "image",
+          "text"
         ],
         "output": [
           "text"
         ]
       },
       "limit": {
-        "context": 131072,
-        "output": 1024
+        "context": 163840,
+        "output": 16384
       },
       "family": "llama"
     },
@@ -21384,9 +21403,9 @@
       "modalities": {
         "input": [
           "text",
-          "audio",
           "image",
-          "video"
+          "video",
+          "audio"
         ],
         "output": [
           "text"
@@ -21686,21 +21705,20 @@
     },
     "stepfun/step-3.5-flash": {
       "id": "stepfun/step-3.5-flash",
-      "reasoning": false,
+      "reasoning": true,
       "temperature": true,
-      "toolCall": false,
+      "toolCall": true,
       "modalities": {
         "input": [
-          "text",
-          "image"
+          "text"
         ],
         "output": [
           "text"
         ]
       },
       "limit": {
-        "context": 64000,
-        "output": 4096
+        "context": 262114,
+        "output": 262114
       },
       "family": "step"
     },
@@ -21800,7 +21818,7 @@
       },
       "limit": {
         "context": 32768,
-        "output": 32768
+        "output": 65536
       },
       "family": "gemini-flash"
     },
@@ -21965,8 +21983,6 @@
         "input": [
           "text",
           "image",
-          "audio",
-          "video",
           "pdf"
         ],
         "output": [
@@ -22011,9 +22027,9 @@
         "input": [
           "text",
           "image",
+          "pdf",
           "audio",
-          "video",
-          "pdf"
+          "video"
         ],
         "output": [
           "text"
@@ -22021,7 +22037,7 @@
       },
       "limit": {
         "context": 1048576,
-        "output": 65536
+        "output": 65535
       },
       "family": "gemini-flash-lite"
     },
@@ -22196,7 +22212,7 @@
     "openai/o3-pro": {
       "id": "openai/o3-pro",
       "reasoning": true,
-      "temperature": false,
+      "temperature": true,
       "toolCall": true,
       "modalities": {
         "input": [
@@ -22272,8 +22288,7 @@
       "limit": {
         "context": 128000,
         "output": 4096
-      },
-      "family": "gpt"
+      }
     },
     "openai/gpt-4-0314": {
       "id": "openai/gpt-4-0314",
@@ -22834,6 +22849,25 @@
         "output": 128000
       }
     },
+    "gemini-2.5-flash-tts": {
+      "id": "gemini-2.5-flash-tts",
+      "family": "gemini-flash",
+      "reasoning": false,
+      "temperature": false,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "audio"
+        ]
+      },
+      "limit": {
+        "context": 32768,
+        "output": 16384
+      }
+    },
     "claude-haiku-4-5@20251001": {
       "id": "claude-haiku-4-5@20251001",
       "family": "claude-haiku",
@@ -23029,27 +23063,6 @@
         "output": 65536
       }
     },
-    "claude-3-5-sonnet@20241022": {
-      "id": "claude-3-5-sonnet@20241022",
-      "family": "claude-sonnet",
-      "reasoning": false,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text",
-          "image",
-          "pdf"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 200000,
-        "output": 8192
-      }
-    },
     "claude-opus-4-8@default": {
       "id": "claude-opus-4-8@default",
       "family": "claude-opus",
@@ -23115,27 +23128,6 @@
         "output": 65536
       }
     },
-    "claude-3-7-sonnet@20250219": {
-      "id": "claude-3-7-sonnet@20250219",
-      "family": "claude-sonnet",
-      "reasoning": true,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text",
-          "image",
-          "pdf"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 200000,
-        "output": 64000
-      }
-    },
     "gemini-3.1-pro-preview": {
       "id": "gemini-3.1-pro-preview",
       "family": "gemini-pro",
@@ -23181,29 +23173,6 @@
       "limit": {
         "context": 1048576,
         "output": 65536
-      }
-    },
-    "gemini-2.0-flash": {
-      "id": "gemini-2.0-flash",
-      "family": "gemini-flash",
-      "reasoning": false,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text",
-          "image",
-          "audio",
-          "video",
-          "pdf"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 1048576,
-        "output": 8192
       }
     },
     "claude-3-5-haiku@20241022": {
@@ -23289,6 +23258,25 @@
       "limit": {
         "context": 2048,
         "output": 1
+      }
+    },
+    "gemini-2.5-pro-tts": {
+      "id": "gemini-2.5-pro-tts",
+      "family": "gemini-pro",
+      "reasoning": false,
+      "temperature": false,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "audio"
+        ]
+      },
+      "limit": {
+        "context": 32768,
+        "output": 16384
       }
     },
     "zai-org/glm-4.7-maas": {
@@ -23555,8 +23543,6 @@
         "input": [
           "text",
           "image",
-          "video",
-          "audio",
           "pdf"
         ],
         "output": [
@@ -24758,6 +24744,27 @@
         "output": 4096
       }
     },
+    "claude-fable-5": {
+      "id": "claude-fable-5",
+      "family": "claude-fable",
+      "reasoning": true,
+      "temperature": false,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "pdf"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 1000000,
+        "output": 128000
+      }
+    },
     "claude-3-7-sonnet-20250219": {
       "id": "claude-3-7-sonnet-20250219",
       "family": "claude-sonnet",
@@ -24987,6 +24994,25 @@
       },
       "limit": {
         "context": 262144,
+        "output": 131072
+      }
+    },
+    "mimo-v2.5-pro-ultraspeed": {
+      "id": "mimo-v2.5-pro-ultraspeed",
+      "family": "mimo",
+      "reasoning": true,
+      "temperature": true,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 1048576,
         "output": 131072
       }
     },
@@ -26965,7 +26991,7 @@
         ]
       },
       "limit": {
-        "context": 2000000,
+        "context": 1000000,
         "output": 30000
       }
     },
@@ -26986,7 +27012,7 @@
         ]
       },
       "limit": {
-        "context": 2000000,
+        "context": 1000000,
         "output": 30000
       }
     },
@@ -27050,7 +27076,7 @@
         ]
       },
       "limit": {
-        "context": 2000000,
+        "context": 1000000,
         "output": 30000
       }
     },
@@ -27777,6 +27803,25 @@
         "output": 4000
       }
     },
+    "north-mini-code-1-0": {
+      "id": "north-mini-code-1-0",
+      "family": "north",
+      "reasoning": true,
+      "temperature": true,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 256000,
+        "output": 64000
+      }
+    },
     "command-r-08-2024": {
       "id": "command-r-08-2024",
       "family": "command-r",
@@ -28166,25 +28211,6 @@
         "output": 16384
       }
     },
-    "o1-preview": {
-      "id": "o1-preview",
-      "family": "o",
-      "reasoning": true,
-      "temperature": true,
-      "toolCall": false,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 128000,
-        "output": 32768
-      }
-    },
     "phi-4-mini-reasoning": {
       "id": "phi-4-mini-reasoning",
       "family": "phi",
@@ -28207,7 +28233,7 @@
     "o1-mini": {
       "id": "o1-mini",
       "family": "o-mini",
-      "reasoning": true,
+      "reasoning": false,
       "temperature": false,
       "toolCall": false,
       "modalities": {
@@ -28587,25 +28613,6 @@
       "limit": {
         "context": 32000,
         "output": 4096
-      }
-    },
-    "mai-ds-r1": {
-      "id": "mai-ds-r1",
-      "family": "mai",
-      "reasoning": true,
-      "temperature": true,
-      "toolCall": false,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 128000,
-        "output": 8192
       }
     },
     "text-embedding-ada-002": {
@@ -29117,25 +29124,6 @@
         "output": 16384
       }
     },
-    "z-ai/glm-4.5-air:free": {
-      "id": "z-ai/glm-4.5-air:free",
-      "family": "glm-air",
-      "reasoning": true,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 131072,
-        "output": 96000
-      }
-    },
     "nousresearch/hermes-3-llama-3.1-405b:free": {
       "id": "nousresearch/hermes-3-llama-3.1-405b:free",
       "family": "hermes",
@@ -29160,6 +29148,27 @@
       "family": "claude-opus",
       "reasoning": true,
       "temperature": false,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "pdf"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 1000000,
+        "output": 128000
+      }
+    },
+    "anthropic/claude-fable-5": {
+      "id": "anthropic/claude-fable-5",
+      "family": "claude",
+      "reasoning": true,
+      "temperature": true,
       "toolCall": true,
       "modalities": {
         "input": [
@@ -29231,7 +29240,7 @@
       },
       "limit": {
         "context": 1000000,
-        "output": 65536
+        "output": 64000
       }
     },
     "liquid/lfm-2.5-1.2b-instruct:free": {
@@ -29421,8 +29430,8 @@
         ]
       },
       "limit": {
-        "context": 512300,
-        "output": 512300
+        "context": 1000000,
+        "output": 65000
       }
     },
     "nvidia/nemotron-nano-12b-v2-vl:free": {
@@ -29433,8 +29442,8 @@
       "toolCall": true,
       "modalities": {
         "input": [
-          "image",
           "text",
+          "image",
           "video"
         ],
         "output": [
@@ -29484,17 +29493,34 @@
         "output": 32768
       }
     },
-    "stepfun/step-3.7-flash": {
-      "id": "stepfun/step-3.7-flash",
-      "family": "step",
+    "nex-agi/nex-n2-pro:free": {
+      "id": "nex-agi/nex-n2-pro:free",
       "reasoning": true,
       "temperature": true,
       "toolCall": true,
       "modalities": {
         "input": [
           "text",
-          "image",
-          "video"
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 262144,
+        "output": 262144
+      }
+    },
+    "stepfun/step-3.7-flash": {
+      "id": "stepfun/step-3.7-flash",
+      "reasoning": true,
+      "temperature": true,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image"
         ],
         "output": [
           "text"
@@ -29502,8 +29528,10 @@
       },
       "limit": {
         "context": 256000,
+        "input": 256000,
         "output": 256000
-      }
+      },
+      "family": "step"
     },
     "google/gemma-4-31b-it:free": {
       "id": "google/gemma-4-31b-it:free",
@@ -29583,6 +29611,27 @@
       "limit": {
         "context": 131072,
         "output": 131072
+      }
+    },
+    "~anthropic/claude-fable-latest": {
+      "id": "~anthropic/claude-fable-latest",
+      "family": "claude-fable",
+      "reasoning": true,
+      "temperature": false,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "pdf"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 1000000,
+        "output": 128000
       }
     },
     "gemma-3-27b": {
@@ -29739,7 +29788,7 @@
         ]
       },
       "limit": {
-        "context": 2000000,
+        "context": 1000000,
         "output": 30000
       }
     },
@@ -30041,7 +30090,7 @@
         ]
       },
       "limit": {
-        "context": 2000000,
+        "context": 1000000,
         "output": 30000
       }
     },
@@ -30343,6 +30392,29 @@
       "limit": {
         "context": 1000000,
         "output": 32000
+      }
+    },
+    "gemini-2.0-flash": {
+      "id": "gemini-2.0-flash",
+      "family": "gemini-flash",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "audio",
+          "video",
+          "pdf"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 1048576,
+        "output": 8192
       }
     },
     "gpt-3.5-turbo": {
@@ -31893,8 +31965,7 @@
       "limit": {
         "context": 200000,
         "output": 64000
-      },
-      "family": "claude-sonnet"
+      }
     },
     "qwen/qwen3.5-flash": {
       "id": "qwen/qwen3.5-flash",
@@ -32297,6 +32368,27 @@
       "limit": {
         "context": 256000,
         "output": 64000
+      }
+    },
+    "openai/gpt-5.5-instant": {
+      "id": "openai/gpt-5.5-instant",
+      "reasoning": true,
+      "temperature": true,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "pdf"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 400000,
+        "input": 400000,
+        "output": 128000
       }
     },
     "minimax/minimax-m2.5-lightning": {
@@ -33285,7 +33377,9 @@
       "toolCall": true,
       "modalities": {
         "input": [
-          "text"
+          "text",
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -33305,15 +33399,17 @@
       "toolCall": true,
       "modalities": {
         "input": [
-          "text"
+          "text",
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
         ]
       },
       "limit": {
-        "context": 2000000,
-        "output": 30000
+        "context": 1000000,
+        "output": 1000000
       }
     },
     "xai/grok-4-fast-non-reasoning": {
@@ -33344,26 +33440,29 @@
       "toolCall": true,
       "modalities": {
         "input": [
-          "text"
+          "text",
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
         ]
       },
       "limit": {
-        "context": 2000000,
-        "output": 30000
+        "context": 1000000,
+        "output": 1000000
       }
     },
     "xai/grok-4-fast-reasoning": {
       "id": "xai/grok-4-fast-reasoning",
       "family": "grok",
       "reasoning": true,
-      "temperature": true,
+      "temperature": false,
       "toolCall": true,
       "modalities": {
         "input": [
-          "text"
+          "text",
+          "image"
         ],
         "output": [
           "text"
@@ -33371,7 +33470,7 @@
       },
       "limit": {
         "context": 2000000,
-        "output": 256000
+        "output": 128000
       }
     },
     "xai/grok-4": {
@@ -33653,22 +33752,21 @@
       "id": "google/gemini-2.0-flash-lite",
       "family": "gemini-flash-lite",
       "reasoning": false,
-      "temperature": true,
+      "temperature": false,
       "toolCall": true,
       "modalities": {
         "input": [
           "text",
           "image",
-          "audio",
           "video",
-          "pdf"
+          "audio"
         ],
         "output": [
           "text"
         ]
       },
       "limit": {
-        "context": 1048576,
+        "context": 990000,
         "output": 8192
       }
     },
@@ -33708,7 +33806,7 @@
       },
       "limit": {
         "context": 1000000,
-        "output": 64000
+        "output": 65000
       },
       "family": "gemini-flash"
     },
@@ -33794,22 +33892,21 @@
       "id": "google/gemini-2.0-flash",
       "family": "gemini-flash",
       "reasoning": false,
-      "temperature": true,
+      "temperature": false,
       "toolCall": true,
       "modalities": {
         "input": [
           "text",
           "image",
-          "audio",
           "video",
-          "pdf"
+          "audio"
         ],
         "output": [
           "text"
         ]
       },
       "limit": {
-        "context": 1048576,
+        "context": 990000,
         "output": 8192
       }
     },
@@ -33952,21 +34049,20 @@
     },
     "openai/gpt-image-1": {
       "id": "openai/gpt-image-1",
-      "family": "gpt",
+      "family": "gpt-image",
       "reasoning": false,
-      "temperature": false,
-      "toolCall": true,
+      "temperature": true,
+      "toolCall": false,
       "modalities": {
         "input": [
-          "text",
-          "image"
+          "text"
         ],
         "output": [
           "image"
         ]
       },
       "limit": {
-        "context": 128000,
+        "context": 0,
         "output": 0
       }
     },
@@ -34012,14 +34108,13 @@
     },
     "openai/gpt-image-1-mini": {
       "id": "openai/gpt-image-1-mini",
-      "family": "gpt",
+      "family": "gpt-image",
       "reasoning": false,
-      "temperature": false,
-      "toolCall": true,
+      "temperature": true,
+      "toolCall": false,
       "modalities": {
         "input": [
-          "text",
-          "image"
+          "text"
         ],
         "output": [
           "image"
@@ -34198,8 +34293,7 @@
           "pdf"
         ],
         "output": [
-          "text",
-          "image"
+          "text"
         ]
       },
       "limit": {
@@ -34231,12 +34325,11 @@
     "openai/gpt-image-2": {
       "id": "openai/gpt-image-2",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
-          "text",
-          "image"
+          "text"
         ],
         "output": [
           "image"
@@ -34245,26 +34338,27 @@
       "limit": {
         "context": 0,
         "output": 0
-      }
+      },
+      "family": "gpt-image"
     },
     "openai/gpt-image-1.5": {
       "id": "openai/gpt-image-1.5",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
-          "text",
-          "image"
+          "text"
         ],
         "output": [
           "image"
         ]
       },
       "limit": {
-        "context": 128000,
+        "context": 0,
         "output": 0
-      }
+      },
+      "family": "gpt-image"
     },
     "openai/gpt-5.2-instant": {
       "id": "openai/gpt-5.2-instant",
@@ -34719,25 +34813,6 @@
         "output": 448
       },
       "temperature": false
-    },
-    "z-ai/glm4.7": {
-      "id": "z-ai/glm4.7",
-      "family": "glm",
-      "reasoning": true,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 204800,
-        "output": 131072
-      }
     },
     "upstage/solar-10_7b-instruct": {
       "id": "upstage/solar-10_7b-instruct",
@@ -35397,25 +35472,6 @@
       "limit": {
         "context": 128000,
         "output": 4096
-      }
-    },
-    "nvidia/llama-3_3-nemotron-super-49b-v1": {
-      "id": "nvidia/llama-3_3-nemotron-super-49b-v1",
-      "family": "nemotron",
-      "reasoning": true,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 131072,
-        "output": 131072
       }
     },
     "nvidia/nemotron-content-safety-reasoning-4b": {
@@ -36234,101 +36290,6 @@
         "output": 16384
       }
     },
-    "minimaxai/minimax-m2": {
-      "id": "MiniMaxAI/MiniMax-M2",
-      "family": "minimax",
-      "reasoning": true,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 262144,
-        "output": 32768
-      }
-    },
-    "anthropic/claude-4-opus": {
-      "id": "anthropic/claude-4-opus",
-      "family": "claude-opus",
-      "reasoning": true,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text",
-          "image"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 200000,
-        "output": 32000
-      }
-    },
-    "anthropic/claude-3-7-sonnet-latest": {
-      "id": "anthropic/claude-3-7-sonnet-latest",
-      "family": "claude-sonnet",
-      "reasoning": true,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text",
-          "image"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 200000,
-        "output": 64000
-      }
-    },
-    "meta-llama/llama-3.1-8b-instruct-turbo": {
-      "id": "meta-llama/Llama-3.1-8B-Instruct-Turbo",
-      "family": "llama",
-      "reasoning": false,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 131072,
-        "output": 16384
-      }
-    },
-    "meta-llama/llama-3.1-70b-instruct-turbo": {
-      "id": "meta-llama/Llama-3.1-70B-Instruct-Turbo",
-      "family": "llama",
-      "reasoning": false,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 131072,
-        "output": 16384
-      }
-    },
     "qwen/qwen3-coder-480b-a35b-instruct-turbo": {
       "id": "Qwen/Qwen3-Coder-480B-A35B-Instruct-Turbo",
       "family": "qwen",
@@ -36422,65 +36383,8 @@
         ]
       },
       "limit": {
-        "context": 448,
-        "output": 448
-      }
-    },
-    "llama3-8b-8192": {
-      "id": "llama3-8b-8192",
-      "family": "llama",
-      "reasoning": false,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 8192,
-        "output": 8192
-      }
-    },
-    "mistral-saba-24b": {
-      "id": "mistral-saba-24b",
-      "family": "mistral",
-      "reasoning": false,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 32768,
-        "output": 32768
-      }
-    },
-    "allam-2-7b": {
-      "id": "allam-2-7b",
-      "family": "allam",
-      "reasoning": false,
-      "temperature": true,
-      "toolCall": false,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 4096,
-        "output": 4096
+        "context": 0,
+        "output": 0
       }
     },
     "llama-3.1-8b-instant": {
@@ -36502,44 +36406,6 @@
         "output": 32678
       }
     },
-    "qwen-qwq-32b": {
-      "id": "qwen-qwq-32b",
-      "family": "qwen",
-      "reasoning": true,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 131072,
-        "output": 16384
-      }
-    },
-    "gemma2-9b-it": {
-      "id": "gemma2-9b-it",
-      "family": "gemma",
-      "reasoning": false,
-      "temperature": true,
-      "toolCall": false,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 8192,
-        "output": 8192
-      }
-    },
     "llama-3.3-70b-versatile": {
       "id": "llama-3.3-70b-versatile",
       "family": "llama",
@@ -36559,69 +36425,11 @@
         "output": 32768
       }
     },
-    "llama3-70b-8192": {
-      "id": "llama3-70b-8192",
-      "family": "llama",
-      "reasoning": false,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 8192,
-        "output": 8192
-      }
-    },
-    "llama-guard-3-8b": {
-      "id": "llama-guard-3-8b",
-      "family": "llama",
-      "reasoning": false,
-      "temperature": true,
-      "toolCall": false,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 8192,
-        "output": 8192
-      }
-    },
-    "meta-llama/llama-4-maverick-17b-128e-instruct": {
-      "id": "meta-llama/llama-4-maverick-17b-128e-instruct",
-      "family": "llama",
-      "reasoning": false,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text",
-          "image"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 131072,
-        "output": 8192
-      }
-    },
     "meta-llama/llama-prompt-guard-2-86m": {
       "id": "meta-llama/llama-prompt-guard-2-86m",
       "family": "llama",
       "reasoning": false,
-      "temperature": true,
+      "temperature": false,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -36640,7 +36448,7 @@
       "id": "meta-llama/llama-prompt-guard-2-22m",
       "family": "llama",
       "reasoning": false,
-      "temperature": true,
+      "temperature": false,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -36658,9 +36466,9 @@
     "groq/compound-mini": {
       "id": "groq/compound-mini",
       "family": "groq",
-      "reasoning": true,
+      "reasoning": false,
       "temperature": true,
-      "toolCall": true,
+      "toolCall": false,
       "modalities": {
         "input": [
           "text"
@@ -36677,9 +36485,9 @@
     "groq/compound": {
       "id": "groq/compound",
       "family": "groq",
-      "reasoning": true,
+      "reasoning": false,
       "temperature": true,
-      "toolCall": true,
+      "toolCall": false,
       "modalities": {
         "input": [
           "text"
@@ -36697,7 +36505,7 @@
       "id": "canopylabs/orpheus-v1-english",
       "family": "canopylabs",
       "reasoning": false,
-      "temperature": true,
+      "temperature": false,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -36716,7 +36524,7 @@
       "id": "canopylabs/orpheus-arabic-saudi",
       "family": "canopylabs",
       "reasoning": false,
-      "temperature": true,
+      "temperature": false,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -39375,6 +39183,26 @@
         "output": 8192
       }
     },
+    "nvidia-nemotron-3-ultra-550b-a55b": {
+      "id": "nvidia-nemotron-3-ultra-550b-a55b",
+      "family": "nemotron",
+      "reasoning": true,
+      "temperature": true,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 256000,
+        "output": 32768
+      }
+    },
     "qwen3-5-397b-a17b": {
       "id": "qwen3-5-397b-a17b",
       "family": "qwen",
@@ -39550,6 +39378,25 @@
       },
       "limit": {
         "context": 200000,
+        "output": 32768
+      }
+    },
+    "tencent-hy3-preview": {
+      "id": "tencent-hy3-preview",
+      "family": "Hy",
+      "reasoning": true,
+      "temperature": true,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 256000,
         "output": 32768
       }
     },
@@ -40421,7 +40268,7 @@
         ]
       },
       "limit": {
-        "context": 2000000,
+        "context": 1000000,
         "output": 30000
       }
     },
@@ -40518,8 +40365,8 @@
         ]
       },
       "limit": {
-        "context": 202752,
-        "output": 120000
+        "context": 131000,
+        "output": 40000
       }
     },
     "zai/glm-5": {
@@ -40538,7 +40385,7 @@
       },
       "limit": {
         "context": 202800,
-        "output": 131072
+        "output": 131100
       }
     },
     "zai/glm-5-turbo": {
@@ -40575,8 +40422,8 @@
         ]
       },
       "limit": {
-        "context": 131072,
-        "output": 131072
+        "context": 128000,
+        "output": 96000
       }
     },
     "zai/glm-4.5-air": {
@@ -40615,8 +40462,8 @@
         ]
       },
       "limit": {
-        "context": 202752,
-        "output": 202752
+        "context": 202800,
+        "output": 64000
       }
     },
     "step-2-16k": {
@@ -40797,7 +40644,7 @@
     "openai.gpt-oss-120b-1:0": {
       "id": "openai.gpt-oss-120b-1:0",
       "family": "gpt-oss",
-      "reasoning": false,
+      "reasoning": true,
       "temperature": true,
       "toolCall": true,
       "modalities": {
@@ -41112,7 +40959,7 @@
     "openai.gpt-oss-120b": {
       "id": "openai.gpt-oss-120b",
       "family": "gpt-oss",
-      "reasoning": false,
+      "reasoning": true,
       "temperature": true,
       "toolCall": true,
       "modalities": {
@@ -42241,6 +42088,46 @@
         "output": 8192
       }
     },
+    "global.anthropic.claude-fable-5": {
+      "id": "global.anthropic.claude-fable-5",
+      "family": "claude-fable",
+      "reasoning": true,
+      "temperature": false,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 1000000,
+        "output": 128000
+      }
+    },
+    "eu.anthropic.claude-fable-5": {
+      "id": "eu.anthropic.claude-fable-5",
+      "family": "claude-fable",
+      "reasoning": true,
+      "temperature": false,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 1000000,
+        "output": 128000
+      }
+    },
     "us.meta.llama4-maverick-17b-instruct-v1:0": {
       "id": "us.meta.llama4-maverick-17b-instruct-v1:0",
       "family": "llama",
@@ -42264,7 +42151,7 @@
     "amazon.nova-2-lite-v1:0": {
       "id": "amazon.nova-2-lite-v1:0",
       "family": "nova",
-      "reasoning": false,
+      "reasoning": true,
       "temperature": true,
       "toolCall": true,
       "modalities": {
@@ -42465,6 +42352,26 @@
         "output": 64000
       }
     },
+    "us.anthropic.claude-fable-5": {
+      "id": "us.anthropic.claude-fable-5",
+      "family": "claude-fable",
+      "reasoning": true,
+      "temperature": false,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 1000000,
+        "output": 128000
+      }
+    },
     "zai.glm-4.7-flash": {
       "id": "zai.glm-4.7-flash",
       "family": "glm-flash",
@@ -42487,7 +42394,7 @@
     "openai.gpt-oss-20b-1:0": {
       "id": "openai.gpt-oss-20b-1:0",
       "family": "gpt-oss",
-      "reasoning": false,
+      "reasoning": true,
       "temperature": true,
       "toolCall": true,
       "modalities": {
@@ -42548,7 +42455,7 @@
     "openai.gpt-oss-20b": {
       "id": "openai.gpt-oss-20b",
       "family": "gpt-oss",
-      "reasoning": false,
+      "reasoning": true,
       "temperature": true,
       "toolCall": true,
       "modalities": {
@@ -43684,6 +43591,25 @@
         "output": 32768
       }
     },
+    "gemma2-9b-it": {
+      "id": "gemma2-9b-it",
+      "family": "gemma",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 8192,
+        "output": 8192
+      }
+    },
     "qwen3-coder": {
       "id": "qwen3-coder",
       "family": "qwen",
@@ -44624,7 +44550,7 @@
       },
       "limit": {
         "context": 128000,
-        "output": 8192
+        "output": 100000
       },
       "family": "longcat"
     },
@@ -44745,11 +44671,68 @@
         "output": 32000
       }
     },
+    "bfl/flux-2-klein-9b": {
+      "id": "bfl/flux-2-klein-9b",
+      "family": "flux",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "bfl/flux-2-flex": {
+      "id": "bfl/flux-2-flex",
+      "family": "flux",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "bfl/flux-2-klein-4b": {
+      "id": "bfl/flux-2-klein-4b",
+      "family": "flux",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
     "bfl/flux-kontext-max": {
       "id": "bfl/flux-kontext-max",
       "family": "flux",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -44764,11 +44747,30 @@
         "output": 0
       }
     },
+    "bfl/flux-2-pro": {
+      "id": "bfl/flux-2-pro",
+      "family": "flux",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 67300,
+        "output": 67300
+      }
+    },
     "bfl/flux-pro-1.1-ultra": {
       "id": "bfl/flux-pro-1.1-ultra",
       "family": "flux",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -44787,7 +44789,7 @@
       "id": "bfl/flux-pro-1.0-fill",
       "family": "flux",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -44806,7 +44808,7 @@
       "id": "bfl/flux-pro-1.1",
       "family": "flux",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -44825,7 +44827,7 @@
       "id": "bfl/flux-kontext-pro",
       "family": "flux",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -44840,6 +44842,25 @@
         "output": 0
       }
     },
+    "bfl/flux-2-max": {
+      "id": "bfl/flux-2-max",
+      "family": "flux",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 67300,
+        "output": 67300
+      }
+    },
     "deepseek/deepseek-v3.2-thinking": {
       "id": "deepseek/deepseek-v3.2-thinking",
       "family": "deepseek-thinking",
@@ -44848,7 +44869,9 @@
       "toolCall": true,
       "modalities": {
         "input": [
-          "text"
+          "text",
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -44856,7 +44879,7 @@
       },
       "limit": {
         "context": 128000,
-        "output": 64000
+        "output": 8000
       }
     },
     "deepseek/deepseek-v3": {
@@ -44875,14 +44898,15 @@
       },
       "limit": {
         "context": 163840,
-        "output": 16384
+        "output": 163840
       }
     },
-    "inception/mercury-edit-2": {
-      "id": "inception/mercury-edit-2",
-      "reasoning": true,
+    "inception/mercury-coder-small": {
+      "id": "inception/mercury-coder-small",
+      "family": "mercury",
+      "reasoning": false,
       "temperature": true,
-      "toolCall": false,
+      "toolCall": true,
       "modalities": {
         "input": [
           "text"
@@ -44892,8 +44916,160 @@
         ]
       },
       "limit": {
-        "context": 128000,
-        "output": 8192
+        "context": 32000,
+        "output": 16384
+      }
+    },
+    "klingai/kling-v2.6-i2v": {
+      "id": "klingai/kling-v2.6-i2v",
+      "family": "ling",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "klingai/kling-v3.0-t2v": {
+      "id": "klingai/kling-v3.0-t2v",
+      "family": "ling",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "klingai/kling-v3.0-motion-control": {
+      "id": "klingai/kling-v3.0-motion-control",
+      "family": "ling",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "klingai/kling-v2.6-motion-control": {
+      "id": "klingai/kling-v2.6-motion-control",
+      "family": "ling",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "klingai/kling-v2.6-t2v": {
+      "id": "klingai/kling-v2.6-t2v",
+      "family": "ling",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "klingai/kling-v2.5-turbo-i2v": {
+      "id": "klingai/kling-v2.5-turbo-i2v",
+      "family": "ling",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "klingai/kling-v2.5-turbo-t2v": {
+      "id": "klingai/kling-v2.5-turbo-t2v",
+      "family": "ling",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "klingai/kling-v3.0-i2v": {
+      "id": "klingai/kling-v3.0-i2v",
+      "family": "ling",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
       }
     },
     "interfaze/interfaze-beta": {
@@ -44912,27 +45088,6 @@
       "limit": {
         "context": 1000000,
         "output": 32000
-      }
-    },
-    "anthropic/claude-3.5-sonnet-20240620": {
-      "id": "anthropic/claude-3.5-sonnet-20240620",
-      "family": "claude-sonnet",
-      "reasoning": false,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text",
-          "image",
-          "pdf"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 200000,
-        "output": 8192
       }
     },
     "alibaba/qwen-3-14b": {
@@ -44969,7 +45124,7 @@
         ]
       },
       "limit": {
-        "context": 262144,
+        "context": 131072,
         "output": 32768
       }
     },
@@ -44992,6 +45147,25 @@
         "output": 32768
       }
     },
+    "alibaba/wan-v2.6-r2v-flash": {
+      "id": "alibaba/wan-v2.6-r2v-flash",
+      "family": "o",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
     "alibaba/qwen3-vl-thinking": {
       "id": "alibaba/qwen3-vl-thinking",
       "family": "qwen",
@@ -45001,7 +45175,8 @@
       "modalities": {
         "input": [
           "text",
-          "image"
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -45009,7 +45184,7 @@
       },
       "limit": {
         "context": 131072,
-        "output": 129024
+        "output": 32768
       }
     },
     "alibaba/qwen3-vl-235b-a22b-instruct": {
@@ -45021,7 +45196,8 @@
       "modalities": {
         "input": [
           "text",
-          "image"
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -45088,7 +45264,7 @@
       },
       "limit": {
         "context": 1000000,
-        "output": 1000000
+        "output": 65536
       }
     },
     "alibaba/qwen3-coder-next": {
@@ -45140,7 +45316,6 @@
       "modalities": {
         "input": [
           "text",
-          "image",
           "pdf"
         ],
         "output": [
@@ -45150,6 +45325,25 @@
       "limit": {
         "context": 991000,
         "output": 64000
+      }
+    },
+    "alibaba/wan-v2.5-t2v-preview": {
+      "id": "alibaba/wan-v2.5-t2v-preview",
+      "family": "o",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
       }
     },
     "alibaba/qwen3.6-plus": {
@@ -45189,14 +45383,14 @@
       },
       "limit": {
         "context": 131072,
-        "output": 65536
+        "output": 32768
       }
     },
     "alibaba/qwen3-embedding-8b": {
       "id": "alibaba/qwen3-embedding-8b",
       "family": "qwen",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -45215,7 +45409,7 @@
       "id": "alibaba/qwen3-embedding-4b",
       "family": "qwen",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -45234,7 +45428,7 @@
       "id": "alibaba/qwen3-embedding-0.6b",
       "family": "qwen",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -45264,7 +45458,7 @@
         ]
       },
       "limit": {
-        "context": 40960,
+        "context": 262144,
         "output": 16384
       }
     },
@@ -45283,8 +45477,8 @@
         ]
       },
       "limit": {
-        "context": 160000,
-        "output": 32768
+        "context": 262144,
+        "output": 8192
       }
     },
     "alibaba/qwen3-coder": {
@@ -45303,7 +45497,66 @@
       },
       "limit": {
         "context": 262144,
-        "output": 66536
+        "output": 65536
+      }
+    },
+    "alibaba/wan-v2.6-i2v-flash": {
+      "id": "alibaba/wan-v2.6-i2v-flash",
+      "family": "o",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "alibaba/qwen3.7-plus": {
+      "id": "alibaba/qwen3.7-plus",
+      "family": "qwen3.7-plus",
+      "reasoning": true,
+      "temperature": true,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "pdf"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 1000000,
+        "output": 64000
+      }
+    },
+    "alibaba/wan-v2.6-r2v": {
+      "id": "alibaba/wan-v2.6-r2v",
+      "family": "o",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
       }
     },
     "alibaba/qwen-3-32b": {
@@ -45321,8 +45574,8 @@
         ]
       },
       "limit": {
-        "context": 40960,
-        "output": 16384
+        "context": 128000,
+        "output": 8192
       }
     },
     "alibaba/qwen3-235b-a22b-thinking": {
@@ -45342,8 +45595,8 @@
         ]
       },
       "limit": {
-        "context": 262114,
-        "output": 262114
+        "context": 131072,
+        "output": 32768
       }
     },
     "alibaba/qwen3-max-thinking": {
@@ -45374,7 +45627,6 @@
       "modalities": {
         "input": [
           "text",
-          "image",
           "pdf"
         ],
         "output": [
@@ -45384,6 +45636,25 @@
       "limit": {
         "context": 240000,
         "output": 64000
+      }
+    },
+    "alibaba/wan-v2.6-i2v": {
+      "id": "alibaba/wan-v2.6-i2v",
+      "family": "o",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
       }
     },
     "alibaba/qwen-3-30b": {
@@ -45405,6 +45676,25 @@
         "output": 16384
       }
     },
+    "alibaba/wan-v2.6-t2v": {
+      "id": "alibaba/wan-v2.6-t2v",
+      "family": "o",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
     "alibaba/qwen3-vl-instruct": {
       "id": "alibaba/qwen3-vl-instruct",
       "family": "qwen",
@@ -45414,7 +45704,8 @@
       "modalities": {
         "input": [
           "text",
-          "image"
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -45429,7 +45720,7 @@
       "id": "mistral/codestral-embed",
       "family": "codestral-embed",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -45487,7 +45778,7 @@
       "id": "mistral/mistral-embed",
       "family": "mistral-embed",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -45517,8 +45808,8 @@
         ]
       },
       "limit": {
-        "context": 60288,
-        "output": 16000
+        "context": 131072,
+        "output": 131072
       }
     },
     "mistral/ministral-14b": {
@@ -45598,25 +45889,6 @@
       "limit": {
         "context": 256000,
         "output": 256000
-      }
-    },
-    "mistral/mixtral-8x22b-instruct": {
-      "id": "mistral/mixtral-8x22b-instruct",
-      "family": "mixtral",
-      "reasoning": false,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 64000,
-        "output": 64000
       }
     },
     "mistral/ministral-8b": {
@@ -45815,8 +46087,8 @@
         "output": 256000
       }
     },
-    "xai/grok-imagine-image-pro": {
-      "id": "xai/grok-imagine-image-pro",
+    "xai/grok-imagine-video-1.5-preview": {
+      "id": "xai/grok-imagine-video-1.5-preview",
       "family": "grok",
       "reasoning": false,
       "temperature": true,
@@ -45826,8 +46098,7 @@
           "text"
         ],
         "output": [
-          "text",
-          "image"
+          "video"
         ]
       },
       "limit": {
@@ -45905,7 +46176,9 @@
       "toolCall": true,
       "modalities": {
         "input": [
-          "text"
+          "text",
+          "image",
+          "pdf"
         ],
         "output": [
           "text"
@@ -45937,11 +46210,68 @@
         "output": 2000000
       }
     },
+    "xai/grok-imagine-video": {
+      "id": "xai/grok-imagine-video",
+      "family": "grok",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "cohere/rerank-v4-pro": {
+      "id": "cohere/rerank-v4-pro",
+      "family": "o",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 32000,
+        "output": 32000
+      }
+    },
+    "cohere/rerank-v4-fast": {
+      "id": "cohere/rerank-v4-fast",
+      "family": "o",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 32000,
+        "output": 32000
+      }
+    },
     "cohere/embed-v4.0": {
       "id": "cohere/embed-v4.0",
       "family": "cohere-embed",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -45954,6 +46284,25 @@
       "limit": {
         "context": 8192,
         "output": 1536
+      }
+    },
+    "cohere/rerank-v3.5": {
+      "id": "cohere/rerank-v3.5",
+      "family": "o",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 4096,
+        "output": 4096
       }
     },
     "moonshotai/kimi-k2-turbo": {
@@ -45975,10 +46324,10 @@
         "output": 16384
       }
     },
-    "perplexity/sonar-reasoning": {
-      "id": "perplexity/sonar-reasoning",
-      "family": "sonar-reasoning",
-      "reasoning": true,
+    "prodia/flux-fast-schnell": {
+      "id": "prodia/flux-fast-schnell",
+      "family": "flux",
+      "reasoning": false,
       "temperature": true,
       "toolCall": false,
       "modalities": {
@@ -45986,12 +46335,12 @@
           "text"
         ],
         "output": [
-          "text"
+          "image"
         ]
       },
       "limit": {
-        "context": 127000,
-        "output": 8000
+        "context": 512,
+        "output": 0
       }
     },
     "nvidia/nemotron-nano-12b-v2-vl": {
@@ -46048,8 +46397,8 @@
         ]
       },
       "limit": {
-        "context": 131072,
-        "output": 16384
+        "context": 128000,
+        "output": 8192
       }
     },
     "meta/llama-3.1-70b": {
@@ -46067,8 +46416,8 @@
         ]
       },
       "limit": {
-        "context": 131072,
-        "output": 16384
+        "context": 128000,
+        "output": 8192
       }
     },
     "meta/llama-3.2-3b": {
@@ -46232,7 +46581,7 @@
       "id": "amazon/titan-embed-text-v2",
       "family": "titan-embed",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46346,7 +46695,7 @@
       },
       "limit": {
         "context": 66000,
-        "output": 66000
+        "output": 16000
       }
     },
     "zai/glm-4.6v": {
@@ -46429,30 +46778,11 @@
         "output": 32768
       }
     },
-    "meituan/longcat-flash-thinking": {
-      "id": "meituan/longcat-flash-thinking",
-      "family": "longcat",
-      "reasoning": true,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 128000,
-        "output": 8192
-      }
-    },
     "voyage/voyage-code-2": {
       "id": "voyage/voyage-code-2",
       "family": "voyage",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46471,7 +46801,7 @@
       "id": "voyage/voyage-code-3",
       "family": "voyage",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46486,11 +46816,30 @@
         "output": 1536
       }
     },
+    "voyage/rerank-2.5-lite": {
+      "id": "voyage/rerank-2.5-lite",
+      "family": "voyage",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 32000,
+        "output": 32000
+      }
+    },
     "voyage/voyage-finance-2": {
       "id": "voyage/voyage-finance-2",
       "family": "voyage",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46509,7 +46858,7 @@
       "id": "voyage/voyage-3.5",
       "family": "voyage",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46547,7 +46896,7 @@
       "id": "voyage/voyage-3.5-lite",
       "family": "voyage",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46560,6 +46909,25 @@
       "limit": {
         "context": 8192,
         "output": 1536
+      }
+    },
+    "voyage/rerank-2.5": {
+      "id": "voyage/rerank-2.5",
+      "family": "voyage",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 32000,
+        "output": 32000
       }
     },
     "voyage/voyage-4": {
@@ -46585,7 +46953,7 @@
       "id": "voyage/voyage-3-large",
       "family": "voyage",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46604,7 +46972,7 @@
       "id": "voyage/voyage-law-2",
       "family": "voyage",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46638,49 +47006,9 @@
         "output": 0
       }
     },
-    "vercel/v0-1.5-md": {
-      "id": "vercel/v0-1.5-md",
-      "family": "v0",
-      "reasoning": true,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text",
-          "image"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 128000,
-        "output": 32000
-      }
-    },
-    "vercel/v0-1.0-md": {
-      "id": "vercel/v0-1.0-md",
-      "family": "v0",
-      "reasoning": true,
-      "temperature": true,
-      "toolCall": true,
-      "modalities": {
-        "input": [
-          "text",
-          "image"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "limit": {
-        "context": 128000,
-        "output": 32000
-      }
-    },
-    "google/gemini-2.5-flash-image-preview": {
-      "id": "google/gemini-2.5-flash-image-preview",
-      "family": "gemini-flash",
+    "google/veo-3.1-fast-generate-001": {
+      "id": "google/veo-3.1-fast-generate-001",
+      "family": "veo",
       "reasoning": false,
       "temperature": true,
       "toolCall": false,
@@ -46689,13 +47017,12 @@
           "text"
         ],
         "output": [
-          "text",
-          "image"
+          "video"
         ]
       },
       "limit": {
-        "context": 32768,
-        "output": 32768
+        "context": 0,
+        "output": 0
       }
     },
     "google/gemini-embedding-2": {
@@ -46715,6 +47042,27 @@
       "limit": {
         "context": 0,
         "output": 0
+      }
+    },
+    "google/gemini-3.1-flash-image": {
+      "id": "google/gemini-3.1-flash-image",
+      "family": "gemini",
+      "reasoning": true,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text",
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 131072,
+        "output": 32768
       }
     },
     "google/imagen-4.0-generate-001": {
@@ -46740,7 +47088,7 @@
       "id": "google/text-embedding-005",
       "family": "text-embedding",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46755,27 +47103,42 @@
         "output": 1536
       }
     },
-    "google/gemini-2.5-flash-preview-09-2025": {
-      "id": "google/gemini-2.5-flash-preview-09-2025",
-      "family": "gemini-flash",
-      "reasoning": true,
+    "google/veo-3.1-generate-001": {
+      "id": "google/veo-3.1-generate-001",
+      "family": "veo",
+      "reasoning": false,
       "temperature": true,
-      "toolCall": true,
+      "toolCall": false,
       "modalities": {
         "input": [
-          "text",
-          "image",
-          "audio",
-          "video",
-          "pdf"
+          "text"
         ],
         "output": [
-          "text"
+          "video"
         ]
       },
       "limit": {
-        "context": 1048576,
-        "output": 65536
+        "context": 0,
+        "output": 0
+      }
+    },
+    "google/veo-3.0-generate-001": {
+      "id": "google/veo-3.0-generate-001",
+      "family": "veo",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
       }
     },
     "google/imagen-4.0-ultra-generate-001": {
@@ -46797,11 +47160,30 @@
         "output": 0
       }
     },
+    "google/veo-3.0-fast-generate-001": {
+      "id": "google/veo-3.0-fast-generate-001",
+      "family": "veo",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
     "google/gemini-embedding-001": {
       "id": "google/gemini-embedding-001",
       "family": "gemini-embedding",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46840,7 +47222,7 @@
       "id": "google/imagen-4.0-fast-generate-001",
       "family": "imagen",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46859,7 +47241,7 @@
       "id": "google/text-multilingual-embedding-002",
       "family": "text-embedding",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46878,7 +47260,7 @@
       "id": "openai/text-embedding-3-small",
       "family": "text-embedding",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46898,7 +47280,7 @@
       "id": "openai/text-embedding-3-large",
       "family": "text-embedding",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46918,7 +47300,7 @@
       "id": "openai/text-embedding-ada-002",
       "family": "text-embedding",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -46938,7 +47320,7 @@
       "id": "openai/gpt-5.1-thinking",
       "family": "gpt",
       "reasoning": true,
-      "temperature": false,
+      "temperature": true,
       "toolCall": true,
       "modalities": {
         "input": [
@@ -46957,26 +47339,158 @@
         "output": 128000
       }
     },
-    "openai/codex-mini": {
-      "id": "openai/codex-mini",
-      "family": "gpt-codex-mini",
-      "reasoning": true,
+    "bytedance/seedance-v1.0-pro-fast": {
+      "id": "bytedance/seedance-v1.0-pro-fast",
+      "family": "seed",
+      "reasoning": false,
       "temperature": true,
-      "toolCall": true,
+      "toolCall": false,
       "modalities": {
         "input": [
-          "text",
-          "image",
-          "pdf"
+          "text"
         ],
         "output": [
-          "text"
+          "video"
         ]
       },
       "limit": {
-        "context": 200000,
-        "input": 100000,
-        "output": 100000
+        "context": 0,
+        "output": 0
+      }
+    },
+    "bytedance/seedance-v1.0-lite-t2v": {
+      "id": "bytedance/seedance-v1.0-lite-t2v",
+      "family": "seed",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "bytedance/seedance-2.0-fast": {
+      "id": "bytedance/seedance-2.0-fast",
+      "family": "seed",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "bytedance/seedance-v1.0-lite-i2v": {
+      "id": "bytedance/seedance-v1.0-lite-i2v",
+      "family": "seed",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "bytedance/seedream-5.0-lite": {
+      "id": "bytedance/seedream-5.0-lite",
+      "family": "seed",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "bytedance/seedance-2.0": {
+      "id": "bytedance/seedance-2.0",
+      "family": "seed",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "bytedance/seedream-4.0": {
+      "id": "bytedance/seedream-4.0",
+      "family": "seed",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "bytedance/seedream-4.5": {
+      "id": "bytedance/seedream-4.5",
+      "family": "seed",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
       }
     },
     "bytedance/seed-1.6": {
@@ -46996,6 +47510,25 @@
       "limit": {
         "context": 256000,
         "output": 32000
+      }
+    },
+    "bytedance/seedance-v1.0-pro": {
+      "id": "bytedance/seedance-v1.0-pro",
+      "family": "seed",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
       }
     },
     "bytedance/seed-1.8": {
@@ -47018,11 +47551,106 @@
         "output": 64000
       }
     },
+    "bytedance/seedance-v1.5-pro": {
+      "id": "bytedance/seedance-v1.5-pro",
+      "family": "seed",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "video"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "recraft/recraft-v4.1-utility": {
+      "id": "recraft/recraft-v4.1-utility",
+      "family": "recraft",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "recraft/recraft-v4.1-pro": {
+      "id": "recraft/recraft-v4.1-pro",
+      "family": "recraft",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "recraft/recraft-v4-pro": {
+      "id": "recraft/recraft-v4-pro",
+      "family": "recraft",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "recraft/recraft-v4.1-utility-pro": {
+      "id": "recraft/recraft-v4.1-utility-pro",
+      "family": "recraft",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
     "recraft/recraft-v2": {
       "id": "recraft/recraft-v2",
       "family": "recraft",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -47041,7 +47669,7 @@
       "id": "recraft/recraft-v3",
       "family": "recraft",
       "reasoning": false,
-      "temperature": false,
+      "temperature": true,
       "toolCall": false,
       "modalities": {
         "input": [
@@ -47053,6 +47681,44 @@
       },
       "limit": {
         "context": 512,
+        "output": 0
+      }
+    },
+    "recraft/recraft-v4": {
+      "id": "recraft/recraft-v4",
+      "family": "recraft",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 0,
+        "output": 0
+      }
+    },
+    "recraft/recraft-v4.1": {
+      "id": "recraft/recraft-v4.1",
+      "family": "recraft",
+      "reasoning": false,
+      "temperature": true,
+      "toolCall": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "image"
+        ]
+      },
+      "limit": {
+        "context": 0,
         "output": 0
       }
     },
@@ -47248,25 +47914,6 @@
       },
       "limit": {
         "context": 8192,
-        "output": 16384
-      }
-    },
-    "gemini-2.5-flash-tts": {
-      "id": "gemini-2.5-flash-tts",
-      "family": "gemini-flash",
-      "reasoning": false,
-      "temperature": true,
-      "toolCall": false,
-      "modalities": {
-        "input": [
-          "text"
-        ],
-        "output": [
-          "audio"
-        ]
-      },
-      "limit": {
-        "context": 32768,
         "output": 16384
       }
     },
@@ -47774,6 +48421,25 @@
         "output": 64000
       }
     },
+    "north-mini-code-free": {
+      "id": "north-mini-code-free",
+      "family": "north-free",
+      "reasoning": true,
+      "temperature": true,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 256000,
+        "output": 64000
+      }
+    },
     "grok-code": {
       "id": "grok-code",
       "family": "grok",
@@ -48018,6 +48684,25 @@
         "output": 0
       }
     },
+    "nvidia/nvidia-nemotron-3-ultra-550b-a55b": {
+      "id": "nvidia/NVIDIA-Nemotron-3-Ultra-550B-A55B",
+      "family": "nemotron",
+      "reasoning": true,
+      "temperature": true,
+      "toolCall": true,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "limit": {
+        "context": 202800,
+        "output": 202800
+      }
+    },
     "nvidia/nemotron-120b-a12b": {
       "id": "nvidia/Nemotron-120B-A12B",
       "family": "nemotron",
@@ -48033,8 +48718,8 @@
         ]
       },
       "limit": {
-        "context": 262144,
-        "output": 32678
+        "context": 202800,
+        "output": 202800
       }
     },
     "lucidquery-nexus-coder": {
@@ -48420,7 +49105,7 @@
     },
     "@cf/moonshotai/kimi-k2.6": {
       "id": "@cf/moonshotai/kimi-k2.6",
-      "family": "kimi",
+      "family": "kimi-k2.6",
       "reasoning": true,
       "temperature": true,
       "toolCall": true,
@@ -48440,7 +49125,7 @@
     },
     "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b": {
       "id": "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-      "family": "deepseek",
+      "family": "deepseek-thinking",
       "reasoning": true,
       "temperature": true,
       "toolCall": false,

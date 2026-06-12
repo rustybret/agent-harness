@@ -6,6 +6,9 @@
       "key": "anthropic/claude-3-5-haiku-latest"
     },
     {
+      "key": "anthropic/claude-fable-5"
+    },
+    {
       "key": "anthropic/claude-haiku-4-5"
     },
     {
@@ -66,10 +69,73 @@
       "key": "cerebras/gpt-oss-120b"
     },
     {
-      "key": "cerebras/llama3.1-8b"
+      "key": "cerebras/zai-glm-4.7"
     },
     {
-      "key": "cerebras/zai-glm-4.7"
+      "key": "google/antigravity-chat_20706"
+    },
+    {
+      "key": "google/antigravity-chat_23310"
+    },
+    {
+      "key": "google/antigravity-claude-opus-4-6-thinking"
+    },
+    {
+      "key": "google/antigravity-claude-sonnet-4-6"
+    },
+    {
+      "key": "google/antigravity-gemini-2.5-flash"
+    },
+    {
+      "key": "google/antigravity-gemini-2.5-flash-lite"
+    },
+    {
+      "key": "google/antigravity-gemini-2.5-flash-thinking"
+    },
+    {
+      "key": "google/antigravity-gemini-2.5-pro"
+    },
+    {
+      "key": "google/antigravity-gemini-3-flash"
+    },
+    {
+      "key": "google/antigravity-gemini-3-flash-agent"
+    },
+    {
+      "key": "google/antigravity-gemini-3.1-flash-image"
+    },
+    {
+      "key": "google/antigravity-gemini-3.1-flash-lite"
+    },
+    {
+      "key": "google/antigravity-gemini-3.1-pro"
+    },
+    {
+      "key": "google/antigravity-gemini-3.1-pro-high"
+    },
+    {
+      "key": "google/antigravity-gemini-3.1-pro-low"
+    },
+    {
+      "key": "google/antigravity-gemini-3.5-flash"
+    },
+    {
+      "key": "google/antigravity-gemini-3.5-flash-extra-low"
+    },
+    {
+      "key": "google/antigravity-gemini-3.5-flash-low"
+    },
+    {
+      "key": "google/antigravity-gemini-pro-agent"
+    },
+    {
+      "key": "google/antigravity-gpt-oss-120b-medium"
+    },
+    {
+      "key": "google/antigravity-tab_flash_lite_preview"
+    },
+    {
+      "key": "google/antigravity-tab_jump_flash_lite_preview"
     },
     {
       "key": "google/gemini-2.5-flash"
@@ -82,9 +148,6 @@
     },
     {
       "key": "google/gemini-2.5-flash-preview-tts"
-    },
-    {
-      "key": "google/gemini-2.5-flash-tts"
     },
     {
       "key": "google/gemini-2.5-pro"
@@ -103,6 +166,9 @@
     },
     {
       "key": "google/gemini-3.1-flash-lite"
+    },
+    {
+      "key": "google/gemini-3.1-pro"
     },
     {
       "key": "google/gemini-3.1-pro-preview"
@@ -127,9 +193,6 @@
     },
     {
       "key": "google/gemma-4-31b-it"
-    },
-    {
-      "key": "groq/allam-2-7b"
     },
     {
       "key": "groq/canopylabs/orpheus-arabic-saudi"
@@ -157,9 +220,6 @@
     },
     {
       "key": "groq/meta-llama/llama-prompt-guard-2-86m"
-    },
-    {
-      "key": "groq/moonshotai/kimi-k2-instruct-0905"
     },
     {
       "key": "groq/openai/gpt-oss-120b"
@@ -210,6 +270,9 @@
       "key": "moonshotai/kimi-k2.6"
     },
     {
+      "key": "moonshotai/kimi-k2.7-code"
+    },
+    {
       "key": "nvidia/abacusai/dracarys-llama-3_1-70b-instruct"
     },
     {
@@ -231,12 +294,6 @@
       "key": "nvidia/bytedance/seed-oss-36b-instruct"
     },
     {
-      "key": "nvidia/deepseek-ai/deepseek-v3.1-terminus"
-    },
-    {
-      "key": "nvidia/deepseek-ai/deepseek-v3.2"
-    },
-    {
       "key": "nvidia/deepseek-ai/deepseek-v4-flash"
     },
     {
@@ -244,9 +301,6 @@
     },
     {
       "key": "nvidia/google/gemma-2-2b-it"
-    },
-    {
-      "key": "nvidia/google/gemma-3-27b-it"
     },
     {
       "key": "nvidia/google/gemma-3n-e2b-it"
@@ -300,13 +354,7 @@
       "key": "nvidia/microsoft/phi-4-multimodal-instruct"
     },
     {
-      "key": "nvidia/minimaxai/minimax-m2.5"
-    },
-    {
       "key": "nvidia/minimaxai/minimax-m2.7"
-    },
-    {
-      "key": "nvidia/mistralai/devstral-2-123b-instruct-2512"
     },
     {
       "key": "nvidia/mistralai/magistral-small-2506"
@@ -333,13 +381,7 @@
       "key": "nvidia/mistralai/mixtral-8x7b-instruct"
     },
     {
-      "key": "nvidia/moonshotai/kimi-k2-instruct"
-    },
-    {
       "key": "nvidia/moonshotai/kimi-k2-instruct-0905"
-    },
-    {
-      "key": "nvidia/moonshotai/kimi-k2-thinking"
     },
     {
       "key": "nvidia/moonshotai/kimi-k2.6"
@@ -369,12 +411,6 @@
       "key": "nvidia/nvidia/llama-3_2-nemoretriever-300m-embed-v1"
     },
     {
-      "key": "nvidia/nvidia/llama-3_3-nemotron-super-49b-v1"
-    },
-    {
-      "key": "nvidia/nvidia/llama-3_3-nemotron-super-49b-v1_5"
-    },
-    {
       "key": "nvidia/nvidia/llama-nemotron-embed-vl-1b-v2"
     },
     {
@@ -394,6 +430,9 @@
     },
     {
       "key": "nvidia/nvidia/nemotron-3-super-120b-a12b"
+    },
+    {
+      "key": "nvidia/nvidia/nemotron-3-ultra-550b-a55b"
     },
     {
       "key": "nvidia/nvidia/nemotron-content-safety-reasoning-4b"
@@ -462,9 +501,6 @@
       "key": "nvidia/qwen/qwen3-next-80b-a3b-instruct"
     },
     {
-      "key": "nvidia/qwen/qwen3-next-80b-a3b-thinking"
-    },
-    {
       "key": "nvidia/qwen/qwen3.5-122b-a10b"
     },
     {
@@ -484,9 +520,6 @@
     },
     {
       "key": "nvidia/z-ai/glm-5.1"
-    },
-    {
-      "key": "nvidia/z-ai/glm4.7"
     },
     {
       "key": "openai/gpt-5.3-codex-spark"
@@ -514,6 +547,9 @@
     },
     {
       "key": "opencode/big-pickle"
+    },
+    {
+      "key": "opencode/claude-fable-5"
     },
     {
       "key": "opencode/claude-haiku-4-5"
@@ -547,6 +583,9 @@
     },
     {
       "key": "opencode/deepseek-v4-flash-free"
+    },
+    {
+      "key": "opencode/deepseek-v4-pro"
     },
     {
       "key": "opencode/gemini-3-flash"
@@ -633,10 +672,10 @@
       "key": "opencode/minimax-m2.7"
     },
     {
-      "key": "opencode/minimax-m3-free"
+      "key": "opencode/nemotron-3-ultra-free"
     },
     {
-      "key": "opencode/nemotron-3-ultra-free"
+      "key": "opencode/north-mini-code-free"
     },
     {
       "key": "opencode/qwen3.5-plus"
@@ -658,6 +697,9 @@
     },
     {
       "key": "xiaomi/mimo-v2.5-pro"
+    },
+    {
+      "key": "xiaomi/mimo-v2.5-pro-ultraspeed"
     }
   ]
 }
