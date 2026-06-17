@@ -72,127 +72,16 @@
       "key": "cerebras/zai-glm-4.7"
     },
     {
-      "key": "google/antigravity-chat_20706"
-    },
-    {
-      "key": "google/antigravity-chat_23310"
-    },
-    {
       "key": "google/antigravity-claude-opus-4-6-thinking"
     },
     {
-      "key": "google/antigravity-claude-sonnet-4-6"
-    },
-    {
-      "key": "google/antigravity-gemini-2.5-flash"
-    },
-    {
-      "key": "google/antigravity-gemini-2.5-flash-lite"
-    },
-    {
-      "key": "google/antigravity-gemini-2.5-flash-thinking"
-    },
-    {
-      "key": "google/antigravity-gemini-2.5-pro"
-    },
-    {
-      "key": "google/antigravity-gemini-3-flash"
-    },
-    {
-      "key": "google/antigravity-gemini-3-flash-agent"
-    },
-    {
-      "key": "google/antigravity-gemini-3.1-flash-image"
-    },
-    {
-      "key": "google/antigravity-gemini-3.1-flash-lite"
+      "key": "google/antigravity-claude-sonnet-4-6-thinking"
     },
     {
       "key": "google/antigravity-gemini-3.1-pro"
     },
     {
-      "key": "google/antigravity-gemini-3.1-pro-high"
-    },
-    {
-      "key": "google/antigravity-gemini-3.1-pro-low"
-    },
-    {
       "key": "google/antigravity-gemini-3.5-flash"
-    },
-    {
-      "key": "google/antigravity-gemini-3.5-flash-extra-low"
-    },
-    {
-      "key": "google/antigravity-gemini-3.5-flash-low"
-    },
-    {
-      "key": "google/antigravity-gemini-pro-agent"
-    },
-    {
-      "key": "google/antigravity-gpt-oss-120b-medium"
-    },
-    {
-      "key": "google/antigravity-tab_flash_lite_preview"
-    },
-    {
-      "key": "google/antigravity-tab_jump_flash_lite_preview"
-    },
-    {
-      "key": "google/gemini-2.5-flash"
-    },
-    {
-      "key": "google/gemini-2.5-flash-image"
-    },
-    {
-      "key": "google/gemini-2.5-flash-lite"
-    },
-    {
-      "key": "google/gemini-2.5-flash-preview-tts"
-    },
-    {
-      "key": "google/gemini-2.5-pro"
-    },
-    {
-      "key": "google/gemini-2.5-pro-preview-tts"
-    },
-    {
-      "key": "google/gemini-3-flash-preview"
-    },
-    {
-      "key": "google/gemini-3-pro-image-preview"
-    },
-    {
-      "key": "google/gemini-3.1-flash-image-preview"
-    },
-    {
-      "key": "google/gemini-3.1-flash-lite"
-    },
-    {
-      "key": "google/gemini-3.1-pro"
-    },
-    {
-      "key": "google/gemini-3.1-pro-preview"
-    },
-    {
-      "key": "google/gemini-3.1-pro-preview-customtools"
-    },
-    {
-      "key": "google/gemini-3.5-flash"
-    },
-    {
-      "key": "google/gemini-embedding-001"
-    },
-    {
-      "key": "google/gemini-flash-latest"
-    },
-    {
-      "key": "google/gemini-flash-lite-latest"
-    },
-    {
-      "key": "google/gemma-4-26b-a4b-it"
-    },
-    {
-      "key": "google/gemma-4-31b-it"
     },
     {
       "key": "groq/canopylabs/orpheus-arabic-saudi"
@@ -271,6 +160,9 @@
     },
     {
       "key": "moonshotai/kimi-k2.7-code"
+    },
+    {
+      "key": "moonshotai/kimi-k2.7-code-highspeed"
     },
     {
       "key": "nvidia/abacusai/dracarys-llama-3_1-70b-instruct"
@@ -547,9 +439,6 @@
     },
     {
       "key": "opencode/big-pickle"
-    },
-    {
-      "key": "opencode/claude-fable-5"
     },
     {
       "key": "opencode/claude-haiku-4-5"

@@ -10,7 +10,10 @@
       "key": "anthropic/claude-fable-5",
       "variants": [
         "high",
-        "max"
+        "low",
+        "max",
+        "medium",
+        "xhigh"
       ]
     },
     {
@@ -182,76 +185,20 @@
       "variants": []
     },
     {
-      "key": "google/antigravity-chat_20706",
-      "variants": []
-    },
-    {
-      "key": "google/antigravity-chat_23310",
-      "variants": []
-    },
-    {
       "key": "google/antigravity-claude-opus-4-6-thinking",
-      "variants": [
-        "high",
-        "low",
-        "max"
-      ]
-    },
-    {
-      "key": "google/antigravity-claude-sonnet-4-6",
       "variants": []
     },
     {
-      "key": "google/antigravity-gemini-2.5-flash",
-      "variants": []
-    },
-    {
-      "key": "google/antigravity-gemini-2.5-flash-lite",
-      "variants": []
-    },
-    {
-      "key": "google/antigravity-gemini-2.5-flash-thinking",
-      "variants": []
-    },
-    {
-      "key": "google/antigravity-gemini-2.5-pro",
-      "variants": []
-    },
-    {
-      "key": "google/antigravity-gemini-3-flash",
-      "variants": [
-        "high",
-        "low",
-        "medium",
-        "minimal"
-      ]
-    },
-    {
-      "key": "google/antigravity-gemini-3-flash-agent",
-      "variants": []
-    },
-    {
-      "key": "google/antigravity-gemini-3.1-flash-image",
-      "variants": []
-    },
-    {
-      "key": "google/antigravity-gemini-3.1-flash-lite",
+      "key": "google/antigravity-claude-sonnet-4-6-thinking",
       "variants": []
     },
     {
       "key": "google/antigravity-gemini-3.1-pro",
       "variants": [
         "high",
-        "low"
+        "low",
+        "medium"
       ]
-    },
-    {
-      "key": "google/antigravity-gemini-3.1-pro-high",
-      "variants": []
-    },
-    {
-      "key": "google/antigravity-gemini-3.1-pro-low",
-      "variants": []
     },
     {
       "key": "google/antigravity-gemini-3.5-flash",
@@ -260,158 +207,6 @@
         "low",
         "medium",
         "minimal"
-      ]
-    },
-    {
-      "key": "google/antigravity-gemini-3.5-flash-extra-low",
-      "variants": []
-    },
-    {
-      "key": "google/antigravity-gemini-3.5-flash-low",
-      "variants": []
-    },
-    {
-      "key": "google/antigravity-gemini-pro-agent",
-      "variants": []
-    },
-    {
-      "key": "google/antigravity-gpt-oss-120b-medium",
-      "variants": []
-    },
-    {
-      "key": "google/antigravity-tab_flash_lite_preview",
-      "variants": []
-    },
-    {
-      "key": "google/antigravity-tab_jump_flash_lite_preview",
-      "variants": []
-    },
-    {
-      "key": "google/gemini-2.5-flash",
-      "variants": [
-        "high",
-        "max"
-      ]
-    },
-    {
-      "key": "google/gemini-2.5-flash-image",
-      "variants": [
-        "high",
-        "max"
-      ]
-    },
-    {
-      "key": "google/gemini-2.5-flash-lite",
-      "variants": [
-        "high",
-        "max"
-      ]
-    },
-    {
-      "key": "google/gemini-2.5-flash-preview-tts",
-      "variants": []
-    },
-    {
-      "key": "google/gemini-2.5-pro",
-      "variants": [
-        "high",
-        "max"
-      ]
-    },
-    {
-      "key": "google/gemini-2.5-pro-preview-tts",
-      "variants": []
-    },
-    {
-      "key": "google/gemini-3-flash-preview",
-      "variants": [
-        "high",
-        "low",
-        "medium",
-        "minimal"
-      ]
-    },
-    {
-      "key": "google/gemini-3-pro-image-preview",
-      "variants": [
-        "high"
-      ]
-    },
-    {
-      "key": "google/gemini-3.1-flash-image-preview",
-      "variants": [
-        "high",
-        "minimal"
-      ]
-    },
-    {
-      "key": "google/gemini-3.1-flash-lite",
-      "variants": [
-        "high",
-        "low",
-        "medium",
-        "minimal"
-      ]
-    },
-    {
-      "key": "google/gemini-3.1-pro",
-      "variants": []
-    },
-    {
-      "key": "google/gemini-3.1-pro-preview",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
-    },
-    {
-      "key": "google/gemini-3.1-pro-preview-customtools",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
-    },
-    {
-      "key": "google/gemini-3.5-flash",
-      "variants": [
-        "high",
-        "low",
-        "medium",
-        "minimal"
-      ]
-    },
-    {
-      "key": "google/gemini-embedding-001",
-      "variants": []
-    },
-    {
-      "key": "google/gemini-flash-latest",
-      "variants": [
-        "high",
-        "low"
-      ]
-    },
-    {
-      "key": "google/gemini-flash-lite-latest",
-      "variants": [
-        "high",
-        "low"
-      ]
-    },
-    {
-      "key": "google/gemma-4-26b-a4b-it",
-      "variants": [
-        "high",
-        "low"
-      ]
-    },
-    {
-      "key": "google/gemma-4-31b-it",
-      "variants": [
-        "high",
-        "low"
       ]
     },
     {
@@ -535,6 +330,10 @@
     },
     {
       "key": "moonshotai/kimi-k2.7-code",
+      "variants": []
+    },
+    {
+      "key": "moonshotai/kimi-k2.7-code-highspeed",
       "variants": []
     },
     {
@@ -1010,13 +809,6 @@
       "variants": []
     },
     {
-      "key": "opencode/claude-fable-5",
-      "variants": [
-        "high",
-        "max"
-      ]
-    },
-    {
       "key": "opencode/claude-haiku-4-5",
       "variants": [
         "high",
@@ -1346,8 +1138,7 @@
       "key": "opencode/north-mini-code-free",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "none"
       ]
     },
     {
