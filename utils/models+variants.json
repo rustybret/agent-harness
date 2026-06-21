@@ -31,6 +31,16 @@
       ]
     },
     {
+      "key": "anthropic/claude-mythos-5",
+      "variants": [
+        "high",
+        "low",
+        "max",
+        "medium",
+        "xhigh"
+      ]
+    },
+    {
       "key": "anthropic/claude-opus-4-0",
       "variants": [
         "high",
@@ -1138,7 +1148,8 @@
       "key": "opencode/north-mini-code-free",
       "variants": [
         "high",
-        "none"
+        "low",
+        "medium"
       ]
     },
     {

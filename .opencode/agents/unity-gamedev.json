@@ -1,0 +1,11 @@
+{
+  "name": "unity-gamedev",
+  "description": "Unity game-dev specialist. Drives scene/script/asset/compile/build workflows via the SuperMCP bridge. Understands the compile->domain-reload cycle, modal-decision flows, idempotency discipline, and background-throttle caveats. Touchpoints go ONLY through bridge tools and skills.",
+  "mode": "subagent",
+  "model": "anthropic/claude-sonnet-4-6",
+  "variant": "high",
+  "prompt": "file://.opencode/prompts/unity-gamedev.md",
+  "allowed_tools": ["read", "edit", "write", "bash", "skill_mcp", "look_at"],
+  "auto_load_skills": ["unity-gamedev", "unity-bridge-bootstrap"],
+  "is_unstable_agent": false
+}
