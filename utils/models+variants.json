@@ -203,6 +203,10 @@
       "variants": []
     },
     {
+      "key": "google/antigravity-gemini-3.1-flash-image",
+      "variants": []
+    },
+    {
       "key": "google/antigravity-gemini-3.1-pro",
       "variants": [
         "high",
@@ -954,6 +958,10 @@
       "variants": []
     },
     {
+      "key": "opencode/glm-5.2",
+      "variants": []
+    },
+    {
       "key": "opencode/gpt-5",
       "variants": [
         "high",
@@ -1161,7 +1169,899 @@
       "variants": []
     },
     {
-      "key": "xiaomi/mimo-v2-flash",
+      "key": "openrouter/ai21/jamba-large-1.7",
+      "variants": []
+    },
+    {
+      "key": "openrouter/aion-labs/aion-1.0",
+      "variants": []
+    },
+    {
+      "key": "openrouter/aion-labs/aion-1.0-mini",
+      "variants": []
+    },
+    {
+      "key": "openrouter/aion-labs/aion-2.0",
+      "variants": []
+    },
+    {
+      "key": "openrouter/aion-labs/aion-rp-llama-3.1-8b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/allenai/olmo-3-32b-think",
+      "variants": []
+    },
+    {
+      "key": "openrouter/amazon/nova-2-lite-v1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/amazon/nova-lite-v1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/amazon/nova-micro-v1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/amazon/nova-premier-v1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/amazon/nova-pro-v1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/anthracite-org/magnum-v4-72b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/anthropic/claude-3-haiku",
+      "variants": []
+    },
+    {
+      "key": "openrouter/anthropic/claude-haiku-4.5",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/anthropic/claude-opus-4",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/anthropic/claude-opus-4.1",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/anthropic/claude-opus-4.5",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/anthropic/claude-opus-4.6",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/anthropic/claude-opus-4.6-fast",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/anthropic/claude-opus-4.7",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/anthropic/claude-opus-4.7-fast",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/anthropic/claude-opus-4.8",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/anthropic/claude-opus-4.8-fast",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/anthropic/claude-sonnet-4",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/anthropic/claude-sonnet-4.5",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/anthropic/claude-sonnet-4.6",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/arcee-ai/coder-large",
+      "variants": []
+    },
+    {
+      "key": "openrouter/arcee-ai/trinity-large-thinking",
+      "variants": []
+    },
+    {
+      "key": "openrouter/arcee-ai/trinity-mini",
+      "variants": []
+    },
+    {
+      "key": "openrouter/arcee-ai/virtuoso-large",
+      "variants": []
+    },
+    {
+      "key": "openrouter/baidu/ernie-4.5-vl-424b-a47b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/bytedance-seed/seed-1.6",
+      "variants": []
+    },
+    {
+      "key": "openrouter/bytedance-seed/seed-1.6-flash",
+      "variants": []
+    },
+    {
+      "key": "openrouter/bytedance-seed/seed-2.0-lite",
+      "variants": []
+    },
+    {
+      "key": "openrouter/bytedance-seed/seed-2.0-mini",
+      "variants": []
+    },
+    {
+      "key": "openrouter/bytedance/ui-tars-1.5-7b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/cohere/command-a",
+      "variants": []
+    },
+    {
+      "key": "openrouter/cohere/command-r-08-2024",
+      "variants": []
+    },
+    {
+      "key": "openrouter/cohere/command-r-plus-08-2024",
+      "variants": []
+    },
+    {
+      "key": "openrouter/cohere/command-r7b-12-2024",
+      "variants": []
+    },
+    {
+      "key": "openrouter/cohere/north-mini-code:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/deepcogito/cogito-v2.1-671b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/deepseek/deepseek-chat",
+      "variants": []
+    },
+    {
+      "key": "openrouter/deepseek/deepseek-chat-v3-0324",
+      "variants": []
+    },
+    {
+      "key": "openrouter/deepseek/deepseek-chat-v3.1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/deepseek/deepseek-r1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/deepseek/deepseek-r1-0528",
+      "variants": []
+    },
+    {
+      "key": "openrouter/deepseek/deepseek-r1-distill-llama-70b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/deepseek/deepseek-v3.1-terminus",
+      "variants": []
+    },
+    {
+      "key": "openrouter/deepseek/deepseek-v3.2",
+      "variants": []
+    },
+    {
+      "key": "openrouter/deepseek/deepseek-v3.2-exp",
+      "variants": []
+    },
+    {
+      "key": "openrouter/deepseek/deepseek-v4-flash",
+      "variants": []
+    },
+    {
+      "key": "openrouter/deepseek/deepseek-v4-pro",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemini-2.5-flash",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemini-2.5-flash-image",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemini-2.5-flash-lite",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemini-2.5-flash-lite-preview-09-2025",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemini-2.5-pro",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemini-2.5-pro-preview",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemini-2.5-pro-preview-05-06",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemini-3-flash-preview",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/google/gemini-3-pro-image",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/google/gemini-3-pro-image-preview",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/google/gemini-3.1-flash-image",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/google/gemini-3.1-flash-image-preview",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/google/gemini-3.1-flash-lite",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/google/gemini-3.1-flash-lite-preview",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/google/gemini-3.1-pro-preview",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/google/gemini-3.1-pro-preview-customtools",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/google/gemini-3.5-flash",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/google/gemma-2-27b-it",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemma-3-12b-it",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemma-3-27b-it",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemma-3-4b-it",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemma-3n-e4b-it",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemma-4-26b-a4b-it",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemma-4-26b-a4b-it:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemma-4-31b-it",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/gemma-4-31b-it:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/lyria-3-clip-preview",
+      "variants": []
+    },
+    {
+      "key": "openrouter/google/lyria-3-pro-preview",
+      "variants": []
+    },
+    {
+      "key": "openrouter/gryphe/mythomax-l2-13b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/ibm-granite/granite-4.0-h-micro",
+      "variants": []
+    },
+    {
+      "key": "openrouter/ibm-granite/granite-4.1-8b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/inception/mercury-2",
+      "variants": []
+    },
+    {
+      "key": "openrouter/inclusionai/ling-2.6-1t",
+      "variants": []
+    },
+    {
+      "key": "openrouter/inclusionai/ling-2.6-flash",
+      "variants": []
+    },
+    {
+      "key": "openrouter/inclusionai/ring-2.6-1t",
+      "variants": []
+    },
+    {
+      "key": "openrouter/inflection/inflection-3-pi",
+      "variants": []
+    },
+    {
+      "key": "openrouter/inflection/inflection-3-productivity",
+      "variants": []
+    },
+    {
+      "key": "openrouter/kwaipilot/kat-coder-pro-v2",
+      "variants": []
+    },
+    {
+      "key": "openrouter/liquid/lfm-2-24b-a2b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/liquid/lfm-2.5-1.2b-instruct:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/liquid/lfm-2.5-1.2b-thinking:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mancer/weaver",
+      "variants": []
+    },
+    {
+      "key": "openrouter/meta-llama/llama-3-8b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/meta-llama/llama-3.1-70b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/meta-llama/llama-3.1-8b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/meta-llama/llama-3.2-11b-vision-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/meta-llama/llama-3.2-1b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/meta-llama/llama-3.2-3b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/meta-llama/llama-3.2-3b-instruct:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/meta-llama/llama-3.3-70b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/meta-llama/llama-3.3-70b-instruct:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/meta-llama/llama-4-maverick",
+      "variants": []
+    },
+    {
+      "key": "openrouter/meta-llama/llama-4-scout",
+      "variants": []
+    },
+    {
+      "key": "openrouter/meta-llama/llama-guard-4-12b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/microsoft/phi-4",
+      "variants": []
+    },
+    {
+      "key": "openrouter/microsoft/phi-4-mini-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/microsoft/wizardlm-2-8x22b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/minimax/minimax-01",
+      "variants": []
+    },
+    {
+      "key": "openrouter/minimax/minimax-m1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/minimax/minimax-m2",
+      "variants": []
+    },
+    {
+      "key": "openrouter/minimax/minimax-m2-her",
+      "variants": []
+    },
+    {
+      "key": "openrouter/minimax/minimax-m2.1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/minimax/minimax-m2.5",
+      "variants": []
+    },
+    {
+      "key": "openrouter/minimax/minimax-m2.7",
+      "variants": []
+    },
+    {
+      "key": "openrouter/minimax/minimax-m3",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/codestral-2508",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/ministral-14b-2512",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/ministral-3b-2512",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/ministral-8b-2512",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/mistral-large",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/mistral-large-2407",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/mistral-large-2512",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/mistral-medium-3",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/mistral-medium-3-5",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/mistral-medium-3.1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/mistral-nemo",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/mistral-saba",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/mistral-small-24b-instruct-2501",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/mistral-small-2603",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/mistral-small-3.1-24b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/mixtral-8x22b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/mistralai/voxtral-small-24b-2507",
+      "variants": []
+    },
+    {
+      "key": "openrouter/moonshotai/kimi-k2",
+      "variants": []
+    },
+    {
+      "key": "openrouter/moonshotai/kimi-k2-0905",
+      "variants": []
+    },
+    {
+      "key": "openrouter/moonshotai/kimi-k2-thinking",
+      "variants": []
+    },
+    {
+      "key": "openrouter/moonshotai/kimi-k2.5",
+      "variants": []
+    },
+    {
+      "key": "openrouter/moonshotai/kimi-k2.6",
+      "variants": []
+    },
+    {
+      "key": "openrouter/moonshotai/kimi-k2.7-code",
+      "variants": []
+    },
+    {
+      "key": "openrouter/morph/morph-v3-fast",
+      "variants": []
+    },
+    {
+      "key": "openrouter/morph/morph-v3-large",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nex-agi/nex-n2-pro",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nousresearch/hermes-3-llama-3.1-405b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nousresearch/hermes-3-llama-3.1-405b:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nousresearch/hermes-3-llama-3.1-70b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nousresearch/hermes-4-405b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nousresearch/hermes-4-70b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nvidia/llama-3.3-nemotron-super-49b-v1.5",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nvidia/nemotron-3-nano-30b-a3b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nvidia/nemotron-3-nano-30b-a3b:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nvidia/nemotron-3-super-120b-a12b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nvidia/nemotron-3-ultra-550b-a55b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nvidia/nemotron-3.5-content-safety:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nvidia/nemotron-nano-12b-v2-vl:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/nvidia/nemotron-nano-9b-v2:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-3.5-turbo",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-3.5-turbo-0613",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-3.5-turbo-16k",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-3.5-turbo-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-4",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-4-turbo",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-4-turbo-preview",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-4.1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-4.1-mini",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-4.1-nano",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-4o",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-4o-2024-05-13",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-4o-2024-08-06",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-4o-2024-11-20",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-4o-mini",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-4o-mini-2024-07-18",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-4o-mini-search-preview",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-4o-search-preview",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-5",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5-codex",
       "variants": [
         "high",
         "low",
@@ -1169,7 +2069,70 @@
       ]
     },
     {
-      "key": "xiaomi/mimo-v2-omni",
+      "key": "openrouter/openai/gpt-5-image",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5-image-mini",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5-mini",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5-nano",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5-pro",
+      "variants": [
+        "high"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.1",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.1-chat",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-5.1-codex",
       "variants": [
         "high",
         "low",
@@ -1177,12 +2140,651 @@
       ]
     },
     {
-      "key": "xiaomi/mimo-v2-pro",
+      "key": "openrouter/openai/gpt-5.1-codex-max",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.1-codex-mini",
       "variants": [
         "high",
         "low",
         "medium"
       ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.2",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.2-chat",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-5.2-codex",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.2-pro",
+      "variants": [
+        "high",
+        "medium",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.3-chat",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-5.3-codex",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.4",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.4-image-2",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.4-mini",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.4-nano",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.4-pro",
+      "variants": [
+        "high",
+        "medium",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.5",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.5-pro",
+      "variants": [
+        "high",
+        "medium",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-audio",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-audio-mini",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-chat-latest",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/gpt-oss-120b",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-oss-120b:free",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-oss-20b",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-oss-20b:free",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-oss-safeguard-20b",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/o1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/o1-pro",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/o3",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/o3-deep-research",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/o3-mini",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/o3-mini-high",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/o3-pro",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/o4-mini",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/o4-mini-deep-research",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openai/o4-mini-high",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openrouter/auto",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openrouter/bodybuilder",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openrouter/free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openrouter/fusion",
+      "variants": []
+    },
+    {
+      "key": "openrouter/openrouter/pareto-code",
+      "variants": []
+    },
+    {
+      "key": "openrouter/perceptron/perceptron-mk1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/perplexity/sonar",
+      "variants": []
+    },
+    {
+      "key": "openrouter/perplexity/sonar-deep-research",
+      "variants": []
+    },
+    {
+      "key": "openrouter/perplexity/sonar-pro",
+      "variants": []
+    },
+    {
+      "key": "openrouter/perplexity/sonar-pro-search",
+      "variants": []
+    },
+    {
+      "key": "openrouter/perplexity/sonar-reasoning-pro",
+      "variants": []
+    },
+    {
+      "key": "openrouter/poolside/laguna-m.1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/poolside/laguna-m.1:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/poolside/laguna-xs.2",
+      "variants": []
+    },
+    {
+      "key": "openrouter/poolside/laguna-xs.2:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen-2.5-72b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen-2.5-7b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen-2.5-coder-32b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen-plus",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen-plus-2025-07-28",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen-plus-2025-07-28:thinking",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen2.5-vl-72b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-14b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-235b-a22b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-235b-a22b-2507",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-235b-a22b-thinking-2507",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-30b-a3b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-30b-a3b-instruct-2507",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-30b-a3b-thinking-2507",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-32b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-8b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-coder",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-coder-30b-a3b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-coder-flash",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-coder-next",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-coder-plus",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-coder:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-max",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-max-thinking",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-next-80b-a3b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-next-80b-a3b-instruct:free",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-next-80b-a3b-thinking",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-vl-235b-a22b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-vl-235b-a22b-thinking",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-vl-30b-a3b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-vl-30b-a3b-thinking",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-vl-32b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-vl-8b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3-vl-8b-thinking",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.5-122b-a10b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.5-27b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.5-35b-a3b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.5-397b-a17b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.5-9b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.5-flash-02-23",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.5-plus-02-15",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.5-plus-20260420",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.6-27b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.6-35b-a3b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.6-flash",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.6-max-preview",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.6-plus",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.7-max",
+      "variants": []
+    },
+    {
+      "key": "openrouter/qwen/qwen3.7-plus",
+      "variants": []
+    },
+    {
+      "key": "openrouter/rekaai/reka-edge",
+      "variants": []
+    },
+    {
+      "key": "openrouter/rekaai/reka-flash-3",
+      "variants": []
+    },
+    {
+      "key": "openrouter/relace/relace-apply-3",
+      "variants": []
+    },
+    {
+      "key": "openrouter/relace/relace-search",
+      "variants": []
+    },
+    {
+      "key": "openrouter/sakana/fugu-ultra",
+      "variants": []
+    },
+    {
+      "key": "openrouter/sao10k/l3-lunaris-8b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/sao10k/l3.1-70b-hanami-x1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/sao10k/l3.1-euryale-70b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/sao10k/l3.3-euryale-70b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/stepfun/step-3.5-flash",
+      "variants": []
+    },
+    {
+      "key": "openrouter/stepfun/step-3.7-flash",
+      "variants": []
+    },
+    {
+      "key": "openrouter/switchpoint/router",
+      "variants": []
+    },
+    {
+      "key": "openrouter/tencent/hunyuan-a13b-instruct",
+      "variants": []
+    },
+    {
+      "key": "openrouter/tencent/hy3-preview",
+      "variants": []
+    },
+    {
+      "key": "openrouter/thedrummer/cydonia-24b-v4.1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/thedrummer/rocinante-12b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/thedrummer/skyfall-36b-v2",
+      "variants": []
+    },
+    {
+      "key": "openrouter/thedrummer/unslopnemo-12b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/undi95/remm-slerp-l2-13b",
+      "variants": []
+    },
+    {
+      "key": "openrouter/upstage/solar-pro-3",
+      "variants": []
+    },
+    {
+      "key": "openrouter/writer/palmyra-x5",
+      "variants": []
+    },
+    {
+      "key": "openrouter/x-ai/grok-4.20",
+      "variants": []
+    },
+    {
+      "key": "openrouter/x-ai/grok-4.20-multi-agent",
+      "variants": []
+    },
+    {
+      "key": "openrouter/x-ai/grok-4.3",
+      "variants": []
+    },
+    {
+      "key": "openrouter/x-ai/grok-build-0.1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/xiaomi/mimo-v2.5",
+      "variants": []
+    },
+    {
+      "key": "openrouter/xiaomi/mimo-v2.5-pro",
+      "variants": []
+    },
+    {
+      "key": "openrouter/z-ai/glm-4.5",
+      "variants": []
+    },
+    {
+      "key": "openrouter/z-ai/glm-4.5-air",
+      "variants": []
+    },
+    {
+      "key": "openrouter/z-ai/glm-4.5v",
+      "variants": []
+    },
+    {
+      "key": "openrouter/z-ai/glm-4.6",
+      "variants": []
+    },
+    {
+      "key": "openrouter/z-ai/glm-4.6v",
+      "variants": []
+    },
+    {
+      "key": "openrouter/z-ai/glm-4.7",
+      "variants": []
+    },
+    {
+      "key": "openrouter/z-ai/glm-4.7-flash",
+      "variants": []
+    },
+    {
+      "key": "openrouter/z-ai/glm-5",
+      "variants": []
+    },
+    {
+      "key": "openrouter/z-ai/glm-5-turbo",
+      "variants": []
+    },
+    {
+      "key": "openrouter/z-ai/glm-5.1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/z-ai/glm-5.2",
+      "variants": []
+    },
+    {
+      "key": "openrouter/z-ai/glm-5v-turbo",
+      "variants": []
     },
     {
       "key": "xiaomi/mimo-v2.5",
