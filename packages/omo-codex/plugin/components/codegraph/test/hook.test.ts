@@ -9,12 +9,13 @@ import { runCodegraphCli } from "../src/cli.ts";
 import {
 	executeCodegraphSessionStartHook,
 	resolveCodegraphCommandInvocation,
+	runCodegraphPostToolUseHook,
 	runCodegraphSessionStartWorker,
 	type WorkerSpawnInvocation,
 } from "../src/hook.ts";
 
 const pluginRoot = resolve(fileURLToPath(new URL("../../..", import.meta.url)));
-const hooksConfigPath = resolve(pluginRoot, "hooks/hooks.json");
+const pluginConfigPath = resolve(pluginRoot, ".codex-plugin/plugin.json");
 
 describe("CodeGraph SessionStart hook", () => {
 	it("#given hook session-start cli args #when invoked with empty JSON input #then it emits valid JSON and exits zero", async () => {
@@ -42,11 +43,58 @@ describe("CodeGraph SessionStart hook", () => {
 					hookEventName: "SessionStart",
 					additionalContext: "LazyCodex CodeGraph bootstrap scheduled in background",
 				},
-				codegraph: { action: "spawned" },
 			});
 		} finally {
 			rmSync(homeDir, { recursive: true, force: true });
 		}
+	});
+
+	it("#given CodeGraph MCP reports an uninitialized project #when PostToolUse fires #then it emits OMO global-store init guidance", async () => {
+		// given
+		const output = runCodegraphPostToolUseHook(
+			{
+				cwd: "/Users/me/project",
+				tool_name: "codegraph.codegraph_status",
+				tool_response: {
+					error: [
+						"Tool execution failed: CodeGraph not initialized in /Users/me/project.",
+						"Run 'codegraph init' in that project first.",
+					].join(" "),
+				},
+			},
+			{ homeDir: "/Users/me" },
+		);
+
+		// when
+		const parsed = JSON.parse(output);
+
+		// then
+		expect(parsed).toEqual({
+			hookSpecificOutput: {
+				hookEventName: "PostToolUse",
+				additionalContext: expect.stringContaining('"/Users/me/.omo/codegraph/projects/project-'),
+			},
+		});
+		expect(parsed.hookSpecificOutput.additionalContext).toContain('run `codegraph init` from "/Users/me/project"');
+	});
+
+	it("#given real CodeGraph status output has no MCP path phrase #when PostToolUse fires #then it emits OMO global-store init guidance", async () => {
+		// given
+		const output = runCodegraphPostToolUseHook(
+			{
+				cwd: "/Users/me/project",
+				tool_name: "mcp__codegraph__codegraph_status",
+				tool_response: ['Project: /Users/me/project', "Not initialized", 'Run "codegraph init" to initialize'].join("\n"),
+			},
+			{ homeDir: "/Users/me" },
+		);
+
+		// when
+		const parsed = JSON.parse(output);
+
+		// then
+		expect(parsed.hookSpecificOutput.additionalContext).toContain('CodeGraph is not initialized for "/Users/me/project"');
+		expect(parsed.hookSpecificOutput.additionalContext).toContain('"/Users/me/.omo/codegraph/projects/project-');
 	});
 
 	it("#given CodeGraph is disabled by Codex SOT config #when SessionStart fires #then it skips without spawning", async () => {
@@ -66,10 +114,7 @@ describe("CodeGraph SessionStart hook", () => {
 		// then
 		expect(result).toEqual({ action: "skipped-disabled", exitCode: 0 });
 		expect(spawned).toEqual([]);
-		expect(JSON.parse(stdout.join(""))).toEqual({
-			hookSpecificOutput: { hookEventName: "SessionStart" },
-			codegraph: { action: "skipped-disabled" },
-		});
+		expect(stdout.join("")).toBe("");
 	});
 
 	it("#given HOME OMO config disables Codex CodeGraph #when SessionStart fires #then it skips without spawning", async () => {
@@ -97,7 +142,7 @@ describe("CodeGraph SessionStart hook", () => {
 			// then
 			expect(result).toEqual({ action: "skipped-disabled", exitCode: 0 });
 			expect(spawned).toEqual([]);
-			expect(JSON.parse(stdout.join("")).codegraph).toEqual({ action: "skipped-disabled" });
+			expect(stdout.join("")).toBe("");
 		} finally {
 			rmSync(homeDir, { recursive: true, force: true });
 			rmSync(workspace, { recursive: true, force: true });
@@ -128,7 +173,7 @@ describe("CodeGraph SessionStart hook", () => {
 			// then
 			expect(result).toEqual({ action: "skipped-disabled", exitCode: 0 });
 			expect(spawned).toEqual([]);
-			expect(JSON.parse(stdout.join("")).codegraph).toEqual({ action: "skipped-disabled" });
+			expect(stdout.join("")).toBe("");
 		} finally {
 			rmSync(homeDir, { recursive: true, force: true });
 			rmSync(workspace, { recursive: true, force: true });
@@ -191,96 +236,14 @@ describe("CodeGraph SessionStart hook", () => {
 					},
 				},
 			]);
-			expect(JSON.parse(stdout.join("")).codegraph).toEqual({ action: "spawned" });
-		} finally {
-			rmSync(workspace, { recursive: true, force: true });
-		}
-	});
-
-	it("#given an unsupported local Node and a PATH CodeGraph command #when worker runs #then it skips without touching the workspace", async () => {
-		// given
-		const workspace = mkdtempSync(join(tmpdir(), "omo-codegraph-worker-node-"));
-		const homeDir = mkdtempSync(join(tmpdir(), "omo-codegraph-worker-node-home-"));
-		const outcomes: unknown[] = [];
-
-		try {
-			// when
-			const result = await runCodegraphSessionStartWorker({
-				cwd: workspace,
-				env: { HOME: homeDir },
-				nodeVersion: "26.3.0",
-				logOutcome: (outcome) => outcomes.push(outcome),
-				deps: {
-					resolveCommand: () => {
-						return { argsPrefix: [], command: "/usr/local/bin/codegraph", exists: true, source: "path" };
-					},
-					ensureProvisioned: () => {
-						throw new Error("ensureProvisioned should not run on unsupported Node");
-					},
-					prepareWorkspace: () => {
-						throw new Error("prepareWorkspace should not run on unsupported Node");
-					},
-					runCommand: () => {
-						throw new Error("runCommand should not run on unsupported Node");
-					},
+			expect(JSON.parse(stdout.join(""))).toEqual({
+				hookSpecificOutput: {
+					additionalContext: "LazyCodex CodeGraph bootstrap scheduled in background",
+					hookEventName: "SessionStart",
 				},
 			});
-
-			// then
-			expect(result).toEqual({ action: "skipped-unsupported-node" });
-			expect(existsSync(join(workspace, ".codegraph"))).toBe(false);
-			expect(outcomes).toEqual([{ action: "skipped-unsupported-node", projectRoot: workspace }]);
 		} finally {
 			rmSync(workspace, { recursive: true, force: true });
-			rmSync(homeDir, { recursive: true, force: true });
-		}
-	});
-
-	it("#given an unsupported local Node but bundled CodeGraph resolves through CODEGRAPH_NODE_BIN #when worker runs #then it bootstraps with the compatible runtime", async () => {
-		// given
-		const workspace = mkdtempSync(join(tmpdir(), "omo-codegraph-worker-compatible-node-"));
-		const homeDir = mkdtempSync(join(tmpdir(), "omo-codegraph-worker-compatible-node-home-"));
-		const nodeBin = "/opt/node22/bin/node";
-		const calls: Array<{ readonly args: readonly string[]; readonly command: string }> = [];
-		const outcomes: unknown[] = [];
-
-		try {
-			// when
-			const result = await runCodegraphSessionStartWorker({
-				cwd: workspace,
-				env: { CODEGRAPH_NODE_BIN: nodeBin, HOME: homeDir },
-				nodeVersion: "26.3.0",
-				logOutcome: (outcome) => outcomes.push(outcome),
-				deps: {
-					ensureGitignored: () => true,
-					ensureProvisioned: () => {
-						throw new Error("provisioning should not run when bundled CodeGraph resolved");
-					},
-					prepareWorkspace: () => ({
-						dataDir: join(homeDir, ".omo/codegraph/projects/test"),
-						dataRoot: join(homeDir, ".omo/codegraph"),
-						linked: true,
-						mode: "global-linked",
-						projectLink: join(workspace, ".codegraph"),
-					}),
-					resolveCommand: () => ({ argsPrefix: ["codegraph.js"], command: nodeBin, exists: true, source: "bundled" }),
-					runCommand: (_projectRoot, command, args) => {
-						calls.push({ args, command });
-						return Promise.resolve({ exitCode: 0, stdout: calls.length === 1 ? '{"initialized":false}' : "", timedOut: false });
-					},
-				},
-			});
-
-			// then
-			expect(result).toEqual({ action: "initialized" });
-			expect(calls).toEqual([
-				{ args: ["codegraph.js", "status", "--json"], command: nodeBin },
-				{ args: ["codegraph.js", "init"], command: nodeBin },
-			]);
-			expect(outcomes).toEqual([{ action: "initialized", exitCode: 0, projectRoot: workspace, source: "bundled", timedOut: false }]);
-		} finally {
-			rmSync(workspace, { recursive: true, force: true });
-			rmSync(homeDir, { recursive: true, force: true });
 		}
 	});
 
@@ -514,7 +477,7 @@ describe("CodeGraph SessionStart hook", () => {
 		}
 	});
 
-	it("#given malformed hook input #when SessionStart fires #then it still emits JSON and exits zero", async () => {
+	it("#given malformed hook input with CodeGraph disabled #when SessionStart fires #then it stays silent and exits zero", async () => {
 		// given
 		const stdout: string[] = [];
 		const spawned: WorkerSpawnInvocation[] = [];
@@ -531,23 +494,23 @@ describe("CodeGraph SessionStart hook", () => {
 		// then
 		expect(result.exitCode).toBe(0);
 		expect(spawned).toEqual([]);
-		expect(JSON.parse(stdout.join("")).codegraph).toEqual({ action: "skipped-disabled" });
+		expect(stdout.join("")).toBe("");
 	});
 
 	it("#given plugin hook config #when inspected #then CodeGraph is registered after bootstrap SessionStart", () => {
 		// given
-		const hooksConfig = JSON.parse(readFileSync(hooksConfigPath, "utf8"));
+		const pluginConfig: unknown = JSON.parse(readFileSync(pluginConfigPath, "utf8"));
 
 		// when
-		const sessionStartHooks = hooksConfig.hooks.SessionStart;
-		const commands = sessionStartHooks.map((entry: { readonly hooks: readonly [{ readonly command: string }] }) => {
-			return entry.hooks[0].command;
-		});
+		const hookPaths =
+			typeof pluginConfig === "object" && pluginConfig !== null && "hooks" in pluginConfig && Array.isArray(pluginConfig.hooks)
+				? pluginConfig.hooks.filter((hookPath): hookPath is string => typeof hookPath === "string")
+				: [];
 
 		// then
-		expect(commands).toContain('node "${PLUGIN_ROOT}/components/codegraph/dist/cli.js" hook session-start');
-		expect(commands.indexOf('node "${PLUGIN_ROOT}/components/bootstrap/dist/cli.js" hook session-start')).toBeLessThan(
-			commands.indexOf('node "${PLUGIN_ROOT}/components/codegraph/dist/cli.js" hook session-start'),
+		expect(hookPaths).toContain("./hooks/session-start-checking-codegraph-bootstrap.json");
+		expect(hookPaths.indexOf("./hooks/session-start-checking-bootstrap-provisioning.json")).toBeLessThan(
+			hookPaths.indexOf("./hooks/session-start-checking-codegraph-bootstrap.json"),
 		);
 	});
 });

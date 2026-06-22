@@ -9,6 +9,7 @@ import { buildCodegraphEnv } from "../../../../../utils/src/codegraph/env.ts";
 import { evaluateCodegraphNodeSupport, type CodegraphNodeSupport } from "../../../../../utils/src/codegraph/node-support.ts";
 import { ensureCodegraphProvisioned } from "../../../../../utils/src/codegraph/provision.ts";
 import {
+	codegraphCommandRequiresSupportedLocalNode,
 	resolveCodegraphCommand,
 	type CodegraphCommandResolution,
 } from "../../../../../utils/src/codegraph/resolve.ts";
@@ -102,13 +103,10 @@ async function resolveOrProvisionCommand(
 	nodeSupport: CodegraphNodeSupport,
 ): Promise<ResolutionResult> {
 	const resolved = deps.resolveCommand({ env, homeDir, provisioned: () => provisionedBinFromInstallDir(config.install_dir) });
-	if (resolved.exists) {
-		if (resolved.source !== "bundled" && resolved.source !== "env" && !nodeSupport.supported) {
-			return { kind: "unsupported-node" };
-		}
+	if (resolved.exists && canUseResolvedCommand(resolved, nodeSupport)) {
 		return { kind: "resolved", resolution: resolved };
 	}
-	if (!nodeSupport.supported) return { kind: "unsupported-node" };
+	if (resolved.exists && config.auto_provision === false) return { kind: "unsupported-node" };
 	if (config.auto_provision === false) return { error: "codegraph binary unavailable and auto_provision is disabled", kind: "unavailable", source: resolved.source };
 
 	const installDir = config.install_dir ?? join(homeDir, ".omo", "codegraph");
@@ -117,6 +115,10 @@ async function resolveOrProvisionCommand(
 		return { error: provisioned.error ?? "provisioning did not produce a binary", kind: "unavailable", source: resolved.source };
 	}
 	return { kind: "resolved", resolution: { argsPrefix: [], command: provisioned.binPath, exists: true, source: "provisioned" } };
+}
+
+function canUseResolvedCommand(resolved: CodegraphCommandResolution, nodeSupport: CodegraphNodeSupport): boolean {
+	return !codegraphCommandRequiresSupportedLocalNode(resolved) || nodeSupport.supported;
 }
 
 function decideStartupAction(status: CodegraphCommandResult): { readonly kind: "init" } | { readonly kind: "skip"; readonly reason: string } | { readonly kind: "sync" } {
