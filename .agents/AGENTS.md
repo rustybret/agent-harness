@@ -8,7 +8,7 @@ Project-scope skills + slash commands under the new `.agents/` directory name. D
 
 Loaded alongside `.opencode/` by [`packages/omo-opencode/src/features/opencode-skill-loader/`](../packages/omo-opencode/src/features/opencode-skill-loader/). When both directories declare the same skill or command name, the higher-priority scope wins per the loader's deduplication rules.
 
-## SKILLS (10, superset of `.opencode/`)
+## SKILLS (11, superset of `.opencode/`)
 
 | Skill | Also in `.opencode/`? | Purpose |
 |-------|------------------------|---------|
@@ -22,6 +22,7 @@ Loaded alongside `.opencode/` by [`packages/omo-opencode/src/features/opencode-s
 | `publish/` | NEW | Skill form of the `/publish` command |
 | `remove-deadcode/` | NEW | Skill form of the `/remove-deadcode` command |
 | `security-research/` | NEW | Team Mode security research audit: 3 vulnerability hunters + 2 PoC engineers |
+| `macos-cua/` | NEW | macOS native desktop automation via CoreGraphics/AX APIs — screenshots, clicks, typing, key chords, scrolling |
 
 The 5 "NEW" skills here are skill-format equivalents of slash commands that exist in BOTH `.opencode/command/` and `.agents/command/`. They allow the same instructions to be triggered either by an explicit `/command` invocation OR by skill auto-loading on matching prompts.
 
