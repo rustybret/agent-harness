@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",
+  "cross_project_mailbox": {
+    "enabled": true,
+    "intake_eligible_agents": ["sisyphus"],
+    "default_sender_access": "allow-none",
+    "senders": {
+      "cloudhome-5aa53d2c": {
+        "access": "allow",
+        "intent_budget": "plan"
+      },
+      "unitysupermcp-7b6c0482": {
+        "access": "allow",
+        "intent_budget": "plan"
+      },
+      "rsg-4abd5985": {
+        "access": "allow",
+        "intent_budget": "plan"
+      }
+    }
+  }
+}
