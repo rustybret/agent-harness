@@ -124,7 +124,10 @@ async function processNote(
     { ...envelope, body: note.body },
     { projectDisplayName: deps.projectDisplayName },
   )
-  const dispatchResult = await deps.dispatchInternalPrompt(buildDispatchArgs(deps, sessionId, triageText))
+  const dispatchResult = await deps.dispatchInternalPrompt({
+    ...buildDispatchArgs(deps, sessionId, triageText),
+    queueBehavior: "defer",
+  })
   if (!isInternalPromptDispatchAccepted(dispatchResult)) {
     return false
   }

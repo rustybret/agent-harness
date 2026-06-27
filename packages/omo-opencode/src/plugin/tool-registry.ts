@@ -18,6 +18,7 @@ import {
   getTaskSystemEnabled,
 } from "./tool-registry-gated-tools"
 import { createTeamModeToolsRecord } from "./tool-registry-team-tools"
+import { createMailboxToolsRecord } from "./tool-registry-mailbox-tools"
 export { trimToolsToCap } from "./tool-registry-trimming"
 import { trimToolsToCap } from "./tool-registry-trimming"
 
@@ -63,6 +64,7 @@ export function createToolRegistry(args: {
     ...createMonitorToolsRecord({ pluginConfig, ctx, managers, factories }),
     ...createTaskToolsRecord({ taskSystemEnabled, pluginConfig, ctx, factories }),
     ...createHashlineToolsRecord({ pluginConfig, ctx, factories }),
+    ...createMailboxToolsRecord({ pluginConfig, ctx, factories }),
   }
 
   const allToolNames = Object.keys(allTools)

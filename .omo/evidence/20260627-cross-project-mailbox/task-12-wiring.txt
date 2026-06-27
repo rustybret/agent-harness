@@ -1,0 +1,96 @@
+Task 12 — Cross-Project Mailbox Plugin Wiring + Config-Flag Gating + Hook Order
+================================================================================
+Date: 2026-06-27
+Branch: feat/cross-project-mailbox
+Worktree: /Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/cross-project-mailbox
+
+SCOPE
+-----
+Wire the idle-drain hook and `project_message` tool into the OpenCode plugin,
+gated on `cross_project_mailbox.enabled`. Enforce .gitignore hygiene. Verify the
+prompt-async-route audit stays green (no allowlist changes).
+
+
+TEST RESULTS
+------------
+1) create-mailbox-session-hooks.test.ts
+   bun test packages/omo-opencode/src/plugin/hooks/create-mailbox-session-hooks.test.ts
+   => 4 pass, 0 fail, 5 expect() calls, 4 tests across 1 file
+
+2) prompt-async-route-audit.test.ts (MUST NOT REGRESS)
+   bun test packages/omo-opencode/src/shared/prompt-async-route-audit.test.ts
+   => 10 pass, 0 fail, 10 expect() calls, 10 tests across 1 file
+   => 0 allowlist changes. Pre-existing baseline gap (idle-drain-hook.ts:127
+      dispatchInternalPrompt without explicit queueBehavior) was fixed by
+      declaring `queueBehavior: "defer"` at the call site — NOT an allowlist edit.
+
+3) cross-project-mailbox feature suite (no regressions)
+   bun test packages/omo-opencode/src/features/cross-project-mailbox/
+   => 130 pass, 0 fail, 287 expect() calls, 130 tests across 13 files
+
+4) plugin suite (no regressions)
+   bun test packages/omo-opencode/src/plugin/
+   => 313 pass, 0 fail, 894 expect() calls, 313 tests across 46 files
+
+
+.GITIGNORE HYGIENE
+------------------
+Appended to repo-root .gitignore:
+   # cross-project agent mailbox
+   coordination_notes/
+   .omo/mailbox-outbox.jsonl
+
+Verification:
+$ git check-ignore -v coordination_notes/test.md
+.gitignore:69:coordination_notes/	coordination_notes/test.md
+exit=0
+
+$ git check-ignore -v .omo/mailbox-outbox.jsonl
+.gitignore:70:.omo/mailbox-outbox.jsonl	.omo/mailbox-outbox.jsonl
+exit=0
+
+Both rules match (exit 0).
+
+
+TYPECHECK NOTE
+--------------
+The only tsgo errors are in TWO files NOT touched by this task and are
+pre-existing branch state from prior waves:
+  - packages/omo-opencode/src/config/schema/oh-my-opencode-config.ts(88,77)
+  - packages/omo-opencode/src/hooks/anthropic-context-window-limit-recovery/recovery-hook.test-support.ts(41,3)
+Both relate to the cross_project_mailbox config default/required-field wiring
+landed before Task 12. No file changed in this task introduces a new type error.
+
+
+STAGED DIFF STAT
+----------------
+$ git diff --cached --stat
+ .gitignore                                         |  4 +
+ packages/omo-opencode/src/config/schema/hooks.ts   |  1 +
+ .../hooks/create-mailbox-hooks.ts                  | 92 ++++++++++++++++++++++
+ .../cross-project-mailbox/hooks/idle-drain-hook.ts |  5 +-
+ .../features/cross-project-mailbox/hooks/index.ts  |  1 +
+ packages/omo-opencode/src/plugin/event.ts          |  8 ++
+ .../hooks/create-mailbox-session-hooks.test.ts     | 83 +++++++++++++++++++
+ .../plugin/hooks/create-mailbox-session-hooks.ts   | 29 +++++++
+ .../src/plugin/hooks/create-session-hooks.ts       | 10 +++
+ .../src/plugin/tool-registry-factories.ts          |  3 +
+ .../src/plugin/tool-registry-mailbox-tools.ts      | 33 ++++++++
+ packages/omo-opencode/src/plugin/tool-registry.ts  |  2 +
+ packages/omo-opencode/src/tools/index.ts           |  1 +
+ 13 files changed, 271 insertions(+), 1 deletion(-)
+
+
+GATING BEHAVIOR (verified by tests)
+-----------------------------------
+- cross_project_mailbox undefined / { enabled: false } => mailboxIdleDrain === null,
+  createMailboxToolsRecord returns {} (no project_message tool)
+- cross_project_mailbox { enabled: true, ... } => mailboxIdleDrain !== null,
+  project_message tool registered
+- HookNameSchema.options includes "cross-project-mailbox-idle-drain"
+
+HOOK ORDER
+----------
+Mailbox idle drain dispatched in event.ts dispatchIdleOnlyHooks AFTER
+teamIdleWakeHint and teamMemberStatusHandler, consistent with the plan
+(fires after todoContinuationEnforcer / teamIdleWakeHint in the idle flow).

@@ -79,6 +79,14 @@ export function createEventHandler(args: {
     managers.tmuxSessionManager?.onEvent?.(input.event);
     await runEventHookSafely("teamIdleWakeHint", teamHandlers.teamIdleWakeHint, input);
     await runEventHookSafely("teamMemberStatusHandler", teamHandlers.teamMemberStatusHandler, input);
+    const mailboxSessionID = getEventSessionID(input);
+    if (mailboxSessionID && hooks.mailboxIdleDrain) {
+      await runEventHookSafely(
+        "mailboxIdleDrain",
+        () => hooks.mailboxIdleDrain?.["session.idle"]({ sessionId: mailboxSessionID }),
+        input,
+      );
+    }
   };
 
   const dispatchSyntheticIdle = async (syntheticIdle: EventInput): Promise<void> => {
