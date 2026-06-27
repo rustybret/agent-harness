@@ -1,5 +1,7 @@
 import path from "node:path"
 
+import { log } from "../../../shared/logger"
+
 import { dispatchInternalPrompt } from "../../../shared/prompt-async-gate"
 import type { PluginContext } from "../../../plugin/types"
 import type { CrossProjectMailboxConfig } from "../config"
@@ -52,7 +54,9 @@ function buildIdleDrainDeps(
       .then((projects) => {
         projectsSnapshot = projects.filter((entry) => entry.repoRoot !== repoRoot)
       })
-      .catch(() => {})
+      .catch((error) => {
+        log("mailbox refresh snapshot failed", { error })
+      })
   }
   refreshSnapshot()
 

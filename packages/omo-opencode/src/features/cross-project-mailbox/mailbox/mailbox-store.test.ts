@@ -147,6 +147,30 @@ describe("MailboxStore#ack", () => {
   })
 })
 
+describe("MailboxStore#markDispatched", () => {
+  describe("#given a reserved note", () => {
+    describe("#when markDispatched is called", () => {
+      it("#then it delegates to PendingDeliveryStore and adds a dispatch_sent entry", async () => {
+        const store = makeStore()
+        const pending = new PendingDeliveryStore(root)
+        const envelope = makeEnvelope()
+        await store.writeNote(envelope, "body")
+        const reservedPath = await store.reserve(envelope.messageId)
+
+        await store.markDispatched({
+          messageId: envelope.messageId,
+          sessionId: "ses_1",
+          reservedPath: reservedPath ?? "",
+          dispatchedAt: Date.now(),
+        })
+
+        const entry = await pending.getEntry(envelope.messageId)
+        expect(entry?.state).toBe("dispatch_sent")
+      })
+    })
+  })
+})
+
 describe("MailboxStore#quarantine", () => {
   describe("#given an unread note", () => {
     describe("#when quarantine is called", () => {
@@ -155,14 +179,17 @@ describe("MailboxStore#quarantine", () => {
         const envelope = makeEnvelope()
         await store.writeNote(envelope, "body")
 
-        await store.quarantine(envelope.messageId, "unauthorized")
+        await store.quarantine(envelope.messageId, "unauthorized", "some detail")
 
         const rejectedPath = path.join(inboxDir(), "rejected", `${envelope.messageId}.md`)
         const reasonPath = path.join(inboxDir(), "rejected", `${envelope.messageId}.reason.json`)
         expect(await exists(rejectedPath)).toBe(true)
         expect(await exists(reasonPath)).toBe(true)
-        const reason = JSON.parse(await readFile(reasonPath, "utf8")) as { reason: string }
+        const reason = JSON.parse(await readFile(reasonPath, "utf8")) as Record<string, unknown>
         expect(reason.reason).toBe("unauthorized")
+        expect(reason.detail).toBe("some detail")
+        expect(typeof reason.at).toBe("string")
+        expect(reason.messageId).toBeUndefined()
       })
     })
   })

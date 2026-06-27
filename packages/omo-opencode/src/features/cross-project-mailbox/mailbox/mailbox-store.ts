@@ -7,7 +7,7 @@ import { parseEnvelope, serializeEnvelope } from "../envelope/schema"
 import type { MailboxMessage } from "../envelope/schema"
 import { assertPathWithinRoot, safeMessageIdFilename } from "../envelope/path-guard"
 import { PendingDeliveryStore } from "./pending-delivery-store"
-import type { MailboxDir, QuarantineReason, UnreadMessage } from "./types"
+import type { MailboxDir, PendingEntry, QuarantineReason, UnreadMessage } from "./types"
 
 const RESERVED_PREFIX = ".delivering-"
 const NOTE_SUFFIX = ".md"
@@ -21,11 +21,19 @@ function isUnreadNoteFile(entry: Dirent): boolean {
 }
 
 export class MailboxStore {
+  private readonly pendingStore: PendingDeliveryStore
+
   constructor(
     private readonly targetRepoRoot: string,
     private readonly fromProjectId: string,
     private readonly config: { reservation_ttl_ms: number },
-  ) {}
+  ) {
+    this.pendingStore = new PendingDeliveryStore(this.targetRepoRoot)
+  }
+
+  async markDispatched(entry: Omit<PendingEntry, "state">): Promise<void> {
+    await this.pendingStore.addDispatchSent(entry)
+  }
 
   private dirs(): MailboxDir {
     const inbox = path.join(this.targetRepoRoot, "coordination_notes", this.fromProjectId)
@@ -149,7 +157,7 @@ export class MailboxStore {
     }
     const reasonPath = path.join(rejected, `${messageId}.reason.json`)
     this.guard(reasonPath)
-    await Bun.write(reasonPath, `${JSON.stringify({ messageId, reason, detail }, null, 2)}\n`)
+    await Bun.write(reasonPath, `${JSON.stringify({ reason, detail, at: new Date().toISOString() }, null, 2)}\n`)
   }
 
   async drainUnread(maxNotes: number): Promise<UnreadMessage[]> {
@@ -179,7 +187,6 @@ export class MailboxStore {
       throw error
     }
 
-    const pending = new PendingDeliveryStore(this.targetRepoRoot)
     for (const entry of entries) {
       if (!entry.isFile()) continue
       if (!entry.name.startsWith(RESERVED_PREFIX) || !entry.name.endsWith(NOTE_SUFFIX)) continue
@@ -187,7 +194,7 @@ export class MailboxStore {
       const fileStat = await stat(filePath)
       if (fileStat.mtimeMs > cutoff) continue
       const messageId = entry.name.slice(RESERVED_PREFIX.length, -NOTE_SUFFIX.length)
-      await this.reclaimOne(messageId, pending, sessionMessageIds)
+      await this.reclaimOne(messageId, this.pendingStore, sessionMessageIds)
     }
   }
 

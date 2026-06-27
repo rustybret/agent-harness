@@ -67,6 +67,7 @@ interface Spies {
   drainUnread: ReturnType<typeof jest.fn>
   reserve: ReturnType<typeof jest.fn>
   quarantine: ReturnType<typeof jest.fn>
+  markDispatched: ReturnType<typeof jest.fn>
   addDispatchSent: ReturnType<typeof jest.fn>
   checkAndRecord: ReturnType<typeof jest.fn>
   checkRateLimit: ReturnType<typeof jest.fn>
@@ -99,6 +100,7 @@ function makeHarness(opts: {
   const reserveResult = "reserveResult" in opts ? opts.reserveResult : "/inbox/.delivering-id.md"
   const reserve = jest.fn(async () => reserveResult)
   const quarantine = jest.fn(async () => undefined)
+  const markDispatched = jest.fn(async () => undefined)
   const addDispatchSent = jest.fn(async () => undefined)
   const checkAndRecord = jest.fn(async () => ({ isDuplicate: opts.duplicate ?? false }))
   const checkRateLimit = jest.fn(async () => ({ limited: opts.rateLimited ?? false }))
@@ -109,7 +111,7 @@ function makeHarness(opts: {
   const resolveActivePrimaryAgent = jest.fn(() => ("primary" in opts ? opts.primary : "sisyphus"))
   const getRegisteredProjects = jest.fn(() => opts.projects ?? [makeProject()])
 
-  const store: MailboxStorePort = { reclaimStale, drainUnread, reserve, quarantine }
+  const store: MailboxStorePort = { reclaimStale, drainUnread, reserve, quarantine, markDispatched }
   const pending: PendingStorePort = { addDispatchSent }
   const digest: DigestStorePort = { checkAndRecord }
   const limiter: RateLimiterPort = { checkRateLimit }
@@ -142,6 +144,7 @@ function makeHarness(opts: {
       drainUnread,
       reserve,
       quarantine,
+      markDispatched,
       addDispatchSent,
       checkAndRecord,
       checkRateLimit,
@@ -173,8 +176,8 @@ describe("createIdleDrainHook", () => {
       expect(spies.reserve).toHaveBeenCalledTimes(1)
       expect(spies.buildTriagePrompt).toHaveBeenCalledTimes(1)
       expect(spies.dispatchInternalPrompt).toHaveBeenCalledTimes(1)
-      expect(spies.addDispatchSent).toHaveBeenCalledTimes(1)
-      expect(spies.addDispatchSent.mock.calls[0][0].messageId).toBe(makeNote().messageId)
+      expect(spies.markDispatched).toHaveBeenCalledTimes(1)
+      expect(spies.markDispatched.mock.calls[0][0].messageId).toBe(makeNote().messageId)
     })
 
     it("#then SAFETY-A: dispatched prompt input carries no agent/model/variant key", async () => {
@@ -225,7 +228,7 @@ describe("createIdleDrainHook", () => {
       // then
       expect(spies.reserve).toHaveBeenCalledTimes(1)
       expect(spies.dispatchInternalPrompt).not.toHaveBeenCalled()
-      expect(spies.addDispatchSent).not.toHaveBeenCalled()
+      expect(spies.markDispatched).not.toHaveBeenCalled()
     })
   })
 
@@ -259,9 +262,7 @@ describe("createIdleDrainHook", () => {
 
       // then
       expect(store["writeNote"]).toBeUndefined()
-      expect(spies.makePendingStore).toHaveBeenCalled()
-      const pending = deps.makePendingStore("/repos/beta") as Record<string, unknown>
-      expect(pending["writeNote"]).toBeUndefined()
+      expect(spies.makeMailboxStore).toHaveBeenCalled()
     })
   })
 

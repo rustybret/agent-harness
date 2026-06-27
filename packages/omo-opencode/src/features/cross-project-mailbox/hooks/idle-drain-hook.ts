@@ -25,6 +25,7 @@ export interface MailboxStorePort {
   drainUnread(maxNotes: number): Promise<UnreadMessage[]>
   reserve(messageId: string): Promise<string | undefined>
   quarantine(messageId: string, reason: QuarantineReason, detail?: string): Promise<void>
+  markDispatched(entry: Omit<PendingEntry, "state">): Promise<void>
 }
 
 export interface PendingStorePort {
@@ -132,7 +133,7 @@ async function processNote(
     return false
   }
 
-  await deps.makePendingStore(deps.repoRoot).addDispatchSent({
+  await store.markDispatched({
     messageId: note.messageId,
     sessionId,
     reservedPath,
