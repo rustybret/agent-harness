@@ -94,6 +94,7 @@ Below is the complete inventory of built-in hooks currently implemented in the h
 | `compaction-context-injector`| `session.compacted` | Restores essential context parameters immediately after history compaction. | OMO v2.5 |
 | `compaction-todo-preserver` | `session.compacted` | Preserves and restructures active todo check-boxes across compaction. | OMO v2.5 |
 | `unstable-agent-babysitter` | `session.idle` | Intercepts rapid looping states and forces background throttling. | OMO v3.0 |
+| `cross-project-mailbox-idle-drain` | `session.idle` | Inspects target directories and drains incoming coordination notes into active sessions. | OMO v4.10 |
 
 ### Tier 5: Skill Hooks
 
@@ -158,6 +159,7 @@ The tools system exposes capabilities to agents based on configuration profiles.
 | `team_shutdown_request`| `team_mode.enabled: true`| Requests lead or member termination on task completion. | OMO v4.0 |
 | `team_approve_shutdown`| `team_mode.enabled: true`| Lead acknowledges and executes a member's shutdown request. | OMO v4.0 |
 | `team_reject_shutdown` | `team_mode.enabled: true`| Lead denies a member's shutdown, providing reason feedback. | OMO v4.0 |
+| `project_message` | `cross_project_mailbox.enabled: true` | Sends an asynchronous, intent-budgeted coordination note to another registered project. | OMO v4.10 |
 
 ---
 
