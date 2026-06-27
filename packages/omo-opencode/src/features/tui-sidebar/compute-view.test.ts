@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 
 import { computeView, viewKey } from "./compute-view"
+import type { MailboxSidebarState } from "../cross-project-mailbox/sidebar"
 import type {
   AgentsState,
   ConfigState,
@@ -39,6 +40,21 @@ const liveLoop: LoopState = {
   pending: 2,
   blocked: 1,
   activeGoal: "Ship sidebar",
+}
+const mailboxSection: MailboxSidebarState = {
+  inboundUnread: 1,
+  inboundProcessed: 0,
+  recentSentCount: 2,
+  recentSent: [
+    {
+      sentAt: 2,
+      toProjectId: "proj-1",
+      messageId: "msg-1",
+      intent: "quick",
+      correlationId: "corr-1",
+      body: "hello",
+    },
+  ],
 }
 
 describe("tui sidebar computeView", () => {
@@ -197,5 +213,74 @@ describe("tui sidebar computeView", () => {
 
     // then
     expect(changedKey).not.toBe(originalKey)
+  })
+
+  it("#given active sections with an enabled mailbox section #when computing view #then the view carries the mailbox state", () => {
+    // given
+    const sections = {
+      config: validConfig,
+      roster,
+      agents: activeAgents,
+      jobs: idleJobs,
+      loop: idleLoop,
+      mailbox: mailboxSection,
+    }
+
+    // when
+    const view = computeView(sections)
+
+    // then
+    expect(view.kind).toBe("active")
+    if (view.kind === "active") {
+      expect(view.mailbox).toEqual(mailboxSection)
+    }
+  })
+
+  it("#given active sections with a null mailbox section #when computing view #then the view mailbox is null", () => {
+    // given
+    const sections = {
+      config: validConfig,
+      roster,
+      agents: activeAgents,
+      jobs: idleJobs,
+      loop: idleLoop,
+      mailbox: null,
+    }
+
+    // when
+    const view = computeView(sections)
+
+    // then
+    expect(view.kind).toBe("active")
+    if (view.kind === "active") {
+      expect(view.mailbox ?? null).toBeNull()
+    }
+  })
+
+  it("#given two active views differing only in mailbox unread count #when computing keys #then viewKey differs", () => {
+    // given
+    const first: SidebarView = {
+      kind: "active",
+      loop: idleLoop,
+      agents: activeAgents,
+      jobs: idleJobs,
+      configBanner: { kind: "none" },
+      mailbox: { ...mailboxSection, inboundUnread: 1 },
+    }
+    const second: SidebarView = {
+      kind: "active",
+      loop: idleLoop,
+      agents: activeAgents,
+      jobs: idleJobs,
+      configBanner: { kind: "none" },
+      mailbox: { ...mailboxSection, inboundUnread: 2 },
+    }
+
+    // when
+    const firstKey = viewKey(first)
+    const secondKey = viewKey(second)
+
+    // then
+    expect(secondKey).not.toBe(firstKey)
   })
 })
