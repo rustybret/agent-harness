@@ -1,3 +1,4 @@
+import type { MailboxSidebarState } from "../cross-project-mailbox/sidebar"
 import { assertNever } from "./state-types"
 import type {
   AgentsState,
@@ -15,6 +16,7 @@ export type ComputeViewSections = {
   readonly agents: AgentsState
   readonly jobs: JobBoardState
   readonly loop: LoopState
+  readonly mailbox?: MailboxSidebarState | null
 }
 
 export function computeView(sections: ComputeViewSections): SidebarView {
@@ -25,6 +27,7 @@ export function computeView(sections: ComputeViewSections): SidebarView {
       agents: sections.agents,
       jobs: sections.jobs,
       configBanner: sections.config.kind === "invalid" ? { kind: "invalid" } : { kind: "none" },
+      ...(sections.mailbox === undefined ? {} : { mailbox: sections.mailbox }),
     }
   }
 
@@ -44,6 +47,7 @@ export function viewKey(view: SidebarView): string {
         agentsKeyParts(view.agents),
         jobsKeyParts(view.jobs),
         ["configBanner", view.configBanner.kind],
+        ["mailbox", stableMailboxKey(view.mailbox ?? null)],
       ])
     case "broken":
       return stableKey(["broken", [...view.messages]])
@@ -60,6 +64,10 @@ function isActive(sections: ComputeViewSections): boolean {
 
 function stableKey(parts: readonly unknown[]): string {
   return JSON.stringify(parts)
+}
+
+function stableMailboxKey(mailbox: MailboxSidebarState | null): readonly unknown[] | null {
+  return mailbox ? [mailbox.inboundUnread, mailbox.inboundProcessed, mailbox.recentSentCount] : null
 }
 
 function rosterKeyParts(roster: RosterState): readonly unknown[] {

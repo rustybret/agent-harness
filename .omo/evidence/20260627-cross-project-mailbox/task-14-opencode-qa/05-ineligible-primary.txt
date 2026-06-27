@@ -1,0 +1,22 @@
+=== INELIGIBLE PRIMARY LEAVES NOTE UNREAD (todo-14 opencode-qa) ===
+Captured at 2026-06-27T05:24:31Z
+
+Config under test: intake_eligible_agents = ["hephaestus"] (sisyphus NOT eligible)
+Server: http://127.0.0.1:15100 (isolated XDG+HOME, no auth, no models fetch)
+
+--- OMO plugin loaded the INELIGIBLE config from sandbox ---
+[2026-06-27T05:24:14.053Z] Config loaded from /private/tmp/mailbox-qa-xJf4SA/config/opencode/oh-my-openagent.jsonc {}
+[2026-06-27T05:24:14.075Z] Config loaded from /private/tmp/mailbox-qa-xJf4SA/config/opencode/oh-my-openagent.jsonc {}
+
+--- inbox after serve with ineligible primary ---
+-rw-r--r--  1 brethoffman  wheel  430 Jun 26 22:20 /private/tmp/mailbox-qa-xJf4SA/receiver/coordination_notes/sender-3683b4bf/f97db543-77be-4746-8d9c-ec5c60fc0e1e.md
+
+--- processed/ dir (must NOT exist) ---
+ls: /private/tmp/mailbox-qa-xJf4SA/receiver/coordination_notes/sender-3683b4bf/processed/: No such file or directory
+processed/ does not exist
+
+RESULT: NOTE REMAINS UNREAD (correct) — message f97db543-77be-4746-8d9c-ec5c60fc0e1e still in inbox, never moved to processed/.
+
+Rationale: even if session.idle fired for a completed turn, isEligiblePrimary()
+rejects when the active primary (sisyphus) is not in intake_eligible_agents.
+Combined with 04 (no model round-trip), the note is correctly left untouched.

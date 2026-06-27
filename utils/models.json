@@ -3,9 +3,6 @@
   "version": "2025.05.13",
   "models": [
     {
-      "key": "anthropic/claude-3-5-haiku-latest"
-    },
-    {
       "key": "anthropic/claude-fable-5"
     },
     {

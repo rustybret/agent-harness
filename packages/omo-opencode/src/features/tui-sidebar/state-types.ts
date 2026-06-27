@@ -1,4 +1,5 @@
 import type { BackgroundTaskStatus } from "../background-agent/types"
+import type { MailboxSidebarState } from "../cross-project-mailbox/sidebar"
 
 export type AgentStatus = "busy" | "idle" | "error" | "running" | "retry"
 
@@ -59,6 +60,7 @@ export type SidebarView =
       readonly agents: AgentsState
       readonly jobs: JobBoardState
       readonly configBanner: ConfigBanner
+      readonly mailbox?: MailboxSidebarState | null
     }
   | { readonly kind: "broken"; readonly messages: readonly string[] }
   | { readonly kind: "idle"; readonly roster: RosterState }

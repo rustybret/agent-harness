@@ -39,6 +39,7 @@ import { safeCreateHook } from "../../shared/safe-create-hook"
 import { sessionExists } from "../../tools"
 import { isTmuxIntegrationEnabled } from "../../create-runtime-tmux-config"
 import { createModelFallbackTitleUpdater } from "./model-fallback-title-updater"
+import { createMailboxSessionHooks, type MailboxSessionHooks } from "./create-mailbox-session-hooks"
 
 export type SessionHooks = {
   preemptiveCompaction: ReturnType<typeof createPreemptiveCompactionHook> | null
@@ -65,6 +66,7 @@ export type SessionHooks = {
   taskResumeInfo: ReturnType<typeof createTaskResumeInfoHook> | null
   runtimeFallback: ReturnType<typeof createRuntimeFallbackHook> | null
   legacyPluginToast: ReturnType<typeof createLegacyPluginToastHook> | null
+  mailboxIdleDrain: MailboxSessionHooks["mailboxIdleDrain"]
 }
 
 export function createSessionHooks(args: {
@@ -234,6 +236,13 @@ export function createSessionHooks(args: {
     ? safeHook("legacy-plugin-toast", () => createLegacyPluginToastHook(ctx))
     : null
 
+  const { mailboxIdleDrain } = createMailboxSessionHooks({
+    ctx,
+    pluginConfig,
+    isHookEnabled,
+    safeHookEnabled,
+  })
+
   return {
     preemptiveCompaction,
     sessionNotification,
@@ -259,5 +268,6 @@ export function createSessionHooks(args: {
     taskResumeInfo,
     runtimeFallback,
     legacyPluginToast,
+    mailboxIdleDrain,
   }
 }

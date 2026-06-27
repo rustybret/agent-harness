@@ -6653,6 +6653,175 @@
       ],
       "additionalProperties": false
     },
+    "cross_project_mailbox": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "default": false,
+          "description": "Enable cross-project mailbox delivery (default: false)",
+          "type": "boolean"
+        },
+        "intake_eligible_agents": {
+          "default": [
+            "sisyphus"
+          ],
+          "description": "Agents permitted to receive cross-project notes during an idle drain",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "build",
+              "plan",
+              "sisyphus",
+              "hephaestus",
+              "sisyphus-junior",
+              "OpenCode-Builder",
+              "prometheus",
+              "metis",
+              "momus",
+              "oracle",
+              "librarian",
+              "explore",
+              "multimodal-looker",
+              "atlas"
+            ]
+          }
+        },
+        "interrupt_policy": {
+          "default": "idle-drain",
+          "description": "How incoming notes interact with the live session. Only idle-drain is implemented; the others are declared-only stubs.",
+          "type": "string",
+          "enum": [
+            "idle-drain",
+            "allow-interrupt",
+            "block-idle-input"
+          ]
+        },
+        "default_sender_access": {
+          "default": "allow-none",
+          "description": "Default access for source projects not listed in senders",
+          "type": "string",
+          "enum": [
+            "allow-all",
+            "allow-none"
+          ]
+        },
+        "senders": {
+          "default": {},
+          "description": "Per-source-project access and intent budget. The key is the source projectId; membership with access allow is the allowlist.",
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "access": {
+                "default": "allow",
+                "description": "Whether this source project may deliver into this mailbox",
+                "type": "string",
+                "enum": [
+                  "allow",
+                  "deny"
+                ]
+              },
+              "intent_budget": {
+                "type": "string",
+                "enum": [
+                  "question",
+                  "quick",
+                  "impl",
+                  "review",
+                  "work-loop",
+                  "plan"
+                ],
+                "description": "Maximum intent tier this source project is permitted to request"
+              }
+            },
+            "required": [
+              "access",
+              "intent_budget"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "bounds": {
+          "default": {
+            "max_hops": 4,
+            "max_notes_per_drain": 5,
+            "same_pair_rate_limit_per_min": 6,
+            "body_digest_ttl_min": 60,
+            "max_body_bytes": 32768,
+            "reservation_ttl_ms": 120000
+          },
+          "type": "object",
+          "properties": {
+            "max_hops": {
+              "default": 4,
+              "description": "Maximum forwarding hops a note may traverse before it is dropped",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "max_notes_per_drain": {
+              "default": 5,
+              "description": "Maximum number of notes delivered in a single idle drain",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "same_pair_rate_limit_per_min": {
+              "default": 6,
+              "description": "Maximum notes per minute allowed between the same source/destination pair",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "body_digest_ttl_min": {
+              "default": 60,
+              "description": "Minutes a body digest is retained for duplicate-note suppression",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "max_body_bytes": {
+              "default": 32768,
+              "description": "Maximum note body size in bytes",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            "reservation_ttl_ms": {
+              "default": 120000,
+              "description": "Milliseconds a delivery reservation is held before it expires",
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            }
+          },
+          "required": [
+            "max_hops",
+            "max_notes_per_drain",
+            "same_pair_rate_limit_per_min",
+            "body_digest_ttl_min",
+            "max_body_bytes",
+            "reservation_ttl_ms"
+          ],
+          "additionalProperties": false,
+          "description": "Safety bounds that throttle and cap cross-project delivery"
+        }
+      },
+      "required": [
+        "enabled",
+        "intake_eligible_agents",
+        "interrupt_policy",
+        "default_sender_access",
+        "senders",
+        "bounds"
+      ],
+      "additionalProperties": false
+    },
     "keyword_detector": {
       "type": "object",
       "properties": {
@@ -6911,6 +7080,7 @@
     }
   },
   "required": [
+    "cross_project_mailbox",
     "git_master"
   ],
   "additionalProperties": false

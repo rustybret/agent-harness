@@ -1,0 +1,48 @@
+=== PROCESSED/ACK STATE (todo-14 opencode-qa) ===
+Captured at 2026-06-27T05:23:37Z
+
+--- inbox state after serve (eligible primary = sisyphus config) ---
+total 8
+drwxr-xr-x  3 brethoffman  wheel   96 Jun 26 22:20 .
+drwxr-xr-x  3 brethoffman  wheel   96 Jun 26 22:19 ..
+-rw-r--r--  1 brethoffman  wheel  430 Jun 26 22:20 f97db543-77be-4746-8d9c-ec5c60fc0e1e.md
+
+--- processed/ dir ---
+ls: /private/tmp/mailbox-qa-xJf4SA/receiver/coordination_notes/sender-3683b4bf/processed/: No such file or directory
+processed/ does not exist (note NOT acked)
+
+=== DOCUMENTED LIMITATION (acceptable per task Step J) ===
+The idle-drain hook fires on the OpenCode `session.idle` lifecycle event AND only
+when resolveActivePrimaryAgent(sessionId) returns an eligible agent (here: "sisyphus").
+
+`session.idle` is emitted when a LIVE session finishes a turn and goes idle. To reach
+it the way the hook requires, a real session must:
+  1. be created with the sisyphus primary agent,
+  2. submit a prompt that runs to completion (requires a configured model + provider
+     credentials and a real LLM round-trip),
+  3. emit session.idle, at which point resolveActivePrimaryAgent() must have OBSERVED
+     sisyphus as the active primary (the AgentPrimaryCache is populated from prior
+     message/agent activity in that session).
+
+In this QA sandbox there is NO provider credential and NO model round-trip (by design —
+OPENCODE_DISABLE_MODELS_FETCH=1, isolated XDG/HOME, no auth). A bare `POST /session`
+creates a session but never runs a turn, so:
+  - no turn completes -> session.idle for an ACTIVE eligible-primary turn never arrives
+    in a form the hook acts on, and
+  - AgentPrimaryCache never observes "sisyphus", so isEligiblePrimary() would be false
+    even if idle fired.
+Therefore the note correctly REMAINS unread in the inbox; it is NOT moved to processed/.
+
+This is the expected, documented boundary of non-interactive harness QA. The drain/ack
+state machine itself (reserve -> dispatch -> pending -> history_confirmed -> ack to
+processed/) is exercised by the unit suite:
+  packages/omo-opencode/src/features/cross-project-mailbox/hooks/idle-drain-hook.test.ts
+  packages/omo-opencode/src/features/cross-project-mailbox/mailbox/mailbox-store.test.ts
+
+What THIS real-harness QA proves instead (and what unit tests cannot):
+  - the worktree dist/index.js loads inside the REAL opencode binary,
+  - it parses the cross_project_mailbox config from the isolated user config,
+  - the idle-drain hook + session.idle wiring is compiled into the loaded bundle
+    (3x "cross-project-mailbox-idle-drain", session.idle handler present),
+  - the SSE lifecycle stream that feeds the plugin event hook is live,
+  - and ALL of it happened with ZERO writes to the real ~/.local/share/opencode DB.

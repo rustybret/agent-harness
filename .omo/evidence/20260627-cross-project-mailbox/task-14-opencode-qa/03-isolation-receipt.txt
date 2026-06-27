@@ -1,0 +1,11 @@
+=== ISOLATION RECEIPT (todo-14 opencode-qa) ===
+Captured at 2026-06-27T05:24:55Z
+Real DB: /Users/brethoffman/.local/share/opencode/opencode.db
+BEFORE (from 00-setup.txt): 4818
+AFTER  (live):              4818
+
+--- sandbox DB was used instead (proof opencode wrote to the sandbox, not real) ---
+Sandbox DB exists: /private/tmp/mailbox-qa-xJf4SA/data/opencode/opencode.db
+Sandbox session count: 4
+
+ISOLATION: CONFIRMED (real DB session count IDENTICAL before==after: 4818 == 4818)
