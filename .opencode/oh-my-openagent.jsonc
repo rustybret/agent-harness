@@ -16,6 +16,14 @@
       "rsg-4abd5985": {
         "access": "allow",
         "intent_budget": "plan"
+      },
+      "art3d-pipeline-6e240ea8": {
+        "access": "allow",
+        "intent_budget": "plan"
+      },
+      "umeairt-comfyui-4d19d7ca": {
+        "access": "allow",
+        "intent_budget": "plan"
       }
     }
   }

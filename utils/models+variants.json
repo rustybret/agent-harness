@@ -473,6 +473,13 @@
       "variants": []
     },
     {
+      "key": "nvidia/minimaxai/minimax-m3",
+      "variants": [
+        "none",
+        "thinking"
+      ]
+    },
+    {
       "key": "nvidia/mistralai/magistral-small-2506",
       "variants": []
     },

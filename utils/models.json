@@ -252,6 +252,9 @@
       "key": "nvidia/minimaxai/minimax-m2.7"
     },
     {
+      "key": "nvidia/minimaxai/minimax-m3"
+    },
+    {
       "key": "nvidia/mistralai/magistral-small-2506"
     },
     {
