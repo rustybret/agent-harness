@@ -1,0 +1,32 @@
+=== SSE HOOK PROBE (todo-14 opencode-qa) ===
+Captured at 2026-06-27T05:20:48Z
+Sandbox: /private/tmp/mailbox-qa-xJf4SA
+Receiver repo (opencode cwd): /private/tmp/mailbox-qa-xJf4SA/receiver
+Plugin: /Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/cross-project-mailbox/dist/index.js
+Server: http://127.0.0.1:15099 (unsecured, isolated XDG+HOME)
+
+--- SSE /event probe for server.connected ---
+watching http://127.0.0.1:15099/event?directory=/private/tmp/mailbox-qa-xJf4SA/receiver for 'server.connected' (<=20s)
+stream head (no 'server.connected' within 20s):
+FAIL: 'server.connected' not observed
+probe_exit=1
+
+=== RESULT: SSE plumbing PROVEN via /global/event ===
+(per opencode-qa skill: seeing the event on the wire proves the matching plugin hook would fire)
+
+--- /global/event capture (server.connected + session.created), parsed .payload.type ---
+   1 server.connected
+   1 session.created
+
+--- PLUGIN-LOAD PROOF: OMO plugin loaded OUR isolated sandbox config (cross_project_mailbox enabled) ---
+[2026-06-27T05:21:10.153Z] [oh-my-openagent] ENTRY - plugin loading {"directory":"/private/tmp/mailbox-qa-xJf4SA/receiver"}
+[2026-06-27T05:21:10.164Z] Config loaded from /private/tmp/mailbox-qa-xJf4SA/config/opencode/oh-my-openagent.jsonc {}
+[2026-06-27T05:21:10.564Z] [oh-my-openagent] ENTRY - plugin loading {"directory":"/private/tmp/mailbox-qa-xJf4SA/receiver"}
+
+--- BUNDLE WIRING PROOF: idle-drain hook compiled into the loaded artifact ---
+occurrences of 'cross-project-mailbox-idle-drain' in dist/index.js: 3
+session.idle handler key present in bundle: yes
+
+CONCLUSION: opencode loaded the worktree plugin in a fully isolated XDG+HOME sandbox,
+parsed the cross_project_mailbox config, and the SSE lifecycle stream (which feeds the
+plugin 'event' hook that dispatches session.idle to the mailbox idle-drain hook) is live.

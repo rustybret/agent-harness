@@ -1,0 +1,6 @@
+=== ISOLATION BASELINE (todo-14 opencode-qa) ===
+Captured at 2026-06-27T05:18:24Z
+Real DB: /Users/brethoffman/.local/share/opencode/opencode.db
+BASELINE session count: 4818
+opencode binary: 0.0.0-fork/local-202606200542
+sqlite3: 3.51.0
