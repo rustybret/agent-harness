@@ -1,0 +1,76 @@
+TASK 4 — Active-primary agent resolver + opencode-qa accuracy probe
+====================================================================
+Date: 2026-06-27
+Worktree: .local-ignore/worktrees/cross-project-mailbox
+Decision (plan-fixed): v1 ships on LAST-KNOWN regardless of probe; probe documents accuracy only.
+
+FILES ADDED
+-----------
+packages/omo-opencode/src/features/cross-project-mailbox/primary-resolver/
+  resolver.ts        AgentPrimaryCache + agentPrimaryCache singleton + resolveActivePrimaryAgent()
+  resolver.test.ts   6 given/when/then unit tests
+  index.ts           barrel
+  README.md          accuracy guarantee + probe results
+
+UNIT TESTS (bun test)
+---------------------
+$ bun test packages/omo-opencode/src/features/cross-project-mailbox/primary-resolver/
+bun test v1.3.14 (0d9b296a)
+ 6 pass
+ 0 fail
+ 6 expect() calls
+Ran 6 tests across 1 file. [90.00ms]
+
+Test cases:
+- fresh cache -> resolve(unknown) === undefined
+- observe("session-xyz","sisyphus") -> resolve === "sisyphus"
+- observe sisyphus THEN hephaestus -> resolve === "hephaestus" (last-known wins)
+- observe session-a, resolve session-b -> undefined (session isolation)
+- observe then clear -> undefined
+- singleton resolveActivePrimaryAgent(unobserved) -> undefined
+
+TDD RED PROOF (before resolver.ts existed)
+------------------------------------------
+$ bun test ...primary-resolver/
+error: Cannot find module './resolver' ...
+ 0 pass / 1 fail / 1 error
+
+OPENCODE-QA PROBE (isolated XDG sandbox)
+----------------------------------------
+$ source script/agent/qa-sandbox.sh
+[qa-sandbox] isolated env ready under /var/folders/.../T/omo-qa-sandbox.XXXXXX.dgQvEwrYcD
+  XDG_DATA_HOME=.../data  XDG_CONFIG_HOME=.../config  CODEX_HOME=.../codex
+
+DB_BEFORE (sandbox session count) = 0
+$ opencode run --format json "What is your agent name?"   (bounded via perl alarm 40s)
+Performing one time database migration... Database migration complete.
+{"type":"error","timestamp":1782531945005,"sessionID":"ses_0f8d10f69ffeRR59BhASGOX5ai","error":{"name":"UnknownError","data":{"message":"Model not found: anthropic/claude-opus-4-7. Did you mean: claude-opus-4-7, claude-opus-4-7-fast?"}}}
+{"type":"error","timestamp":1782531946665,"sessionID":"ses_0f8d10f69ffeRR59BhASGOX5ai","error":{"_tag":"BadRequest"}}
+DB_AFTER (sandbox session count) = 1
+
+ISOLATION RECEIPT
+-----------------
+- Sandbox DB session count 0 -> 1 (only the sandbox's own session).
+- Host DB ~/.local/share/opencode/opencode.db: 4806 sessions, mtime "Jun 26 20:45:48 2026"
+  (UNCHANGED, predates the probe run). Host was NEVER written.
+
+PROBE FINDINGS
+--------------
+- Every streamed JSON event carries `sessionID` at the top level of the event envelope
+  => the session key the cache needs is present on the chat surface.
+- Agent-field availability CONFIRMED via code review: plugin-interface.ts `chat.params`
+  handler reads `input.agent` (string | {name}), and plugin/chat-message.ts:95-97 already
+  does `if (input.agent) updateSessionAgent(input.sessionID, input.agent)` — the same
+  `agent` field this resolver's cache will be fed from.
+- Sandbox lacks provider auth, so the model call errored (Model not found) before
+  producing assistant text. This does NOT affect the resolver: opencode sets `agent` on
+  the hook input regardless of model-call success.
+- Tab-switch timing was NOT directly instrumented (non-interactive `opencode run` does not
+  switch agents mid-session). The last-known window is therefore a documented design
+  property, not a measured number. Real-time Tab-switch observation = v2 (not implemented).
+
+VERDICT
+-------
+- Decision unchanged (last-known), per plan spec.
+- Isolation proven (host DB untouched). No regression.
+- Resolver interface is simple + synchronous as required by the consuming drain hook (todo 8).
