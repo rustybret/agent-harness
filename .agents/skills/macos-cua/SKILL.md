@@ -88,5 +88,5 @@ submitting a form, making a purchase. Ask for explicit user confirmation first.
 | Reference | Load when... |
 |---|---|
 | [`references/mcp-config-examples.md`](references/mcp-config-examples.md) | Configuring macos-cua MCP at global or project scope |
-| [upstream `installation.md`](../../../../../../../Git/macos-cua/skills/macos-cua/references/installation.md) | First-time setup, building from source, permission walkthrough |
-| [upstream `troubleshooting.md`](../../../../../../../Git/macos-cua/skills/macos-cua/references/troubleshooting.md) | Black screenshots, clicks not registering, binary not found |
+| upstream `installation.md` (local: `~/Git/macos-cua/skills/macos-cua/references/installation.md`) | First-time setup, building from source, permission walkthrough |
+| upstream `troubleshooting.md` (local: `~/Git/macos-cua/skills/macos-cua/references/troubleshooting.md`) | Black screenshots, clicks not registering, binary not found |
