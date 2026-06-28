@@ -32,9 +32,20 @@ The Tier-2 stealth browser is **CloakBrowser**, installed at runtime via `pip`
 (`pip install cloakbrowser`). No CloakBrowser source is vendored in this repository.
 
 - Source: https://github.com/CloakHQ/CloakBrowser
-- Pinned runtime version: **0.3.28** (documented in `references/chrome-stealth.md`;
+- Pinned runtime version: **0.4.0** (documented in `references/chrome-stealth.md`;
   this is a documented version string, not an automated drift check).
-- Licensed under the MIT License:
+- Wrapper source license: MIT License.
+- Binary license: the compiled CloakBrowser Chromium binary downloaded by
+  `cloakbrowser.ensure_binary()` is governed by the separate CloakBrowser
+  Binary License:
+  https://github.com/CloakHQ/CloakBrowser/blob/main/BINARY-LICENSE.md
+- Redistribution note: this npm package does not redistribute the CloakBrowser
+  binary, does not repackage it, and does not include it in `skills/` or
+  `dist/skills`. Users who run the Tier-2 setup download the binary directly
+  from CloakHQ's official distribution channels and must comply with that
+  binary license.
+
+MIT wrapper source license:
 
 ```
 MIT License
@@ -68,7 +79,7 @@ The Tier-2 automation CLI is **agent-browser**, installed at runtime via `npm`
 (`npm i -g agent-browser`). No agent-browser source is vendored in this repository.
 
 - Source: https://github.com/vercel-labs/agent-browser
-- Pinned runtime version: **0.27.1** (documented in `references/chrome-stealth.md`;
+- Pinned runtime version: **0.29.1** (documented in `references/chrome-stealth.md`;
   documented version string, no automated drift check).
 - Licensed under the Apache License, Version 2.0 (the "License"); you may not use
   these files except in compliance with the License. You may obtain a copy of the

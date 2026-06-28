@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
 // src/serve.ts
-import { spawn } from "node:child_process";
 import { existsSync as existsSync5, realpathSync } from "node:fs";
-import { homedir as homedir5 } from "node:os";
-import { basename as basename3, extname, join as join6, resolve as resolve2 } from "node:path";
+import { homedir as homedir6 } from "node:os";
+import { basename as basename3, join as join6, resolve as resolve2 } from "node:path";
 import {
   cwd as processCwd,
   env as processEnv,
-  execPath as processExecPath,
-  stderr as processStderr
+  stdin as processStdin,
+  stderr as processStderr,
+  stdout as processStdout
 } from "node:process";
 import { fileURLToPath } from "node:url";
 
@@ -358,6 +358,14 @@ var CODEGRAPH_PACKAGE = "@colbymchenry/codegraph";
 var CODEGRAPH_ENV_BIN = "OMO_CODEGRAPH_BIN";
 var CODEGRAPH_LEGACY_ENV_BIN = "CODEGRAPH_BIN";
 var CODEGRAPH_NODE_CANDIDATES = ["node24", "node22", "node20", "node"];
+var CODEGRAPH_NODE_PATH_CANDIDATES = [
+  "/opt/homebrew/opt/node@24/bin/node",
+  "/opt/homebrew/opt/node@22/bin/node",
+  "/opt/homebrew/opt/node@20/bin/node",
+  "/usr/local/opt/node@24/bin/node",
+  "/usr/local/opt/node@22/bin/node",
+  "/usr/local/opt/node@20/bin/node"
+];
 var requireFromHere = createRequire(import.meta.url);
 function defaultRequireResolve(specifier) {
   return requireFromHere.resolve(specifier);
@@ -408,7 +416,8 @@ function defaultNodeRuntime(env, fileExists, which, nodeVersion) {
   }
   const candidates = [
     ...isNodeExecutableName(process.execPath) ? [process.execPath] : [],
-    ...CODEGRAPH_NODE_CANDIDATES.map((commandName) => which(commandName)).filter((candidate) => candidate !== null)
+    ...CODEGRAPH_NODE_CANDIDATES.map((commandName) => which(commandName)).filter((candidate) => candidate !== null),
+    ...CODEGRAPH_NODE_PATH_CANDIDATES.filter((candidate) => fileExists(candidate))
   ];
   const seen = new Set;
   for (const candidate of candidates) {
@@ -472,6 +481,9 @@ function resolveCodegraphCommand(options = {}) {
     source: "path"
   };
 }
+
+// ../../shared/src/config-loader.ts
+import { homedir as homedir5 } from "node:os";
 
 // ../../../../utils/src/omo-config/loader.ts
 import { existsSync as existsSync4, readFileSync } from "node:fs";
@@ -1698,18 +1710,393 @@ function loadOmoConfig(options) {
 
 // ../../shared/src/config-loader.ts
 function getCodexOmoConfig(options = {}) {
+  const env = options.env ?? process.env;
+  const homeDir = resolveHomeDir(options);
   const result = loadOmoConfig({
     ...options.cwd === undefined ? {} : { cwd: options.cwd },
-    ...options.env === undefined ? {} : { env: options.env },
-    ...options.homeDir === undefined ? {} : { homeDir: options.homeDir },
+    env,
+    homeDir,
     harness: "codex"
   });
+  const trustedConfig = loadOmoConfig({
+    cwd: homeDir,
+    env,
+    homeDir,
+    harness: "codex"
+  });
+  const trustedCodegraphInstallDir = trustedConfig.config.codegraph?.install_dir;
   return {
     ...result.config,
     sources: result.sources,
+    ...trustedCodegraphInstallDir === undefined ? {} : { trustedCodegraphInstallDir },
     warnings: result.warnings
   };
 }
+function resolveHomeDir(options) {
+  const env = options.env ?? process.env;
+  return options.homeDir ?? env["HOME"] ?? env["USERPROFILE"] ?? homedir5();
+}
+
+// src/mcp-bridge.ts
+import { spawn } from "node:child_process";
+
+// ../../../../mcp-stdio-core/src/record.ts
+function isPlainRecord(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+// ../../../../mcp-stdio-core/src/responses.ts
+function successResponse(id, result) {
+  return { jsonrpc: "2.0", id, result };
+}
+function errorResponse(id, code, message, data) {
+  return { jsonrpc: "2.0", id, error: data === undefined ? { code, message } : { code, message, data } };
+}
+function jsonRpcId(value) {
+  return typeof value === "string" || typeof value === "number" || value === null ? value : null;
+}
+// ../../../../mcp-stdio-core/src/transport.ts
+var HEADER_SEPARATOR = Buffer.from(`\r
+\r
+`);
+async function* readStdioJsonRpcMessages(input) {
+  let buffer = Buffer.alloc(0);
+  for await (const chunk of input) {
+    buffer = Buffer.concat([buffer, bufferFromChunk(chunk)]);
+    while (true) {
+      const result = readNextMessage(buffer);
+      if (result.kind === "incomplete")
+        break;
+      buffer = result.remaining;
+      if (result.message)
+        yield result.message;
+    }
+  }
+  const trailing = buffer.toString("utf8").trim();
+  if (trailing.length > 0) {
+    yield parseJsonPayload(trailing, "line");
+  }
+}
+function writeStdioJsonRpcResponse(output, response, responseMode) {
+  const body = JSON.stringify(response);
+  if (responseMode === "framed") {
+    output.write(`Content-Length: ${Buffer.byteLength(body, "utf8")}\r
+\r
+${body}`);
+    return;
+  }
+  output.write(`${body}
+`);
+}
+function readNextMessage(buffer) {
+  if (buffer.length === 0)
+    return { kind: "incomplete" };
+  return startsWithContentLength(buffer) ? readFramedMessage(buffer) : readLineMessage(buffer);
+}
+function readLineMessage(buffer) {
+  const newlineIndex = buffer.indexOf(10);
+  if (newlineIndex === -1)
+    return { kind: "incomplete" };
+  const line = buffer.subarray(0, newlineIndex).toString("utf8").replace(/\r$/, "");
+  if (line.trim().length === 0) {
+    return { kind: "complete", remaining: buffer.subarray(newlineIndex + 1) };
+  }
+  return {
+    kind: "complete",
+    message: parseJsonPayload(line, "line"),
+    remaining: buffer.subarray(newlineIndex + 1)
+  };
+}
+function readFramedMessage(buffer) {
+  const separatorIndex = buffer.indexOf(HEADER_SEPARATOR);
+  if (separatorIndex === -1)
+    return { kind: "incomplete" };
+  const headers = buffer.subarray(0, separatorIndex).toString("ascii");
+  const contentLength = parseContentLength(headers);
+  const bodyStart = separatorIndex + HEADER_SEPARATOR.length;
+  if (contentLength === undefined) {
+    return {
+      kind: "complete",
+      message: {
+        kind: "parse_error",
+        message: "Missing or invalid Content-Length header",
+        responseMode: "framed"
+      },
+      remaining: buffer.subarray(bodyStart)
+    };
+  }
+  const bodyEnd = bodyStart + contentLength;
+  if (buffer.length < bodyEnd)
+    return { kind: "incomplete" };
+  const body = buffer.subarray(bodyStart, bodyEnd).toString("utf8");
+  return {
+    kind: "complete",
+    message: parseJsonPayload(body, "framed"),
+    remaining: buffer.subarray(bodyEnd)
+  };
+}
+function startsWithContentLength(buffer) {
+  const prefix = buffer.subarray(0, "content-length:".length).toString("ascii").toLowerCase();
+  return prefix === "content-length:";
+}
+function parseContentLength(headers) {
+  for (const line of headers.split(`\r
+`)) {
+    const match = /^content-length:\s*(\d+)$/i.exec(line);
+    if (match === null)
+      continue;
+    const value = match[1];
+    if (value === undefined)
+      return;
+    return Number(value);
+  }
+  return;
+}
+function parseJsonPayload(payload, responseMode) {
+  try {
+    return { kind: "request", payload: JSON.parse(payload), responseMode };
+  } catch (error) {
+    return { kind: "parse_error", message: error instanceof Error ? error.message : String(error), responseMode };
+  }
+}
+function bufferFromChunk(chunk) {
+  if (Buffer.isBuffer(chunk))
+    return chunk;
+  if (typeof chunk === "string")
+    return Buffer.from(chunk);
+  throw new TypeError(`Unsupported stdio chunk type: ${typeof chunk}`);
+}
+
+// ../../../../mcp-stdio-core/src/server.ts
+var DEFAULT_IDLE_TIMEOUT_MS = 10 * 60000;
+var noopLog = () => {};
+async function runJsonRpcStdioServer(config) {
+  const log = config.log ?? noopLog;
+  const idleTimeoutMs = config.idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS;
+  const idleTimer = createIdleTimer(idleTimeoutMs, log, config.onIdleTimeout);
+  log("stdio_started", { cwd: process.cwd(), idle_timeout_ms: idleTimeoutMs });
+  idleTimer.arm();
+  try {
+    for await (const message of readStdioJsonRpcMessages(config.input)) {
+      if (idleTimer.closed())
+        break;
+      idleTimer.arm();
+      if (message.kind === "parse_error") {
+        handleParseError(message, config, log);
+        continue;
+      }
+      await handleRequest(message, config, log);
+    }
+  } finally {
+    idleTimer.clear();
+    log("stdio_stopped");
+  }
+}
+function handleParseError(message, config, log) {
+  log("parse_error", { message: message.message });
+  const response = config.parseErrorResponse?.(message.message) ?? errorResponse(null, -32700, "Parse error", message.message);
+  if (response !== undefined) {
+    writeStdioJsonRpcResponse(config.output, response, message.responseMode);
+  }
+}
+async function handleRequest(message, config, log) {
+  const parsed = message.payload;
+  const id = isPlainRecord(parsed) ? jsonRpcId(parsed["id"]) : null;
+  const method = isPlainRecord(parsed) && typeof parsed["method"] === "string" ? parsed["method"] : null;
+  log("request", { id: id === null ? null : String(id), method });
+  try {
+    const response = await config.handler(parsed, config.handlerOptions);
+    if (response === undefined)
+      return;
+    writeStdioJsonRpcResponse(config.output, response, message.responseMode);
+    log("response", { id: String(response.id), method, is_error: response.error !== undefined });
+  } catch (error) {
+    if (config.onHandlerError === undefined)
+      throw error;
+    config.onHandlerError(error);
+  }
+}
+function createIdleTimer(idleTimeoutMs, log, onIdleTimeout) {
+  let timer = null;
+  let isClosed = false;
+  return {
+    arm: () => {
+      if (timer !== null)
+        clearTimeout(timer);
+      if (idleTimeoutMs <= 0)
+        return;
+      timer = setTimeout(() => {
+        isClosed = true;
+        log("idle_timeout", { idle_timeout_ms: idleTimeoutMs });
+        onIdleTimeout?.();
+      }, idleTimeoutMs);
+      timer.unref();
+    },
+    clear: () => {
+      if (timer === null)
+        return;
+      clearTimeout(timer);
+      timer = null;
+    },
+    closed: () => isClosed
+  };
+}
+// src/serve-invocation.ts
+import { extname } from "node:path";
+import { execPath as processExecPath } from "node:process";
+var WINDOWS_CMD_EXTENSIONS = new Set([".bat", ".cmd"]);
+var WINDOWS_NODE_SCRIPT_EXTENSIONS = new Set([".cjs", ".js", ".mjs"]);
+function resolveServeProcessInvocation(command, args, platform = process.platform) {
+  if (platform !== "win32")
+    return { args: [...args], command };
+  const extension = extname(command).toLowerCase();
+  if (WINDOWS_NODE_SCRIPT_EXTENSIONS.has(extension)) {
+    return { args: [command, ...args], command: processExecPath };
+  }
+  if (WINDOWS_CMD_EXTENSIONS.has(extension)) {
+    return { args: ["/d", "/s", "/c", command, ...args], command: "cmd.exe" };
+  }
+  return { args: [...args], command };
+}
+
+// src/mcp-bridge.ts
+class CodegraphBridgeStdioError extends Error {
+  streamName;
+  name = "CodegraphBridgeStdioError";
+  constructor(streamName) {
+    super(`CodeGraph MCP bridge missing child ${streamName}`);
+    this.streamName = streamName;
+  }
+}
+async function runBridgedCodegraphProcess(command, args, options) {
+  const invocation = resolveServeProcessInvocation(command, args);
+  const child = spawn(invocation.command, invocation.args, {
+    cwd: options.cwd,
+    env: options.env,
+    stdio: ["pipe", "pipe", "inherit"]
+  });
+  const childInput = child.stdin;
+  const childOutput = child.stdout;
+  if (childInput === null)
+    throw new CodegraphBridgeStdioError("stdin");
+  if (childOutput === null)
+    throw new CodegraphBridgeStdioError("stdout");
+  const responseModes = new Map;
+  let defaultResponseMode = "framed";
+  const childExit = new Promise((resolveExit, reject) => {
+    child.once("error", reject);
+    child.once("exit", (code, signal) => {
+      if (code !== null) {
+        resolveExit(code);
+        return;
+      }
+      resolveExit(signal === null ? 0 : 1);
+    });
+  });
+  const bridgeDone = Promise.all([
+    forwardClientToCodegraph(options.input, childInput, responseModes, (mode) => {
+      defaultResponseMode = mode;
+    }),
+    forwardCodegraphToClient(childOutput, options.output, responseModes, () => defaultResponseMode)
+  ]);
+  const destroyChildPipes = () => {
+    childInput.destroy();
+    childOutput.destroy();
+  };
+  childExit.then(destroyChildPipes, destroyChildPipes);
+  return Promise.race([childExit, bridgeDone.then(() => childExit)]);
+}
+async function forwardClientToCodegraph(input, childInput, responseModes, setDefaultResponseMode) {
+  for await (const message of readStdioJsonRpcMessages(input)) {
+    if (message.kind === "parse_error") {
+      continue;
+    }
+    const responseMode = message.responseMode;
+    setDefaultResponseMode(responseMode);
+    const key = responseModeKey(message.payload);
+    if (key !== null)
+      responseModes.set(key, responseMode);
+    await writeLine(childInput, JSON.stringify(message.payload));
+  }
+  childInput.end();
+}
+async function forwardCodegraphToClient(childOutput, output, responseModes, defaultResponseMode) {
+  for await (const message of readStdioJsonRpcMessages(childOutput)) {
+    if (message.kind === "parse_error") {
+      writeStdioJsonRpcResponse(output, errorResponse(null, -32700, "Parse error", message.message), defaultResponseMode());
+      continue;
+    }
+    const key = responseModeKey(message.payload);
+    const responseMode = key === null ? defaultResponseMode() : responseModes.get(key) ?? defaultResponseMode();
+    if (key !== null)
+      responseModes.delete(key);
+    writeStdioJsonRpcResponse(output, message.payload, responseMode);
+  }
+}
+function responseModeKey(payload) {
+  if (!isPlainRecord(payload) || !("id" in payload))
+    return null;
+  const id = jsonRpcId(payload["id"]);
+  return `${typeof id}:${String(id)}`;
+}
+async function writeLine(output, line) {
+  if (output.write(`${line}
+`))
+    return;
+  await new Promise((resolveDrain, reject) => {
+    output.once("drain", resolveDrain);
+    output.once("error", reject);
+  });
+}
+
+// src/mcp-unavailable.ts
+async function runUnavailableCodegraphMcpServer(options) {
+  await runJsonRpcStdioServer({
+    handler: handleUnavailableCodegraphMcpRequest,
+    handlerOptions: {
+      reason: options.reason.trim(),
+      serverVersion: options.serverVersion
+    },
+    input: options.input,
+    output: options.output
+  });
+}
+async function handleUnavailableCodegraphMcpRequest(input, options) {
+  if (!isPlainRecord(input)) {
+    return errorResponse(null, -32600, "Invalid Request");
+  }
+  const id = jsonRpcId(input["id"]);
+  const method = input["method"];
+  if (method === "notifications/initialized")
+    return;
+  if (method === "ping")
+    return successResponse(id, {});
+  if (method === "initialize") {
+    return successResponse(id, {
+      capabilities: { tools: { listChanged: false } },
+      protocolVersion: requestedProtocolVersion(input["params"]),
+      serverInfo: { name: "codegraph", version: options.serverVersion }
+    });
+  }
+  if (method === "tools/list") {
+    return successResponse(id, { tools: [] });
+  }
+  if (method === "tools/call") {
+    return successResponse(id, {
+      content: [{ text: options.reason, type: "text" }],
+      isError: true
+    });
+  }
+  return errorResponse(id, -32601, `Method not found: ${String(method)}`);
+}
+function requestedProtocolVersion(params) {
+  if (!isPlainRecord(params) || typeof params["protocolVersion"] !== "string")
+    return "2024-11-05";
+  return params["protocolVersion"];
+}
+
+// src/session-start-worker.ts
+var SESSION_START_CWD_ENV = "OMO_CODEGRAPH_SESSION_START_CWD";
+var WINDOWS_CMD_EXTENSIONS2 = new Set([".bat", ".cmd"]);
 
 // src/serve.ts
 var CODEGRAPH_SKIP_HINT = `CodeGraph MCP skipped: codegraph binary not found. Install CodeGraph or set OMO_CODEGRAPH_BIN.
@@ -1717,62 +2104,75 @@ var CODEGRAPH_SKIP_HINT = `CodeGraph MCP skipped: codegraph binary not found. In
 var CODEGRAPH_DISABLED_HINT = `CodeGraph MCP skipped: disabled by OMO SOT config. Set [codex].codegraph.enabled=true to enable it.
 `;
 var CODEGRAPH_VERSION = "1.0.1";
-var WINDOWS_CMD_EXTENSIONS = new Set([".bat", ".cmd"]);
-var WINDOWS_NODE_SCRIPT_EXTENSIONS = new Set([".cjs", ".js", ".mjs"]);
+var PROJECT_CWD_ENV_KEYS = ["OMO_CODEGRAPH_PROJECT_CWD", SESSION_START_CWD_ENV, "PWD"];
 async function runCodegraphServe(options = {}) {
   const env = options.env ?? processEnv;
-  const homeDir = options.homeDir ?? homedir5();
-  const config = options.config ?? getCodexOmoConfig({ cwd: options.cwd ?? processCwd(), env, homeDir });
+  const homeDir = options.homeDir ?? homedir6();
+  const wrapperCwd = options.cwd ?? processCwd();
+  const projectCwd = resolveProjectCwd(env, wrapperCwd);
+  const config = options.config ?? getCodexOmoConfig({ cwd: projectCwd, env, homeDir });
   const codegraphConfig = config.codegraph ?? {};
   if (codegraphConfig.enabled === false) {
-    (options.stderr ?? processStderr).write(CODEGRAPH_DISABLED_HINT);
-    return 1;
+    return runUnavailableMcp(CODEGRAPH_DISABLED_HINT, options);
   }
+  const trustedInstallDir = config.trustedCodegraphInstallDir;
   const resolutionOptions = {
     env,
     homeDir,
-    provisioned: () => provisionedBinFromInstallDir(codegraphConfig.install_dir)
+    provisioned: () => provisionedBinFromInstallDir(trustedInstallDir)
   };
   let resolution = options.resolve?.(resolutionOptions) ?? resolveCodegraphCommand(resolutionOptions);
   const nodeSupport = evaluateCodegraphNodeSupport({ env, nodeVersion: options.nodeVersion });
   if (!resolution.exists || shouldSkipResolvedCommand(resolution, options.commandExists ?? existsSync5)) {
     if (resolution.source === "path" && !nodeSupport.supported) {
-      (options.stderr ?? processStderr).write(buildCodegraphNodeSkipHint(nodeSupport));
-      return 1;
+      return runUnavailableMcp(buildCodegraphNodeSkipHint(nodeSupport), options);
     }
     const provisioned = await provisionMissingCodegraph({
       config: codegraphConfig,
       ensureProvisioned: options.ensureProvisioned ?? ensureCodegraphProvisioned,
       homeDir,
-      resolution
+      resolution,
+      ...trustedInstallDir === undefined ? {} : { trustedInstallDir }
     });
     if (provisioned === null) {
-      (options.stderr ?? processStderr).write(CODEGRAPH_SKIP_HINT);
-      return 1;
+      return runUnavailableMcp(CODEGRAPH_SKIP_HINT, options);
     }
     resolution = provisioned;
   }
   if (codegraphCommandRequiresSupportedLocalNode(resolution) && !nodeSupport.supported) {
-    (options.stderr ?? processStderr).write(buildCodegraphNodeSkipHint(nodeSupport));
-    return 1;
+    return runUnavailableMcp(buildCodegraphNodeSkipHint(nodeSupport), options);
   }
-  const runProcess = options.runProcess ?? runChildProcess;
-  const codegraphEnv = codegraphEnvForConfig(codegraphConfig, homeDir, options.buildEnv);
+  const runProcess = options.runProcess ?? runBridgedCodegraphProcess;
+  const codegraphEnv = codegraphEnvForConfig(trustedInstallDir, homeDir, options.buildEnv);
   const mergedEnv = {
     ...env,
     ...codegraphEnv
   };
   return runProcess(resolution.command, [...resolution.argsPrefix, "serve", "--mcp"], {
+    cwd: projectCwd,
     env: mergedEnv,
-    stdio: "inherit"
+    input: options.stdin ?? processStdin,
+    output: options.stdout ?? processStdout,
+    stderr: options.stderr ?? processStderr,
+    stdio: "pipe"
   });
+}
+async function runUnavailableMcp(reason, options) {
+  (options.stderr ?? processStderr).write(reason);
+  await runUnavailableCodegraphMcpServer({
+    input: options.stdin ?? processStdin,
+    output: options.stdout ?? processStdout,
+    reason,
+    serverVersion: CODEGRAPH_VERSION
+  });
+  return 0;
 }
 async function provisionMissingCodegraph(options) {
   if (options.resolution.source === "env")
     return null;
   if (options.config.auto_provision === false)
     return null;
-  const installDir = options.config.install_dir ?? join6(options.homeDir, ".omo", "codegraph");
+  const installDir = options.trustedInstallDir ?? join6(options.homeDir, ".omo", "codegraph");
   const result = await options.ensureProvisioned({
     installDir,
     lockDir: join6(installDir, ".locks"),
@@ -1792,9 +2192,20 @@ function shouldSkipResolvedCommand(resolution, commandExists) {
 function looksLikePath2(command) {
   return command.includes("/") || command.includes("\\");
 }
-function codegraphEnvForConfig(config, homeDir, buildEnv) {
+function codegraphEnvForConfig(trustedInstallDir, homeDir, buildEnv) {
   const env = buildEnv?.({ homeDir }) ?? buildCodegraphEnv({ homeDir });
-  return config.install_dir === undefined ? env : { ...env, CODEGRAPH_INSTALL_DIR: config.install_dir };
+  return trustedInstallDir === undefined ? env : { ...env, CODEGRAPH_INSTALL_DIR: trustedInstallDir };
+}
+function resolveProjectCwd(env, fallback) {
+  for (const key of PROJECT_CWD_ENV_KEYS) {
+    const candidate = env[key]?.trim();
+    if (candidate === undefined || candidate.length === 0)
+      continue;
+    const resolved = resolve2(candidate);
+    if (existsSync5(resolved))
+      return resolved;
+  }
+  return resolve2(fallback);
 }
 function provisionedBinFromInstallDir(installDir) {
   if (installDir === undefined)
@@ -1804,32 +2215,6 @@ function provisionedBinFromInstallDir(installDir) {
 }
 async function runCodegraphServeCli() {
   process.exitCode = await runCodegraphServe();
-}
-async function runChildProcess(command, args, options) {
-  const invocation = resolveServeProcessInvocation(command, args);
-  const child = spawn(invocation.command, invocation.args, { env: options.env, stdio: options.stdio });
-  return new Promise((resolve3, reject) => {
-    child.once("error", reject);
-    child.once("exit", (code, signal) => {
-      if (code !== null) {
-        resolve3(code);
-        return;
-      }
-      resolve3(signal === null ? 0 : 1);
-    });
-  });
-}
-function resolveServeProcessInvocation(command, args, platform = process.platform) {
-  if (platform !== "win32")
-    return { args: [...args], command };
-  const extension = extname(command).toLowerCase();
-  if (WINDOWS_NODE_SCRIPT_EXTENSIONS.has(extension)) {
-    return { args: [command, ...args], command: processExecPath };
-  }
-  if (WINDOWS_CMD_EXTENSIONS.has(extension)) {
-    return { args: ["/d", "/s", "/c", command, ...args], command: "cmd.exe" };
-  }
-  return { args: [...args], command };
 }
 if (isDirectInvocation(process.argv[1])) {
   runCodegraphServeCli().catch((error) => {

@@ -76,6 +76,14 @@ channel scenario when the behavior is user-facing. `--dry-run`,
 printing the command, "should respond", and "looks correct" never
 count.
 
+For TUI visual QA, terminal transcripts alone are not enough when a
+visual surface is being evaluated. In this repo, prefer
+`node script/qa/web-terminal-visual-qa.mjs --title "<surface>" --from-file <capture.txt> --evidence-dir <dir>`
+or the helper's `--command` tmux-backed PTY connector when available.
+Outside this repo, capture equivalent browser/computer-use rendered
+terminal evidence: screenshot, plain transcript, rendered HTML or action
+log, and cleanup receipt.
+
 # Bootstrap (DO ALL FOUR BEFORE ANY OTHER WORK — NO SKIPPING)
 
 ## 0. Survey the skills, then size the work
@@ -178,10 +186,16 @@ serialize only when one output strictly feeds the next.
   inactive/uninitialized, or cold-start unavailable, keep moving with
   Read/Grep/Glob/LSP and the ast-grep skill.
 - Repo-wide inspection, CLI smoke tests, git/history, bounded command
-  output → prefer `omo sparkshell <command>` before raw shell commands
-  (use `omo sparkshell --shell '<cmd>'` only when shell metacharacters
-  are required; `--tmux-pane <id> --tail-lines N` only to inspect an
-  existing pane). Sparkshell is your default lens on the tree.
+  output → use `omo sparkshell <command> [args...]` first. Pass ordinary
+  commands as executable and arguments in separate argv tokens, for
+  example `omo sparkshell rg --files`; not `omo sparkshell 'rg --files'`,
+  because the quoted string is treated as one executable name. Raw
+  `rg`/`grep`/`cat`/`git` are fallbacks when Sparkshell is unavailable
+  or too narrow. `--shell` is only for shell syntax such as
+  metacharacters, pipelines, redirects, command substitution, or
+  variable expansion; `--tmux-pane` is only for inspecting an existing
+  pane, never for launching ordinary commands. Sparkshell is your
+  default lens.
 - Symbols — definitions, references, rename impact, diagnostics →
   `lsp_goto_definition`, `lsp_find_references`, `lsp_symbols`,
   `lsp_diagnostics`. Use the LSP, not text search, for anything
