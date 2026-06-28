@@ -6654,7 +6654,6 @@
       "additionalProperties": false
     },
     "cross_project_mailbox": {
-      "default": {},
       "type": "object",
       "properties": {
         "enabled": {
@@ -7080,7 +7079,6 @@
     }
   },
   "required": [
-    "cross_project_mailbox",
     "git_master"
   ],
   "additionalProperties": false

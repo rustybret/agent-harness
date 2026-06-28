@@ -1,4 +1,5 @@
 import type { HookName, OhMyOpenCodeConfig } from "../../config"
+import { autoProvisionMailboxConfig } from "../../features/cross-project-mailbox/auto-provision"
 import { createMailboxHooks, type MailboxHooks } from "../../features/cross-project-mailbox/hooks"
 import { safeCreateHook } from "../../shared/safe-create-hook"
 import type { PluginContext } from "../types"
@@ -15,6 +16,10 @@ export function createMailboxSessionHooks(args: {
 }): MailboxSessionHooks {
   const { ctx, pluginConfig, isHookEnabled, safeHookEnabled } = args
   const config = pluginConfig.cross_project_mailbox
+
+  if (!config) {
+    autoProvisionMailboxConfig(ctx.directory)
+  }
 
   const mailboxIdleDrain =
     isHookEnabled("cross-project-mailbox-idle-drain") && config?.enabled

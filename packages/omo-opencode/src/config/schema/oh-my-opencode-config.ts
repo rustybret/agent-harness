@@ -85,7 +85,7 @@ export const OhMyOpenCodeConfigSchema = z.object({
   monitor: MonitorConfigSchema.optional(),
   codegraph: CodegraphConfigSchema.optional(),
   team_mode: TeamModeConfigSchema.optional(),
-  cross_project_mailbox: CrossProjectMailboxConfigSchema.optional().default({}),
+  cross_project_mailbox: CrossProjectMailboxConfigSchema.optional(),
   keyword_detector: KeywordDetectorConfigSchema.optional(),
   babysitting: BabysittingConfigSchema.optional(),
   git_master: GitMasterConfigSchema.default({
