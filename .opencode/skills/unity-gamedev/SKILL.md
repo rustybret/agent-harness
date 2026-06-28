@@ -112,6 +112,12 @@ work that silently strands.
   the first call's result before a second issue, and pass an `idempotency_key`
   where supported.
 
+## Connection & Startup Sequence
+
+- **Independent BEAM Lifecycle**: The BEAM server can (and should) be started independently before opening Unity (e.g., `unity-bridge/Editor~/server/supermcp start`).
+- **Auto-Attachment**: When Unity Editor starts, it automatically detects the running BEAM server and attaches to it without spawning its own child process.
+- **Domain Reload Resilience**: Under the default HTTP bridge transport, domain reloads (such as entering/exiting Play Mode or compiling scripts) do not drop the connection.
+
 ## Decision & Write Safety
 
 - Before any destructive op (delete, reload, replace, overwrite), call
@@ -128,6 +134,4 @@ work that silently strands.
   bridge tool logic.
 - Prefer the focused domain skill once the loop is running; this skill is the
   orchestration entry point, not a permanent replacement for `unity-scene` et al.
-- The bridge connects via remote HTTP at `http://127.0.0.1:27182/mcp` and starts
-  automatically when the Unity Editor loads the `com.supermcp.unity-bridge` package.
-  No separate server launch is required.
+- The bridge connects via remote HTTP at `http://127.0.0.1:27182/mcp`.
