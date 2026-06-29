@@ -364,6 +364,21 @@ describe("runProjectMessageSend - target not in registry", () => {
     expect(handle.writeCalls).toBe(0)
     expect(handle.outboxCalls).toBe(0)
   })
+
+  it("resolves target by display name (case-insensitive) when projectId has no match", async () => {
+    // given
+    const handle = spyDeps(cfg({ senders: { "proj-b": { access: "allow", intent_budget: "plan" } } }))
+
+    // when — pass "Project B" (display name) instead of "proj-b" (projectId)
+    const result = await runProjectMessageSend(
+      { targetProjectId: "Project B", intent: "quick", body: "display name fallback test" },
+      handle.deps,
+    )
+
+    // then
+    expect("ok" in result && result.ok).toBe(true)
+    expect(handle.writeCalls).toBe(1)
+  })
 })
 
 describe("runProjectMessageSend - preflight blocks before write", () => {

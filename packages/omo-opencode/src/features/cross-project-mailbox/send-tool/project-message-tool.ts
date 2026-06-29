@@ -62,16 +62,20 @@ export async function runProjectMessageSend(
   deps: ProjectMessageToolDeps,
 ): Promise<SendResult> {
   const projects = await deps.registry.listProjects()
-  const targetEntry = projects.find((entry) => entry.projectId === input.targetProjectId)
+  const targetEntry =
+    projects.find((entry) => entry.projectId === input.targetProjectId) ??
+    projects.find((entry) => entry.displayName.toLowerCase() === input.targetProjectId.toLowerCase())
   if (targetEntry === undefined) {
     return { error: "target-not-found" }
   }
 
+  const normalizedInput: SendInput = { ...input, targetProjectId: targetEntry.projectId }
+
   const built = await buildSendEnvelope(
-    input,
+    normalizedInput,
     deps.thisProjectId,
     deps.thisRepoRoot,
-    input.targetProjectId,
+    targetEntry.projectId,
     targetEntry.displayName,
     deps.thisProjectDisplayName,
   )
@@ -79,7 +83,7 @@ export async function runProjectMessageSend(
     return { error: built.error }
   }
 
-  const preflight = await runSendPreflight(input, built.envelope.hopCount, deps.config, targetEntry)
+  const preflight = await runSendPreflight(normalizedInput, built.envelope.hopCount, deps.config, targetEntry)
   if (preflight.blocked) {
     return { blocked: true, reason: preflight.reason }
   }
@@ -119,7 +123,7 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
   return tool({
     description: "Send a note to another registered project's agent session",
     args: {
-      targetProjectId: tool.schema.string().describe("Registered projectId of the destination project"),
+      targetProjectId: tool.schema.string().describe("Registered projectId or display name of the destination project"),
       intent: tool.schema.enum(MAILBOX_INTENTS).describe("Intent tier of this note"),
       body: tool.schema.string().describe("Note body"),
       priority: tool.schema.number().optional().default(0).describe("Optional priority; higher drains first"),
