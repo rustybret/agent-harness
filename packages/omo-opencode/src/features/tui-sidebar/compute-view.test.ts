@@ -55,6 +55,9 @@ const mailboxSection: MailboxSidebarState = {
       body: "hello",
     },
   ],
+  outboundUnresolved: 0,
+  outboundRead: 0,
+  outboundFailed: 0,
 }
 
 describe("tui sidebar computeView", () => {
@@ -255,6 +258,69 @@ describe("tui sidebar computeView", () => {
     if (view.kind === "active") {
       expect(view.mailbox ?? null).toBeNull()
     }
+  })
+
+  it("#given idle sections with an enabled mailbox section #when computing view #then the idle view carries the mailbox state", () => {
+    // given
+    const sections = {
+      config: validConfig,
+      roster,
+      agents: idleAgents,
+      jobs: idleJobs,
+      loop: idleLoop,
+      mailbox: mailboxSection,
+    }
+
+    // when
+    const view = computeView(sections)
+
+    // then
+    expect(view.kind).toBe("idle")
+    if (view.kind === "idle") {
+      expect(view.mailbox).toEqual(mailboxSection)
+    }
+  })
+
+  it("#given idle sections with a null mailbox section #when computing view #then the idle view mailbox is null", () => {
+    // given
+    const sections = {
+      config: validConfig,
+      roster,
+      agents: idleAgents,
+      jobs: idleJobs,
+      loop: idleLoop,
+      mailbox: null,
+    }
+
+    // when
+    const view = computeView(sections)
+
+    // then
+    expect(view.kind).toBe("idle")
+    if (view.kind === "idle") {
+      expect(view.mailbox ?? null).toBeNull()
+    }
+  })
+
+  it("#given two idle views differing only in mailbox outbound counts #when computing keys #then viewKey differs", () => {
+    // given
+    const first: SidebarView = {
+      kind: "idle",
+      roster,
+      mailbox: { ...mailboxSection, outboundRead: 3 },
+    }
+    const second: SidebarView = {
+      kind: "idle",
+      roster,
+      mailbox: { ...mailboxSection, outboundUnresolved: 3 },
+    }
+
+    // when
+    const firstKey = viewKey(first)
+    const secondKey = viewKey(second)
+
+    // then
+    expect(secondKey).not.toBe(firstKey)
   })
 
   it("#given two active views differing only in mailbox unread count #when computing keys #then viewKey differs", () => {

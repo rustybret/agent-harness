@@ -1,5 +1,9 @@
 import type { TuiPluginModule } from "@opencode-ai/plugin/tui"
 
+import type {
+  MailboxSidebarRegistryPort,
+  MailboxSidebarState,
+} from "./features/cross-project-mailbox/sidebar"
 import { computeView, viewKey } from "./features/tui-sidebar/compute-view"
 import { POLL_INTERVAL_MS } from "./features/tui-sidebar/constants"
 import { deriveAgents, deriveConfig, deriveJobBoard, deriveLoop, deriveRoster } from "./features/tui-sidebar/derivers"
@@ -90,16 +94,34 @@ async function loadRosterRows(directory: string): Promise<readonly RosterRow[]> 
   return resolver(directory)
 }
 
+async function loadMailboxSection(directory: string): Promise<MailboxSidebarState | null> {
+  const { validatePluginConfig } = await import("./config/validate")
+  const { applyMailboxDefault } = await import("./features/cross-project-mailbox/config-defaults")
+  const mailboxConfig = applyMailboxDefault(validatePluginConfig(directory).config).cross_project_mailbox
+  if (!mailboxConfig || mailboxConfig.enabled === false) return null
+
+  const { createProjectRegistry } = await import("./features/cross-project-mailbox/registry")
+  const { readMailboxSidebarState } = await import("./features/cross-project-mailbox/sidebar")
+  const projects = await createProjectRegistry().listProjects()
+  const repoRootById = new Map(projects.map((entry) => [entry.projectId, entry.repoRoot]))
+  const registry: MailboxSidebarRegistryPort = {
+    getRepoRootForProjectId: (id) => repoRootById.get(id),
+  }
+  return readMailboxSidebarState(directory, mailboxConfig, registry)
+}
+
 async function readView(directory: string): Promise<SidebarView> {
   const validation = await loadPluginValidation(directory)
   const mirror = readMirror(directory)
   const roster = await loadRosterRows(directory)
+  const mailbox = await loadMailboxSection(directory)
   return computeView({
     config: deriveConfig(validation),
     roster: deriveRoster(roster),
     agents: deriveAgents(mirror),
     jobs: deriveJobBoard(mirror),
     loop: deriveLoop(mirror),
+    mailbox,
   })
 }
 
