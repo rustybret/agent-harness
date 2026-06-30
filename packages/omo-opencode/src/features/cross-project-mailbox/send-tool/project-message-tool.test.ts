@@ -24,11 +24,36 @@ let thisRepoRoot: string
 let targetBRoot: string
 let targetARoot: string
 let projects: ProjectEntry[]
+let emptyConfigHome: string
+let savedXdgConfigHome: string | undefined
+let savedOpencodeConfigDir: string | undefined
+
+const PERMISSIVE_SENDERS = {
+  "proj-b": { access: "allow", intent_budget: "plan" },
+  "proj-a": { access: "allow", intent_budget: "plan" },
+}
+
+async function writeProjectMailboxConfig(mailbox: Record<string, unknown>): Promise<void> {
+  const dir = path.join(thisRepoRoot, ".opencode")
+  await mkdir(dir, { recursive: true })
+  await writeFile(path.join(dir, "oh-my-openagent.json"), JSON.stringify({ cross_project_mailbox: mailbox }))
+}
+
+async function writeRawProjectConfig(content: string): Promise<void> {
+  const dir = path.join(thisRepoRoot, ".opencode")
+  await mkdir(dir, { recursive: true })
+  await writeFile(path.join(dir, "oh-my-openagent.json"), content)
+}
 
 beforeEach(async () => {
   thisRepoRoot = await mkdtemp(path.join(os.tmpdir(), "cpm-send-this-"))
   targetBRoot = await mkdtemp(path.join(os.tmpdir(), "cpm-send-b-"))
   targetARoot = await mkdtemp(path.join(os.tmpdir(), "cpm-send-a-"))
+  emptyConfigHome = await mkdtemp(path.join(os.tmpdir(), "cpm-xdg-"))
+  savedXdgConfigHome = process.env.XDG_CONFIG_HOME
+  savedOpencodeConfigDir = process.env.OPENCODE_CONFIG_DIR
+  process.env.XDG_CONFIG_HOME = emptyConfigHome
+  delete process.env.OPENCODE_CONFIG_DIR
   projects = [
     { projectId: "proj-b", repoRoot: targetBRoot, displayName: "Project B", lastSeen: 1 },
     { projectId: "proj-a", repoRoot: targetARoot, displayName: "Project A", lastSeen: 2 },
@@ -36,9 +61,14 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
+  if (savedXdgConfigHome === undefined) delete process.env.XDG_CONFIG_HOME
+  else process.env.XDG_CONFIG_HOME = savedXdgConfigHome
+  if (savedOpencodeConfigDir === undefined) delete process.env.OPENCODE_CONFIG_DIR
+  else process.env.OPENCODE_CONFIG_DIR = savedOpencodeConfigDir
   await rm(thisRepoRoot, { recursive: true, force: true })
   await rm(targetBRoot, { recursive: true, force: true })
   await rm(targetARoot, { recursive: true, force: true })
+  await rm(emptyConfigHome, { recursive: true, force: true })
 })
 
 function cfg(overrides: Record<string, unknown> = {}): CrossProjectMailboxConfig {
@@ -118,6 +148,7 @@ function makeParent(overrides: Partial<MailboxMessage> = {}): MailboxMessage {
 describe("runProjectMessageSend - fresh send", () => {
   it("writes the note, originates at hop 0, and appends one outbox line when no threadId given", async () => {
     // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
     const def = createProjectMessageTool(realDeps(cfg()))
 
     // when
@@ -382,6 +413,7 @@ describe("runProjectMessageSend - target not in registry", () => {
 
   it("logs the canonical projectId and target repoRoot in the outbox when resolved by display name", async () => {
     // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
     const def = createProjectMessageTool(realDeps(cfg()))
 
     // when — target by display name "Project B", which resolves to canonical "proj-b"
@@ -416,5 +448,109 @@ describe("runProjectMessageSend - preflight blocks before write", () => {
     expect(result).toEqual({ blocked: true, reason: "unauthorized" })
     expect(handle.writeCalls).toBe(0)
     expect(handle.outboxCalls).toBe(0)
+  })
+})
+
+describe("createProjectMessageTool - lazy per-send config reload", () => {
+  it("observes a newly-allowed sender written to disk between two execute calls without rebuilding the tool", async () => {
+    // given
+    await writeProjectMailboxConfig({
+      enabled: true,
+      senders: {
+        "proj-b": { access: "deny", intent_budget: "plan" },
+        "proj-a": { access: "allow", intent_budget: "plan" },
+      },
+    })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    const first = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "first" }, {})) as string,
+    ) as { blocked?: boolean; reason?: string }
+
+    // then
+    expect(first.blocked).toBe(true)
+    expect(first.reason).toBe("unauthorized")
+
+    // when
+    await writeProjectMailboxConfig({
+      enabled: true,
+      senders: {
+        "proj-b": { access: "allow", intent_budget: "plan" },
+        "proj-a": { access: "allow", intent_budget: "plan" },
+      },
+    })
+    const second = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "second" }, {})) as string,
+    ) as { ok?: boolean }
+
+    // then
+    expect(second.ok).toBe(true)
+  })
+
+  it("rejects a body above the runtime min-cap with a clean blocked result when max_body_bytes is lowered", async () => {
+    // given
+    await writeProjectMailboxConfig({
+      enabled: true,
+      senders: PERMISSIVE_SENDERS,
+      bounds: { max_body_bytes: 1000 },
+    })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    const out = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "x".repeat(2000) }, {})) as string,
+    ) as { blocked?: boolean; reason?: string }
+
+    // then
+    expect(out.blocked).toBe(true)
+    expect(out.reason).toContain("1000")
+  })
+
+  it("still rejects a 40000-byte body when max_body_bytes is raised to 99999 (hard cap 32768)", async () => {
+    // given
+    await writeProjectMailboxConfig({
+      enabled: true,
+      senders: PERMISSIVE_SENDERS,
+      bounds: { max_body_bytes: 99999 },
+    })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    const out = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "x".repeat(40000) }, {})) as string,
+    ) as { blocked?: boolean; reason?: string }
+
+    // then
+    expect(out.blocked).toBe(true)
+    expect(out.reason).toContain("32768")
+  })
+
+  it("falls back to last-good config and still completes the send when the on-disk config is malformed", async () => {
+    // given
+    await writeRawProjectConfig("{ this is not valid json")
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    const out = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "fallback body" }, {})) as string,
+    ) as { ok?: boolean }
+
+    // then
+    expect(out.ok).toBe(true)
+  })
+
+  it("returns a blocked result when a fresh on-disk read reports the mailbox disabled", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: false, senders: PERMISSIVE_SENDERS })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    const out = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "disabled body" }, {})) as string,
+    ) as { blocked?: boolean }
+
+    // then
+    expect(out.blocked).toBe(true)
   })
 })

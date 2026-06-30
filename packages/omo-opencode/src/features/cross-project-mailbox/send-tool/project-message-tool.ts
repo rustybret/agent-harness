@@ -1,6 +1,7 @@
 import { type ToolDefinition, tool } from "@opencode-ai/plugin/tool"
 import { z } from "zod"
 
+import { validatePluginConfig } from '../../../config/validate';
 import type { CrossProjectMailboxConfig } from "../config"
 import { MAILBOX_INTENTS, MAX_BODY_BYTES, type MailboxMessage } from "../envelope/schema"
 import { MailboxStore } from "../mailbox/mailbox-store"
@@ -119,8 +120,16 @@ export async function runProjectMessageSend(
   }
 }
 
+function resolveFreshSendConfig(deps: ProjectMessageToolDeps): CrossProjectMailboxConfig {
+  const read = validatePluginConfig(deps.thisRepoRoot)
+  if (read.valid && read.config.cross_project_mailbox) {
+    return read.config.cross_project_mailbox
+  }
+  return deps.config
+}
+
 export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefinition {
-  const inputSchema = createProjectMessageInputSchema(deps.config.bounds.max_body_bytes)
+  const inputSchema = createProjectMessageInputSchema(MAX_BODY_BYTES)
   return tool({
     description: "Send a note to another registered project's agent session",
     args: {
@@ -133,8 +142,19 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
       inReplyToMessageId: tool.schema.string().optional().describe("Optional parent messageId when replying to a received note"),
     },
     execute: async (rawArgs) => {
+      const freshConfig = resolveFreshSendConfig(deps)
+      if (freshConfig.enabled === false) {
+        return JSON.stringify({ blocked: true, reason: "mailbox disabled" })
+      }
+
+      const effectiveBodyCap = Math.min(freshConfig.bounds.max_body_bytes, MAX_BODY_BYTES)
+      const rawBody = typeof rawArgs.body === "string" ? rawArgs.body : ""
+      if (rawBody.length > effectiveBodyCap) {
+        return JSON.stringify({ blocked: true, reason: `body exceeds max_body_bytes (${effectiveBodyCap})` })
+      }
+
       const input = inputSchema.parse(rawArgs)
-      const result = await runProjectMessageSend(input, deps)
+      const result = await runProjectMessageSend(input, { ...deps, config: freshConfig })
       return JSON.stringify(result)
     },
   })
