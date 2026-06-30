@@ -10,8 +10,14 @@ import { deriveAgents, deriveConfig, deriveJobBoard, deriveLoop, deriveRoster } 
 import type { ViewNode } from "./features/tui-sidebar/element-helpers"
 import { readMirror } from "./features/tui-sidebar/mirror-io"
 import { buildViewNodes } from "./features/tui-sidebar/render-view"
+import type { MailboxToggleOpts } from "./features/tui-sidebar/render-view"
 import type { RosterRow } from "./features/tui-sidebar/state-types"
 import type { SidebarView } from "./features/tui-sidebar/state-types"
+import {
+  queueTuiPreferenceUpdate,
+  readTuiPreferencesFileSync,
+  resolveOmoCollapsed,
+} from "./features/tui-sidebar/tui-preferences"
 import { log } from "./shared/logger"
 
 type SolidRuntime<Node> = {
@@ -155,6 +161,21 @@ const module: TuiPluginModule = {
     let inFlight = false
     let timer: ReturnType<typeof setTimeout> | null = null
 
+    let mailboxCollapsed: boolean = resolveOmoCollapsed(readTuiPreferencesFileSync())
+
+    const toggleMailbox = (): void => {
+      mailboxCollapsed = !mailboxCollapsed
+      queueTuiPreferenceUpdate(["mailbox", "collapsed"], mailboxCollapsed)
+      api.renderer.requestRender()
+    }
+
+    const mailboxToggle: MailboxToggleOpts = {
+      get collapsed() {
+        return mailboxCollapsed
+      },
+      onToggle: toggleMailbox,
+    }
+
     registerSidebarContentSlot({
       registerSlot: (registration) => {
         api.slots.register(registration)
@@ -162,7 +183,7 @@ const module: TuiPluginModule = {
       requestRender: () => {
         api.renderer.requestRender()
       },
-      renderSidebar: () => materialize(buildViewNodes(currentView, api.theme.current), solid),
+      renderSidebar: () => materialize(buildViewNodes(currentView, api.theme.current, mailboxToggle), solid),
     })
 
     const schedule = (): void => {

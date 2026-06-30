@@ -7,6 +7,11 @@ import { join } from "node:path"
 
 import type { TuiPluginApi, TuiPluginMeta, TuiSlotPlugin } from "@opencode-ai/plugin/tui"
 
+import {
+  queueTuiPreferenceUpdate,
+  readTuiPreferencesFileSync,
+  resolveOmoCollapsed,
+} from "./features/tui-sidebar/tui-preferences"
 import tuiModule, { handleTuiPollError } from "./tui"
 
 type SolidNode = {
@@ -122,5 +127,43 @@ describe("TUI sidebar polling", () => {
     const thrownValue = "bad poll state"
 
     expect(() => handleTuiPollError(thrownValue)).toThrow(thrownValue)
+  })
+})
+
+describe("mailbox collapse preference round-trip", () => {
+  const ENV_KEY = "OPENCODE_TUI_PREFERENCES_FILE"
+  let prefsDir = ""
+  let previousEnv: string | undefined
+
+  beforeEach(() => {
+    previousEnv = process.env[ENV_KEY]
+    prefsDir = mkdtempSync(join(tmpdir(), "omo-tui-prefs-"))
+    process.env[ENV_KEY] = join(prefsDir, "tui-preferences.jsonc")
+  })
+
+  afterEach(() => {
+    if (previousEnv === undefined) delete process.env[ENV_KEY]
+    else process.env[ENV_KEY] = previousEnv
+    rmSync(prefsDir, { recursive: true, force: true })
+  })
+
+  it("#given a collapsed=true write #when re-read from disk #then the collapse state persists", async () => {
+    // given
+    await queueTuiPreferenceUpdate(["mailbox", "collapsed"], true)
+
+    // when
+    const afterTrue = resolveOmoCollapsed(readTuiPreferencesFileSync())
+
+    // then
+    expect(afterTrue).toBe(true)
+
+    // given
+    await queueTuiPreferenceUpdate(["mailbox", "collapsed"], false)
+
+    // when
+    const afterFalse = resolveOmoCollapsed(readTuiPreferencesFileSync())
+
+    // then
+    expect(afterFalse).toBe(false)
   })
 })
