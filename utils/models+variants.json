@@ -1278,14 +1278,6 @@
       ]
     },
     {
-      "key": "openrouter/anthropic/claude-opus-4.6-fast",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
-    },
-    {
       "key": "openrouter/anthropic/claude-opus-4.7",
       "variants": [
         "high",
