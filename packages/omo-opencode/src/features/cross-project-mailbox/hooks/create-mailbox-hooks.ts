@@ -2,6 +2,7 @@ import path from "node:path"
 
 import { log } from "../../../shared/logger"
 
+import { validatePluginConfig } from "../../../config/validate"
 import { dispatchInternalPrompt } from "../../../shared/prompt-async-gate"
 import type { PluginContext } from "../../../plugin/types"
 import type { CrossProjectMailboxConfig } from "../config"
@@ -62,6 +63,7 @@ function buildIdleDrainDeps(
 
   return {
     config,
+    validatePluginConfig,
     repoRoot,
     directory: ctx.directory,
     projectDisplayName: path.basename(repoRoot),

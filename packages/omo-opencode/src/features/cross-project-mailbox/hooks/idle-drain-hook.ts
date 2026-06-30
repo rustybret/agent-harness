@@ -17,6 +17,18 @@ function isEligiblePrimary(config: CrossProjectMailboxConfig, primary: string): 
   return (config.intake_eligible_agents as readonly string[]).includes(primary)
 }
 
+function isPermissionlessConfig(config: CrossProjectMailboxConfig): boolean {
+  if (config.default_sender_access !== "allow-none") return false
+  return !Object.values(config.senders ?? {}).some((sender) => sender.access === "allow")
+}
+
+function resolveFreshConfig(deps: IdleDrainHookDeps): CrossProjectMailboxConfig {
+  const read = deps.validatePluginConfig(deps.directory)
+  const fresh = read.config?.cross_project_mailbox
+  if (read.valid && fresh) return fresh
+  return deps.config
+}
+
 type AsyncDispatchArgs = Extract<InternalPromptDispatchArgs, { mode: "async" }>
 type DispatchClient = AsyncDispatchArgs["client"]
 
@@ -45,8 +57,16 @@ export interface RateLimiterPort {
   checkRateLimit(fromProjectId: string, toProjectId: string): Promise<{ limited: boolean }>
 }
 
+export interface PluginConfigReadResult {
+  valid: boolean
+  config: { cross_project_mailbox?: CrossProjectMailboxConfig }
+}
+
+export type ValidatePluginConfigPort = (directory: string) => PluginConfigReadResult
+
 export interface IdleDrainHookDeps {
   config: CrossProjectMailboxConfig
+  validatePluginConfig: ValidatePluginConfigPort
   repoRoot: string
   directory: string
   projectDisplayName: string
@@ -85,6 +105,7 @@ function buildDispatchArgs(
 
 async function processNote(
   deps: IdleDrainHookDeps,
+  config: CrossProjectMailboxConfig,
   store: MailboxStorePort,
   digestStore: DigestStorePort,
   rateLimiter: RateLimiterPort,
@@ -100,7 +121,7 @@ async function processNote(
     body: note.body,
   })
   if (duplicate.isDuplicate) {
-    const dupResult = deps.validateInbound(envelope, deps.config, { duplicateLoop: true })
+    const dupResult = deps.validateInbound(envelope, config, { duplicateLoop: true })
     await store.quarantine(note.messageId, dupResult.reason ?? "duplicate-loop", dupResult.detail ?? "")
     return false
   }
@@ -110,7 +131,7 @@ async function processNote(
     return false
   }
 
-  const validation = deps.validateInbound(envelope, deps.config)
+  const validation = deps.validateInbound(envelope, config)
   if (!validation.valid) {
     await store.quarantine(note.messageId, validation.reason ?? "malformed", validation.detail ?? "")
     return false
@@ -149,12 +170,17 @@ export function createIdleDrainHook(deps: IdleDrainHookDeps): {
     "session.idle": async ({ sessionId }: { sessionId: string }): Promise<void> => {
       if (!sessionId) return
 
+      const freshConfig = resolveFreshConfig(deps)
+
+      if (freshConfig.enabled === false) return
+      if (isPermissionlessConfig(freshConfig)) return
+
       const primary = deps.resolveActivePrimaryAgent(sessionId)
-      if (primary === undefined || !isEligiblePrimary(deps.config, primary)) {
+      if (primary === undefined || !isEligiblePrimary(freshConfig, primary)) {
         return
       }
 
-      const maxNotes = deps.config.bounds.max_notes_per_drain
+      const maxNotes = freshConfig.bounds.max_notes_per_drain
       const projects = deps.getRegisteredProjects()
       const sessionMessageIds = new Set(await deps.getSessionMessages(sessionId))
       const digestStore = deps.makeDigestStore(deps.repoRoot)
@@ -168,7 +194,7 @@ export function createIdleDrainHook(deps: IdleDrainHookDeps): {
         const candidates = await store.drainUnread(maxNotes)
         for (const note of candidates) {
           if (injected >= maxNotes) break
-          const dispatched = await processNote(deps, store, digestStore, rateLimiter, sessionId, note)
+          const dispatched = await processNote(deps, freshConfig, store, digestStore, rateLimiter, sessionId, note)
           if (dispatched) injected += 1
         }
       }
