@@ -379,6 +379,26 @@ describe("runProjectMessageSend - target not in registry", () => {
     expect("ok" in result && result.ok).toBe(true)
     expect(handle.writeCalls).toBe(1)
   })
+
+  it("logs the canonical projectId and target repoRoot in the outbox when resolved by display name", async () => {
+    // given
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when — target by display name "Project B", which resolves to canonical "proj-b"
+    const out = await def.execute(
+      { targetProjectId: "Project B", intent: "quick", body: "canonical outbox test" },
+      {},
+    )
+    const parsed = JSON.parse(out as string) as { ok: boolean }
+
+    // then
+    expect(parsed.ok).toBe(true)
+    const outboxRaw = await readFile(path.join(thisRepoRoot, ".omo", "mailbox-outbox.jsonl"), "utf8")
+    const line = outboxRaw.trim().split("\n").at(-1) ?? "{}"
+    const entry = JSON.parse(line) as { toProjectId: string; toRepoRoot?: string }
+    expect(entry.toProjectId).toBe("proj-b")
+    expect(entry.toRepoRoot).toBe(targetBRoot)
+  })
 })
 
 describe("runProjectMessageSend - preflight blocks before write", () => {

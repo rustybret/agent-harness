@@ -103,7 +103,8 @@ export async function runProjectMessageSend(
   const append = deps.appendOutbox ?? appendOutboxLog
   await append(deps.thisRepoRoot, {
     sentAt: built.envelope.timestamp,
-    toProjectId: input.targetProjectId,
+    toProjectId: targetEntry.projectId,
+    toRepoRoot: targetEntry.repoRoot,
     messageId: built.envelope.messageId,
     intent: built.envelope.intent,
     correlationId: built.envelope.correlationId,

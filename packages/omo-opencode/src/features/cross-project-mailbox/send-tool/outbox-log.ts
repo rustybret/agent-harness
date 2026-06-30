@@ -8,6 +8,7 @@ const BODY_PREVIEW_MAX = 100
 export interface OutboxEntry {
   sentAt: number
   toProjectId: string
+  toRepoRoot?: string
   messageId: string
   intent: IntentEnum
   correlationId: string
@@ -24,10 +25,19 @@ export async function appendOutboxLog(repoRoot: string, entry: OutboxEntry): Pro
   const record = {
     sentAt: entry.sentAt,
     toProjectId: entry.toProjectId,
+    toRepoRoot: entry.toRepoRoot,
     messageId: entry.messageId,
     intent: entry.intent,
     correlationId: entry.correlationId,
     body: entry.body.slice(0, BODY_PREVIEW_MAX),
   }
   await appendFile(logPath, `${JSON.stringify(record)}\n`, "utf8")
+}
+
+export function parseOutboxLine(line: string): OutboxEntry | null {
+  try {
+    return JSON.parse(line) as OutboxEntry
+  } catch {
+    return null
+  }
 }

@@ -3,7 +3,7 @@ import { readdir, readFile } from "node:fs/promises"
 import path from "node:path"
 
 import type { CrossProjectMailboxConfig } from "../config"
-import { outboxLogPath } from "../send-tool"
+import { outboxLogPath, parseOutboxLine } from "../send-tool"
 import type { OutboxEntry } from "../send-tool"
 
 const NOTE_SUFFIX = ".md"
@@ -78,12 +78,4 @@ async function readRecentSent(
 
   const recentSent = entries.slice(-RECENT_SENT_LIMIT).reverse()
   return { recentSent, recentSentCount: entries.length }
-}
-
-function parseOutboxLine(line: string): OutboxEntry | null {
-  try {
-    return JSON.parse(line) as OutboxEntry
-  } catch {
-    return null
-  }
 }
