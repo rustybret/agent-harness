@@ -12,7 +12,7 @@ describe("CrossProjectMailboxConfigSchema", () => {
         const result = CrossProjectMailboxConfigSchema.parse(input)
 
         // then
-        expect(result.enabled).toBe(false)
+        expect(result.enabled).toBe(true)
         expect(result.intake_eligible_agents).toEqual(["sisyphus"])
         expect(result.interrupt_policy).toBe("idle-drain")
         expect(result.default_sender_access).toBe("allow-none")

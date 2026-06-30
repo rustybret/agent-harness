@@ -13,6 +13,7 @@ import {
   parseJsonc,
 } from "../shared"
 import { applyDisabledProviders } from "../shared/disabled-providers"
+import { applyMailboxDefault } from "../features/cross-project-mailbox/config-defaults"
 import { CONFIG_BASENAME, LEGACY_CONFIG_BASENAME } from "../shared/plugin-identity"
 import { OhMyOpenCodeConfigSchema, type OhMyOpenCodeConfig } from "./schema"
 
@@ -138,7 +139,7 @@ function mergeLoadedConfig(
   }
 
   config = { ...config, mcp_env_allowlist: userMcpEnvAllowlist }
-  return applyDisabledProviders(config)
+  return applyMailboxDefault(applyDisabledProviders(config))
 }
 
 export function validatePluginConfig(directory: string): PluginConfigValidation {
