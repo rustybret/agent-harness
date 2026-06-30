@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs"
 import path from "node:path"
 
+import { log } from "../../shared/logger"
 import { CONFIG_BASENAME, LEGACY_CONFIG_BASENAME } from "../../shared/plugin-identity"
 import {
   clearPluginConfigFileDetectionCache,
@@ -42,6 +43,6 @@ export function autoProvisionMailboxConfig(repoRoot: string): void {
     writeFileSync(configPath, stubContent(schemaPath), "utf8")
     clearPluginConfigFileDetectionCache()
   } catch (err) {
-    console.error("[cross-project-mailbox] auto-provision failed:", err)
+    log("[cross-project-mailbox] auto-provision failed", { error: err })
   }
 }

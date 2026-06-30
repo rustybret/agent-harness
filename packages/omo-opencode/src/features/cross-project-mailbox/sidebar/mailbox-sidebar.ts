@@ -1,6 +1,6 @@
 import type { Dirent } from "node:fs"
-import { existsSync } from "node:fs"
-import { readdir, readFile } from "node:fs/promises"
+import { closeSync, existsSync, openSync, readSync, statSync } from "node:fs"
+import { readdir } from "node:fs/promises"
 import path from "node:path"
 
 import { log } from "../../../shared/logger"
@@ -13,6 +13,10 @@ const NOTE_SUFFIX = ".md"
 const RESERVED_PREFIX = ".delivering-"
 const RECENT_SENT_LIMIT = 3
 const OUTBOX_ACK_WINDOW = 50
+// Tail budget for the outbox log: large enough to comfortably hold more than
+// OUTBOX_ACK_WINDOW JSONL lines (body preview capped at 100 chars), bounded so a
+// huge log is never loaded in full.
+const OUTBOX_TAIL_BYTES = 64 * 1024
 
 export interface MailboxSidebarRegistryPort {
   getRepoRootForProjectId(id: string): string | undefined
@@ -79,20 +83,39 @@ function isNoteFile(entry: Dirent): boolean {
 async function readDirSafe(dir: string): Promise<Dirent[]> {
   try {
     return await readdir(dir, { withFileTypes: true })
-  } catch {
+  } catch (error) {
+    // A missing directory is expected (no notes yet); record it for diagnostics
+    // rather than swallowing silently.
+    log("mailbox sidebar readdir failed", { error, dir })
     return []
+  }
+}
+
+// Reads at most maxBytes from the END of a file without loading the whole file.
+// The outbox log is newline-separated JSONL, so a truncated leading line is
+// discarded by the caller's window slice + parse filter. Never throws.
+function readLastBytes(filePath: string, maxBytes: number): string {
+  let fd: number | null = null
+  try {
+    const size = statSync(filePath).size
+    fd = openSync(filePath, "r")
+    const length = Math.min(size, maxBytes)
+    const offset = Math.max(0, size - maxBytes)
+    const buf = Buffer.alloc(length)
+    if (length > 0) readSync(fd, buf, 0, length, offset)
+    return buf.toString("utf8")
+  } catch (error) {
+    log("mailbox sidebar outbox tail read failed", { error, filePath })
+    return ""
+  } finally {
+    if (fd !== null) closeSync(fd)
   }
 }
 
 async function readRecentSent(
   repoRoot: string,
 ): Promise<{ recentSent: OutboxEntry[]; recentSentCount: number }> {
-  let raw: string
-  try {
-    raw = await readFile(outboxLogPath(repoRoot), "utf8")
-  } catch {
-    return { recentSent: [], recentSentCount: 0 }
-  }
+  const raw = readLastBytes(outboxLogPath(repoRoot), OUTBOX_TAIL_BYTES)
 
   const lines = raw
     .split("\n")

@@ -1,6 +1,7 @@
 import { appendFile, mkdir } from "node:fs/promises"
 import path from "node:path"
 
+import { log } from "../../../shared/logger"
 import type { IntentEnum } from "../validation/types"
 
 const BODY_PREVIEW_MAX = 100
@@ -37,7 +38,8 @@ export async function appendOutboxLog(repoRoot: string, entry: OutboxEntry): Pro
 export function parseOutboxLine(line: string): OutboxEntry | null {
   try {
     return JSON.parse(line) as OutboxEntry
-  } catch {
+  } catch (error) {
+    log("Failed to parse outbox line", { error, line: line.slice(0, BODY_PREVIEW_MAX) })
     return null
   }
 }

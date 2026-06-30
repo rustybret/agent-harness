@@ -5,6 +5,8 @@ import { dirname, join } from "node:path"
 import { randomUUID } from "node:crypto"
 import { applyEdits, modify, parse } from "jsonc-parser"
 
+import { log } from "../../shared/logger"
+
 // Shared preferences file for OpenCode TUI plugins. One top-level key per plugin
 // (short, non-integer-like name). The file is OPTIONAL: every reader falls back
 // to defaults when it is missing or malformed.
@@ -39,7 +41,10 @@ export function readTuiPreferencesFileSync(): Record<string, unknown> {
     if (raw.trim() === "") return {}
     const root: unknown = parse(raw)
     return isRecord(root) ? root : {}
-  } catch {
+  } catch (error) {
+    // A missing file is expected before any preference is written; log at the
+    // file level for diagnostics without treating it as a fault.
+    log("tui preferences read failed", { error })
     return {}
   }
 }
@@ -61,7 +66,9 @@ async function writePreference(path: string[], value: unknown): Promise<void> {
   let text: string
   try {
     text = await readFile(file, "utf8")
-  } catch {
+  } catch (error) {
+    // Missing file is expected on first write; seed an empty root below.
+    log("tui preferences write read-back failed", { error })
     text = ""
   }
   // Missing or empty file: seed with an empty object so modify has a root.
@@ -70,9 +77,10 @@ async function writePreference(path: string[], value: unknown): Promise<void> {
   let root: unknown
   try {
     root = parse(text)
-  } catch {
+  } catch (error) {
     // The shared file is currently malformed. Skip the write rather than clobber
     // sibling plugins' keys; the user fixes the file and persistence resumes.
+    log("tui preferences write skipped: malformed file", { error })
     return
   }
   if (!isRecord(root)) return
@@ -95,6 +103,10 @@ let writeChain: Promise<void> = Promise.resolve()
 // pass the path RELATIVE to the omo key (e.g. ["mailbox","collapsed"]) and this
 // prepends "oh-my-openagent" internally. Never throws.
 export function queueTuiPreferenceUpdate(path: string[], value: unknown): Promise<void> {
-  writeChain = writeChain.then(() => writePreference(path, value)).catch(() => {})
+  writeChain = writeChain
+    .then(() => writePreference(path, value))
+    .catch((error) => {
+      log("tui preferences queued update failed", { error })
+    })
   return writeChain
 }

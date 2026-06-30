@@ -145,7 +145,10 @@ export function handleTuiPollError(
 const module: TuiPluginModule = {
   id: "oh-my-openagent:tui",
   tui: async (api) => {
-    const solid = await import("@opentui/solid").catch(() => null)
+    const solid = await import("@opentui/solid").catch((error) => {
+      log("[tui-sidebar] @opentui/solid unavailable; sidebar disabled", { error })
+      return null
+    })
     if (!solid) {
       return
     }

@@ -39,7 +39,10 @@ function loadSessionMessageIds(
       }
       return ids
     })
-    .catch(() => [])
+    .catch((error) => {
+      log("mailbox load session messages failed", { error, sessionId })
+      return []
+    })
 }
 
 function buildIdleDrainDeps(
