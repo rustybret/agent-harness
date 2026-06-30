@@ -66,6 +66,9 @@
       "key": "anthropic/claude-sonnet-4-6"
     },
     {
+      "key": "anthropic/claude-sonnet-5"
+    },
+    {
       "key": "cerebras/gpt-oss-120b"
     },
     {

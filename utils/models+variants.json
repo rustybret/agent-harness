@@ -179,6 +179,13 @@
       ]
     },
     {
+      "key": "anthropic/claude-sonnet-5",
+      "variants": [
+        "high",
+        "max"
+      ]
+    },
+    {
       "key": "cerebras/gpt-oss-120b",
       "variants": [
         "high",
