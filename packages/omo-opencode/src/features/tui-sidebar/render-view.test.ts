@@ -197,6 +197,45 @@ describe("tui sidebar renderView", () => {
     expect(header?.props.onMouseDown).toBe(onToggle)
   })
 
+  it("#given a collapsed mailbox with activity #when building nodes #then header shows In/Out summary line", () => {
+    // given
+    const view = computeView({ ...activeSections, mailbox: mailboxState })
+    const onToggle = (): void => {}
+
+    // when
+    const collapsed = buildViewNodes(view, theme, { collapsed: true, onToggle })
+    const collapsedTexts = flattenText(collapsed)
+
+    // then: summary line present in collapsed view
+    const summaryLine = collapsedTexts.find((entry) => entry.text.startsWith("In "))
+    expect(summaryLine).toBeDefined()
+    expect(summaryLine?.text).toBe("In 2 / Out 1")
+    // rows not visible
+    expect(collapsedTexts.some((entry) => entry.text.includes("unread"))).toBe(false)
+  })
+
+  it("#given an all-zero mailbox #when expanded #then it renders the idle placeholder", () => {
+    // given
+    const zeroMailbox: MailboxSidebarState = {
+      inboundUnread: 0,
+      inboundProcessed: 0,
+      recentSentCount: 0,
+      recentSent: [],
+      outboundUnresolved: 0,
+      outboundRead: 0,
+      outboundFailed: 0,
+    }
+    const view = computeView({ ...activeSections, mailbox: zeroMailbox })
+
+    // when
+    const nodes = buildViewNodes(view, theme)
+    const texts = flattenText(nodes).map((entry) => entry.text)
+
+    // then
+    expect(texts.some((t) => t === "Mailbox idle")).toBe(true)
+    expect(texts.some((t) => t.includes("unread"))).toBe(false)
+  })
+
   it("#given active view without mailbox #when building nodes #then it renders no Mailbox section", () => {
     // given
     const view = computeView({ ...activeSections, mailbox: null })

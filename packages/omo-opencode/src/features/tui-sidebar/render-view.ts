@@ -236,10 +236,33 @@ function mailboxNodes(
   if (toggle?.onToggle) headerProps.onMouseDown = toggle.onToggle
   const titleText = text(headerProps, `Mailbox ${toggle?.collapsed ? "▶" : "▼"}`)
 
+  const allZero =
+    mailbox.inboundUnread === 0 &&
+    mailbox.inboundProcessed === 0 &&
+    mailbox.outboundUnresolved === 0 &&
+    mailbox.outboundRead === 0 &&
+    mailbox.outboundFailed === 0
+
   if (toggle?.collapsed) {
+    const summaryLine = allZero
+      ? text({ fg: theme.textMuted }, "idle")
+      : text(
+          { fg: mailbox.inboundUnread > 0 || mailbox.outboundUnresolved > 0 ? theme.warning : theme.textMuted },
+          `In ${mailbox.inboundUnread} / Out ${mailbox.outboundUnresolved}`,
+        )
     return [
       box({ borderStyle: "single", borderColor: theme.borderSubtle, flexDirection: "column", padding: 1 }, [
         titleText,
+        summaryLine,
+      ]),
+    ]
+  }
+
+  if (allZero) {
+    return [
+      box({ borderStyle: "single", borderColor: theme.borderSubtle, flexDirection: "column", padding: 1 }, [
+        titleText,
+        text({ fg: theme.textMuted }, "Mailbox idle"),
       ]),
     ]
   }
