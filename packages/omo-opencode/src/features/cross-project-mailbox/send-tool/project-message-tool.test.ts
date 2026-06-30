@@ -400,7 +400,7 @@ describe("runProjectMessageSend - target not in registry", () => {
     // given
     const handle = spyDeps(cfg({ senders: { "proj-b": { access: "allow", intent_budget: "plan" } } }))
 
-    // when — pass "Project B" (display name) instead of "proj-b" (projectId)
+    // when: pass "Project B" (display name) instead of "proj-b" (projectId)
     const result = await runProjectMessageSend(
       { targetProjectId: "Project B", intent: "quick", body: "display name fallback test" },
       handle.deps,
@@ -416,7 +416,7 @@ describe("runProjectMessageSend - target not in registry", () => {
     await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
     const def = createProjectMessageTool(realDeps(cfg()))
 
-    // when — target by display name "Project B", which resolves to canonical "proj-b"
+    // when: target by display name "Project B", which resolves to canonical "proj-b"
     const out = await def.execute(
       { targetProjectId: "Project B", intent: "quick", body: "canonical outbox test" },
       {},
