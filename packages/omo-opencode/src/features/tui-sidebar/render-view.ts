@@ -1,3 +1,4 @@
+import type { MailboxSidebarState } from "../cross-project-mailbox/sidebar"
 import { LABEL_MAX } from "./constants"
 import { box, text } from "./element-helpers"
 import type { ViewNode } from "./element-helpers"
@@ -22,7 +23,16 @@ type ThemeLike = {
   readonly borderSubtle?: unknown
 }
 
-export function buildViewNodes(view: SidebarView, theme: ThemeLike): ViewNode[] {
+export type MailboxToggleOpts = {
+  readonly collapsed: boolean
+  readonly onToggle: () => void
+}
+
+export function buildViewNodes(
+  view: SidebarView,
+  theme: ThemeLike,
+  mailboxToggle?: MailboxToggleOpts,
+): ViewNode[] {
   switch (view.kind) {
     case "active":
       return [
@@ -31,12 +41,18 @@ export function buildViewNodes(view: SidebarView, theme: ThemeLike): ViewNode[] 
           ...loopNodes(view.loop, theme),
           ...agentNodes(view.agents, theme),
           ...jobNodes(view.jobs, theme),
+          ...mailboxNodes(view.mailbox, theme, mailboxToggle),
         ]),
       ]
     case "broken":
       return brokenNodes(view.messages, theme)
     case "idle":
-      return idleNodes(view.roster, theme)
+      return [
+        box({ flexDirection: "column", gap: 1 }, [
+          ...idleNodes(view.roster, theme),
+          ...mailboxNodes(view.mailbox, theme, mailboxToggle),
+        ]),
+      ]
     default:
       return assertNever(view)
   }
@@ -54,11 +70,12 @@ function linesForView(view: SidebarView): string[] {
         ...loopLines(view.loop),
         ...agentLines(view.agents),
         ...jobLines(view.jobs),
+        ...mailboxLines(view.mailbox),
       ]
     case "broken":
       return ["config invalid - run doctor", ...view.messages]
     case "idle":
-      return rosterLines(view.roster)
+      return [...rosterLines(view.roster), ...mailboxLines(view.mailbox)]
     default:
       return assertNever(view)
   }
@@ -206,6 +223,65 @@ function rosterLines(roster: RosterState): string[] {
     default:
       return assertNever(roster)
   }
+}
+
+function mailboxNodes(
+  mailbox: MailboxSidebarState | null | undefined,
+  theme: ThemeLike,
+  toggle?: MailboxToggleOpts,
+): ViewNode[] {
+  if (!mailbox) return []
+
+  const headerProps: Record<string, unknown> = { fg: theme.info }
+  if (toggle?.onToggle) headerProps.onMouseDown = toggle.onToggle
+  const titleText = text(headerProps, `Mailbox ${toggle?.collapsed ? "▶" : "▼"}`)
+
+  if (toggle?.collapsed) {
+    return [
+      box({ borderStyle: "single", borderColor: theme.borderSubtle, flexDirection: "column", padding: 1 }, [
+        titleText,
+      ]),
+    ]
+  }
+
+  const rows: ViewNode[] = [titleText]
+  rows.push(
+    text(
+      { fg: mailbox.inboundUnread > 0 ? theme.warning : theme.textMuted },
+      `in ${mailbox.inboundUnread} unread ${mailbox.inboundProcessed} done`,
+    ),
+  )
+
+  if (mailbox.outboundRead > 0 || mailbox.outboundUnresolved > 0 || mailbox.outboundFailed > 0) {
+    rows.push(
+      text(
+        {
+          fg:
+            mailbox.outboundFailed > 0
+              ? theme.error
+              : mailbox.outboundUnresolved > 0
+                ? theme.warning
+                : theme.textMuted,
+        },
+        `out ${mailbox.outboundUnresolved} pending ${mailbox.outboundRead} read ${mailbox.outboundFailed} fail`,
+      ),
+    )
+  }
+
+  return [
+    box({ borderStyle: "single", borderColor: theme.borderSubtle, flexDirection: "column", padding: 1 }, rows),
+  ]
+}
+
+function mailboxLines(mailbox: MailboxSidebarState | null | undefined): string[] {
+  if (!mailbox) return []
+  return [
+    "Mailbox",
+    `in ${mailbox.inboundUnread} unread ${mailbox.inboundProcessed} done`,
+    ...(mailbox.outboundRead > 0 || mailbox.outboundUnresolved > 0 || mailbox.outboundFailed > 0
+      ? [`out ${mailbox.outboundUnresolved} pending ${mailbox.outboundRead} read ${mailbox.outboundFailed} fail`]
+      : []),
+  ]
 }
 
 function section(title: string, theme: ThemeLike, children: readonly ViewNode[]): ViewNode {
