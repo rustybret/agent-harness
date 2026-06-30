@@ -79,10 +79,12 @@ interface Spies {
   makePendingStore: ReturnType<typeof jest.fn>
   resolveActivePrimaryAgent: ReturnType<typeof jest.fn>
   getRegisteredProjects: ReturnType<typeof jest.fn>
+  validatePluginConfig: ReturnType<typeof jest.fn>
 }
 
 function makeHarness(opts: {
   config?: CrossProjectMailboxConfig
+  freshConfigRead?: { valid: boolean; config: { cross_project_mailbox?: CrossProjectMailboxConfig } }
   notes?: UnreadMessage[]
   projects?: ProjectEntry[]
   primary?: string | undefined
@@ -110,6 +112,9 @@ function makeHarness(opts: {
   const getSessionMessages = jest.fn(async () => opts.sessionMessages ?? [])
   const resolveActivePrimaryAgent = jest.fn(() => ("primary" in opts ? opts.primary : "sisyphus"))
   const getRegisteredProjects = jest.fn(() => opts.projects ?? [makeProject()])
+  const validatePluginConfig = jest.fn(
+    () => opts.freshConfigRead ?? { valid: true, config: { cross_project_mailbox: config } },
+  )
 
   const store: MailboxStorePort = { reclaimStale, drainUnread, reserve, quarantine, markDispatched }
   const pending: PendingStorePort = { addDispatchSent }
@@ -121,6 +126,7 @@ function makeHarness(opts: {
 
   const deps: IdleDrainHookDeps = {
     config,
+    validatePluginConfig: validatePluginConfig as never,
     repoRoot: "/repos/beta",
     directory: "/repos/beta",
     projectDisplayName: "beta",
@@ -156,6 +162,7 @@ function makeHarness(opts: {
       makePendingStore,
       resolveActivePrimaryAgent,
       getRegisteredProjects,
+      validatePluginConfig,
     },
   }
 }
@@ -361,6 +368,99 @@ describe("createIdleDrainHook", () => {
       // then
       expect(spies.drainUnread.mock.calls[0][0]).toBe(1)
       expect(spies.dispatchInternalPrompt).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("#given a sender's access is flipped in config between two idle drains", () => {
+    it("#then the second drain observes the new permission via a fresh per-drain config read", async () => {
+      // given
+      const denyConfig = makeConfig({
+        default_sender_access: "allow-none",
+        senders: { "alpha-id": { access: "deny", intent_budget: "impl" } },
+      })
+      const allowConfig = makeConfig({
+        default_sender_access: "allow-none",
+        senders: { "alpha-id": { access: "allow", intent_budget: "impl" } },
+      })
+      const reads = [
+        { valid: true, config: { cross_project_mailbox: denyConfig } },
+        { valid: true, config: { cross_project_mailbox: allowConfig } },
+      ]
+      const { deps, spies } = makeHarness({ primary: "sisyphus" })
+      spies.validatePluginConfig.mockImplementation(() => reads.shift())
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(spies.validateInbound).toHaveBeenCalled()
+      expect(spies.validateInbound.mock.calls.at(-1)?.[1]).toBe(allowConfig)
+    })
+  })
+
+  describe("#given a permissionless config (allow-none with no allow senders)", () => {
+    it("#then the handler early-outs before resolving primary or listing projects", async () => {
+      // given
+      const permissionless = makeConfig({
+        default_sender_access: "allow-none",
+        senders: {},
+      })
+      const { deps, spies } = makeHarness({
+        primary: "sisyphus",
+        freshConfigRead: { valid: true, config: { cross_project_mailbox: permissionless } },
+      })
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(spies.resolveActivePrimaryAgent).not.toHaveBeenCalled()
+      expect(spies.getRegisteredProjects).not.toHaveBeenCalled()
+      expect(spies.makeMailboxStore).not.toHaveBeenCalled()
+      expect(spies.dispatchInternalPrompt).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("#given a fresh read where the mailbox is disabled", () => {
+    it("#then the handler early-outs before any scan", async () => {
+      // given
+      const disabled = makeConfig({ enabled: false, default_sender_access: "allow-all" })
+      const { deps, spies } = makeHarness({
+        primary: "sisyphus",
+        freshConfigRead: { valid: true, config: { cross_project_mailbox: disabled } },
+      })
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(spies.resolveActivePrimaryAgent).not.toHaveBeenCalled()
+      expect(spies.getRegisteredProjects).not.toHaveBeenCalled()
+      expect(spies.makeMailboxStore).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("#given a malformed fresh config read (valid:false)", () => {
+    it("#then it falls back to the last-known-good captured config and the drain completes", async () => {
+      // given
+      const goodConfig = makeConfig({ default_sender_access: "allow-all" })
+      const { deps, spies } = makeHarness({
+        primary: "sisyphus",
+        config: goodConfig,
+        freshConfigRead: { valid: false, config: { cross_project_mailbox: undefined } },
+      })
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(spies.dispatchInternalPrompt).toHaveBeenCalledTimes(1)
+      expect(spies.validateInbound.mock.calls[0][1]).toBe(goodConfig)
     })
   })
 })

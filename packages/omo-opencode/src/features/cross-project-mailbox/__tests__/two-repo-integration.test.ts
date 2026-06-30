@@ -144,6 +144,7 @@ async function createEnv(): Promise<TwoRepoEnv> {
 
     const deps: IdleDrainHookDeps = {
       config,
+      validatePluginConfig: () => ({ valid: true, config: { cross_project_mailbox: config } }),
       repoRoot: receiverRoot,
       directory: receiverRoot,
       projectDisplayName: "receiver",
@@ -293,7 +294,10 @@ describe("cross-project mailbox two-repo integration", () => {
         const env = await createEnv()
         const envelope = env.makeEnvelope({ intent: "question" })
         await env.writeRawNote(envelope, "unauthorized sender body")
-        const config = env.buildConfig({ default_sender_access: "allow-none", senders: {} })
+        const config = env.buildConfig({
+          default_sender_access: "allow-none",
+          senders: { "some-other-allowed-project-id": { access: "allow", intent_budget: "impl" } },
+        })
 
         // when
         await env.runIdle(config)

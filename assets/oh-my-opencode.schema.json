@@ -6661,8 +6661,8 @@
       "type": "object",
       "properties": {
         "enabled": {
-          "default": false,
-          "description": "Enable cross-project mailbox delivery (default: false)",
+          "default": true,
+          "description": "Enable cross-project mailbox delivery (default: true)",
           "type": "boolean"
         },
         "intake_eligible_agents": {

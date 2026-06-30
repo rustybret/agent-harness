@@ -32,7 +32,7 @@ const CrossProjectMailboxBoundsSchema = z
   .describe("Safety bounds that throttle and cap cross-project delivery")
 
 export const CrossProjectMailboxConfigSchema = z.object({
-  enabled: z.boolean().default(false).describe("Enable cross-project mailbox delivery (default: false)"),
+  enabled: z.boolean().default(true).describe("Enable cross-project mailbox delivery (default: true)"),
   intake_eligible_agents: z
     .array(OverridableAgentNameSchema)
     .default(["sisyphus"])

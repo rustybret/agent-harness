@@ -17,7 +17,7 @@ export function createMailboxSessionHooks(args: {
   const { ctx, pluginConfig, isHookEnabled, safeHookEnabled } = args
   const config = pluginConfig.cross_project_mailbox
 
-  if (!config) {
+  if (config?.enabled !== false) {
     autoProvisionMailboxConfig(ctx.directory)
   }
 

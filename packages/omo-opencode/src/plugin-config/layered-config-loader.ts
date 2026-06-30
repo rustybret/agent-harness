@@ -3,6 +3,7 @@ import { homedir } from "node:os";
 import * as path from "path";
 import { OhMyOpenCodeConfigSchema, type OhMyOpenCodeConfig } from "../config";
 import { applyDisabledProviders } from "../shared/disabled-providers";
+import { applyMailboxDefault } from "../features/cross-project-mailbox/config-defaults";
 import { migrateLegacyConfigFile } from "../shared/migrate-legacy-config-file";
 import { CONFIG_BASENAME, LEGACY_CONFIG_BASENAME } from "../shared/plugin-identity";
 import {
@@ -187,6 +188,8 @@ export function loadPluginConfig(
   };
 
   applyDisabledProviders(config);
+
+  config = applyMailboxDefault(config);
 
   log("Final merged config", {
     agents: config.agents,

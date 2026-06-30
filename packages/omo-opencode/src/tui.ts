@@ -1,13 +1,23 @@
 import type { TuiPluginModule } from "@opencode-ai/plugin/tui"
 
+import type {
+  MailboxSidebarRegistryPort,
+  MailboxSidebarState,
+} from "./features/cross-project-mailbox/sidebar"
 import { computeView, viewKey } from "./features/tui-sidebar/compute-view"
 import { POLL_INTERVAL_MS } from "./features/tui-sidebar/constants"
 import { deriveAgents, deriveConfig, deriveJobBoard, deriveLoop, deriveRoster } from "./features/tui-sidebar/derivers"
 import type { ViewNode } from "./features/tui-sidebar/element-helpers"
 import { readMirror } from "./features/tui-sidebar/mirror-io"
 import { buildViewNodes } from "./features/tui-sidebar/render-view"
+import type { MailboxToggleOpts } from "./features/tui-sidebar/render-view"
 import type { RosterRow } from "./features/tui-sidebar/state-types"
 import type { SidebarView } from "./features/tui-sidebar/state-types"
+import {
+  queueTuiPreferenceUpdate,
+  readTuiPreferencesFileSync,
+  resolveOmoCollapsed,
+} from "./features/tui-sidebar/tui-preferences"
 import { log } from "./shared/logger"
 
 type SolidRuntime<Node> = {
@@ -90,16 +100,34 @@ async function loadRosterRows(directory: string): Promise<readonly RosterRow[]> 
   return resolver(directory)
 }
 
+async function loadMailboxSection(directory: string): Promise<MailboxSidebarState | null> {
+  const { validatePluginConfig } = await import("./config/validate")
+  const { applyMailboxDefault } = await import("./features/cross-project-mailbox/config-defaults")
+  const mailboxConfig = applyMailboxDefault(validatePluginConfig(directory).config).cross_project_mailbox
+  if (!mailboxConfig || mailboxConfig.enabled === false) return null
+
+  const { createProjectRegistry } = await import("./features/cross-project-mailbox/registry")
+  const { readMailboxSidebarState } = await import("./features/cross-project-mailbox/sidebar")
+  const projects = await createProjectRegistry().listProjects()
+  const repoRootById = new Map(projects.map((entry) => [entry.projectId, entry.repoRoot]))
+  const registry: MailboxSidebarRegistryPort = {
+    getRepoRootForProjectId: (id) => repoRootById.get(id),
+  }
+  return readMailboxSidebarState(directory, mailboxConfig, registry)
+}
+
 async function readView(directory: string): Promise<SidebarView> {
   const validation = await loadPluginValidation(directory)
   const mirror = readMirror(directory)
   const roster = await loadRosterRows(directory)
+  const mailbox = await loadMailboxSection(directory)
   return computeView({
     config: deriveConfig(validation),
     roster: deriveRoster(roster),
     agents: deriveAgents(mirror),
     jobs: deriveJobBoard(mirror),
     loop: deriveLoop(mirror),
+    mailbox,
   })
 }
 
@@ -117,7 +145,10 @@ export function handleTuiPollError(
 const module: TuiPluginModule = {
   id: "oh-my-openagent:tui",
   tui: async (api) => {
-    const solid = await import("@opentui/solid").catch(() => null)
+    const solid = await import("@opentui/solid").catch((error) => {
+      log("[tui-sidebar] @opentui/solid unavailable; sidebar disabled", { error })
+      return null
+    })
     if (!solid) {
       return
     }
@@ -133,6 +164,21 @@ const module: TuiPluginModule = {
     let inFlight = false
     let timer: ReturnType<typeof setTimeout> | null = null
 
+    let mailboxCollapsed: boolean = resolveOmoCollapsed(readTuiPreferencesFileSync())
+
+    const toggleMailbox = (): void => {
+      mailboxCollapsed = !mailboxCollapsed
+      queueTuiPreferenceUpdate(["mailbox", "collapsed"], mailboxCollapsed)
+      api.renderer.requestRender()
+    }
+
+    const mailboxToggle: MailboxToggleOpts = {
+      get collapsed() {
+        return mailboxCollapsed
+      },
+      onToggle: toggleMailbox,
+    }
+
     registerSidebarContentSlot({
       registerSlot: (registration) => {
         api.slots.register(registration)
@@ -140,7 +186,7 @@ const module: TuiPluginModule = {
       requestRender: () => {
         api.renderer.requestRender()
       },
-      renderSidebar: () => materialize(buildViewNodes(currentView, api.theme.current), solid),
+      renderSidebar: () => materialize(buildViewNodes(currentView, api.theme.current, mailboxToggle), solid),
     })
 
     const schedule = (): void => {

@@ -35,7 +35,11 @@ export function computeView(sections: ComputeViewSections): SidebarView {
     return { kind: "broken", messages: sections.config.messages }
   }
 
-  return { kind: "idle", roster: sections.roster }
+  return {
+    kind: "idle",
+    roster: sections.roster,
+    ...(sections.mailbox === undefined ? {} : { mailbox: sections.mailbox }),
+  }
 }
 
 export function viewKey(view: SidebarView): string {
@@ -52,7 +56,11 @@ export function viewKey(view: SidebarView): string {
     case "broken":
       return stableKey(["broken", [...view.messages]])
     case "idle":
-      return stableKey(["idle", rosterKeyParts(view.roster)])
+      return stableKey([
+        "idle",
+        rosterKeyParts(view.roster),
+        ["mailbox", stableMailboxKey(view.mailbox ?? null)],
+      ])
     default:
       return assertNever(view)
   }
@@ -67,7 +75,16 @@ function stableKey(parts: readonly unknown[]): string {
 }
 
 function stableMailboxKey(mailbox: MailboxSidebarState | null): readonly unknown[] | null {
-  return mailbox ? [mailbox.inboundUnread, mailbox.inboundProcessed, mailbox.recentSentCount] : null
+  return mailbox
+    ? [
+        mailbox.inboundUnread,
+        mailbox.inboundProcessed,
+        mailbox.recentSentCount,
+        mailbox.outboundUnresolved,
+        mailbox.outboundRead,
+        mailbox.outboundFailed,
+      ]
+    : null
 }
 
 function rosterKeyParts(roster: RosterState): readonly unknown[] {

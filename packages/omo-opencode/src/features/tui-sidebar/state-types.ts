@@ -63,7 +63,7 @@ export type SidebarView =
       readonly mailbox?: MailboxSidebarState | null
     }
   | { readonly kind: "broken"; readonly messages: readonly string[] }
-  | { readonly kind: "idle"; readonly roster: RosterState }
+  | { readonly kind: "idle"; readonly roster: RosterState; readonly mailbox?: MailboxSidebarState | null }
 
 export function assertNever(value: never): never {
   throw new Error(`Unexpected variant: ${JSON.stringify(value)}`)
