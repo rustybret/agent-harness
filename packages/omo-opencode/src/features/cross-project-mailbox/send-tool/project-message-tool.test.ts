@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test"
 
 import { CrossProjectMailboxConfigSchema, type CrossProjectMailboxConfig } from "../config"
 import { type MailboxMessage, serializeEnvelope } from "../envelope/schema"
+import type { PresenceStatus } from "../presence"
 import type { ProjectEntry } from "../registry/types"
 import {
   createProjectMessageTool,
@@ -521,6 +522,191 @@ describe("runProjectMessageSend - target not in registry", () => {
     const entry = JSON.parse(line) as { toProjectId: string; toRepoRoot?: string }
     expect(entry.toProjectId).toBe("proj-b")
     expect(entry.toRepoRoot).toBe(targetBRoot)
+  })
+})
+
+interface LaunchSpyHandle {
+  deps: ProjectMessageToolDeps
+  presenceCalls: string[]
+  launchCalls: Array<{ repoRoot: string; projectId: string; policy: string }>
+  writeCalls: number
+}
+
+function launchSpyDeps(
+  config: CrossProjectMailboxConfig,
+  presence: PresenceStatus,
+): LaunchSpyHandle {
+  const handle: LaunchSpyHandle = {
+    presenceCalls: [],
+    launchCalls: [],
+    writeCalls: 0,
+    deps: {
+      config,
+      thisProjectId: THIS_PROJECT_ID,
+      thisRepoRoot,
+      thisProjectDisplayName: "Project C",
+      registry: { listProjects: async () => projects },
+      writeNote: async () => {
+        handle.writeCalls += 1
+      },
+      appendOutbox: async () => {},
+      readPresence: async (projectId: string) => {
+        handle.presenceCalls.push(projectId)
+        return presence
+      },
+      launchTarget: async (repoRoot: string, projectId: string, policy) => {
+        handle.launchCalls.push({ repoRoot, projectId, policy })
+        return true
+      },
+    },
+  }
+  return handle
+}
+
+describe("runProjectMessageSend - launch policy", () => {
+  it("does not read presence or launch when launch_policy is disabled", async () => {
+    // given
+    const handle = launchSpyDeps(cfg({ launch_policy: "disabled" }), "offline")
+
+    // when
+    const result = await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello" },
+      handle.deps,
+    )
+
+    // then
+    expect("ok" in result && result.ok).toBe(true)
+    expect(handle.presenceCalls).toEqual([])
+    expect(handle.launchCalls).toEqual([])
+    expect(handle.writeCalls).toBe(1)
+  })
+
+  it("never enters the launch path when the target is live", async () => {
+    // given
+    const handle = launchSpyDeps(cfg({ launch_policy: "auto" }), "live")
+
+    // when
+    const result = await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello" },
+      handle.deps,
+    )
+
+    // then
+    expect("ok" in result && result.ok).toBe(true)
+    expect(handle.presenceCalls).toEqual(["proj-b"])
+    expect(handle.launchCalls).toEqual([])
+    expect(handle.writeCalls).toBe(1)
+  })
+
+  it("never enters the launch path when the target is stale", async () => {
+    // given
+    const handle = launchSpyDeps(cfg({ launch_policy: "auto" }), "stale")
+
+    // when
+    const result = await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello" },
+      handle.deps,
+    )
+
+    // then
+    expect("ok" in result && result.ok).toBe(true)
+    expect(handle.launchCalls).toEqual([])
+    expect(handle.writeCalls).toBe(1)
+  })
+
+  it("launches once with the target repoRoot/projectId/policy when offline and policy is auto", async () => {
+    // given
+    const handle = launchSpyDeps(cfg({ launch_policy: "auto" }), "offline")
+
+    // when
+    const result = await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello" },
+      handle.deps,
+    )
+
+    // then
+    expect("ok" in result && result.ok).toBe(true)
+    expect(handle.presenceCalls).toEqual(["proj-b"])
+    expect(handle.launchCalls).toHaveLength(1)
+    expect(handle.launchCalls[0]).toEqual({ repoRoot: targetBRoot, projectId: "proj-b", policy: "auto" })
+    expect(handle.writeCalls).toBe(1)
+  })
+
+  it("still sends after launching when offline (message queues via writeNote)", async () => {
+    // given
+    const handle = launchSpyDeps(cfg({ launch_policy: "ask" }), "offline")
+
+    // when
+    const result = await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello" },
+      handle.deps,
+    )
+
+    // then
+    expect("ok" in result && result.ok).toBe(true)
+    expect(handle.launchCalls).toHaveLength(1)
+    expect(handle.launchCalls[0]?.policy).toBe("ask")
+    expect(handle.writeCalls).toBe(1)
+  })
+})
+
+describe("runProjectMessageSend - launch permission wiring (ask policy)", () => {
+  it("passes launchPermissionAsk through the default launchTargetSession path: deny = no launch", async () => {
+    // given
+    let asked = 0
+    const deps: ProjectMessageToolDeps = {
+      config: cfg({ launch_policy: "ask" }),
+      thisProjectId: THIS_PROJECT_ID,
+      thisRepoRoot,
+      thisProjectDisplayName: "Project C",
+      registry: { listProjects: async () => projects },
+      writeNote: async () => {},
+      appendOutbox: async () => {},
+      readPresence: async () => "offline",
+      launchPermissionAsk: async () => {
+        asked += 1
+        return false
+      },
+    }
+
+    // when
+    const result = await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello" },
+      deps,
+    )
+
+    // then
+    expect("ok" in result && result.ok).toBe(true)
+    expect(asked).toBe(1)
+  })
+
+  it("passes launchPermissionAsk through the default launchTargetSession path: allow = asked once", async () => {
+    // given
+    let asked = 0
+    const deps: ProjectMessageToolDeps = {
+      config: cfg({ launch_policy: "ask" }),
+      thisProjectId: THIS_PROJECT_ID,
+      thisRepoRoot,
+      thisProjectDisplayName: "Project C",
+      registry: { listProjects: async () => projects },
+      writeNote: async () => {},
+      appendOutbox: async () => {},
+      readPresence: async () => "offline",
+      launchPermissionAsk: async (target: string) => {
+        asked += 1
+        expect(target).toBe(targetBRoot)
+        return false
+      },
+    }
+
+    // when
+    await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello" },
+      deps,
+    )
+
+    // then
+    expect(asked).toBe(1)
   })
 })
 

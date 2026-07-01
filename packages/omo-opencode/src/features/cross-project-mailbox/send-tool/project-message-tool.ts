@@ -4,8 +4,11 @@ import { z } from "zod"
 import { validatePluginConfig } from '../../../config/validate';
 import type { CrossProjectMailboxConfig } from "../config"
 import { MAILBOX_INTENTS, MAX_BODY_BYTES, type MailboxMessage } from "../envelope/schema"
+import { launchTargetSession } from "../launch"
 import { MailboxStore } from "../mailbox/mailbox-store"
+import { readPresenceStatus, type PresenceStatus } from "../presence"
 import type { ProjectEntry } from "../registry/types"
+import { readOutboundBudget } from "../visibility"
 import { buildSendEnvelope, type SendInput } from "./envelope-builder"
 import { appendOutboxLog } from "./outbox-log"
 import { type PreflightReason, runSendPreflight } from "./send-preflight"
@@ -15,6 +18,7 @@ export const IntentEnumSchema = z.enum(MAILBOX_INTENTS)
 export function createProjectMessageInputSchema(maxBodyBytes: number) {
   return z
     .object({
+      mode: z.enum(["send", "list"]).default("send"),
       targetProjectId: z.string(),
       intent: IntentEnumSchema,
       category: z.string().optional(),
@@ -41,6 +45,9 @@ export interface ProjectMessageToolDeps {
   registry: ProjectMessageRegistry
   writeNote?: (targetRepoRoot: string, fromProjectId: string, envelope: MailboxMessage, body: string) => Promise<void>
   appendOutbox?: typeof appendOutboxLog
+  readPresence?: (projectId: string) => Promise<PresenceStatus>
+  launchTarget?: (repoRoot: string, projectId: string, policy: CrossProjectMailboxConfig["launch_policy"]) => Promise<boolean>
+  launchPermissionAsk?: (target: string) => Promise<boolean>
 }
 
 export type SendResult =
@@ -57,6 +64,28 @@ async function defaultWriteNote(
 ): Promise<void> {
   const store = new MailboxStore(targetRepoRoot, fromProjectId, { reservation_ttl_ms: reservationTtlMs })
   await store.writeNote(envelope, body)
+}
+
+async function maybeLaunchOfflineTarget(
+  targetEntry: ProjectEntry,
+  deps: ProjectMessageToolDeps,
+): Promise<void> {
+  const policy = deps.config.launch_policy
+  if (policy === "disabled") return
+
+  const readPresence = deps.readPresence ?? ((projectId: string) => readPresenceStatus(projectId))
+  const status = await readPresence(targetEntry.projectId)
+  if (status !== "offline") return
+
+  const launch =
+    deps.launchTarget ??
+    ((repoRoot: string, projectId: string, launchPolicy: CrossProjectMailboxConfig["launch_policy"]) =>
+      launchTargetSession(repoRoot, {
+        policy: launchPolicy,
+        projectId,
+        launchPermissionAsk: deps.launchPermissionAsk,
+      }))
+  await launch(targetEntry.repoRoot, targetEntry.projectId, policy)
 }
 
 export async function runProjectMessageSend(
@@ -90,6 +119,8 @@ export async function runProjectMessageSend(
     return { blocked: true, reason: preflight.reason }
   }
 
+  await maybeLaunchOfflineTarget(targetEntry, deps)
+
   if (deps.writeNote) {
     await deps.writeNote(targetEntry.repoRoot, deps.thisProjectId, built.envelope, built.body)
   } else {
@@ -121,6 +152,20 @@ export async function runProjectMessageSend(
   }
 }
 
+export async function runProjectMessageList(deps: ProjectMessageToolDeps): Promise<{
+  mode: "list"
+  advisory: string
+  rows: Awaited<ReturnType<typeof readOutboundBudget>>
+}> {
+  const readPresence = deps.readPresence ?? ((projectId: string) => readPresenceStatus(projectId))
+  const rows = await readOutboundBudget(deps.config, deps.registry, { readPresence })
+  return {
+    mode: "list",
+    advisory: "ADVISORY - target-side inbound validation remains authoritative.",
+    rows,
+  }
+}
+
 function resolveFreshSendConfig(deps: ProjectMessageToolDeps): CrossProjectMailboxConfig {
   const read = validatePluginConfig(deps.thisRepoRoot)
   if (read.valid && read.config.cross_project_mailbox) {
@@ -134,10 +179,15 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
   return tool({
     description: "Send a note to another registered project's agent session",
     args: {
-      targetProjectId: tool.schema.string().describe("Registered projectId or display name of the destination project"),
-      intent: tool.schema.enum(MAILBOX_INTENTS).describe("Intent tier of this note"),
+      mode: tool.schema
+        .enum(["send", "list"])
+        .optional()
+        .default("send")
+        .describe("send delivers the note; list returns the ADVISORY outbound-budget table without sending"),
+      targetProjectId: tool.schema.string().optional().describe("Registered projectId or display name of the destination project (required for mode=send)"),
+      intent: tool.schema.enum(MAILBOX_INTENTS).optional().describe("Intent tier of this note (required for mode=send)"),
       category: tool.schema.string().optional().describe("Optional task category; when set it gates the note in place of intent"),
-      body: tool.schema.string().describe("Note body"),
+      body: tool.schema.string().optional().describe("Note body (required for mode=send)"),
       priority: tool.schema.number().optional().default(0).describe("Optional priority; higher drains first"),
       threadId: tool.schema.string().optional().describe("Optional correlation UUID for a fresh thread (ignored on replies)"),
       supersedes: tool.schema.string().optional().describe("Optional messageId this note supersedes"),
@@ -147,6 +197,11 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
       const freshConfig = resolveFreshSendConfig(deps)
       if (freshConfig.enabled === false) {
         return JSON.stringify({ blocked: true, reason: "mailbox disabled" })
+      }
+
+      if (rawArgs.mode === "list") {
+        const listResult = await runProjectMessageList({ ...deps, config: freshConfig })
+        return JSON.stringify(listResult)
       }
 
       const effectiveBodyCap = Math.min(freshConfig.bounds.max_body_bytes, MAX_BODY_BYTES)

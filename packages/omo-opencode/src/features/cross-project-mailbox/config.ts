@@ -52,6 +52,10 @@ export const CrossProjectMailboxConfigSchema = z.object({
     .record(z.string(), SenderConfigSchema)
     .default({})
     .describe("Per-source-project access and intent budget. The key is the source projectId; membership with access allow is the allowlist."),
+  launch_policy: z
+    .enum(["disabled", "ask", "auto"])
+    .default("disabled")
+    .describe("Whether the sender may launch an offline target's session before delivery: disabled never launches, ask requests permission, auto launches without asking."),
   bounds: CrossProjectMailboxBoundsSchema.default(() => CrossProjectMailboxBoundsSchema.parse({})),
 })
 

@@ -17,6 +17,14 @@ describe("CrossProjectMailboxConfigSchema", () => {
         expect(result.interrupt_policy).toBe("idle-drain")
         expect(result.default_sender_access).toBe("allow-none")
         expect(result.senders).toEqual({})
+        expect(result.launch_policy).toBe("disabled")
+      })
+
+      it("#then accepts the launch_policy enum values", () => {
+        // given / when / then
+        expect(CrossProjectMailboxConfigSchema.parse({ launch_policy: "ask" }).launch_policy).toBe("ask")
+        expect(CrossProjectMailboxConfigSchema.parse({ launch_policy: "auto" }).launch_policy).toBe("auto")
+        expect(CrossProjectMailboxConfigSchema.safeParse({ launch_policy: "invalid" }).success).toBe(false)
       })
 
       it("#then applies the documented bounds defaults", () => {
