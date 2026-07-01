@@ -61,6 +61,7 @@ export const HookNameSchema = z.enum([
   "legacy-plugin-toast",
   "provider-quirks-normalizer",
   "cross-project-mailbox-idle-drain",
+  "cross-project-mailbox-outbound-budget-injector",
 ])
 
 export type HookName = z.infer<typeof HookNameSchema>

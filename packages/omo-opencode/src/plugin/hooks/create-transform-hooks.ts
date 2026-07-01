@@ -16,6 +16,7 @@ import {
   contextCollector,
   createContextInjectorMessagesTransformHook,
 } from "../../features/context-injector"
+import { createOutboundBudgetInjector } from "../../features/cross-project-mailbox/visibility"
 import { safeCreateHook } from "../../shared/safe-create-hook"
 
 export type TransformHooks = {
@@ -24,6 +25,7 @@ export type TransformHooks = {
   contextInjectorMessagesTransform: ReturnType<typeof createContextInjectorMessagesTransformHook>
   teamModeStatusInjector: ReturnType<typeof createTeamModeStatusInjector> | null
   teamMailboxInjector: ReturnType<typeof createTeamMailboxInjector> | null
+  outboundBudgetInjector: ReturnType<typeof createOutboundBudgetInjector> | null
   toolPairValidator: ReturnType<typeof createToolPairValidatorHook> | null
   monitorStatusInjector: ReturnType<typeof createMonitorStatusInjectorHook> | null
   providerQuirksNormalizer: ReturnType<typeof createProviderQuirksNormalizerHook> | null
@@ -92,6 +94,16 @@ export function createTransformHooks(args: {
       )
     : null
 
+  const mailboxConfig = pluginConfig.cross_project_mailbox
+  const outboundBudgetInjector =
+    mailboxConfig?.enabled && isHookEnabled("cross-project-mailbox-outbound-budget-injector")
+      ? safeCreateHook(
+          "cross-project-mailbox-outbound-budget-injector",
+          () => createOutboundBudgetInjector({ config: mailboxConfig, directory: ctx.directory }),
+          { enabled: safeHookEnabled },
+        )
+      : null
+
   const toolPairValidator = isHookEnabled("tool-pair-validator")
     ? safeCreateHook(
         "tool-pair-validator",
@@ -123,6 +135,7 @@ export function createTransformHooks(args: {
     contextInjectorMessagesTransform,
     teamModeStatusInjector,
     teamMailboxInjector,
+    outboundBudgetInjector,
     toolPairValidator,
     monitorStatusInjector,
     providerQuirksNormalizer,

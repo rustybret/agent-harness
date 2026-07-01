@@ -710,6 +710,46 @@ describe("runProjectMessageSend - launch permission wiring (ask policy)", () => 
   })
 })
 
+describe("createProjectMessageTool - probe mode (mode:list)", () => {
+  it("returns the advisory outbound-budget rows and writes nothing", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const handle = spyDeps(cfg())
+    handle.deps.readPresence = async () => "offline"
+    const def = createProjectMessageTool(handle.deps)
+
+    // when
+    const out = JSON.parse(
+      (await def.execute(
+        { mode: "list", targetProjectId: "proj-b", intent: "quick", body: "ignored" },
+        {},
+      )) as string,
+    ) as { mode?: string; advisory?: string; rows?: Array<{ targetProjectId: string }> }
+
+    // then
+    expect(out.mode).toBe("list")
+    expect(out.advisory).toContain("ADVISORY")
+    expect(out.rows?.map((row) => row.targetProjectId).sort()).toEqual(["proj-a", "proj-b"])
+    expect(handle.writeCalls).toBe(0)
+    expect(handle.outboxCalls).toBe(0)
+  })
+
+  it("does not append any outbox line to disk in probe mode", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    await def.execute({ mode: "list", targetProjectId: "proj-b", intent: "quick", body: "x" }, {})
+
+    // then
+    const outboxExists = await readFile(path.join(thisRepoRoot, ".omo", "mailbox-outbox.jsonl"), "utf8")
+      .then(() => true)
+      .catch(() => false)
+    expect(outboxExists).toBe(false)
+  })
+})
+
 describe("runProjectMessageSend - preflight blocks before write", () => {
   it("does not write or append when preflight blocks", async () => {
     // given
