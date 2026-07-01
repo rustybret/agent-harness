@@ -71,7 +71,7 @@ describe("CrossProjectMailboxConfigSchema", () => {
         expect(result.interrupt_policy).toBe("allow-interrupt")
         expect(result.default_sender_access).toBe("allow-all")
         expect(result.senders["project-alpha"]).toEqual({ access: "allow", intent_budget: "impl" })
-        expect(result.senders["project-beta"]).toEqual({ access: "deny", intent_budget: "review" })
+        expect(result.senders["project-beta"]).toEqual({ access: "deny", intent_budget: "plan" })
         expect(result.bounds.max_hops).toBe(2)
       })
 

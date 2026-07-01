@@ -1,7 +1,10 @@
 import { z } from "zod"
 import { OverridableAgentNameSchema } from "../../config/schema/agent-names"
+import { LEGACY_INTENT_MAP } from "./permission-tiers"
 
-const IntentBudgetSchema = z.enum(["question", "quick", "impl", "review", "work-loop", "plan"])
+const IntentBudgetSchema = z
+  .enum(["question", "quick", "impl", "review", "work-loop", "plan"])
+  .transform((value) => LEGACY_INTENT_MAP[value] ?? "impl")
 
 const SenderConfigSchema = z.object({
   access: z.enum(["allow", "deny"]).default("allow").describe("Whether this source project may deliver into this mailbox"),

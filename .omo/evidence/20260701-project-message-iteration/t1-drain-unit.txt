@@ -1,0 +1,11 @@
+bun test v1.3.14 (0d9b296a)
+
+packages/omo-opencode/src/features/cross-project-mailbox/primary-resolver/resolver.test.ts:
+(pass) resolveActivePrimaryAgent > #given no session agent recorded for the session > #then it resolves to undefined and is not drain-eligible [2.61ms]
+(pass) resolveActivePrimaryAgent > #given the live store recorded a legacy display name for the session > #then it canonicalizes to the config key and is drain-eligible [1.08ms]
+(pass) resolveActivePrimaryAgent > #given the live store recorded a non-eligible agent for the session > #then the config key is returned but drain is gated (false) [0.15ms]
+
+ 3 pass
+ 0 fail
+ 6 expect() calls
+Ran 3 tests across 1 file. [270.00ms]

@@ -3,6 +3,8 @@ import { Buffer } from "node:buffer"
 import yaml from "js-yaml"
 import { z } from "zod"
 
+import { canonicalizeLegacyIntent } from "../permission-tiers"
+
 export const MAX_BODY_BYTES = 32768
 
 export const MAILBOX_INTENTS = ["question", "quick", "impl", "review", "work-loop", "plan"] as const
@@ -45,6 +47,8 @@ export function parseEnvelope(fileContent: string): { envelope: MailboxMessage; 
   }
 
   const rawFrontmatter = yaml.load(match[1] ?? "", { schema: yaml.JSON_SCHEMA })
-  const envelope = MailboxMessageSchema.parse(rawFrontmatter)
+  const parsed = MailboxMessageSchema.parse(rawFrontmatter)
+  const canonicalIntent = canonicalizeLegacyIntent(parsed.intent) ?? parsed.intent
+  const envelope: MailboxMessage = { ...parsed, intent: canonicalIntent }
   return { envelope, body: match[2] ?? "" }
 }
