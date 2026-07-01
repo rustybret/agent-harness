@@ -379,6 +379,97 @@ describe("runSendPreflight", () => {
   })
 })
 
+describe("runSendPreflight - category gate", () => {
+  const targetEntry: ProjectEntry = { projectId: "proj-b", repoRoot: "/tmp/b", displayName: "B", lastSeen: 1 }
+
+  it("accepts category quick under an impl ceiling even when intent would map higher", async () => {
+    // given
+    const config = cfg({ senders: { "proj-b": { access: "allow", intent_budget: "impl" } } })
+
+    // when
+    const result = await runSendPreflight(
+      { targetProjectId: "proj-b", intent: "plan", body: "x", category: "quick" },
+      0,
+      config,
+      targetEntry,
+    )
+
+    // then
+    expect(result).toEqual({ blocked: false })
+  })
+
+  it("rejects category deep under an impl ceiling even when intent would pass", async () => {
+    // given
+    const config = cfg({ senders: { "proj-b": { access: "allow", intent_budget: "impl" } } })
+
+    // when
+    const result = await runSendPreflight(
+      { targetProjectId: "proj-b", intent: "quick", body: "x", category: "deep" },
+      0,
+      config,
+      targetEntry,
+    )
+
+    // then
+    expect(result).toEqual({ blocked: true, reason: "over-budget" })
+  })
+
+  it("falls back to the intent gate when category is omitted", async () => {
+    // given
+    const config = cfg({ senders: { "proj-b": { access: "allow", intent_budget: "impl" } } })
+
+    // when
+    const result = await runSendPreflight(
+      { targetProjectId: "proj-b", intent: "plan", body: "x" },
+      0,
+      config,
+      targetEntry,
+    )
+
+    // then
+    expect(result).toEqual({ blocked: true, reason: "over-budget" })
+  })
+})
+
+describe("createProjectMessageTool - multibyte body byte cap", () => {
+  it("rejects a multibyte body whose utf8 byte length exceeds the cap even when its code-unit length does not", async () => {
+    // given: "€" is 1 UTF-16 code unit but 3 UTF-8 bytes; 4 of them = 4 code units, 12 bytes
+    await writeProjectMailboxConfig({
+      enabled: true,
+      senders: PERMISSIVE_SENDERS,
+      bounds: { max_body_bytes: 10 },
+    })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    const out = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "\u20AC\u20AC\u20AC\u20AC" }, {})) as string,
+    ) as { blocked?: boolean; reason?: string }
+
+    // then
+    expect(out.blocked).toBe(true)
+    expect(out.reason).toContain("10")
+  })
+
+  it("accepts a multibyte body exactly at the utf8 byte cap boundary", async () => {
+    // given: 3 "€" chars = 3 code units, exactly 9 bytes
+    await writeProjectMailboxConfig({
+      enabled: true,
+      senders: PERMISSIVE_SENDERS,
+      bounds: { max_body_bytes: 9 },
+    })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    const out = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "\u20AC\u20AC\u20AC" }, {})) as string,
+    ) as { ok?: boolean }
+
+    // then
+    expect(out.ok).toBe(true)
+  })
+})
+
 describe("runProjectMessageSend - target not in registry", () => {
   it("returns target-not-found and writes nothing", async () => {
     // given

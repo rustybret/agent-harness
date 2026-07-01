@@ -41,7 +41,7 @@ export async function runSendPreflight(
     return { blocked: true, reason: "unauthorized" }
   }
 
-  if (!withinBudget(requiredTier(input.intent), decision.ceiling)) {
+  if (!withinBudget(requiredTier(input.category ?? input.intent), decision.ceiling)) {
     return { blocked: true, reason: "over-budget" }
   }
 

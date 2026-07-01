@@ -10,6 +10,7 @@ import type { IntentEnum } from "../validation/types"
 export interface SendInput {
   targetProjectId: string
   intent: IntentEnum
+  category?: string
   body: string
   priority?: number
   threadId?: string | null
@@ -101,6 +102,7 @@ export async function buildSendEnvelope(
     fromProjectId: thisProjectId,
     toProjectId: targetProjectId,
     intent: input.intent,
+    category: input.category,
     priority: input.priority ?? 0,
     hopCount,
     hopPath,

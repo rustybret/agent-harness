@@ -20,6 +20,7 @@ export const MailboxMessageSchema = z.object({
   fromProjectId: z.string(),
   toProjectId: z.string(),
   intent: z.enum(MAILBOX_INTENTS),
+  category: z.string().optional(),
   priority: z.number().int().default(0),
   hopCount: z.number().int().min(0),
   hopPath: z.array(z.string()),

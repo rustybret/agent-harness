@@ -67,11 +67,11 @@ export function validateInbound(
     return { valid: false, reason: "unauthorized", detail: `sender ${note.fromProjectId} is not authorized` }
   }
 
-  if (!withinBudget(requiredTier(note.intent), decision.ceiling)) {
+  if (!withinBudget(requiredTier(note.category ?? note.intent), decision.ceiling)) {
     return {
       valid: false,
       reason: "over-budget",
-      detail: `intent ${note.intent} exceeds ceiling ${decision.ceiling}`,
+      detail: `intent ${note.category ?? note.intent} exceeds ceiling ${decision.ceiling}`,
     }
   }
 

@@ -17,6 +17,7 @@ export function createProjectMessageInputSchema(maxBodyBytes: number) {
     .object({
       targetProjectId: z.string(),
       intent: IntentEnumSchema,
+      category: z.string().optional(),
       body: z.string().max(maxBodyBytes),
       priority: z.number().default(0),
       threadId: z.string().nullable().optional(),
@@ -135,6 +136,7 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
     args: {
       targetProjectId: tool.schema.string().describe("Registered projectId or display name of the destination project"),
       intent: tool.schema.enum(MAILBOX_INTENTS).describe("Intent tier of this note"),
+      category: tool.schema.string().optional().describe("Optional task category; when set it gates the note in place of intent"),
       body: tool.schema.string().describe("Note body"),
       priority: tool.schema.number().optional().default(0).describe("Optional priority; higher drains first"),
       threadId: tool.schema.string().optional().describe("Optional correlation UUID for a fresh thread (ignored on replies)"),
@@ -149,7 +151,7 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
 
       const effectiveBodyCap = Math.min(freshConfig.bounds.max_body_bytes, MAX_BODY_BYTES)
       const rawBody = typeof rawArgs.body === "string" ? rawArgs.body : ""
-      if (rawBody.length > effectiveBodyCap) {
+      if (Buffer.byteLength(rawBody, "utf8") > effectiveBodyCap) {
         return JSON.stringify({ blocked: true, reason: `body exceeds max_body_bytes (${effectiveBodyCap})` })
       }
 
