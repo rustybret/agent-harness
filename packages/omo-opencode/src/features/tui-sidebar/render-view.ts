@@ -253,19 +253,12 @@ function mailboxNodes(
   if (toggle?.onToggle) headerProps.onMouseDown = toggle.onToggle
   const titleText = text(headerProps, `Mailbox ${toggle?.collapsed ? "▶" : "▼"}`)
 
-  const allZero =
-    mailbox.inboundUnread === 0 &&
-    mailbox.inboundProcessed === 0 &&
-    mailbox.outboundUnresolved === 0 &&
-    mailbox.outboundRead === 0 &&
-    mailbox.outboundFailed === 0
-
   if (toggle?.collapsed) {
-    const summaryLine = allZero
-      ? text({ fg: theme.textMuted }, "idle")
+    const summaryLine = mailboxAllZero(mailbox)
+      ? text({ fg: theme.textMuted }, mailboxCollapsedSummary(mailbox))
       : text(
           { fg: mailbox.inboundUnread > 0 || mailbox.outboundUnresolved > 0 ? theme.warning : theme.textMuted },
-          `In ${mailbox.inboundUnread} / Out ${mailbox.outboundUnresolved}`,
+          mailboxCollapsedSummary(mailbox),
         )
     return [
       box({ borderStyle: "single", borderColor: theme.borderSubtle, flexDirection: "column", padding: 1 }, [
@@ -275,7 +268,7 @@ function mailboxNodes(
     ]
   }
 
-  if (allZero) {
+  if (mailboxAllZero(mailbox)) {
     return [
       box({ borderStyle: "single", borderColor: theme.borderSubtle, flexDirection: "column", padding: 1 }, [
         titleText,
@@ -285,26 +278,26 @@ function mailboxNodes(
   }
 
   const rows: ViewNode[] = [titleText]
-  rows.push(
-    text(
-      { fg: mailbox.inboundUnread > 0 ? theme.warning : theme.textMuted },
-      `in ${mailbox.inboundUnread} unread ${mailbox.inboundProcessed} done`,
-    ),
-  )
 
-  if (mailbox.outboundRead > 0 || mailbox.outboundUnresolved > 0 || mailbox.outboundFailed > 0) {
+  if (mailboxHasInbound(mailbox)) {
+    rows.push(text({ fg: theme.textMuted }, mailboxSectionHeader("in")))
+    rows.push(
+      text({ fg: mailbox.inboundUnread > 0 ? theme.warning : theme.textMuted }, mailboxCountRow("unread", mailbox.inboundUnread)),
+    )
+    rows.push(text({ fg: theme.text }, mailboxCountRow("done", mailbox.inboundProcessed)))
+  }
+
+  if (mailboxHasOutbound(mailbox)) {
+    rows.push(text({ fg: theme.textMuted }, mailboxSectionHeader("out")))
     rows.push(
       text(
-        {
-          fg:
-            mailbox.outboundFailed > 0
-              ? theme.error
-              : mailbox.outboundUnresolved > 0
-                ? theme.warning
-                : theme.textMuted,
-        },
-        `out ${mailbox.outboundUnresolved} pending ${mailbox.outboundRead} read ${mailbox.outboundFailed} fail`,
+        { fg: mailbox.outboundUnresolved > 0 ? theme.warning : theme.textMuted },
+        mailboxCountRow("pending", mailbox.outboundUnresolved),
       ),
+    )
+    rows.push(text({ fg: theme.text }, mailboxCountRow("read", mailbox.outboundRead)))
+    rows.push(
+      text({ fg: mailbox.outboundFailed > 0 ? theme.error : theme.textMuted }, mailboxCountRow("fail", mailbox.outboundFailed)),
     )
   }
 
@@ -313,15 +306,58 @@ function mailboxNodes(
   ]
 }
 
+const MAILBOX_SECTION_INDENT = "  "
+const MAILBOX_ROW_INDENT = "    "
+const MAILBOX_LABEL_WIDTH = 12
+
+function mailboxSectionHeader(name: string): string {
+  return `${MAILBOX_SECTION_INDENT}${name}`
+}
+
+function mailboxCountRow(label: string, count: number): string {
+  return `${MAILBOX_ROW_INDENT}${label.padEnd(MAILBOX_LABEL_WIDTH)}${count}`
+}
+
+function mailboxCollapsedSummary(mailbox: MailboxSidebarState): string {
+  if (mailboxAllZero(mailbox)) return `${MAILBOX_SECTION_INDENT}idle`
+  return `${MAILBOX_SECTION_INDENT}in:${mailbox.inboundUnread} out:${mailbox.outboundUnresolved}`
+}
+
+function mailboxAllZero(mailbox: MailboxSidebarState): boolean {
+  return (
+    mailbox.inboundUnread === 0 &&
+    mailbox.inboundProcessed === 0 &&
+    mailbox.outboundUnresolved === 0 &&
+    mailbox.outboundRead === 0 &&
+    mailbox.outboundFailed === 0
+  )
+}
+
+function mailboxHasInbound(mailbox: MailboxSidebarState): boolean {
+  return mailbox.inboundUnread > 0 || mailbox.inboundProcessed > 0
+}
+
+function mailboxHasOutbound(mailbox: MailboxSidebarState): boolean {
+  return mailbox.outboundUnresolved > 0 || mailbox.outboundRead > 0 || mailbox.outboundFailed > 0
+}
+
 function mailboxLines(mailbox: MailboxSidebarState | null | undefined): string[] {
   if (!mailbox) return []
-  return [
-    "Mailbox",
-    `in ${mailbox.inboundUnread} unread ${mailbox.inboundProcessed} done`,
-    ...(mailbox.outboundRead > 0 || mailbox.outboundUnresolved > 0 || mailbox.outboundFailed > 0
-      ? [`out ${mailbox.outboundUnresolved} pending ${mailbox.outboundRead} read ${mailbox.outboundFailed} fail`]
-      : []),
-  ]
+  if (mailboxAllZero(mailbox)) return ["Mailbox", "Mailbox idle"]
+
+  const lines = ["Mailbox"]
+  if (mailboxHasInbound(mailbox)) {
+    lines.push(mailboxSectionHeader("in"))
+    lines.push(mailboxCountRow("unread", mailbox.inboundUnread))
+    lines.push(mailboxCountRow("done", mailbox.inboundProcessed))
+  }
+  if (mailboxHasOutbound(mailbox)) {
+    lines.push(mailboxSectionHeader("out"))
+    lines.push(mailboxCountRow("pending", mailbox.outboundUnresolved))
+    lines.push(mailboxCountRow("read", mailbox.outboundRead))
+    lines.push(mailboxCountRow("fail", mailbox.outboundFailed))
+  }
+  return lines
 }
 
 function section(title: string, theme: ThemeLike, children: readonly ViewNode[]): ViewNode {

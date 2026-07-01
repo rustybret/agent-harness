@@ -128,7 +128,7 @@ describe("tui sidebar renderView", () => {
     expect(nodes[0]?.kind).toBe("box")
   })
 
-  it("#given active view with mailbox #when building nodes #then it renders a Mailbox section with inbox and outbox rows", () => {
+  it("#given active view with mailbox #when building nodes #then it renders two-column label/count rows", () => {
     // given
     const view = computeView({ ...activeSections, mailbox: mailboxState })
 
@@ -139,11 +139,91 @@ describe("tui sidebar renderView", () => {
 
     // then
     expect(texts.some((value) => value.startsWith("Mailbox"))).toBe(true)
-    expect(texts.some((value) => value.includes("in 2 unread 5 done"))).toBe(true)
-    expect(texts.some((value) => value.includes("out 1 pending 3 read 0 fail"))).toBe(true)
+    expect(texts).toContain("  in")
+    expect(texts).toContain("    unread      2")
+    expect(texts).toContain("    done        5")
+    expect(texts).toContain("  out")
+    expect(texts).toContain("    pending     1")
+    expect(texts).toContain("    read        3")
+    expect(texts).toContain("    fail        0")
     expect(description).toContain("Mailbox")
-    expect(description).toContain("in 2 unread 5 done")
-    expect(description).toContain("out 1 pending 3 read 0 fail")
+    expect(description).toContain("    unread      2")
+    expect(description).toContain("    pending     1")
+  })
+
+  it("#given active populated mailbox #when building nodes #then the text rows match the two-column snapshot", () => {
+    // given
+    const view = computeView({ ...activeSections, mailbox: mailboxState })
+
+    // when
+    const texts = flattenText(buildMailboxNodes(view, theme)).map((entry) => entry.text)
+
+    // then
+    expect(texts).toEqual([
+      "Mailbox ▼",
+      "  in",
+      "    unread      2",
+      "    done        5",
+      "  out",
+      "    pending     1",
+      "    read        3",
+      "    fail        0",
+    ])
+  })
+
+  it("#given an inbound-only mailbox #when building nodes #then it renders only the in section", () => {
+    // given
+    const inboundOnly: MailboxSidebarState = {
+      inboundUnread: 4,
+      inboundProcessed: 1,
+      recentSentCount: 0,
+      recentSent: [],
+      outboundUnresolved: 0,
+      outboundRead: 0,
+      outboundFailed: 0,
+    }
+    const view = computeView({ ...activeSections, mailbox: inboundOnly })
+
+    // when
+    const texts = flattenText(buildMailboxNodes(view, theme)).map((entry) => entry.text)
+
+    // then
+    expect(texts).toEqual([
+      "Mailbox ▼",
+      "  in",
+      "    unread      4",
+      "    done        1",
+    ])
+    expect(texts.some((value) => value.startsWith("  out"))).toBe(false)
+  })
+
+  it("#given an outbound-fail mailbox #when building nodes #then the fail row shows its count with the error color", () => {
+    // given
+    const failMailbox: MailboxSidebarState = {
+      inboundUnread: 0,
+      inboundProcessed: 0,
+      recentSentCount: 0,
+      recentSent: [],
+      outboundUnresolved: 0,
+      outboundRead: 2,
+      outboundFailed: 3,
+    }
+    const view = computeView({ ...activeSections, mailbox: failMailbox })
+
+    // when
+    const entries = flattenText(buildMailboxNodes(view, theme))
+    const texts = entries.map((entry) => entry.text)
+
+    // then
+    expect(texts).toEqual([
+      "Mailbox ▼",
+      "  out",
+      "    pending     0",
+      "    read        2",
+      "    fail        3",
+    ])
+    const failRow = entries.find((entry) => entry.text.startsWith("    fail"))
+    expect(failRow?.props.fg).toBe("error")
   })
 
   it("#given idle view with mailbox #when building nodes #then it renders a Mailbox section after the model roster", () => {
@@ -179,7 +259,7 @@ describe("tui sidebar renderView", () => {
     // then
     expect(collapsedTexts.length).toBeLessThan(expandedTexts.length)
     expect(collapsedTexts.some((entry) => entry.text.startsWith("Mailbox"))).toBe(true)
-    expect(collapsedTexts.some((entry) => entry.text.includes("in 2 unread"))).toBe(false)
+    expect(collapsedTexts.some((entry) => entry.text.includes("unread"))).toBe(false)
     const header = collapsedTexts.find((entry) => entry.text.startsWith("Mailbox"))
     expect(header?.props.onMouseDown).toBe(onToggle)
   })
@@ -207,11 +287,34 @@ describe("tui sidebar renderView", () => {
     const collapsedTexts = flattenText(collapsed)
 
     // then: summary line present in collapsed view
-    const summaryLine = collapsedTexts.find((entry) => entry.text.startsWith("In "))
+    const summaryLine = collapsedTexts.find((entry) => entry.text.includes("in:"))
     expect(summaryLine).toBeDefined()
-    expect(summaryLine?.text).toBe("In 2 / Out 1")
+    expect(summaryLine?.text).toBe("  in:2 out:1")
     // rows not visible
     expect(collapsedTexts.some((entry) => entry.text.includes("unread"))).toBe(false)
+  })
+
+  it("#given an all-zero mailbox #when collapsed #then it renders a single idle summary line", () => {
+    // given
+    const zeroMailbox: MailboxSidebarState = {
+      inboundUnread: 0,
+      inboundProcessed: 0,
+      recentSentCount: 0,
+      recentSent: [],
+      outboundUnresolved: 0,
+      outboundRead: 0,
+      outboundFailed: 0,
+    }
+    const view = computeView({ ...activeSections, mailbox: zeroMailbox })
+    const onToggle = (): void => {}
+
+    // when
+    const collapsedTexts = flattenText(buildMailboxNodes(view, theme, { collapsed: true, onToggle })).map(
+      (entry) => entry.text,
+    )
+
+    // then
+    expect(collapsedTexts).toEqual(["Mailbox ▶", "  idle"])
   })
 
   it("#given an all-zero mailbox #when expanded #then it renders the idle placeholder", () => {
