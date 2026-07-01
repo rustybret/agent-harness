@@ -1,0 +1,64 @@
+# T8/T9 mailbox sidebar panel - rendered via the REAL production render code
+# (readMailboxSidebarState -> computeView -> buildMailboxNodes) against live
+# seeded hub state. Two-column label/count rows come from mailboxCountRow
+# (MAILBOX_LABEL_WIDTH=12).
+
+## Live mailbox state (hub)
+{
+  "inboundUnread": 1,
+  "inboundProcessed": 1,
+  "recentSentCount": 3,
+  "recentSent": [
+    {
+      "sentAt": 1782941294007,
+      "toProjectId": "peer-710204f4",
+      "toRepoRoot": "/tmp/omo-qa-jrqnXw/peer",
+      "messageId": "5f76f8f3-485d-4208-a296-3fc35375c117",
+      "intent": "impl",
+      "correlationId": "bb4da409-4938-43bb-9b85-ed1f0130813c",
+      "body": "outbound fail"
+    },
+    {
+      "sentAt": 1782941294007,
+      "toProjectId": "peer-710204f4",
+      "toRepoRoot": "/tmp/omo-qa-jrqnXw/peer",
+      "messageId": "28305ae1-0a0c-4cc8-9efa-11cf0f7730da",
+      "intent": "impl",
+      "correlationId": "4ede7886-b109-47d3-ba27-d59cbe427d31",
+      "body": "outbound pending"
+    },
+    {
+      "sentAt": 1782941294004,
+      "toProjectId": "peer-710204f4",
+      "toRepoRoot": "/tmp/omo-qa-jrqnXw/peer",
+      "messageId": "20fe2847-e5a4-4ac3-98f0-5b7384cb6c6b",
+      "intent": "impl",
+      "correlationId": "a31d8182-689c-409a-ae51-927acadb3512",
+      "body": "outbound read"
+    }
+  ],
+  "outboundUnresolved": 1,
+  "outboundRead": 1,
+  "outboundFailed": 1
+}
+
+## Rendered panel
++--------------------------------------+
+| SIDEBAR (top -> bottom render order) |
++--------------------------------------+
+
+[slot order 150]  Cross-Project Mailbox   <-- renders ABOVE Magic Context
+    Mailbox ▼
+      in
+        unread      1
+        done        1
+      out
+        pending     1
+        read        1
+        fail        1
+
+[slot order 200]  Magic Context           <-- external plugin default slot
+[slot order 900]  OmO sidebar (roster/jobs/ulw)
+
+Ordering invariant: MAILBOX_SLOT_ORDER (150) < Magic Context (200) < OMO (900).
+Lower order renders higher, so the mailbox panel sits ABOVE Magic Context.
