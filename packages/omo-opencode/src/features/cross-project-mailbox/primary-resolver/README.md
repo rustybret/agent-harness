@@ -19,7 +19,7 @@ const primary = resolveActivePrimaryAgent(sessionId) // string | undefined, e.g.
 ```
 
 A session with no recorded agent resolves to `undefined`, which the drain hook
-treats as ineligible (fail-closed). The resolver is synchronous by design — it is
+treats as ineligible (fail-closed). The resolver is synchronous by design - it is
 on a hot path and a `Map.get` plus canonicalization is all it needs.
 
 ## Accuracy guarantee
