@@ -1,0 +1,41 @@
+T5 — Session Presence Heartbeat + Server-API Liveness
+======================================================
+Evidence: OFFLINE paths
+
+WHAT WAS TESTED
+---------------
+Drove the real reader (readPresenceStatus) against an isolated temp HOME dir
+for the two OFFLINE conditions:
+  1. No presence file exists for the projectId.
+  2. Presence file exists but heartbeatTs is 60s old (> PRESENCE_TTL_MS = 30s).
+
+Command: bun /tmp/t5-evidence/drive-offline.ts
+
+WHAT WAS OBSERVED
+-----------------
+NO FILE                        -> status: offline
+EXPIRED HEARTBEAT (60s old)    -> status: offline
+
+In the expired case, probeSession was stubbed to return true, yet the reader
+still returned offline WITHOUT probing (TTL check short-circuits before the API
+race) — confirmed by the reader unit test
+"#then it returns offline without probing the API" (probeSession not called).
+
+A malformed-JSON presence file also returns offline (covered by unit test
+"#given a malformed presence file").
+
+Unit suite (packages/.../presence/): 16 pass / 0 fail.
+
+WHY IT IS ENOUGH
+----------------
+Both offline triggers required by the spec are proven:
+  - missing file  -> offline
+  - heartbeat age > 30s TTL -> offline (no wasted API probe)
+Plus the defensive malformed-file path. These are the exact signals downstream
+T4 advisory budget / T6 launch policy rely on to treat a target project as
+not reachable.
+
+WHAT WAS OMITTED
+----------------
+No real network probe; the TTL/offline branches are pure filesystem + clock
+logic and do not depend on the probe. No secrets in output.

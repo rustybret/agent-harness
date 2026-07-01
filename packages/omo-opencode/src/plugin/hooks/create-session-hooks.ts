@@ -67,6 +67,7 @@ export type SessionHooks = {
   runtimeFallback: ReturnType<typeof createRuntimeFallbackHook> | null
   legacyPluginToast: ReturnType<typeof createLegacyPluginToastHook> | null
   mailboxIdleDrain: MailboxSessionHooks["mailboxIdleDrain"]
+  mailboxPresenceHeartbeat: MailboxSessionHooks["mailboxPresenceHeartbeat"]
 }
 
 export function createSessionHooks(args: {
@@ -236,7 +237,7 @@ export function createSessionHooks(args: {
     ? safeHook("legacy-plugin-toast", () => createLegacyPluginToastHook(ctx))
     : null
 
-  const { mailboxIdleDrain } = createMailboxSessionHooks({
+  const { mailboxIdleDrain, mailboxPresenceHeartbeat } = createMailboxSessionHooks({
     ctx,
     pluginConfig,
     isHookEnabled,
@@ -269,5 +270,6 @@ export function createSessionHooks(args: {
     runtimeFallback,
     legacyPluginToast,
     mailboxIdleDrain,
+    mailboxPresenceHeartbeat,
   }
 }
