@@ -179,6 +179,24 @@
       ]
     },
     {
+      "key": "anthropic/claude-sonnet-5",
+      "variants": [
+        "high",
+        "low",
+        "max",
+        "medium",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "cerebras/gemma-4-31b",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
       "key": "cerebras/gpt-oss-120b",
       "variants": [
         "high",
@@ -818,6 +836,16 @@
       "variants": []
     },
     {
+      "key": "opencode/claude-fable-5",
+      "variants": [
+        "high",
+        "low",
+        "max",
+        "medium",
+        "xhigh"
+      ]
+    },
+    {
       "key": "opencode/claude-haiku-4-5",
       "variants": [
         "high",
@@ -889,6 +917,16 @@
         "low",
         "max",
         "medium"
+      ]
+    },
+    {
+      "key": "opencode/claude-sonnet-5",
+      "variants": [
+        "high",
+        "low",
+        "max",
+        "medium",
+        "xhigh"
       ]
     },
     {
@@ -1127,6 +1165,10 @@
       "variants": []
     },
     {
+      "key": "opencode/kimi-k2.7-code",
+      "variants": []
+    },
+    {
       "key": "opencode/mimo-v2.5-free",
       "variants": [
         "high",
@@ -1141,6 +1183,13 @@
     {
       "key": "opencode/minimax-m2.7",
       "variants": []
+    },
+    {
+      "key": "opencode/minimax-m3",
+      "variants": [
+        "none",
+        "thinking"
+      ]
     },
     {
       "key": "opencode/nemotron-3-ultra-free",
@@ -1238,6 +1287,14 @@
       "variants": []
     },
     {
+      "key": "openrouter/anthropic/claude-fable-5",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
       "key": "openrouter/anthropic/claude-haiku-4.5",
       "variants": [
         "high",
@@ -1327,6 +1384,14 @@
     },
     {
       "key": "openrouter/anthropic/claude-sonnet-4.6",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "key": "openrouter/anthropic/claude-sonnet-5",
       "variants": [
         "high",
         "low",
@@ -1590,6 +1655,14 @@
       ]
     },
     {
+      "key": "openrouter/google/gemini-3.1-flash-lite-image",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
       "key": "openrouter/google/gemini-3.1-flash-lite-preview",
       "variants": [
         "high",
@@ -1799,10 +1872,6 @@
     },
     {
       "key": "openrouter/microsoft/phi-4",
-      "variants": []
-    },
-    {
-      "key": "openrouter/microsoft/phi-4-mini-instruct",
       "variants": []
     },
     {
