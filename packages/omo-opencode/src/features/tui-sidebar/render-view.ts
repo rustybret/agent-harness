@@ -31,7 +31,6 @@ export type MailboxToggleOpts = {
 export function buildViewNodes(
   view: SidebarView,
   theme: ThemeLike,
-  mailboxToggle?: MailboxToggleOpts,
 ): ViewNode[] {
   switch (view.kind) {
     case "active":
@@ -41,7 +40,6 @@ export function buildViewNodes(
           ...loopNodes(view.loop, theme),
           ...agentNodes(view.agents, theme),
           ...jobNodes(view.jobs, theme),
-          ...mailboxNodes(view.mailbox, theme, mailboxToggle),
         ]),
       ]
     case "broken":
@@ -50,12 +48,31 @@ export function buildViewNodes(
       return [
         box({ flexDirection: "column", gap: 1 }, [
           ...idleNodes(view.roster, theme),
-          ...mailboxNodes(view.mailbox, theme, mailboxToggle),
         ]),
       ]
     default:
       return assertNever(view)
   }
+}
+
+export function selectMailbox(view: SidebarView): MailboxSidebarState | null | undefined {
+  switch (view.kind) {
+    case "active":
+    case "idle":
+      return view.mailbox
+    case "broken":
+      return null
+    default:
+      return assertNever(view)
+  }
+}
+
+export function buildMailboxNodes(
+  view: SidebarView,
+  theme: ThemeLike,
+  mailboxToggle?: MailboxToggleOpts,
+): ViewNode[] {
+  return mailboxNodes(selectMailbox(view), theme, mailboxToggle)
 }
 
 export function describeView(view: SidebarView): string {

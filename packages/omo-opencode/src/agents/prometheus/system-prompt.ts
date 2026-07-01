@@ -1,5 +1,6 @@
 import { loadPromptSync, prometheusPromptVariants } from "@oh-my-opencode/prompts-core"
 
+// @allow: Prometheus is explicitly excluded from cross-project coordination by design
 export const PROMETHEUS_PERMISSION = {
   edit: "allow" as const,
   bash: "allow" as const,

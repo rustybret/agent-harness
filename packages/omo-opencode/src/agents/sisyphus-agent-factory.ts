@@ -1,5 +1,5 @@
 import type { AgentConfig } from "@opencode-ai/sdk";
-import { categorizeTools } from "./dynamic-agent-prompt-builder";
+import { categorizeTools, buildCrossProjectCoordinationSection } from "./dynamic-agent-prompt-builder";
 import type {
   AvailableAgent,
   AvailableCategory,
@@ -77,68 +77,74 @@ export function createSisyphusAgent(
   const categories = availableCategories ?? [];
   const agents = availableAgents ?? [];
 
-  switch (resolveSisyphusPromptFamily(model)) {
-    case "kimi-k2-7":
-      return buildGptSisyphusAgentConfig(
-        MODE,
-        model,
-        buildKimiK27SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
-      );
-    case "kimi-k2-6":
-      return buildGptSisyphusAgentConfig(
-        MODE,
-        model,
-        buildKimiK26SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
-      );
-    case "gpt-5-5":
-      return buildGptSisyphusAgentConfig(
-        MODE,
-        model,
-        buildGpt55SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
-      );
-    case "gpt-5-4":
-      return buildGptSisyphusAgentConfig(
-        MODE,
-        model,
-        buildGpt54SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
-      );
-    case "claude-fable-5":
-      return buildClaudeSisyphusAgentConfig(
-        MODE,
-        model,
-        buildClaudeFable5SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
-      );
-    case "claude-opus-4-8":
-      return buildClaudeSisyphusAgentConfig(
-        MODE,
-        model,
-        buildClaudeOpus48SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
-      );
-    case "claude-opus-4-7":
-      return buildClaudeSisyphusAgentConfig(
-        MODE,
-        model,
-        buildClaudeOpus47SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
-      );
-    case "glm-5-2":
-      return buildGlmSisyphusAgentConfig(
-        MODE,
-        model,
-        buildGlm52SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
-      );
-    case "fallback": {
-      const prompt = buildFallbackSisyphusPrompt(
-        model,
-        agents,
-        tools,
-        skills,
-        categories,
-        useTaskSystem,
-      );
-      return isGptModel(model)
-        ? buildGptSisyphusAgentConfig(MODE, model, prompt)
-        : buildClaudeSisyphusAgentConfig(MODE, model, prompt);
+  const config = (() => {
+    switch (resolveSisyphusPromptFamily(model)) {
+      case "kimi-k2-7":
+        return buildGptSisyphusAgentConfig(
+          MODE,
+          model,
+          buildKimiK27SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
+        );
+      case "kimi-k2-6":
+        return buildGptSisyphusAgentConfig(
+          MODE,
+          model,
+          buildKimiK26SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
+        );
+      case "gpt-5-5":
+        return buildGptSisyphusAgentConfig(
+          MODE,
+          model,
+          buildGpt55SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
+        );
+      case "gpt-5-4":
+        return buildGptSisyphusAgentConfig(
+          MODE,
+          model,
+          buildGpt54SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
+        );
+      case "claude-fable-5":
+        return buildClaudeSisyphusAgentConfig(
+          MODE,
+          model,
+          buildClaudeFable5SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
+        );
+      case "claude-opus-4-8":
+        return buildClaudeSisyphusAgentConfig(
+          MODE,
+          model,
+          buildClaudeOpus48SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
+        );
+      case "claude-opus-4-7":
+        return buildClaudeSisyphusAgentConfig(
+          MODE,
+          model,
+          buildClaudeOpus47SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
+        );
+      case "glm-5-2":
+        return buildGlmSisyphusAgentConfig(
+          MODE,
+          model,
+          buildGlm52SisyphusPrompt(model, agents, tools, skills, categories, useTaskSystem),
+        );
+      case "fallback": {
+        const prompt = buildFallbackSisyphusPrompt(
+          model,
+          agents,
+          tools,
+          skills,
+          categories,
+          useTaskSystem,
+        );
+        return isGptModel(model)
+          ? buildGptSisyphusAgentConfig(MODE, model, prompt)
+          : buildClaudeSisyphusAgentConfig(MODE, model, prompt);
+      }
     }
-  }
+  })();
+
+  // @allow: Cross-project coordination
+  config.prompt += "\n\n" + buildCrossProjectCoordinationSection();
+  return config;
 }
 createSisyphusAgent.mode = MODE;

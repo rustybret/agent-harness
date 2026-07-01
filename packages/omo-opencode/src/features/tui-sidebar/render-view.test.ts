@@ -3,7 +3,7 @@ import { describe, expect, it } from "bun:test"
 import type { MailboxSidebarState } from "../cross-project-mailbox/sidebar"
 import { computeView } from "./compute-view"
 import type { ViewNode } from "./element-helpers"
-import { buildViewNodes, describeView } from "./render-view"
+import { buildMailboxNodes, buildViewNodes, describeView } from "./render-view"
 import type { ComputeViewSections } from "./compute-view"
 import type { SidebarView } from "./state-types"
 
@@ -133,7 +133,7 @@ describe("tui sidebar renderView", () => {
     const view = computeView({ ...activeSections, mailbox: mailboxState })
 
     // when
-    const nodes = buildViewNodes(view, theme)
+    const nodes = buildMailboxNodes(view, theme)
     const texts = flattenText(nodes).map((entry) => entry.text)
     const description = describeView(view)
 
@@ -155,13 +155,13 @@ describe("tui sidebar renderView", () => {
     }
 
     // when
-    const nodes = buildViewNodes(view, theme)
-    const texts = flattenText(nodes).map((entry) => entry.text)
+    const rosterTexts = flattenText(buildViewNodes(view, theme)).map((entry) => entry.text)
+    const mailboxTexts = flattenText(buildMailboxNodes(view, theme)).map((entry) => entry.text)
     const description = describeView(view)
 
     // then
-    expect(texts).toContain("sisyphus gpt-5.5")
-    expect(texts.some((value) => value.startsWith("Mailbox"))).toBe(true)
+    expect(rosterTexts).toContain("sisyphus gpt-5.5")
+    expect(mailboxTexts.some((value) => value.startsWith("Mailbox"))).toBe(true)
     expect(description.indexOf("sisyphus")).toBeLessThan(description.indexOf("Mailbox"))
   })
 
@@ -171,8 +171,8 @@ describe("tui sidebar renderView", () => {
     const onToggle = (): void => {}
 
     // when
-    const collapsed = buildViewNodes(view, theme, { collapsed: true, onToggle })
-    const expanded = buildViewNodes(view, theme, { collapsed: false, onToggle })
+    const collapsed = buildMailboxNodes(view, theme, { collapsed: true, onToggle })
+    const expanded = buildMailboxNodes(view, theme, { collapsed: false, onToggle })
     const collapsedTexts = flattenText(collapsed)
     const expandedTexts = flattenText(expanded)
 
@@ -190,7 +190,7 @@ describe("tui sidebar renderView", () => {
     const onToggle = (): void => {}
 
     // when
-    const nodes = buildViewNodes(view, theme, { collapsed: false, onToggle })
+    const nodes = buildMailboxNodes(view, theme, { collapsed: false, onToggle })
     const header = flattenText(nodes).find((entry) => entry.text.startsWith("Mailbox"))
 
     // then
@@ -203,7 +203,7 @@ describe("tui sidebar renderView", () => {
     const onToggle = (): void => {}
 
     // when
-    const collapsed = buildViewNodes(view, theme, { collapsed: true, onToggle })
+    const collapsed = buildMailboxNodes(view, theme, { collapsed: true, onToggle })
     const collapsedTexts = flattenText(collapsed)
 
     // then: summary line present in collapsed view
@@ -228,7 +228,7 @@ describe("tui sidebar renderView", () => {
     const view = computeView({ ...activeSections, mailbox: zeroMailbox })
 
     // when
-    const nodes = buildViewNodes(view, theme)
+    const nodes = buildMailboxNodes(view, theme)
     const texts = flattenText(nodes).map((entry) => entry.text)
 
     // then
@@ -241,12 +241,11 @@ describe("tui sidebar renderView", () => {
     const view = computeView({ ...activeSections, mailbox: null })
 
     // when
-    const nodes = buildViewNodes(view, theme)
-    const texts = flattenText(nodes).map((entry) => entry.text)
+    const mailboxTexts = flattenText(buildMailboxNodes(view, theme)).map((entry) => entry.text)
     const description = describeView(view)
 
     // then
-    expect(texts.some((value) => value.startsWith("Mailbox"))).toBe(false)
+    expect(mailboxTexts.some((value) => value.startsWith("Mailbox"))).toBe(false)
     expect(description).not.toContain("Mailbox")
   })
 })

@@ -9,7 +9,7 @@ import { POLL_INTERVAL_MS } from "./features/tui-sidebar/constants"
 import { deriveAgents, deriveConfig, deriveJobBoard, deriveLoop, deriveRoster } from "./features/tui-sidebar/derivers"
 import type { ViewNode } from "./features/tui-sidebar/element-helpers"
 import { readMirror } from "./features/tui-sidebar/mirror-io"
-import { buildViewNodes } from "./features/tui-sidebar/render-view"
+import { buildMailboxNodes, buildViewNodes } from "./features/tui-sidebar/render-view"
 import type { MailboxToggleOpts } from "./features/tui-sidebar/render-view"
 import type { RosterRow } from "./features/tui-sidebar/state-types"
 import type { SidebarView } from "./features/tui-sidebar/state-types"
@@ -26,6 +26,10 @@ type SolidRuntime<Node> = {
   readonly setProp: (node: Node, name: string, value: unknown) => unknown
 }
 
+// Lower order renders higher: 150 sorts the mailbox above Magic Context (external DEFAULT_SLOT_ORDER 200).
+export const MAILBOX_SLOT_ORDER = 150
+export const OMO_SLOT_ORDER = 900
+
 type SidebarSlotRegistration<Node> = {
   readonly order: number
   readonly slots: {
@@ -37,15 +41,23 @@ type RegisterSidebarContentSlotInput<Node> = {
   readonly registerSlot: (registration: SidebarSlotRegistration<Node>) => void
   readonly requestRender: () => void
   readonly renderSidebar: () => Node
+  readonly renderMailbox: () => Node
 }
 
 function registerSidebarContentSlot<Node>({
   registerSlot,
   requestRender,
   renderSidebar,
+  renderMailbox,
 }: RegisterSidebarContentSlotInput<Node>): void {
   registerSlot({
-    order: 900,
+    order: MAILBOX_SLOT_ORDER,
+    slots: {
+      sidebar_content: renderMailbox,
+    },
+  })
+  registerSlot({
+    order: OMO_SLOT_ORDER,
     slots: {
       sidebar_content: renderSidebar,
     },
@@ -186,7 +198,8 @@ const module: TuiPluginModule = {
       requestRender: () => {
         api.renderer.requestRender()
       },
-      renderSidebar: () => materialize(buildViewNodes(currentView, api.theme.current, mailboxToggle), solid),
+      renderSidebar: () => materialize(buildViewNodes(currentView, api.theme.current), solid),
+      renderMailbox: () => materialize(buildMailboxNodes(currentView, api.theme.current, mailboxToggle), solid),
     })
 
     const schedule = (): void => {
