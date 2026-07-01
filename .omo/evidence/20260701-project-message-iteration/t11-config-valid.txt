@@ -1,0 +1,6 @@
+Config validation result:
+{
+  "valid": true,
+  "messages": [],
+  "path": "/Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/project-message-iteration/.opencode/oh-my-openagent.jsonc"
+}

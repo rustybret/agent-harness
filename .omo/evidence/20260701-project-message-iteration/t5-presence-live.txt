@@ -1,0 +1,49 @@
+T5 — Session Presence Heartbeat + Server-API Liveness
+======================================================
+Evidence: LIVE and STALE paths
+
+WHAT WAS TESTED
+---------------
+Drove the real presence writer (writePresenceRecord) and reader
+(readPresenceStatus) from packages/omo-opencode/src/features/cross-project-mailbox/presence/
+against an isolated temp HOME dir (mktemp), no real ~/.omo touched.
+
+Command: bun /tmp/t5-evidence/drive-live.ts
+  1. writePresenceRecord(record, tmpHome) -> atomic tmp+rename write
+  2. readPresenceStatus with a stubbed probeSession returning true  (API OK)
+  3. readPresenceStatus with a stubbed probeSession returning false (API down)
+
+WHAT WAS OBSERVED
+-----------------
+WROTE: <tmp>/.omo/presence/alpha-id.json
+FILE MODE: 600                         <- 0o600 owner read/write only, as required
+CONTENT:
+{
+  "projectId": "alpha-id",
+  "repoRoot": "/repos/alpha",
+  "serverUrl": "http://127.0.0.1:4096",
+  "sessionId": "ses_live",
+  "pid": 4242,
+  "heartbeatTs": 1782936421134
+}
+FRESH FILE + API OK   -> status: live      <- heartbeat < 30s AND session API responds
+FRESH FILE + API DOWN -> status: stale     <- file fresh but API unreachable/non-2xx
+
+Unit suite (packages/.../presence/): 16 pass / 0 fail / 25 expect() calls, 3 files.
+Full cross-project-mailbox suite: 201 pass / 0 fail (no regressions from wiring).
+tsgo --noEmit -p packages/omo-opencode/tsconfig.json -> EXIT=0.
+
+WHY IT IS ENOUGH
+----------------
+The two positive presence outcomes (live, stale) are both exercised end-to-end
+through the real file writer and the real reader parse+TTL logic. The API probe
+is dependency-injected (probeSession) so the live vs stale branch is isolated
+from network flakiness; the record on disk is the true artifact downstream T4/T6
+readers consume. File mode 0o600 and the well-formed JSON record are verified
+directly from statSync/readFileSync.
+
+WHAT WAS OMITTED
+----------------
+No live opencode server was spawned for the probe (the default probe hits
+GET <serverUrl>/session/<id>); the probe branch is covered by stubbed
+probeSession in tests and the drive script. No secrets/tokens present in output.

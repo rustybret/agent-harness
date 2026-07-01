@@ -1,0 +1,86 @@
+# Live opencode server SSE + idle-drain hook proof
+# ------------------------------------------------------------------
+# Receiver opencode server booted from the REAL compiled worktree plugin:
+#   dist/index.js -> file:// plugin entry in receiver2/opencode.json
+# Isolated XDG sandbox (XDG_DATA_HOME/CONFIG/STATE/CACHE under /tmp/omo-qa-*).
+
+## 1. Plugin loaded live (proves config hook fired -> our agents registered)
+GET /agent returned the OmO Sisyphus orchestrator (native:false = plugin-injected):
+  {"name":"Sisyphus - ultraworker", ... "(Sisyphus - OhMyOpenCode)" ... "mode":"primary"}
+
+## 2. Live SSE event stream (GET /event) captured session lifecycle:
+
+data: {"id":"evt_f1f90e7bd001WAtlfDtZC4NH81","type":"server.connected","properties":{}}
+
+data: {"id":"evt_f1f90ebe9001nkn9eo4xD95t8r","type":"session.created","properties":{"sessionID":"ses_0e06f1417ffercWPBJMMNVLoxB","info":{"id":"ses_0e06f1417ffercWPBJMMNVLoxB","slug":"kind-harbor","version":"1.17.13","projectID":"global","directory":"/private/tmp/omo-qa-jrqnXw/receiver2","path":"private/tmp/omo-qa-jrqnXw/receiver2","title":"New session - 2026-07-01T21:23:39.112Z","cost":0,"tokens":{"input":0,"output":0,"reasoning":0,"cache":{"read":0,"write":0}},"time":{"created":1782941019112,"updated":1782941019112}}}}
+
+
+## 3. idle-drain hook registration + drain behavior (unit/integration)
+# session.idle is the event the idle-drain-hook subscribes to. A full live
+# drain requires a configured model turn to reach idle; in this headless,
+# no-API sandbox we prove the drain LOGIC (the T1 fix: resolveActivePrimaryAgent
+# now reads getSessionAgent + canonicalizes) with the hook's own test suite,
+# which drives the real createIdleDrainHook against real MailboxStore files.
+
+## 3a. idle-drain-hook.test.ts (drives real createIdleDrainHook)
+==================================================================
+bun test v1.3.14 (0d9b296a)
+
+packages/omo-opencode/src/features/cross-project-mailbox/hooks/idle-drain-hook.test.ts:
+(pass) createIdleDrainHook > #given an eligible idle session with one valid unread note > #then validates, dispatches once, and records dispatch-sent without acking [4.59ms]
+(pass) createIdleDrainHook > #given an eligible idle session with one valid unread note > #then SAFETY-A: dispatched prompt input carries no agent/model/variant key [0.70ms]
+(pass) createIdleDrainHook > #given the active primary is not in intake_eligible_agents > #then the note is suppressed and nothing is validated or dispatched [0.15ms]
+(pass) createIdleDrainHook > #given reserve() returns undefined (already reserved by another drain) > #then the note is not dispatched, not acked, and no pending entry is added [0.15ms]
+(pass) createIdleDrainHook > #given there is no live session (falsy sessionId) > #then SAFETY-B: the hook returns early with zero session/store activity [0.15ms]
+(pass) createIdleDrainHook > #given a full drain cycle on an eligible session > #then SAFETY-C: the hook never writes a note or sends a reply [0.16ms]
+(pass) createIdleDrainHook > #given an unread note with intent plan on an eligible session > #then SAFETY-D: no prometheus spawn occurs and the note is dispatched normally [0.55ms]
+(pass) createIdleDrainHook > #given validateInbound rejects the note as unauthorized > #then the note is quarantined and not dispatched [0.14ms]
+(pass) createIdleDrainHook > #given the same-pair rate limiter reports limited > #then the note stays unread (not quarantined) and is not dispatched [0.13ms]
+(pass) createIdleDrainHook > #given the body digest store reports a duplicate body > #then validateInbound is called with duplicateLoop and the note is quarantined duplicate-loop [0.59ms]
+(pass) createIdleDrainHook > #given a max_notes_per_drain cap of 1 with two unread notes > #then only one note is dispatched per idle cycle [0.19ms]
+(pass) createIdleDrainHook > #given a sender's access is flipped in config between two idle drains > #then the second drain observes the new permission via a fresh per-drain config read [0.24ms]
+(pass) createIdleDrainHook > #given a permissionless config (allow-none with no allow senders) > #then the handler early-outs before resolving primary or listing projects [0.11ms]
+(pass) createIdleDrainHook > #given a fresh read where the mailbox is disabled > #then the handler early-outs before any scan [0.10ms]
+(pass) createIdleDrainHook > #given a malformed fresh config read (valid:false) > #then it falls back to the last-known-good captured config and the drain completes [0.11ms]
+
+ 15 pass
+ 0 fail
+ 53 expect() calls
+Ran 15 tests across 1 file. [482.00ms]
+
+## 3b. primary-resolver/resolver.test.ts (the T1 fix: resolveActivePrimaryAgent)
+==================================================================
+bun test v1.3.14 (0d9b296a)
+
+packages/omo-opencode/src/features/cross-project-mailbox/primary-resolver/resolver.test.ts:
+(pass) resolveActivePrimaryAgent > #given no session agent recorded for the session > #then it resolves to undefined and is not drain-eligible [0.60ms]
+(pass) resolveActivePrimaryAgent > #given the live store recorded a legacy display name for the session > #then it canonicalizes to the config key and is drain-eligible [3.03ms]
+(pass) resolveActivePrimaryAgent > #given the live store recorded a non-eligible agent for the session > #then the config key is returned but drain is gated (false) [0.16ms]
+
+ 3 pass
+ 0 fail
+ 6 expect() calls
+Ran 3 tests across 1 file. [97.00ms]
+
+## 3c. two-repo-integration.test.ts (end-to-end drain across two repos)
+==================================================================
+bun test v1.3.14 (0d9b296a)
+
+packages/omo-opencode/src/features/cross-project-mailbox/__tests__/two-repo-integration.test.ts:
+(pass) cross-project mailbox two-repo integration > #given a sender and receiver repo wired through the registry > #when the sender delivers a note and the receiver drains while idle > #then the note lands in the receiver mailbox directory [17.49ms]
+(pass) cross-project mailbox two-repo integration > #given a sender and receiver repo wired through the registry > #when the sender delivers a note and the receiver drains while idle > #then the idle drain dispatches the note body into the receiver session [12.84ms]
+(pass) cross-project mailbox two-repo integration > #given a sender and receiver repo wired through the registry > #when the sender delivers a note and the receiver drains while idle > #then the sender outbox log records the sent message [9.84ms]
+(pass) cross-project mailbox two-repo integration > #given a sender and receiver repo wired through the registry > #when the sender delivers a note and the receiver drains while idle > #then a second idle cycle acks the dispatched note into processed/ [11.02ms]
+(pass) cross-project mailbox two-repo integration > #given the receiver primary agent is ineligible for intake > #when the active primary is not in intake_eligible_agents > #then nothing is dispatched and the note stays unread [14.69ms]
+(pass) cross-project mailbox two-repo integration > #given the receiver primary agent is ineligible for intake > #when the session has no active primary > #then nothing is dispatched and the note stays unread [12.07ms]
+(pass) cross-project mailbox two-repo integration > #given an inbound note that fails authorization policy > #when the source project is not in the allowlist > #then the note is quarantined to rejected/ and never dispatched [50.04ms]
+(pass) cross-project mailbox two-repo integration > #given an inbound note that fails authorization policy > #when the note intent exceeds the sender intent budget > #then the note is quarantined over-budget and never dispatched [12.34ms]
+(pass) cross-project mailbox two-repo integration > #given loop-guard bounds on inbound delivery > #when a note has already traversed the maximum hops > #then the note is quarantined hop-exceeded and never dispatched [8.76ms]
+(pass) cross-project mailbox two-repo integration > #given loop-guard bounds on inbound delivery > #when two distinct notes exceed the same-pair rate limit in one window > #then only the first note is dispatched and the second stays unread [18.45ms]
+(pass) cross-project mailbox two-repo integration > #given loop-guard bounds on inbound delivery > #when a second note repeats an already-seen body digest > #then the duplicate is quarantined duplicate-loop and only the original dispatches [19.64ms]
+(pass) cross-project mailbox two-repo integration > #given two idle drains racing on the same single note > #when both drains run concurrently > #then the note is delivered exactly once [6.48ms]
+
+ 12 pass
+ 0 fail
+ 24 expect() calls
+Ran 12 tests across 1 file. [365.00ms]

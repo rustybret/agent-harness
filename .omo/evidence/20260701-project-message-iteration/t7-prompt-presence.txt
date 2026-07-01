@@ -1,0 +1,4 @@
+packages/omo-opencode/src/agents/dynamic-agent-core-sections.ts:248:  return `## Cross-project coordination
+packages/omo-opencode/src/agents/sisyphus-agent-factory.ts:146:  // @allow: Cross-project coordination
+packages/omo-opencode/src/agents/hephaestus/agent.ts:128:  // @allow: Cross-project coordination
+packages/omo-opencode/src/agents/atlas/agent.ts:116:  // @allow: Cross-project coordination

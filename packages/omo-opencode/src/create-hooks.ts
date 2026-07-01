@@ -22,6 +22,7 @@ export type DisposableCreatedHooks = {
   todoContinuationEnforcer?: DisposableHook
   autoSlashCommand?: DisposableHook
   anthropicContextWindowLimitRecovery?: DisposableHook
+  mailboxPresenceHeartbeat?: DisposableHook
 }
 
 export function disposeCreatedHooks(hooks: DisposableCreatedHooks): void {
@@ -31,6 +32,7 @@ export function disposeCreatedHooks(hooks: DisposableCreatedHooks): void {
   hooks.todoContinuationEnforcer?.dispose?.()
   hooks.autoSlashCommand?.dispose?.()
   hooks.anthropicContextWindowLimitRecovery?.dispose?.()
+  hooks.mailboxPresenceHeartbeat?.dispose?.()
 }
 
 export function createHooks(args: {

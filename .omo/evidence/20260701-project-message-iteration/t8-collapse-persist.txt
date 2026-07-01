@@ -1,0 +1,23 @@
+=== T8 mailbox collapse-state persistence evidence ===
+WHAT: collapse toggle still persists via queueTuiPreferenceUpdate(["mailbox","collapsed"]) after moving to the new slot
+WHY ENOUGH: round-trip test writes collapsed=true/false and re-reads from disk via resolveOmoCollapsed; render tests confirm collapsed header renders + toggle onMouseDown wired on new buildMailboxNodes slot
+CMD: bun test tui.test.ts (collapse round-trip) + render-view.test.ts (collapse header/toggle)
+
+(pass) TUI sidebar polling > #given the TUI plugin starts #when it registers sidebar slots #then a mailbox slot and an omo slot are registered before the initial render [249.10ms]
+(pass) TUI sidebar polling > #given the mailbox slot order and an external slot at the Magic Context default #when sorted ascending #then the mailbox slot renders first [1.21ms]
+(pass) TUI sidebar polling > #given an unexpected Error during polling #when the poll error handler runs #then the error is logged [0.99ms]
+(pass) TUI sidebar polling > #given a non-Error throw during polling #when the poll error handler runs #then the value is rethrown [0.88ms]
+(pass) mailbox collapse preference round-trip > #given a collapsed=true write #when re-read from disk #then the collapse state persists [4.04ms]
+(pass) tui sidebar renderView > #given active view #when building nodes #then it renders ULW agents jobs and invalid banner in order [1.61ms]
+(pass) tui sidebar renderView > #given a redacted active goal #when describing #then it reports the active goal as private [0.35ms]
+(pass) tui sidebar renderView > #given broken view #when describing #then it includes config invalid and run doctor [0.14ms]
+(pass) tui sidebar renderView > #given idle roster #when rendering #then it lists configured model rows [0.15ms]
+(pass) tui sidebar renderView > #given active view with mailbox #when building nodes #then it renders a Mailbox section with inbox and outbox rows [0.67ms]
+(pass) tui sidebar renderView > #given idle view with mailbox #when building nodes #then it renders a Mailbox section after the model roster [0.51ms]
+(pass) tui sidebar renderView > #given a mailbox #when collapsed #then it renders the header only and omits the rows but keeps the toggle prop [0.75ms]
+(pass) tui sidebar renderView > #given an expanded mailbox with a toggle #when building nodes #then the header carries onMouseDown [0.13ms]
+(pass) tui sidebar renderView > #given a collapsed mailbox with activity #when building nodes #then header shows In/Out summary line [0.39ms]
+(pass) tui sidebar renderView > #given an all-zero mailbox #when expanded #then it renders the idle placeholder [0.14ms]
+(pass) tui sidebar renderView > #given active view without mailbox #when building nodes #then it renders no Mailbox section [0.10ms]
+ 16 pass
+ 0 fail

@@ -1,7 +1,11 @@
 import { z } from "zod"
 import { OverridableAgentNameSchema } from "../../config/schema/agent-names"
+import { LEGACY_INTENT_MAP } from "./permission-tiers"
 
-const IntentBudgetSchema = z.enum(["question", "quick", "impl", "review", "work-loop", "plan"])
+const IntentBudgetSchema = z
+  .enum(["question", "quick", "impl", "review", "work-loop", "plan"])
+  .transform((value) => LEGACY_INTENT_MAP[value] ?? "impl")
+  .pipe(z.enum(["question", "impl", "plan"]))
 
 const SenderConfigSchema = z.object({
   access: z.enum(["allow", "deny"]).default("allow").describe("Whether this source project may deliver into this mailbox"),
@@ -49,6 +53,10 @@ export const CrossProjectMailboxConfigSchema = z.object({
     .record(z.string(), SenderConfigSchema)
     .default({})
     .describe("Per-source-project access and intent budget. The key is the source projectId; membership with access allow is the allowlist."),
+  launch_policy: z
+    .enum(["disabled", "ask", "auto"])
+    .default("disabled")
+    .describe("Whether the sender may launch an offline target's session before delivery: disabled never launches, ask requests permission, auto launches without asking."),
   bounds: CrossProjectMailboxBoundsSchema.default(() => CrossProjectMailboxBoundsSchema.parse({})),
 })
 

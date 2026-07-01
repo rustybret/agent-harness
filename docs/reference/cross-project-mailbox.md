@@ -49,7 +49,7 @@ Configure the mailbox by adding the `cross_project_mailbox` block to your user c
     "senders": {
       "abc12345": {
         "access": "allow", // "allow" or "deny" access to deliver to this mailbox
-        "intent_budget": "impl" // Maximum intent permitted: "question" | "quick" | "impl" | "review" | "work-loop" | "plan"
+        "intent_budget": "impl" // Maximum intent permitted: "question" | "impl" | "plan"
       }
     },
 
@@ -122,7 +122,9 @@ Once configured, Sisyphus (or Hephaestus/Atlas) will automatically discover the 
   "name": "project_message",
   "arguments": {
     "targetProjectId": "abc12345", // Target project to send note to
-    "intent": "quick", // "question" | "quick" | "impl" | "review" | "work-loop" | "plan"
+    "intent": "impl", // "question" | "impl" | "plan" (optional if category is provided)
+    "category": "quick", // Optional category to route the task
+    "mode": "list", // Optional mode: "list" for budget probe, or omit for normal message delivery
     "body": "Markdown text describing the task or coordination request.",
     "priority": 0, // Higher numbers are drained first
     "threadId": "optional-uuid", // Correlation thread grouping (UUID v4)
@@ -146,7 +148,7 @@ fromProject: "art3d-pipeline"
 toProject: "ComfyUI-Manager"
 fromProjectId: "xyz98765"
 toProjectId: "abc12345"
-intent: "quick"
+intent: "impl"
 priority: 0
 hopCount: 0
 hopPath: []
@@ -154,6 +156,58 @@ supersedes: null
 ---
 Implement new SDXL fallback route.
 ```
+
+---
+
+## Permission Tiers
+
+The mailbox enforces a three tier permission model to gate incoming messages. The three tiers are:
+
+* `question`: lowest tier, mapped to agents (explore, librarian, oracle, metis, momus) or explicit `intent: "question"`.
+* `impl`: medium tier, mapped to categories `quick` or `unspecified-low`, legacy `intent: "quick"`, or explicit `intent: "impl"`.
+* `plan`: highest tier, mapped to categories `deep`, `ultrabrain`, `unspecified-high`, `visual-engineering`, `artistry`, or `writing`, legacy `intent: "review"` or `intent: "work-loop"`, or explicit `intent: "plan"`.
+
+### Gating Rule
+The gating rule is defined as:
+`requiredTier(category ?? intent) <= grantedCeiling(sender)`
+
+The `category` field on `project_message` is optional. If omitted, the `intent` determines the required tier.
+
+---
+
+## Session Presence
+
+Active sessions maintain presence information to allow other projects to verify their status.
+
+* **Heartbeat File**: A JSON file located at `~/.omo/presence/<projectId>.json` is updated every 30 seconds while the session is active.
+* **Fields**: The heartbeat file contains the following fields:
+  * `serverUrl`: The URL of the local server.
+  * `sessionId`: The unique identifier of the active session.
+  * `pid`: The process ID of the session.
+  * `updatedAt`: The timestamp of the last update.
+* **Liveness Check**: The sender performs a liveness check by hitting the `serverUrl` API endpoint to confirm the session is alive.
+* **Staleness**: A heartbeat that is more than 30 seconds old is considered stale, indicating the session is down.
+
+---
+
+## Launch Policy
+
+The launch policy controls how a sender behaves when the target project session is not running.
+
+* **Configuration**: `launch_policy: "disabled" | "ask" | "auto"` (default: `"disabled"`)
+* `disabled`: Messages queue in the target mailbox. The sender does not launch the target or ask the user.
+* `ask`: The sender asks the user before launching a headless server in the target repository.
+* `auto`: The sender automatically launches the target session without asking.
+* **Safety Note**: The default is set to `disabled` because automatic launching creates background processes that the user might not expect.
+
+---
+
+## Advisory Outbound Budget
+
+The mailbox supports a probe mode to inspect allowed targets and budgets.
+
+* **Probe Mode**: Call the `project_message` tool with `mode: "list"` to enumerate allowed targets and their granted budgets without sending a message.
+* **Budget Table**: An advisory budget table is injected at session start showing the ceiling tier for each allowed target.
 
 ---
 
@@ -186,11 +240,14 @@ Other validation codes:
 - `unauthorized-sender`: Sender is blocked or not in the allowlist.
 - `intent-budget-exceeded`: Sent intent exceeds authorized budget.
 
-### 3. TUI Sidebar Status
-Look at the OpenCode TUI sidebar to check mailbox status. The mailbox renders active counts directly in the layout:
-```
-[Mailbox: 2 unread | xyz98765 -> quick (1), impl (1)]
-```
+### 3. TUI Mailbox Sidebar
+The TUI includes a dedicated sidebar slot for monitoring the mailbox.
+
+* **Sidebar Slot**: Positioned at order 150, which is directly above the Magic Context slot at order 200.
+* **Layout**: Uses a two column layout with the label on the left and the count on the right.
+* **Idle State**: When all counts are zero, the sidebar displays "Mailbox idle" in muted text.
+* **Collapsibility**: The sidebar is collapsible, and its collapse state persists to `tui-preferences.jsonc`.
+
 If a message is queued but not draining, verify that:
-- The session is in an idle state.
-- The active primary agent is listed in the `intake_eligible_agents` array (default: Sisyphus-only).
+* The session is in an idle state.
+* The active primary agent is listed in the `intake_eligible_agents` array (default: Sisyphus only).

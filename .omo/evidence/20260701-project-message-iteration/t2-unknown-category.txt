@@ -1,0 +1,17 @@
+=== CATEGORY_TIER map ===
+  quick -> impl
+  unspecified-low -> impl
+  deep -> plan
+  ultrabrain -> plan
+  unspecified-high -> plan
+  visual-engineering -> plan
+  artistry -> plan
+  writing -> plan
+=== AGENT_TIER map ===
+  explore -> question
+  librarian -> question
+  oracle -> question
+  metis -> question
+  momus -> question
+=== requiredTier("frobnicate") ===
+  threw: Unknown category/agent/intent: "frobnicate"

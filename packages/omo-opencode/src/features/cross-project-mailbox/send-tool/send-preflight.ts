@@ -1,7 +1,7 @@
 import type { CrossProjectMailboxConfig } from "../config"
+import type { CanonicalIntent } from "../permission-tiers"
+import { requiredTier, withinBudget } from "../permission-tiers"
 import type { ProjectEntry } from "../registry/types"
-import type { IntentEnum } from "../validation/types"
-import { withinBudget } from "../validation/validate-inbound"
 import type { SendInput } from "./envelope-builder"
 
 export type ProjectRegistryEntry = ProjectEntry
@@ -10,11 +10,11 @@ export type PreflightReason = "unauthorized" | "over-budget" | "hop-exceeded" | 
 
 export type PreflightResult = { blocked: false } | { blocked: true; reason: PreflightReason }
 
-const LOWEST_CEILING: IntentEnum = "question"
+const LOWEST_CEILING: CanonicalIntent = "question"
 
 interface SenderDecision {
   allowed: boolean
-  ceiling: IntentEnum
+  ceiling: CanonicalIntent
 }
 
 function resolveSenderDecision(input: SendInput, config: CrossProjectMailboxConfig): SenderDecision {
@@ -41,7 +41,7 @@ export async function runSendPreflight(
     return { blocked: true, reason: "unauthorized" }
   }
 
-  if (!withinBudget(input.intent, decision.ceiling)) {
+  if (!withinBudget(requiredTier(input.category ?? input.intent), decision.ceiling)) {
     return { blocked: true, reason: "over-budget" }
   }
 

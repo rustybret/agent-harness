@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test"
 
 import { CrossProjectMailboxConfigSchema, type CrossProjectMailboxConfig } from "../config"
 import { type MailboxMessage, serializeEnvelope } from "../envelope/schema"
+import type { PresenceStatus } from "../presence"
 import type { ProjectEntry } from "../registry/types"
 import {
   createProjectMessageTool,
@@ -379,6 +380,97 @@ describe("runSendPreflight", () => {
   })
 })
 
+describe("runSendPreflight - category gate", () => {
+  const targetEntry: ProjectEntry = { projectId: "proj-b", repoRoot: "/tmp/b", displayName: "B", lastSeen: 1 }
+
+  it("accepts category quick under an impl ceiling even when intent would map higher", async () => {
+    // given
+    const config = cfg({ senders: { "proj-b": { access: "allow", intent_budget: "impl" } } })
+
+    // when
+    const result = await runSendPreflight(
+      { targetProjectId: "proj-b", intent: "plan", body: "x", category: "quick" },
+      0,
+      config,
+      targetEntry,
+    )
+
+    // then
+    expect(result).toEqual({ blocked: false })
+  })
+
+  it("rejects category deep under an impl ceiling even when intent would pass", async () => {
+    // given
+    const config = cfg({ senders: { "proj-b": { access: "allow", intent_budget: "impl" } } })
+
+    // when
+    const result = await runSendPreflight(
+      { targetProjectId: "proj-b", intent: "quick", body: "x", category: "deep" },
+      0,
+      config,
+      targetEntry,
+    )
+
+    // then
+    expect(result).toEqual({ blocked: true, reason: "over-budget" })
+  })
+
+  it("falls back to the intent gate when category is omitted", async () => {
+    // given
+    const config = cfg({ senders: { "proj-b": { access: "allow", intent_budget: "impl" } } })
+
+    // when
+    const result = await runSendPreflight(
+      { targetProjectId: "proj-b", intent: "plan", body: "x" },
+      0,
+      config,
+      targetEntry,
+    )
+
+    // then
+    expect(result).toEqual({ blocked: true, reason: "over-budget" })
+  })
+})
+
+describe("createProjectMessageTool - multibyte body byte cap", () => {
+  it("rejects a multibyte body whose utf8 byte length exceeds the cap even when its code-unit length does not", async () => {
+    // given: "€" is 1 UTF-16 code unit but 3 UTF-8 bytes; 4 of them = 4 code units, 12 bytes
+    await writeProjectMailboxConfig({
+      enabled: true,
+      senders: PERMISSIVE_SENDERS,
+      bounds: { max_body_bytes: 10 },
+    })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    const out = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "\u20AC\u20AC\u20AC\u20AC" }, {})) as string,
+    ) as { blocked?: boolean; reason?: string }
+
+    // then
+    expect(out.blocked).toBe(true)
+    expect(out.reason).toContain("10")
+  })
+
+  it("accepts a multibyte body exactly at the utf8 byte cap boundary", async () => {
+    // given: 3 "€" chars = 3 code units, exactly 9 bytes
+    await writeProjectMailboxConfig({
+      enabled: true,
+      senders: PERMISSIVE_SENDERS,
+      bounds: { max_body_bytes: 9 },
+    })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    const out = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "\u20AC\u20AC\u20AC" }, {})) as string,
+    ) as { ok?: boolean }
+
+    // then
+    expect(out.ok).toBe(true)
+  })
+})
+
 describe("runProjectMessageSend - target not in registry", () => {
   it("returns target-not-found and writes nothing", async () => {
     // given
@@ -430,6 +522,231 @@ describe("runProjectMessageSend - target not in registry", () => {
     const entry = JSON.parse(line) as { toProjectId: string; toRepoRoot?: string }
     expect(entry.toProjectId).toBe("proj-b")
     expect(entry.toRepoRoot).toBe(targetBRoot)
+  })
+})
+
+interface LaunchSpyHandle {
+  deps: ProjectMessageToolDeps
+  presenceCalls: string[]
+  launchCalls: Array<{ repoRoot: string; projectId: string; policy: string }>
+  writeCalls: number
+}
+
+function launchSpyDeps(
+  config: CrossProjectMailboxConfig,
+  presence: PresenceStatus,
+): LaunchSpyHandle {
+  const handle: LaunchSpyHandle = {
+    presenceCalls: [],
+    launchCalls: [],
+    writeCalls: 0,
+    deps: {
+      config,
+      thisProjectId: THIS_PROJECT_ID,
+      thisRepoRoot,
+      thisProjectDisplayName: "Project C",
+      registry: { listProjects: async () => projects },
+      writeNote: async () => {
+        handle.writeCalls += 1
+      },
+      appendOutbox: async () => {},
+      readPresence: async (projectId: string) => {
+        handle.presenceCalls.push(projectId)
+        return presence
+      },
+      launchTarget: async (repoRoot: string, projectId: string, policy) => {
+        handle.launchCalls.push({ repoRoot, projectId, policy })
+        return true
+      },
+    },
+  }
+  return handle
+}
+
+describe("runProjectMessageSend - launch policy", () => {
+  it("does not read presence or launch when launch_policy is disabled", async () => {
+    // given
+    const handle = launchSpyDeps(cfg({ launch_policy: "disabled" }), "offline")
+
+    // when
+    const result = await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello" },
+      handle.deps,
+    )
+
+    // then
+    expect("ok" in result && result.ok).toBe(true)
+    expect(handle.presenceCalls).toEqual([])
+    expect(handle.launchCalls).toEqual([])
+    expect(handle.writeCalls).toBe(1)
+  })
+
+  it("never enters the launch path when the target is live", async () => {
+    // given
+    const handle = launchSpyDeps(cfg({ launch_policy: "auto" }), "live")
+
+    // when
+    const result = await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello" },
+      handle.deps,
+    )
+
+    // then
+    expect("ok" in result && result.ok).toBe(true)
+    expect(handle.presenceCalls).toEqual(["proj-b"])
+    expect(handle.launchCalls).toEqual([])
+    expect(handle.writeCalls).toBe(1)
+  })
+
+  it("never enters the launch path when the target is stale", async () => {
+    // given
+    const handle = launchSpyDeps(cfg({ launch_policy: "auto" }), "stale")
+
+    // when
+    const result = await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello" },
+      handle.deps,
+    )
+
+    // then
+    expect("ok" in result && result.ok).toBe(true)
+    expect(handle.launchCalls).toEqual([])
+    expect(handle.writeCalls).toBe(1)
+  })
+
+  it("launches once with the target repoRoot/projectId/policy when offline and policy is auto", async () => {
+    // given
+    const handle = launchSpyDeps(cfg({ launch_policy: "auto" }), "offline")
+
+    // when
+    const result = await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello" },
+      handle.deps,
+    )
+
+    // then
+    expect("ok" in result && result.ok).toBe(true)
+    expect(handle.presenceCalls).toEqual(["proj-b"])
+    expect(handle.launchCalls).toHaveLength(1)
+    expect(handle.launchCalls[0]).toEqual({ repoRoot: targetBRoot, projectId: "proj-b", policy: "auto" })
+    expect(handle.writeCalls).toBe(1)
+  })
+
+  it("still sends after launching when offline (message queues via writeNote)", async () => {
+    // given
+    const handle = launchSpyDeps(cfg({ launch_policy: "ask" }), "offline")
+
+    // when
+    const result = await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello" },
+      handle.deps,
+    )
+
+    // then
+    expect("ok" in result && result.ok).toBe(true)
+    expect(handle.launchCalls).toHaveLength(1)
+    expect(handle.launchCalls[0]?.policy).toBe("ask")
+    expect(handle.writeCalls).toBe(1)
+  })
+})
+
+describe("runProjectMessageSend - launch permission wiring (ask policy)", () => {
+  it("passes launchPermissionAsk through the default launchTargetSession path: deny = no launch", async () => {
+    // given
+    let asked = 0
+    const deps: ProjectMessageToolDeps = {
+      config: cfg({ launch_policy: "ask" }),
+      thisProjectId: THIS_PROJECT_ID,
+      thisRepoRoot,
+      thisProjectDisplayName: "Project C",
+      registry: { listProjects: async () => projects },
+      writeNote: async () => {},
+      appendOutbox: async () => {},
+      readPresence: async () => "offline",
+      launchPermissionAsk: async () => {
+        asked += 1
+        return false
+      },
+    }
+
+    // when
+    const result = await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello" },
+      deps,
+    )
+
+    // then
+    expect("ok" in result && result.ok).toBe(true)
+    expect(asked).toBe(1)
+  })
+
+  it("passes launchPermissionAsk through the default launchTargetSession path: allow = asked once", async () => {
+    // given
+    let asked = 0
+    const deps: ProjectMessageToolDeps = {
+      config: cfg({ launch_policy: "ask" }),
+      thisProjectId: THIS_PROJECT_ID,
+      thisRepoRoot,
+      thisProjectDisplayName: "Project C",
+      registry: { listProjects: async () => projects },
+      writeNote: async () => {},
+      appendOutbox: async () => {},
+      readPresence: async () => "offline",
+      launchPermissionAsk: async (target: string) => {
+        asked += 1
+        expect(target).toBe(targetBRoot)
+        return false
+      },
+    }
+
+    // when
+    await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello" },
+      deps,
+    )
+
+    // then
+    expect(asked).toBe(1)
+  })
+})
+
+describe("createProjectMessageTool - probe mode (mode:list)", () => {
+  it("returns the advisory outbound-budget rows and writes nothing", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const handle = spyDeps(cfg())
+    handle.deps.readPresence = async () => "offline"
+    const def = createProjectMessageTool(handle.deps)
+
+    // when
+    const out = JSON.parse(
+      (await def.execute(
+        { mode: "list", targetProjectId: "proj-b", intent: "quick", body: "ignored" },
+        {},
+      )) as string,
+    ) as { mode?: string; advisory?: string; rows?: Array<{ targetProjectId: string }> }
+
+    // then
+    expect(out.mode).toBe("list")
+    expect(out.advisory).toContain("ADVISORY")
+    expect(out.rows?.map((row) => row.targetProjectId).sort()).toEqual(["proj-a", "proj-b"])
+    expect(handle.writeCalls).toBe(0)
+    expect(handle.outboxCalls).toBe(0)
+  })
+
+  it("does not append any outbox line to disk in probe mode", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    await def.execute({ mode: "list", targetProjectId: "proj-b", intent: "quick", body: "x" }, {})
+
+    // then
+    const outboxExists = await readFile(path.join(thisRepoRoot, ".omo", "mailbox-outbox.jsonl"), "utf8")
+      .then(() => true)
+      .catch(() => false)
+    expect(outboxExists).toBe(false)
   })
 })
 

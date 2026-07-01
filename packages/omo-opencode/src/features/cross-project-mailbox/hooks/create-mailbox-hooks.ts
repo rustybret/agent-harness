@@ -13,10 +13,17 @@ import { createProjectRegistry } from "../registry"
 import type { ProjectEntry } from "../registry/types"
 import { buildTriagePrompt } from "../triage"
 import { validateInbound } from "../validation"
+import { getServerBaseUrl } from "../../../shared/opencode-http-api"
+import { projectIdForRoot } from "../envelope/project-id"
+import {
+  createPresenceHeartbeatHook,
+  type PresenceHeartbeatHook,
+} from "../presence"
 import { createIdleDrainHook, type IdleDrainHookDeps } from "./idle-drain-hook"
 
 export type MailboxHooks = {
   mailboxIdleDrain: ReturnType<typeof createIdleDrainHook> | null
+  mailboxPresenceHeartbeat: PresenceHeartbeatHook | null
 }
 
 function loadSessionMessageIds(
@@ -92,10 +99,30 @@ function buildIdleDrainDeps(
   }
 }
 
+function buildPresenceHeartbeatHook(ctx: PluginContext): PresenceHeartbeatHook | null {
+  const repoRoot = ctx.directory
+  const serverUrl = getServerBaseUrl(ctx.client)
+  if (serverUrl === null) {
+    log("mailbox presence heartbeat disabled: no server base url")
+    return null
+  }
+  let projectId: string
+  try {
+    projectId = projectIdForRoot(repoRoot)
+  } catch (error) {
+    log("mailbox presence heartbeat disabled: projectId resolution failed", { error })
+    return null
+  }
+  return createPresenceHeartbeatHook({ projectId, repoRoot, serverUrl })
+}
+
 export function createMailboxHooks(
   ctx: PluginContext,
   config: CrossProjectMailboxConfig | undefined,
 ): MailboxHooks {
-  if (!config?.enabled) return { mailboxIdleDrain: null }
-  return { mailboxIdleDrain: createIdleDrainHook(buildIdleDrainDeps(ctx, config)) }
+  if (!config?.enabled) return { mailboxIdleDrain: null, mailboxPresenceHeartbeat: null }
+  return {
+    mailboxIdleDrain: createIdleDrainHook(buildIdleDrainDeps(ctx, config)),
+    mailboxPresenceHeartbeat: buildPresenceHeartbeatHook(ctx),
+  }
 }

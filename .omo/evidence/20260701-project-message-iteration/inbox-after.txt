@@ -1,0 +1,11 @@
+# Receiver inbox AFTER idle drain (dispatch + history-confirm ack)
+# message id: 5e845880-f136-49ec-b42c-5ae0eeca678e
+# dispatched into receiver session: true
+# processed/<msgId>.md appeared: true
+# inbox note consumed (no longer unread): true
+
+## coordination_notes/sender2-8c13b02c/
+DIR   processed
+
+## coordination_notes/sender2-8c13b02c/processed/
+FILE  5e845880-f136-49ec-b42c-5ae0eeca678e.md  (418b)

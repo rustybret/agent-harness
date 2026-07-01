@@ -46,6 +46,7 @@ Below is the complete inventory of built-in hooks currently implemented in the h
 | `hephaestus-agents-md-injector` | `chat.message` | Injects local directory `AGENTS.md` context for Hephaestus deep-work scopes. | OMO v3.0 |
 | `no-sisyphus-gpt` | `chat.message` | Blocks the Sisyphus orchestrator from executing on incompatible GPT model endpoints. | OMO v3.1 |
 | `no-hephaestus-non-gpt` | `chat.message` | restrains Hephaestus from executing on non-GPT model endpoints to prevent tool failures. | OMO v3.1 |
+| `session-presence-heartbeat` | `session.created` + `session.dispose` | Writes the presence heartbeat file at session start and clears it on session dispose. | OMO v4.10 |
 
 ### Tier 2: Tool Guard Hooks
 
@@ -82,6 +83,7 @@ Below is the complete inventory of built-in hooks currently implemented in the h
 | `monitor-status-injector` | `messages.transform` | Appends real-time process monitoring state to the system prompt. | OMO v3.0 |
 | `team-mode-status-injector`| `messages.transform` | Appends active multi-agent layouts and execution grids to member prompts. | OMO v4.0 |
 | `team-mailbox-injector` | `messages.transform` | Injects unread lead and colleague messages into the active agent context. | OMO v4.0 |
+| `cross-project-mailbox-outbound-budget-injector` | `messages.transform` | Injects the advisory budget table at session start. | OMO v4.10 |
 
 ### Tier 4: Continuation Hooks
 
@@ -159,7 +161,7 @@ The tools system exposes capabilities to agents based on configuration profiles.
 | `team_shutdown_request`| `team_mode.enabled: true`| Requests lead or member termination on task completion. | OMO v4.0 |
 | `team_approve_shutdown`| `team_mode.enabled: true`| Lead acknowledges and executes a member's shutdown request. | OMO v4.0 |
 | `team_reject_shutdown` | `team_mode.enabled: true`| Lead denies a member's shutdown, providing reason feedback. | OMO v4.0 |
-| `project_message` | `cross_project_mailbox.enabled: true` | Sends an asynchronous, intent-budgeted coordination note to another registered project. | OMO v4.10 |
+| `project_message` | `cross_project_mailbox.enabled: true` | Sends an asynchronous, intent budgeted coordination note to another registered project. Supports `mode: "list"` probe mode, optional `category` field, and `launch_policy` behavior. | OMO v4.10 |
 
 ---
 

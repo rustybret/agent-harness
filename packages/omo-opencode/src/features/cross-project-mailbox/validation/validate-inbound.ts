@@ -1,14 +1,10 @@
 import type { CrossProjectMailboxConfig } from "../config"
 import type { MailboxMessage } from "../envelope/schema"
-import type { IntentEnum, ValidateOptions, ValidationResult } from "./types"
+import { requiredTier, withinBudget } from "../permission-tiers"
+import type { CanonicalIntent } from "../permission-tiers"
+import type { ValidateOptions, ValidationResult } from "./types"
 
-export const INTENT_LADDER: IntentEnum[] = ["question", "quick", "impl", "review", "work-loop", "plan"]
-
-const LOWEST_CEILING: IntentEnum = "question"
-
-export function withinBudget(noteIntent: IntentEnum, budgetCeiling: IntentEnum): boolean {
-  return INTENT_LADDER.indexOf(noteIntent) <= INTENT_LADDER.indexOf(budgetCeiling)
-}
+const LOWEST_CEILING: CanonicalIntent = "question"
 
 const REQUIRED_FIELDS = [
   "messageId",
@@ -32,7 +28,7 @@ function findMissingField(note: MailboxMessage): string | undefined {
 
 interface SenderDecision {
   allowed: boolean
-  ceiling: IntentEnum
+  ceiling: CanonicalIntent
 }
 
 function resolveSenderDecision(note: MailboxMessage, config: CrossProjectMailboxConfig): SenderDecision {
@@ -71,11 +67,11 @@ export function validateInbound(
     return { valid: false, reason: "unauthorized", detail: `sender ${note.fromProjectId} is not authorized` }
   }
 
-  if (!withinBudget(note.intent, decision.ceiling)) {
+  if (!withinBudget(requiredTier(note.category ?? note.intent), decision.ceiling)) {
     return {
       valid: false,
       reason: "over-budget",
-      detail: `intent ${note.intent} exceeds ceiling ${decision.ceiling}`,
+      detail: `intent ${note.category ?? note.intent} exceeds ceiling ${decision.ceiling}`,
     }
   }
 

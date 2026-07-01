@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test"
 import { CrossProjectMailboxConfigSchema, type CrossProjectMailboxConfig } from "../config"
 import type { MailboxMessage } from "../envelope/schema"
 import type { RejectionReason } from "./types"
-import { INTENT_LADDER, validateInbound, withinBudget } from "./validate-inbound"
+import { validateInbound } from "./validate-inbound"
 
 function makeNote(overrides: Partial<MailboxMessage> = {}): MailboxMessage {
   const base: MailboxMessage = {
@@ -27,46 +27,6 @@ function makeNote(overrides: Partial<MailboxMessage> = {}): MailboxMessage {
 function makeConfig(overrides: Partial<CrossProjectMailboxConfig> = {}): CrossProjectMailboxConfig {
   return CrossProjectMailboxConfigSchema.parse({ ...overrides })
 }
-
-describe("INTENT_LADDER", () => {
-  describe("#given the documented privilege ladder", () => {
-    describe("#when read in order", () => {
-      it("#then ranks question lowest and plan highest", () => {
-        // given / when / then
-        expect(INTENT_LADDER).toEqual(["question", "quick", "impl", "review", "work-loop", "plan"])
-      })
-    })
-  })
-})
-
-describe("withinBudget", () => {
-  describe("#given a note intent below the ceiling", () => {
-    describe("#when compared", () => {
-      it("#then returns true", () => {
-        // given / when / then
-        expect(withinBudget("quick", "impl")).toBe(true)
-      })
-    })
-  })
-
-  describe("#given a note intent equal to the ceiling", () => {
-    describe("#when compared", () => {
-      it("#then returns true", () => {
-        // given / when / then
-        expect(withinBudget("impl", "impl")).toBe(true)
-      })
-    })
-  })
-
-  describe("#given a note intent above the ceiling", () => {
-    describe("#when compared", () => {
-      it("#then returns false", () => {
-        // given / when / then
-        expect(withinBudget("plan", "impl")).toBe(false)
-      })
-    })
-  })
-})
 
 describe("validateInbound", () => {
   describe("#given an explicit allow sender", () => {

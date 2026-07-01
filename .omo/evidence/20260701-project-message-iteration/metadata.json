@@ -1,0 +1,29 @@
+{
+  "title": "OmO Cross-Project Mailbox Sidebar (T8 slot 150 above Magic Context, T9 two-column)",
+  "connector": "file-replay",
+  "browserCapture": "captured",
+  "source": {
+    "kind": "file-replay",
+    "path": "/tmp/omo-qa-sidebar-pane.txt"
+  },
+  "redaction": {
+    "builtInRules": 6,
+    "literalRules": 0,
+    "regexRules": 0
+  },
+  "wrap": "on",
+  "dimensions": {
+    "cols": 140,
+    "rows": 40,
+    "screenshotWidth": 1268,
+    "screenshotHeight": 840
+  },
+  "cleanup": "cleanup: file replay; no live process",
+  "files": {
+    "html": "/Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/project-message-iteration/.omo/evidence/20260701-project-message-iteration/terminal.html",
+    "text": "/Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/project-message-iteration/.omo/evidence/20260701-project-message-iteration/terminal.txt",
+    "ansi": "/Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/project-message-iteration/.omo/evidence/20260701-project-message-iteration/terminal-ansi.txt",
+    "png": "/Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/project-message-iteration/.omo/evidence/20260701-project-message-iteration/terminal.png",
+    "metadata": "/Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/project-message-iteration/.omo/evidence/20260701-project-message-iteration/metadata.json"
+  }
+}

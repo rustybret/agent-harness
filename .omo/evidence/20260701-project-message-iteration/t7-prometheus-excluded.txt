@@ -1,0 +1,1 @@
+packages/omo-opencode/src/agents/prometheus/system-prompt.ts:3:// @allow: Prometheus is explicitly excluded from cross-project coordination by design

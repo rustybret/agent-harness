@@ -1,0 +1,10 @@
+bun test v1.3.14 (0d9b296a)
+
+packages/omo-opencode/src/features/cross-project-mailbox/send-tool/project-message-tool.test.ts:
+(pass) runSendPreflight - category gate > accepts category quick under an impl ceiling even when intent would map higher [6.71ms]
+
+ 1 pass
+ 24 filtered out
+ 0 fail
+ 1 expect() calls
+Ran 1 test across 1 file. [280.00ms]

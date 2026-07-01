@@ -243,3 +243,12 @@ export function buildParallelDelegationSection(
 
 **Your value is orchestration, decomposition, and quality control. Delegating with crystal-clear prompts IS your work.**`
 }
+
+export function buildCrossProjectCoordinationSection(): string {
+  return `## Cross-project coordination
+- Use \`project_message\` to send notes to other projects in your allowlist.
+- Run \`project_message({ mode: "list" })\` to see allowed targets, permission ceilings (question / impl / plan), and advisory outbound-budget.
+- Set \`category\` to an omo task category (e.g. \`"quick"\` for impl-tier, \`"deep"\` for plan-tier) to express the task scope.
+- Acceptance criteria for a task may include a cross-project request/response cycle.
+- Offline targets: if launch_policy is "disabled" (the default), the note is queued - do not block on a response.`
+}

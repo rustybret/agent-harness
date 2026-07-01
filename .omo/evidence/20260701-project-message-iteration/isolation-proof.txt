@@ -1,0 +1,36 @@
+# Isolation proof: real ~/.local/share/opencode/opencode.db was NOT touched by QA
+# =============================================================================
+# All QA that could spawn opencode ran under an isolated XDG sandbox
+# (XDG_DATA_HOME / XDG_CONFIG_HOME / XDG_STATE_HOME / XDG_CACHE_HOME all pointed
+# at /tmp/omo-qa-XXXXXX). The headless receiver server was additionally launched
+# with OPENCODE_DB=:memory:. The real opencode DB is the isolation gate.
+
+## Real-DB session count
+BEFORE (start of QA): 5027
+AFTER  (end of QA):   5030
+DELTA: +3
+
+## Leak gate (the count that actually matters)
+Sessions in the REAL DB whose directory is under the QA sandbox or any fake
+project (omo-qa-*, /receiver*, /hub, /sender, /peer): 0
+
+RESULT: 0 QA-sandbox sessions in the real DB -> NO LEAK. The isolated
+opencode never wrote to the real opencode.db.
+
+## Explaining the +3 delta (honest accounting)
+The +3 sessions are this QA agent's OWN opencode sessions (the harness driving
+this task), created under real project directories, NOT by the QA sandbox.
+The six most recent real-DB sessions are:
+/Volumes/Topper2TB/Git/agent-harness | look_at: Verify the mailbox sidebar panel is 
+/Volumes/Topper2TB/Git/webgameECS | W3#8: Entity placement profiling precondition
+/Volumes/Topper2TB/Git/webgameECS | W2#4: min-conflicts repair loop in SpatialLoc
+/Volumes/Topper2TB/Git/webgameECS | W1#3: SpatialLocalRepairSolver seed initial p
+/Volumes/Topper2TB/Git/cloudhome | Sisyphus-Junior background task (@Sisyphus-Ju
+/Volumes/Topper2TB/Git/agent-harness | T13: Live opencode-qa e2e — prove drain fires
+
+Every new row sits under a real repo path (agent-harness / webgameECS /
+cloudhome) and corresponds to the running agent + its background tasks + the
+look_at screenshot-verification tool. None originate from the QA sandbox
+(/tmp/omo-qa-*), the isolated receiver server, or the :memory: CLI runs.
+
+CONCLUSION: The QA harness did not pollute the real opencode.db. Isolation holds.

@@ -1,0 +1,10 @@
+# Receiver inbox BEFORE idle drain
+# receiver project: receiver2-977d0df4
+# sender inbox dir: coordination_notes/sender2-8c13b02c/
+# message id: 5e845880-f136-49ec-b42c-5ae0eeca678e
+
+## coordination_notes/sender2-8c13b02c/
+FILE  5e845880-f136-49ec-b42c-5ae0eeca678e.md  (418b)
+
+## coordination_notes/sender2-8c13b02c/processed/
+(missing: ENOENT: no such file or directory, scandir '/tmp/omo-qa-jrqnXw/receiver2/coordination_notes/sender2-8c13b02c/processed')

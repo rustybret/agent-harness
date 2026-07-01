@@ -1,0 +1,32 @@
+T1 NEGATIVE CASE — drain eligibility gating
+============================================
+
+WHAT WAS TESTED
+- resolveActivePrimaryAgent(sessionId) now reads the LIVE session-agent store
+  (getSessionAgent -> resolveRegisteredAgentName -> getAgentConfigKey), replacing
+  the dead agentPrimaryCache Map that was never fed in production.
+- Negative path: an active non-eligible primary must NOT be drain-eligible.
+
+CASE
+- given updateSessionAgent(sid, "hephaestus")
+- and   intake_eligible_agents: ["sisyphus"]
+- when  resolveActivePrimaryAgent(sid) => "hephaestus"
+- then  isEligiblePrimary(["sisyphus"], "hephaestus") === false  => drain GATED
+
+POSITIVE CONTROL (same suite)
+- given updateSessionAgent(sid, "Sisyphus (Ultraworker)")  (legacy display name)
+- and   intake_eligible_agents: ["sisyphus"]
+- when  resolveActivePrimaryAgent(sid) => "sisyphus"  (canonicalized)
+- then  drain ELIGIBLE (true)
+
+WHAT WAS OBSERVED
+- resolver.test.ts: 3 pass / 0 fail (see t1-drain-unit.txt)
+- Full mailbox suite: 162 pass / 0 fail across 16 files
+- grep "agentPrimaryCache|\.observe(" (non-test) => ZERO hits (dead cache deleted)
+- LSP diagnostics on resolver.ts => clean
+
+WHY IT IS ENOUGH
+- The bug was: agentPrimaryCache always returned undefined -> drain fail-closed
+  for every project. Tests now prove the live store is read AND canonicalized to
+  the config key that intake_eligible_agents compares against, covering both the
+  eligible (legacy display name) and gated (non-eligible agent) branches.

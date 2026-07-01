@@ -6,6 +6,7 @@ import type { PluginContext } from "../types"
 
 export type MailboxSessionHooks = {
   mailboxIdleDrain: MailboxHooks["mailboxIdleDrain"]
+  mailboxPresenceHeartbeat: MailboxHooks["mailboxPresenceHeartbeat"]
 }
 
 export function createMailboxSessionHooks(args: {
@@ -21,14 +22,17 @@ export function createMailboxSessionHooks(args: {
     autoProvisionMailboxConfig(ctx.directory)
   }
 
-  const mailboxIdleDrain =
+  const hooks =
     isHookEnabled("cross-project-mailbox-idle-drain") && config?.enabled
       ? safeCreateHook(
           "cross-project-mailbox-idle-drain",
-          () => createMailboxHooks(ctx, config).mailboxIdleDrain,
+          () => createMailboxHooks(ctx, config),
           { enabled: safeHookEnabled },
         )
       : null
 
-  return { mailboxIdleDrain }
+  return {
+    mailboxIdleDrain: hooks?.mailboxIdleDrain ?? null,
+    mailboxPresenceHeartbeat: hooks?.mailboxPresenceHeartbeat ?? null,
+  }
 }

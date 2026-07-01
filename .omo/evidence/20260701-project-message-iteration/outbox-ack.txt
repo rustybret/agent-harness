@@ -1,0 +1,32 @@
+# Sender outbox ack derivation (sidebar resolveOutboundAck)
+# The mailbox has no mutable "read" field in the JSONL; ack state is DERIVED:
+# an outbox entry is reported outboundRead once the receiver has moved the note
+# into coordination_notes/<senderProjectId>/processed/<msgId>.md.
+
+## Raw outbox log (/tmp/omo-qa-jrqnXw/sender2/.omo/mailbox-outbox.jsonl)
+{"sentAt":1782940915231,"toProjectId":"receiver2-977d0df4","toRepoRoot":"/tmp/omo-qa-jrqnXw/receiver2","messageId":"5e845880-f136-49ec-b42c-5ae0eeca678e","intent":"impl","correlationId":"6c3a832d-fd33-47f9-9603-7ac05a09ee33","body":"please implement the cross-project drain feature end to end"}
+
+## Derived sidebar state (sender side)
+{
+  "inboundUnread": 0,
+  "inboundProcessed": 0,
+  "recentSentCount": 1,
+  "recentSent": [
+    {
+      "sentAt": 1782940915231,
+      "toProjectId": "receiver2-977d0df4",
+      "toRepoRoot": "/tmp/omo-qa-jrqnXw/receiver2",
+      "messageId": "5e845880-f136-49ec-b42c-5ae0eeca678e",
+      "intent": "impl",
+      "correlationId": "6c3a832d-fd33-47f9-9603-7ac05a09ee33",
+      "body": "please implement the cross-project drain feature end to end"
+    }
+  ],
+  "outboundUnresolved": 0,
+  "outboundRead": 1,
+  "outboundFailed": 0
+}
+
+## Interpretation
+outboundRead == 1  -> the sent message transitioned to READ status
+outboundUnresolved == 0, outboundFailed == 0

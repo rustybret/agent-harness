@@ -1,0 +1,52 @@
+# Over-ceiling send rejection (live runSendPreflight + test suite)
+# ------------------------------------------------------------------
+## 1. Live preflight call (real runSendPreflight from dist source)
+# A sender granted only ceiling 'question' requests intent 'plan'.
+
+REQUESTED_INTENT=plan  GRANTED_CEILING=question
+RESULT={"blocked":true,"reason":"over-budget"}
+REJECTED=true  REASON=over-budget
+CONTROL_IN_BUDGET_QUESTION_BLOCKED=false
+
+## 2. project-message-tool.test.ts over-budget cases
+==================================================================
+(pass) runProjectMessageSend - fresh send > writes the note, originates at hop 0, and appends one outbox line when no threadId given [30.47ms]
+(pass) runProjectMessageSend - fresh send > honors threadId as correlationId on a fresh send [6.26ms]
+(pass) runProjectMessageSend - reply > appends a hop, extends the hopPath, and inherits the parent correlationId [4.63ms]
+(pass) runProjectMessageSend - reply > ignores threadId input on a reply (parent correlationId wins) [4.68ms]
+(pass) runProjectMessageSend - reply > returns a typed error and writes nothing when the reply parent is not found [2.23ms]
+(pass) ProjectMessageInputSchema - strict > rejects raw hopCount input [2.91ms]
+(pass) ProjectMessageInputSchema - strict > rejects raw hopPath and correlationId inputs [2.16ms]
+(pass) runSendPreflight > blocks an over-budget intent [3.09ms]
+(pass) runSendPreflight > blocks an unauthorized sender [3.35ms]
+(pass) runSendPreflight > blocks when the hop cap would be reached [2.00ms]
+(pass) runSendPreflight > blocks when the target is not registered [2.08ms]
+(pass) runSendPreflight - category gate > accepts category quick under an impl ceiling even when intent would map higher [1.21ms]
+(pass) runSendPreflight - category gate > rejects category deep under an impl ceiling even when intent would pass [3.95ms]
+(pass) runSendPreflight - category gate > falls back to the intent gate when category is omitted [2.31ms]
+(pass) createProjectMessageTool - multibyte body byte cap > rejects a multibyte body whose utf8 byte length exceeds the cap even when its code-unit length does not [7.39ms]
+(pass) createProjectMessageTool - multibyte body byte cap > accepts a multibyte body exactly at the utf8 byte cap boundary [5.86ms]
+(pass) runProjectMessageSend - target not in registry > returns target-not-found and writes nothing [1.29ms]
+(pass) runProjectMessageSend - target not in registry > resolves target by display name (case-insensitive) when projectId has no match [1.09ms]
+(pass) runProjectMessageSend - target not in registry > logs the canonical projectId and target repoRoot in the outbox when resolved by display name [4.91ms]
+(pass) runProjectMessageSend - launch policy > does not read presence or launch when launch_policy is disabled [1.03ms]
+
+## 3. validate-inbound.test.ts over-budget rejection
+==================================================================
+(pass) validateInbound > #given an explicit allow sender > #when validating a note within budget > #then result is valid [4.57ms]
+(pass) validateInbound > #given an explicit deny sender > #when validating > #then result is unauthorized [0.18ms]
+(pass) validateInbound > #given an unlisted sender with default allow-all > #when validating a question-intent note > #then result is valid [0.13ms]
+(pass) validateInbound > #given an unlisted sender with default allow-none > #when validating > #then result is unauthorized [0.10ms]
+(pass) validateInbound > #given an explicit sender with an impl budget ceiling > #when the note intent is below the ceiling > #then result is valid [0.13ms]
+(pass) validateInbound > #given an explicit sender with an impl budget ceiling > #when the note intent is at the ceiling > #then result is valid [0.10ms]
+(pass) validateInbound > #given an explicit sender with an impl budget ceiling > #when the note intent is over the ceiling > #then result is over-budget and is not downgraded [0.10ms]
+(pass) validateInbound > #given an unlisted sender allowed by allow-all > #when the note intent is quick (above the lowest ceiling) > #then result is over-budget [0.16ms]
+(pass) validateInbound > #given an unlisted sender allowed by allow-all > #when the note intent is question (the lowest ceiling) > #then result is valid [0.52ms]
+(pass) validateInbound > #given a note at the max hop count > #when validating > #then result is hop-exceeded [0.17ms]
+(pass) validateInbound > #given a note below the max hop count > #when access and budget also pass > #then result is valid [0.09ms]
+(pass) validateInbound > #given a note missing a required field > #when validating a note with an undefined messageId > #then result is malformed [0.09ms]
+(pass) validateInbound > #given the rate-limit concern that belongs to todo 7 > #when inspecting the rejection reason type > #then RejectionReason never includes rate-limited [0.07ms]
+(pass) validateInbound > #given a note flagged as a duplicate loop > #when validating with duplicateLoop true > #then result is duplicate-loop [0.08ms]
+ 14 pass
+ 0 fail
+Ran 14 tests across 1 file. [174.00ms]

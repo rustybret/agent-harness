@@ -12,7 +12,7 @@ import {
   readTuiPreferencesFileSync,
   resolveOmoCollapsed,
 } from "./features/tui-sidebar/tui-preferences"
-import tuiModule, { handleTuiPollError } from "./tui"
+import tuiModule, { handleTuiPollError, MAILBOX_SLOT_ORDER, OMO_SLOT_ORDER } from "./tui"
 
 type SolidNode = {
   readonly tag: string
@@ -53,11 +53,11 @@ describe("TUI sidebar polling", () => {
     rmSync(tempDir, { recursive: true, force: true })
   })
 
-  it("#given the TUI plugin starts #when it registers the sidebar slot #then an initial render is requested immediately", async () => {
+  it("#given the TUI plugin starts #when it registers sidebar slots #then a mailbox slot and an omo slot are registered before the initial render", async () => {
     // given
     const calls: string[] = []
     const disposers: (() => void)[] = []
-    let registration: TuiSlotPlugin | undefined
+    const registrations: TuiSlotPlugin[] = []
 
     mock.module("@opentui/solid", () => ({
       createElement: (tag: string): SolidNode => ({ tag, props: {}, children: [] }),
@@ -75,7 +75,7 @@ describe("TUI sidebar polling", () => {
       slots: {
         register: (nextRegistration: TuiSlotPlugin): string => {
           calls.push("register")
-          registration = nextRegistration
+          registrations.push(nextRegistration)
           return "omo-sidebar-slot"
         },
       },
@@ -97,15 +97,29 @@ describe("TUI sidebar polling", () => {
     await tuiModule.tui(api as unknown as TuiPluginApi, undefined, {} as TuiPluginMeta)
 
     // then
-    expect(calls).toEqual(["register", "render"])
-    expect(registration).toBeDefined()
-    if (!registration) {
-      throw new Error("sidebar slot was not registered")
+    expect(calls).toEqual(["register", "register", "render"])
+    expect(registrations.map((entry) => entry.order)).toEqual([MAILBOX_SLOT_ORDER, OMO_SLOT_ORDER])
+    for (const registration of registrations) {
+      expect(Object.keys(registration.slots)).toEqual(["sidebar_content"])
+      expect(registration.slots.sidebar_content).toBeFunction()
     }
-    expect(registration.order).toBe(900)
-    expect(Object.keys(registration.slots)).toEqual(["sidebar_content"])
-    expect(registration.slots.sidebar_content).toBeFunction()
     for (const dispose of disposers) dispose()
+  })
+
+  it("#given the mailbox slot order and an external slot at the Magic Context default #when sorted ascending #then the mailbox slot renders first", () => {
+    // given
+    const MAGIC_CONTEXT_DEFAULT_SLOT_ORDER = 200
+    const slots = [
+      { id: "magic-context", order: MAGIC_CONTEXT_DEFAULT_SLOT_ORDER },
+      { id: "mailbox", order: MAILBOX_SLOT_ORDER },
+    ]
+
+    // when
+    const sorted = [...slots].sort((left, right) => left.order - right.order)
+
+    // then
+    expect(MAILBOX_SLOT_ORDER).toBeLessThan(MAGIC_CONTEXT_DEFAULT_SLOT_ORDER)
+    expect(sorted.map((slot) => slot.id)).toEqual(["mailbox", "magic-context"])
   })
 
   it("#given an unexpected Error during polling #when the poll error handler runs #then the error is logged", () => {

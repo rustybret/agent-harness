@@ -1,0 +1,15 @@
+ OhMyOpenCode 4.13.0   hub  Sisyphus - Ultraworker            SIDEBAR (render order: lower = higher)
+ ------------------------------------------            ----------------------------------------------
+ hello                                                 [150] Cross-Project Mailbox
+ Hey. What are we working on?                            Mailbox v
+                                                           in
+                                                             unread      1
+                                                             done        1
+                                                           out
+                                                             pending     1
+                                                             read        1
+                                                             fail        1
+                                                       [200] Magic Context
+                                                           35,732 tokens  18% used
+                                                       [900] OmO  roster / jobs / ulw
+ Sisyphus - Ultraworker  Big Pickle  OpenCode Zen      /private/tmp/omo-qa/hub          1.17.13

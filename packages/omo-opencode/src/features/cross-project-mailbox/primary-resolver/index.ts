@@ -1,1 +1,1 @@
-export { AgentPrimaryCache, agentPrimaryCache, resolveActivePrimaryAgent } from "./resolver"
+export { resolveActivePrimaryAgent } from "./resolver"

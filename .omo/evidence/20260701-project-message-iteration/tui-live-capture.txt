@@ -1,0 +1,55 @@
+
+  ┃                                                                                                                                                                                 Greeting
+  ┃  hello
+  ┃                                                                                                                                                                                 Context
+                                                                                                                                                                                    35,732 tokens
+     + Thought: 957ms                                                                                                                                                               18% used
+                                                                                                                                                                                    $0.00 spent
+     Hey. What are we working on?
+
+     ▣  Sisyphus - Ultraworker · Big Pickle · 4.7s                                                                                                                                    ▼ AFT                      v0.42.0
+
+                                                                                                                                                                                     Search Index
+                                                                                                                                                                                     Status                     disabled
+                                                                                                                                                                                     Disk                              —
+
+                                                                                                                                                                                     Semantic Index
+                                                                                                                                                                                     Status                     disabled
+                                                                                                                                                                                     Disk                              —
+
+                                                                                                                                                                                     Code Health
+                                                                                                                                                                                     Errors                            0
+                                                                                                                                                                                     Warnings                          0
+                                                                                                                                                                                     Dead Code                         0
+                                                                                                                                                                                     Unused Exports                    0
+                                                                                                                                                                                     Duplicates                        0
+                                                                                                                                                                                     TODOs                             0
+
+
+                                                                                                                                                                                    ▼ MCP
+                                                                                                                                                                                    • codegraph Disabled
+                                                                                                                                                                                    • context7 Connected
+                                                                                                                                                                                    • grep_app Connected
+                                                                                                                                                                                    • lsp Connected
+                                                                                                                                                                                    • websearch Connected
+
+                                                                                                                                                                                    LSP
+                                                                                                                                                                                    LSPs are disabled
+
+
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃
+  ┃
+  ┃  Sisyphus - Ultraworker · Big Pickle OpenCode Zen                                                                                                                               /private/tmp/omo-qa-jrqnXw/hub
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+                                                                                                                                                    35.7K (18%)  ctrl+p commands    • OpenCode 1.17.13
+
