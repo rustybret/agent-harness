@@ -6730,15 +6730,6 @@
                 ]
               },
               "intent_budget": {
-                "type": "string",
-                "enum": [
-                  "question",
-                  "quick",
-                  "impl",
-                  "review",
-                  "work-loop",
-                  "plan"
-                ],
                 "description": "Maximum intent tier this source project is permitted to request"
               }
             },
@@ -6748,6 +6739,16 @@
             ],
             "additionalProperties": false
           }
+        },
+        "launch_policy": {
+          "default": "disabled",
+          "description": "Whether the sender may launch an offline target's session before delivery: disabled never launches, ask requests permission, auto launches without asking.",
+          "type": "string",
+          "enum": [
+            "disabled",
+            "ask",
+            "auto"
+          ]
         },
         "bounds": {
           "default": {
@@ -6821,6 +6822,7 @@
         "interrupt_policy",
         "default_sender_access",
         "senders",
+        "launch_policy",
         "bounds"
       ],
       "additionalProperties": false
