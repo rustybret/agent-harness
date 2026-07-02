@@ -1,6 +1,6 @@
 import type { Dirent } from "node:fs"
 import { randomUUID } from "node:crypto"
-import { mkdir, open, readdir, readFile, rename, rm, stat } from "node:fs/promises"
+import { mkdir, open, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises"
 import path from "node:path"
 
 import { parseEnvelope, serializeEnvelope } from "../envelope/schema"
@@ -157,7 +157,7 @@ export class MailboxStore {
     }
     const reasonPath = path.join(rejected, `${messageId}.reason.json`)
     this.guard(reasonPath)
-    await Bun.write(reasonPath, `${JSON.stringify({ reason, detail, at: new Date().toISOString() }, null, 2)}\n`)
+    await writeFile(reasonPath, `${JSON.stringify({ reason, detail, at: new Date().toISOString() }, null, 2)}\n`)
   }
 
   async drainUnread(maxNotes: number): Promise<UnreadMessage[]> {

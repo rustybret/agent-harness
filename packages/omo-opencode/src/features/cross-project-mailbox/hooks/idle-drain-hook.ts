@@ -1,6 +1,7 @@
 import {
   isInternalPromptDispatchAccepted,
 } from "../../../shared/prompt-async-gate"
+import { log } from "../../../shared/logger"
 import type {
   InternalPromptDispatchArgs,
   InternalPromptDispatchResult,
@@ -172,11 +173,22 @@ export function createIdleDrainHook(deps: IdleDrainHookDeps): {
 
       const freshConfig = resolveFreshConfig(deps)
 
-      if (freshConfig.enabled === false) return
-      if (isPermissionlessConfig(freshConfig)) return
+      if (freshConfig.enabled === false) {
+        log("[mailbox-idle-drain] skipped: disabled", { sessionId })
+        return
+      }
+      if (isPermissionlessConfig(freshConfig)) {
+        log("[mailbox-idle-drain] skipped: permissionless config", { sessionId })
+        return
+      }
 
       const primary = deps.resolveActivePrimaryAgent(sessionId)
       if (primary === undefined || !isEligiblePrimary(freshConfig, primary)) {
+        log("[mailbox-idle-drain] skipped: primary not eligible", {
+          sessionId,
+          primary: primary ?? null,
+          eligible: freshConfig.intake_eligible_agents,
+        })
         return
       }
 
@@ -192,11 +204,21 @@ export function createIdleDrainHook(deps: IdleDrainHookDeps): {
         const store = deps.makeMailboxStore(deps.repoRoot, sender.projectId)
         await store.reclaimStale(sessionMessageIds)
         const candidates = await store.drainUnread(maxNotes)
+        if (candidates.length > 0) {
+          log("[mailbox-idle-drain] candidates found", {
+            sessionId,
+            sender: sender.projectId,
+            count: candidates.length,
+          })
+        }
         for (const note of candidates) {
           if (injected >= maxNotes) break
           const dispatched = await processNote(deps, freshConfig, store, digestStore, rateLimiter, sessionId, note)
           if (dispatched) injected += 1
         }
+      }
+      if (injected > 0) {
+        log("[mailbox-idle-drain] injected notes", { sessionId, injected })
       }
     },
   }

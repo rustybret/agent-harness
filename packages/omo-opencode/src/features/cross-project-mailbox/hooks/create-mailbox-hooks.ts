@@ -26,30 +26,54 @@ export type MailboxHooks = {
   mailboxPresenceHeartbeat: PresenceHeartbeatHook | null
 }
 
-function loadSessionMessageIds(
+const MAILBOX_MARKER_PATTERN = /\[mailbox-message-id: ([^\]\s]+)\]/g
+
+function collectMarkerIds(value: unknown, into: Set<string>): void {
+  if (typeof value === "string") {
+    for (const match of value.matchAll(MAILBOX_MARKER_PATTERN)) {
+      const id = match[1]
+      if (id !== undefined) into.add(id)
+    }
+    return
+  }
+  if (Array.isArray(value)) {
+    for (const entry of value) collectMarkerIds(entry, into)
+    return
+  }
+  if (typeof value === "object" && value !== null) {
+    for (const entry of Object.values(value)) collectMarkerIds(entry, into)
+  }
+}
+
+export async function loadSessionMessageIds(
   ctx: PluginContext,
   sessionId: string,
 ): Promise<string[]> {
-  const messagesApi = ctx.client?.session?.messages
-  if (typeof messagesApi !== "function") return Promise.resolve([])
-  return Promise.resolve(
-    messagesApi({ path: { id: sessionId }, query: { directory: ctx.directory } }),
-  )
-    .then((result) => {
-      const data = (result as { data?: unknown })?.data ?? result
-      if (!Array.isArray(data)) return []
-      const ids: string[] = []
-      for (const entry of data) {
-        const id = (entry as { info?: { id?: unknown }; id?: unknown })?.info?.id
-          ?? (entry as { id?: unknown })?.id
-        if (typeof id === "string") ids.push(id)
-      }
-      return ids
+  const session = ctx.client?.session
+  const messagesApi = session?.messages
+  if (typeof messagesApi !== "function") return []
+  try {
+    const result = await messagesApi.call(session, {
+      path: { id: sessionId },
+      query: { directory: ctx.directory },
     })
-    .catch((error) => {
-      log("mailbox load session messages failed", { error, sessionId })
-      return []
+    const data = (result as { data?: unknown })?.data ?? result
+    if (!Array.isArray(data)) return []
+    const ids = new Set<string>()
+    for (const entry of data) {
+      const id = (entry as { info?: { id?: unknown }; id?: unknown })?.info?.id
+        ?? (entry as { id?: unknown })?.id
+      if (typeof id === "string") ids.add(id)
+      collectMarkerIds(entry, ids)
+    }
+    return [...ids]
+  } catch (error) {
+    log("mailbox load session messages failed", {
+      error: error instanceof Error ? `${error.name}: ${error.message}` : String(error),
+      sessionId,
     })
+    return []
+  }
 }
 
 function buildIdleDrainDeps(
@@ -101,7 +125,7 @@ function buildIdleDrainDeps(
 
 function buildPresenceHeartbeatHook(ctx: PluginContext): PresenceHeartbeatHook | null {
   const repoRoot = ctx.directory
-  const serverUrl = getServerBaseUrl(ctx.client)
+  const serverUrl = ctx.serverUrl?.toString() ?? getServerBaseUrl(ctx.client)
   if (serverUrl === null) {
     log("mailbox presence heartbeat disabled: no server base url")
     return null

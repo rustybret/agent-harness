@@ -28,7 +28,8 @@ export function createEventHookRunner(): EventHookRunner {
         hook: hookName,
         eventType: input.event.type,
         sessionID: getEventSessionID(input),
-        error: error instanceof Error ? error : String(error),
+        error: error instanceof Error ? `${error.name}: ${error.message}` : String(error),
+        stack: error instanceof Error ? error.stack?.split("\n").slice(0, 5).join(" | ") : undefined,
       });
     }
   };

@@ -11,6 +11,7 @@ export function buildTriagePrompt(note: MailboxMessage & { body: string }, confi
 
   return [
     header,
+    `[mailbox-message-id: ${note.messageId}]`,
     "",
     "--- inbound note ---",
     note.body.trimEnd(),
