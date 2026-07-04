@@ -8,6 +8,7 @@ export {
   type PresenceRecord,
 } from "./presence-record"
 export {
+  defaultProbeSession,
   isPresenceRecord,
   readPresenceStatus,
   type PresenceStatus,

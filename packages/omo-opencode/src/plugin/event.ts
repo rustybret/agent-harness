@@ -81,7 +81,7 @@ export function createEventHandler(args: {
     await runEventHookSafely("teamMemberStatusHandler", teamHandlers.teamMemberStatusHandler, input);
     const mailboxSessionID = getEventSessionID(input);
     if (mailboxSessionID && hooks.mailboxPresenceHeartbeat) {
-      hooks.mailboxPresenceHeartbeat.onSessionActive(mailboxSessionID);
+      hooks.mailboxPresenceHeartbeat.onSessionActive(mailboxSessionID, "start");
     }
     if (mailboxSessionID && hooks.mailboxIdleDrain) {
       await runEventHookSafely(
@@ -153,7 +153,7 @@ export function createEventHandler(args: {
     if (event.type === "session.created") {
       const createdSessionID = resolveSessionEventID(props);
       if (createdSessionID && hooks.mailboxPresenceHeartbeat) {
-        hooks.mailboxPresenceHeartbeat.onSessionActive(createdSessionID);
+        hooks.mailboxPresenceHeartbeat.onSessionActive(createdSessionID, "start");
       }
       await handleSessionCreatedEvent({
         event,

@@ -117,4 +117,119 @@ describe("createPresenceHeartbeatHook", () => {
       hook.dispose()
     })
   })
+
+  describe("#given a modeDetector reports currentMode() === \"external\"", () => {
+    it("#then the beat writes mode:\"external\" with the real serverUrl", async () => {
+      // given
+      const detector = {
+        detect: jest.fn(async () => "external" as const),
+        currentMode: jest.fn(() => "external" as const),
+      }
+      const { deps, writeRecord } = makeDeps({ modeDetector: detector })
+      const hook = createPresenceHeartbeatHook(deps)
+
+      // when
+      hook.onSessionActive("ses_1", "start")
+      await Promise.resolve()
+      await Promise.resolve()
+
+      // then
+      expect(detector.detect).toHaveBeenCalledWith("ses_1", "start")
+      const record = writeRecord.mock.calls.at(-1)?.[0]
+      expect(record?.mode).toBe("external")
+      expect(record?.serverUrl).toBe("http://127.0.0.1:4096")
+
+      // cleanup
+      hook.dispose()
+    })
+  })
+
+  describe("#given a modeDetector reports currentMode() === \"internal\"", () => {
+    it("#then the beat writes mode:\"internal\" with serverUrl null", async () => {
+      // given
+      const detector = {
+        detect: jest.fn(async () => "internal" as const),
+        currentMode: jest.fn(() => "internal" as const),
+      }
+      const { deps, writeRecord } = makeDeps({ modeDetector: detector })
+      const hook = createPresenceHeartbeatHook(deps)
+
+      // when
+      hook.onSessionActive("ses_1", "start")
+      await Promise.resolve()
+      await Promise.resolve()
+
+      // then
+      const record = writeRecord.mock.calls.at(-1)?.[0]
+      expect(record?.mode).toBe("internal")
+      expect(record?.serverUrl).toBeNull()
+
+      // cleanup
+      hook.dispose()
+    })
+  })
+
+  describe("#given detect() resolves after a delay", () => {
+    it("#then the record reflects the resolved mode on the post-detect beat", async () => {
+      // given
+      let resolveMode: (() => void) | undefined
+      let mode: "external" | "internal" = "external"
+      const detector = {
+        detect: jest.fn(
+          () =>
+            new Promise<"internal">((resolve) => {
+              resolveMode = () => {
+                mode = "internal"
+                resolve("internal")
+              }
+            }),
+        ),
+        currentMode: jest.fn(() => mode),
+      }
+      const { deps, writeRecord } = makeDeps({ modeDetector: detector })
+      const hook = createPresenceHeartbeatHook(deps)
+
+      // when
+      hook.onSessionActive("ses_1", "start")
+      await Promise.resolve()
+      const beforeResolve = writeRecord.mock.calls.length
+      resolveMode?.()
+      await Promise.resolve()
+      await Promise.resolve()
+
+      // then
+      expect(beforeResolve).toBe(0)
+      const record = writeRecord.mock.calls.at(-1)?.[0]
+      expect(record?.mode).toBe("internal")
+      expect(record?.serverUrl).toBeNull()
+
+      // cleanup
+      hook.dispose()
+    })
+  })
+
+  describe("#given detect() rejects", () => {
+    it("#then the beat still runs so internal sessions keep heartbeating", async () => {
+      // given
+      const detector = {
+        detect: jest.fn(async () => {
+          throw new Error("probe boom")
+        }),
+        currentMode: jest.fn(() => "external" as const),
+      }
+      const { deps, writeRecord } = makeDeps({ modeDetector: detector })
+      const hook = createPresenceHeartbeatHook(deps)
+
+      // when
+      hook.onSessionActive("ses_1", "start")
+      await Promise.resolve()
+      await Promise.resolve()
+
+      // then
+      expect(writeRecord.mock.calls.length).toBeGreaterThan(0)
+
+      // cleanup
+      hook.dispose()
+    })
+  })
 })

@@ -1,4 +1,5 @@
 import { log } from "../../../shared/logger"
+import type { ModeDetectTrigger, ModeDetector } from "./mode-detector"
 import {
   PRESENCE_INTERVAL_MS,
   type PresenceRecord,
@@ -8,16 +9,17 @@ import {
 export interface PresenceHeartbeatDeps {
   projectId: string
   repoRoot: string
-  serverUrl: string
+  serverUrl: string | null
   homeDir?: string
   pid?: number
   now?: () => number
   intervalMs?: number
   writeRecord?: (record: PresenceRecord, homeDir?: string) => Promise<void>
+  modeDetector?: Pick<ModeDetector, "detect" | "currentMode">
 }
 
 export interface PresenceHeartbeatHook {
-  onSessionActive: (sessionId: string) => void
+  onSessionActive: (sessionId: string, trigger?: ModeDetectTrigger) => void
   dispose: () => void
 }
 
@@ -26,19 +28,25 @@ export function createPresenceHeartbeatHook(deps: PresenceHeartbeatDeps): Presen
   const pid = deps.pid ?? process.pid
   const intervalMs = deps.intervalMs ?? PRESENCE_INTERVAL_MS
   const writeRecord = deps.writeRecord ?? writePresenceRecord
+  const detector = deps.modeDetector
 
   let interval: ReturnType<typeof setInterval> | undefined
   let currentSessionId: string | undefined
 
-  const buildRecord = (sessionId: string): PresenceRecord => ({
-    projectId: deps.projectId,
-    repoRoot: deps.repoRoot,
-    mode: "external",
-    serverUrl: deps.serverUrl,
-    sessionId,
-    pid,
-    heartbeatTs: now(),
-  })
+  const buildRecord = (sessionId: string): PresenceRecord => {
+    // "unknown" (no detector, or a detect not yet resolved) keeps the legacy external default so
+    // peers still see freshness; only a confirmed "internal" mode publishes the null-url record.
+    const isExternal = (detector?.currentMode() ?? "external") !== "internal"
+    return {
+      projectId: deps.projectId,
+      repoRoot: deps.repoRoot,
+      mode: isExternal ? "external" : "internal",
+      serverUrl: isExternal ? deps.serverUrl : null,
+      sessionId,
+      pid,
+      heartbeatTs: now(),
+    }
+  }
 
   const beat = (): void => {
     if (currentSessionId === undefined) return
@@ -51,10 +59,16 @@ export function createPresenceHeartbeatHook(deps: PresenceHeartbeatDeps): Presen
   }
 
   return {
-    onSessionActive: (sessionId: string): void => {
+    onSessionActive: (sessionId: string, trigger: ModeDetectTrigger = "start"): void => {
       if (!sessionId) return
       currentSessionId = sessionId
-      beat()
+      if (detector) {
+        // Resolve the live mode BEFORE the first beat so the record is mode-tagged from the start.
+        // detect() memoizes per session, so recurring idle beats never re-probe.
+        detector.detect(sessionId, trigger).then(beat, beat)
+      } else {
+        beat()
+      }
       if (interval === undefined) {
         interval = setInterval(beat, intervalMs)
         if (typeof interval.unref === "function") interval.unref()
