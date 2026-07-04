@@ -18,3 +18,12 @@ export {
   type PresenceHeartbeatDeps,
   type PresenceHeartbeatHook,
 } from "./presence-heartbeat-hook"
+export {
+  createModeDetector,
+  type MailboxMode,
+  type MailboxModeState,
+  type ModeDetector,
+  type ModeDetectorDeps,
+  type ModeDetectorLog,
+  type ModeDetectTrigger,
+} from "./mode-detector"
