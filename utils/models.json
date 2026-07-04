@@ -423,7 +423,7 @@
       "key": "nvidia/upstage/solar-10_7b-instruct"
     },
     {
-      "key": "nvidia/z-ai/glm-5.1"
+      "key": "nvidia/z-ai/glm-5.2"
     },
     {
       "key": "openai/gpt-5.3-codex-spark"
@@ -1306,6 +1306,12 @@
     },
     {
       "key": "openrouter/poolside/laguna-m.1:free"
+    },
+    {
+      "key": "openrouter/poolside/laguna-xs-2.1"
+    },
+    {
+      "key": "openrouter/poolside/laguna-xs-2.1:free"
     },
     {
       "key": "openrouter/poolside/laguna-xs.2"

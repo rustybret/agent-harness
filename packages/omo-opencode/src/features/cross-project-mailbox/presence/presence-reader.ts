@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises"
 import os from "node:os"
 
+import { isRecord } from "@oh-my-opencode/utils"
+
 import { log } from "../../../shared/logger"
 import { getServerBasicAuthHeader } from "../../../shared/opencode-server-auth"
 import {
@@ -18,12 +20,15 @@ export interface ReadPresenceStatusDeps {
   probeTimeoutMs?: number
 }
 
-function isPresenceRecord(value: unknown): value is PresenceRecord {
+export function isPresenceRecord(value: unknown): value is PresenceRecord {
   if (typeof value !== "object" || value === null) return false
   const record = value as Record<string, unknown>
+  const mode = record["mode"]
+  const serverUrl = record["serverUrl"]
   return (
     typeof record["projectId"] === "string" &&
-    typeof record["serverUrl"] === "string" &&
+    (mode === "internal" || mode === "external") &&
+    (typeof serverUrl === "string" || serverUrl === null) &&
     typeof record["sessionId"] === "string" &&
     typeof record["heartbeatTs"] === "number"
   )
@@ -43,16 +48,28 @@ async function readRecord(projectId: string, homeDir: string): Promise<PresenceR
   }
 }
 
-async function defaultProbeSession(record: PresenceRecord): Promise<boolean> {
+function buildSessionStatusUrl(serverUrl: string, repoRoot: string): string {
+  const base = serverUrl.replace(/\/$/, "")
+  const url = new URL(`${base}/session/status`)
+  url.searchParams.set("directory", repoRoot)
+  return url.toString()
+}
+
+export async function defaultProbeSession(record: PresenceRecord): Promise<boolean> {
+  if (record.serverUrl === null) return false
   const auth = getServerBasicAuthHeader()
-  const url = `${record.serverUrl.replace(/\/$/, "")}/session/${encodeURIComponent(record.sessionId)}`
+  const headers: Record<string, string> = { "x-opencode-directory": record.repoRoot }
+  if (auth) headers["Authorization"] = auth
   try {
-    const response = await fetch(url, {
+    const response = await fetch(buildSessionStatusUrl(record.serverUrl, record.repoRoot), {
       method: "GET",
-      headers: auth ? { Authorization: auth } : undefined,
+      headers,
       signal: AbortSignal.timeout(DEFAULT_PROBE_TIMEOUT_MS),
     })
-    return response.ok
+    if (!response.ok) return false
+    const payload: unknown = await response.json()
+    if (!isRecord(payload)) return false
+    return Object.hasOwn(payload, record.sessionId)
   } catch (error) {
     log("[presence-reader] session probe failed", {
       error: error instanceof Error ? error.message : String(error),
