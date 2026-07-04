@@ -56,7 +56,7 @@ async function defaultWriteNote(
 
 // Fire-and-forget doc-drop: resolve target, build envelope, run receiver-protecting preflight
 // (allowlist + intent-budget + hop-check), write the note into the target's coordination_notes/,
-// and append the outbox log. NO presence probe and NO launch — those are sender-side liveness
+// and append the outbox log. NO presence probe and NO launch: those are sender-side liveness
 // concerns irrelevant to a pure file drop.
 export async function runProjectNoteSend(
   input: SendInput,
