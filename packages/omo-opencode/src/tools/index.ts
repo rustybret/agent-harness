@@ -32,7 +32,10 @@ export {
   createTaskUpdateTool,
 } from "./task"
 export { createHashlineEditTool } from "./hashline-edit"
-export { createProjectMessageTool } from "../features/cross-project-mailbox/send-tool"
+export {
+  createProjectMessageTool,
+  createProjectNoteTool,
+} from "../features/cross-project-mailbox/send-tool"
 export { createTeamSendMessageTool } from "../features/team-mode/tools/messaging"
 
 export function createBackgroundTools(manager: BackgroundManager, client: OpencodeClient): Record<string, ToolDefinition> {
