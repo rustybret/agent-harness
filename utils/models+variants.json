@@ -758,11 +758,8 @@
       "variants": []
     },
     {
-      "key": "nvidia/z-ai/glm-5.2",
-      "variants": [
-        "high",
-        "max"
-      ]
+      "key": "nvidia/z-ai/glm-5.1",
+      "variants": []
     },
     {
       "key": "openai/gpt-5.3-codex-spark",
@@ -2694,22 +2691,6 @@
     },
     {
       "key": "openrouter/poolside/laguna-m.1:free",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
-    },
-    {
-      "key": "openrouter/poolside/laguna-xs-2.1",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
-    },
-    {
-      "key": "openrouter/poolside/laguna-xs-2.1:free",
       "variants": [
         "high",
         "low",
