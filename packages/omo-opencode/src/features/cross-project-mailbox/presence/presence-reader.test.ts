@@ -172,6 +172,80 @@ describe("readPresenceStatus", () => {
     })
   })
 
+  describe("#given a fresh internal-mode record", () => {
+    it("#then it returns internal without invoking the probe", async () => {
+      // given
+      const record = makeRecord({ mode: "internal", serverUrl: null, heartbeatTs: Date.now() })
+      await writePresenceRecord(record, homeDir)
+      const probeSession = jest.fn(async () => true)
+      const deps: ReadPresenceStatusDeps = { probeSession }
+
+      // when
+      const status = await readPresenceStatus(record.projectId, homeDir, deps)
+
+      // then
+      expect(status).toBe("internal")
+      expect(probeSession).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("#given a fresh internal-mode record and the default probe (real fetch)", () => {
+    const realFetch = globalThis.fetch
+
+    afterEach(() => {
+      globalThis.fetch = realFetch
+    })
+
+    it("#then it returns internal and never calls fetch", async () => {
+      // given
+      const record = makeRecord({ mode: "internal", serverUrl: null, heartbeatTs: Date.now() })
+      await writePresenceRecord(record, homeDir)
+      const fetchSpy = jest.fn(async () => new Response("{}", { status: 200 }))
+      globalThis.fetch = fetchSpy as unknown as typeof globalThis.fetch
+
+      // when
+      const status = await readPresenceStatus(record.projectId, homeDir)
+
+      // then
+      expect(status).toBe("internal")
+      expect(fetchSpy).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("#given a stale-heartbeat internal-mode record", () => {
+    it("#then it returns offline, not internal", async () => {
+      // given
+      const record = makeRecord({ mode: "internal", serverUrl: null, heartbeatTs: Date.now() - 60_000 })
+      await writePresenceRecord(record, homeDir)
+      const probeSession = jest.fn(async () => true)
+      const deps: ReadPresenceStatusDeps = { probeSession }
+
+      // when
+      const status = await readPresenceStatus(record.projectId, homeDir, deps)
+
+      // then
+      expect(status).toBe("offline")
+      expect(probeSession).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("#given a fresh external-mode record and an empty status map (probe absent)", () => {
+    it("#then it returns stale", async () => {
+      // given
+      const record = makeRecord({ mode: "external", heartbeatTs: Date.now() })
+      await writePresenceRecord(record, homeDir)
+      const probeSession = jest.fn(async () => false)
+      const deps: ReadPresenceStatusDeps = { probeSession }
+
+      // when
+      const status = await readPresenceStatus(record.projectId, homeDir, deps)
+
+      // then
+      expect(status).toBe("stale")
+      expect(probeSession).toHaveBeenCalledTimes(1)
+    })
+  })
+
   describe("#given a fresh file and a probe that never resolves within the timeout", () => {
     it("#then it returns stale via the 2s race timeout", async () => {
       // given

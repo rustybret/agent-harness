@@ -11,7 +11,7 @@ import {
   presenceRecordPath,
 } from "./presence-record"
 
-export type PresenceStatus = "live" | "stale" | "offline"
+export type PresenceStatus = "live" | "stale" | "offline" | "internal"
 
 const DEFAULT_PROBE_TIMEOUT_MS = 2_000
 
@@ -105,6 +105,8 @@ export async function readPresenceStatus(
 
   const age = Date.now() - record.heartbeatTs
   if (age > PRESENCE_TTL_MS) return "offline"
+
+  if (record.mode === "internal") return "internal"
 
   const timeoutMs = deps.probeTimeoutMs ?? DEFAULT_PROBE_TIMEOUT_MS
   const alive = await raceProbe(record, deps.probeSession, timeoutMs)
