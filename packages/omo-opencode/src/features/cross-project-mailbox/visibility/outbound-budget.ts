@@ -6,6 +6,10 @@ import type { ProjectEntry } from "../registry/types"
 
 export type OutboundBudgetPresence = PresenceStatus | "unknown"
 
+export function presenceLabel(presence: OutboundBudgetPresence): string {
+  return presence === "internal" ? "internal (doc-drop)" : presence
+}
+
 export interface OutboundBudgetRow {
   targetProjectId: string
   displayName: string
@@ -79,7 +83,9 @@ export function renderOutboundBudgetTable(rows: readonly OutboundBudgetRow[]): s
     "| --- | --- | --- | --- |",
   ]
   for (const row of rows) {
-    lines.push(`| ${row.displayName} | ${row.targetProjectId} | ${row.grantedCeiling} | ${row.presence} |`)
+    lines.push(
+      `| ${row.displayName} | ${row.targetProjectId} | ${row.grantedCeiling} | ${presenceLabel(row.presence)} |`,
+    )
   }
   return lines.join("\n")
 }

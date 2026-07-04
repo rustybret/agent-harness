@@ -3,8 +3,9 @@ import { describe, expect, it } from "bun:test"
 import type { MailboxSidebarState } from "../cross-project-mailbox/sidebar"
 import { computeView } from "./compute-view"
 import type { ViewNode } from "./element-helpers"
-import { buildMailboxNodes, buildViewNodes, describeView } from "./render-view"
+import { buildMailboxNodes, buildOutboundBudgetNodes, buildViewNodes, describeView } from "./render-view"
 import type { ComputeViewSections } from "./compute-view"
+import type { OutboundBudgetRow } from "../cross-project-mailbox/visibility"
 import type { SidebarView } from "./state-types"
 
 function flattenText(nodes: readonly ViewNode[]): { text: string; props: Readonly<Record<string, unknown>> }[] {
@@ -370,5 +371,86 @@ describe("tui sidebar renderView", () => {
     // then
     expect(mailboxTexts.some((value) => value.includes("Mailbox"))).toBe(false)
     expect(description).not.toContain("Mailbox")
+  })
+})
+
+function budgetRow(overrides: Partial<OutboundBudgetRow>): OutboundBudgetRow {
+  return {
+    targetProjectId: "proj-1",
+    displayName: "Project One",
+    grantedCeiling: "quick",
+    presence: "offline",
+    ...overrides,
+  }
+}
+
+describe("tui sidebar buildOutboundBudgetNodes", () => {
+  it("#given a row whose presence is internal #when building nodes #then the doc-drop label renders in a two-column row", () => {
+    // given
+    const rows: OutboundBudgetRow[] = [budgetRow({ displayName: "Internal Peer", presence: "internal" })]
+
+    // when
+    const nodes = buildOutboundBudgetNodes(rows, theme)
+    const entries = flattenText(nodes)
+    const texts = entries.map((entry) => entry.text)
+
+    // then
+    expect(texts).toEqual(["Outbound", "Internal Peer", "internal (doc-drop)"])
+    const statusEntry = entries.find((entry) => entry.text === "internal (doc-drop)")
+    expect(statusEntry?.props.fg).toBe("info")
+  })
+
+  it("#given internal and non-internal rows #when building nodes #then each is a space-between row with label left and status right", () => {
+    // given
+    const rows: OutboundBudgetRow[] = [
+      budgetRow({ displayName: "Live Peer", presence: "live" }),
+      budgetRow({ displayName: "Internal Peer", presence: "internal" }),
+    ]
+
+    // when
+    const nodes = buildOutboundBudgetNodes(rows, theme)
+    const rowBoxes: ViewNode[] = []
+    const walk = (node: ViewNode): void => {
+      if (node.kind === "box" && node.props.justifyContent === "space-between") rowBoxes.push(node)
+      for (const child of node.children ?? []) walk(child)
+    }
+    for (const node of nodes) walk(node)
+
+    // then
+    expect(rowBoxes.length).toBe(2)
+    for (const row of rowBoxes) {
+      expect(row.props.flexDirection).toBe("row")
+      expect(row.props.width).toBe("100%")
+      expect(row.children?.length).toBe(2)
+      expect(row.children?.[0]?.kind).toBe("text")
+      expect(row.children?.[1]?.kind).toBe("text")
+    }
+  })
+
+  it("#given live stale offline and unknown rows #when building nodes #then each renders its own label unchanged", () => {
+    // given
+    const rows: OutboundBudgetRow[] = [
+      budgetRow({ displayName: "L", presence: "live" }),
+      budgetRow({ displayName: "S", presence: "stale" }),
+      budgetRow({ displayName: "O", presence: "offline" }),
+      budgetRow({ displayName: "U", presence: "unknown" }),
+    ]
+
+    // when
+    const texts = flattenText(buildOutboundBudgetNodes(rows, theme)).map((entry) => entry.text)
+
+    // then
+    expect(texts).toEqual(["Outbound", "L", "live", "S", "stale", "O", "offline", "U", "unknown"])
+  })
+
+  it("#given no rows #when building nodes #then it renders nothing", () => {
+    // given
+    const rows: OutboundBudgetRow[] = []
+
+    // when
+    const nodes = buildOutboundBudgetNodes(rows, theme)
+
+    // then
+    expect(nodes).toEqual([])
   })
 })

@@ -1,4 +1,6 @@
 import type { MailboxSidebarState } from "../cross-project-mailbox/sidebar"
+import { presenceLabel } from "../cross-project-mailbox/visibility"
+import type { OutboundBudgetRow } from "../cross-project-mailbox/visibility"
 import { LABEL_MAX } from "./constants"
 import { box, text } from "./element-helpers"
 import type { ViewNode } from "./element-helpers"
@@ -73,6 +75,44 @@ export function buildMailboxNodes(
   mailboxToggle?: MailboxToggleOpts,
 ): ViewNode[] {
   return mailboxNodes(selectMailbox(view), theme, mailboxToggle)
+}
+
+export function buildOutboundBudgetNodes(
+  rows: readonly OutboundBudgetRow[],
+  theme: ThemeLike,
+): ViewNode[] {
+  if (rows.length === 0) return []
+
+  const children: ViewNode[] = [text({ fg: theme.info }, "Outbound")]
+  for (const row of rows) {
+    children.push(
+      outboundBudgetRow(truncate(row.displayName), presenceLabel(row.presence), presenceFg(row.presence, theme), theme),
+    )
+  }
+  return [box({ flexDirection: "column", width: "100%" }, children)]
+}
+
+function outboundBudgetRow(label: string, status: string, statusFg: unknown, theme: ThemeLike): ViewNode {
+  return box({ width: "100%", flexDirection: "row", justifyContent: "space-between" }, [
+    text({ fg: theme.textMuted }, label),
+    text({ fg: statusFg }, status),
+  ])
+}
+
+function presenceFg(presence: OutboundBudgetRow["presence"], theme: ThemeLike): unknown {
+  switch (presence) {
+    case "live":
+      return theme.success
+    case "internal":
+      return theme.info
+    case "stale":
+      return theme.warning
+    case "offline":
+    case "unknown":
+      return theme.textMuted
+    default:
+      return theme.text
+  }
 }
 
 export function describeView(view: SidebarView): string {
