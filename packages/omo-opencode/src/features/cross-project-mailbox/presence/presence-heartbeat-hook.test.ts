@@ -43,6 +43,7 @@ describe("createPresenceHeartbeatHook", () => {
       expect(record).toEqual({
         projectId: "alpha-id",
         repoRoot: "/repos/alpha",
+        mode: "external",
         serverUrl: "http://127.0.0.1:4096",
         sessionId: "ses_1",
         pid: 4242,

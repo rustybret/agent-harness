@@ -33,6 +33,7 @@ export function createPresenceHeartbeatHook(deps: PresenceHeartbeatDeps): Presen
   const buildRecord = (sessionId: string): PresenceRecord => ({
     projectId: deps.projectId,
     repoRoot: deps.repoRoot,
+    mode: "external",
     serverUrl: deps.serverUrl,
     sessionId,
     pid,

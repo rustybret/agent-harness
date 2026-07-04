@@ -4,9 +4,11 @@ export {
   presenceDir,
   presenceRecordPath,
   writePresenceRecord,
+  type PresenceMode,
   type PresenceRecord,
 } from "./presence-record"
 export {
+  isPresenceRecord,
   readPresenceStatus,
   type PresenceStatus,
   type ReadPresenceStatusDeps,

@@ -15,6 +15,7 @@ function makeRecord(overrides: Partial<PresenceRecord> = {}): PresenceRecord {
   return {
     projectId: "alpha-id",
     repoRoot: "/repos/alpha",
+    mode: "external",
     serverUrl: "http://127.0.0.1:4096",
     sessionId: "ses_abc",
     pid: 4242,
@@ -110,6 +111,40 @@ describe("writePresenceRecord", () => {
       const filePath = presenceRecordPath(second.projectId, homeDir)
       const parsed = JSON.parse(readFileSync(filePath, "utf8")) as PresenceRecord
       expect(parsed.heartbeatTs).toBe(2)
+    })
+  })
+
+  describe("#given an external-mode record with a real serverUrl", () => {
+    it("#then it round-trips through write and read unchanged", async () => {
+      // given
+      const record = makeRecord({ mode: "external", serverUrl: "http://127.0.0.1:4096" })
+
+      // when
+      await writePresenceRecord(record, homeDir)
+
+      // then
+      const filePath = presenceRecordPath(record.projectId, homeDir)
+      const parsed = JSON.parse(readFileSync(filePath, "utf8")) as PresenceRecord
+      expect(parsed).toEqual(record)
+      expect(parsed.mode).toBe("external")
+      expect(parsed.serverUrl).toBe("http://127.0.0.1:4096")
+    })
+  })
+
+  describe("#given an internal-mode record with a null serverUrl", () => {
+    it("#then it round-trips through write and read with serverUrl null", async () => {
+      // given
+      const record = makeRecord({ mode: "internal", serverUrl: null })
+
+      // when
+      await writePresenceRecord(record, homeDir)
+
+      // then
+      const filePath = presenceRecordPath(record.projectId, homeDir)
+      const parsed = JSON.parse(readFileSync(filePath, "utf8")) as PresenceRecord
+      expect(parsed).toEqual(record)
+      expect(parsed.mode).toBe("internal")
+      expect(parsed.serverUrl).toBeNull()
     })
   })
 })

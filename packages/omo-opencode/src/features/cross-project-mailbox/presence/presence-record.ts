@@ -8,10 +8,13 @@ export const PRESENCE_INTERVAL_MS = 10_000
 
 const PRESENCE_FILE_MODE = 0o600
 
+export type PresenceMode = "internal" | "external"
+
 export interface PresenceRecord {
   projectId: string
   repoRoot: string
-  serverUrl: string
+  mode: PresenceMode
+  serverUrl: string | null
   sessionId: string
   pid: number
   heartbeatTs: number
