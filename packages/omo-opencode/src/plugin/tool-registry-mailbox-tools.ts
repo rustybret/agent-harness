@@ -48,7 +48,7 @@ export function createMailboxToolsRecord(args: {
   }
 
   return {
-    project_message: messageFactory(sharedDeps),
+    project_message: messageFactory({ ...sharedDeps, modeDetector }),
     project_note: noteFactory({ ...sharedDeps, modeDetector }),
   }
 }

@@ -9,6 +9,7 @@ import { CrossProjectMailboxConfigSchema, type CrossProjectMailboxConfig } from 
 import { type MailboxMessage, serializeEnvelope } from "../envelope/schema"
 import type { PresenceStatus } from "../presence"
 import type { ProjectEntry } from "../registry/types"
+import type { MailboxModeState, ModeDetectTrigger, ModeDetector } from "../presence"
 import {
   createProjectMessageTool,
   ProjectMessageInputSchema,
@@ -869,5 +870,179 @@ describe("createProjectMessageTool - lazy per-send config reload", () => {
 
     // then
     expect(out.blocked).toBe(true)
+  })
+})
+
+interface ModeSpy {
+  detector: Pick<ModeDetector, "currentMode" | "detect">
+  detectCalls: Array<{ sessionId: string; trigger: ModeDetectTrigger }>
+}
+
+function fixedModeDetector(mode: MailboxModeState): ModeSpy {
+  const detectCalls: ModeSpy["detectCalls"] = []
+  return {
+    detectCalls,
+    detector: {
+      currentMode: () => mode,
+      detect: async (sessionId: string, trigger: ModeDetectTrigger) => {
+        detectCalls.push({ sessionId, trigger })
+        return mode === "external" ? "external" : "internal"
+      },
+    },
+  }
+}
+
+function lazyModeDetector(resolved: "internal" | "external"): ModeSpy {
+  const detectCalls: ModeSpy["detectCalls"] = []
+  let current: MailboxModeState = "unknown"
+  return {
+    detectCalls,
+    detector: {
+      currentMode: () => current,
+      detect: async (sessionId: string, trigger: ModeDetectTrigger) => {
+        detectCalls.push({ sessionId, trigger })
+        current = resolved
+        return resolved
+      },
+    },
+  }
+}
+
+interface GateSpyHandle {
+  deps: ProjectMessageToolDeps
+  writeCalls: number
+  outboxCalls: number
+  presenceCalls: string[]
+  launchCalls: number
+}
+
+function gateSpyDeps(config: CrossProjectMailboxConfig, detector: Pick<ModeDetector, "currentMode" | "detect">): GateSpyHandle {
+  const handle: GateSpyHandle = {
+    writeCalls: 0,
+    outboxCalls: 0,
+    presenceCalls: [],
+    launchCalls: 0,
+    deps: {
+      config,
+      thisProjectId: THIS_PROJECT_ID,
+      thisRepoRoot,
+      thisProjectDisplayName: "Project C",
+      registry: { listProjects: async () => projects },
+      modeDetector: detector,
+      writeNote: async () => {
+        handle.writeCalls += 1
+      },
+      appendOutbox: async () => {
+        handle.outboxCalls += 1
+      },
+      readPresence: async (projectId: string) => {
+        handle.presenceCalls.push(projectId)
+        return "offline"
+      },
+      launchTarget: async () => {
+        handle.launchCalls += 1
+        return true
+      },
+    },
+  }
+  return handle
+}
+
+describe("createProjectMessageTool - internal/external mode gate", () => {
+  it("blocks a send with the guidance reason and never probes/writes/launches when mode is internal", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const spy = fixedModeDetector("internal")
+    const handle = gateSpyDeps(cfg({ launch_policy: "auto" }), spy.detector)
+    const def = createProjectMessageTool(handle.deps)
+
+    // when
+    const out = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "internal send" }, { sessionID: "ses_int" })) as string,
+    ) as { blocked?: boolean; reason?: string }
+
+    // then
+    expect(out.blocked).toBe(true)
+    expect(out.reason).toBe("internal session - use project_note")
+    expect(handle.writeCalls).toBe(0)
+    expect(handle.outboxCalls).toBe(0)
+    expect(handle.presenceCalls).toEqual([])
+    expect(handle.launchCalls).toBe(0)
+
+    const outboxExists = await readFile(path.join(thisRepoRoot, ".omo", "mailbox-outbox.jsonl"), "utf8")
+      .then(() => true)
+      .catch(() => false)
+    expect(outboxExists).toBe(false)
+  })
+
+  it("leaves the external-mode send path unchanged (delivers, writes, appends)", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const spy = fixedModeDetector("external")
+    const handle = gateSpyDeps(cfg({ launch_policy: "disabled" }), spy.detector)
+    const def = createProjectMessageTool(handle.deps)
+
+    // when
+    const out = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "external send" }, { sessionID: "ses_ext" })) as string,
+    ) as { ok?: boolean }
+
+    // then
+    expect(out.ok).toBe(true)
+    expect(handle.writeCalls).toBe(1)
+    expect(handle.outboxCalls).toBe(1)
+  })
+
+  it("lazily detects with the tool-exec trigger and blocks when detect resolves internal", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const spy = lazyModeDetector("internal")
+    const handle = gateSpyDeps(cfg(), spy.detector)
+    const def = createProjectMessageTool(handle.deps)
+
+    // when
+    const out = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "lazy send" }, { sessionID: "ses_lazy" })) as string,
+    ) as { blocked?: boolean; reason?: string }
+
+    // then
+    expect(out.blocked).toBe(true)
+    expect(out.reason).toBe("internal session - use project_note")
+    expect(spy.detectCalls).toEqual([{ sessionId: "ses_lazy", trigger: "tool-exec" }])
+    expect(handle.writeCalls).toBe(0)
+  })
+
+  it("allows mode:list in internal mode and returns the advisory budget table", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const spy = fixedModeDetector("internal")
+    const handle = gateSpyDeps(cfg(), spy.detector)
+    const def = createProjectMessageTool(handle.deps)
+
+    // when
+    const out = JSON.parse(
+      (await def.execute({ mode: "list", targetProjectId: "proj-b", intent: "quick", body: "ignored" }, { sessionID: "ses_int" })) as string,
+    ) as { mode?: string; advisory?: string; rows?: Array<{ targetProjectId: string }> }
+
+    // then
+    expect(out.mode).toBe("list")
+    expect(out.advisory).toContain("ADVISORY")
+    expect(out.rows?.map((row) => row.targetProjectId).sort()).toEqual(["proj-a", "proj-b"])
+    expect(handle.writeCalls).toBe(0)
+    expect(spy.detectCalls).toEqual([])
+  })
+
+  it("defaults to external (unchanged behavior) when no detector is injected", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    const out = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "no detector" }, {})) as string,
+    ) as { ok?: boolean }
+
+    // then
+    expect(out.ok).toBe(true)
   })
 })

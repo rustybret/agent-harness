@@ -6,7 +6,7 @@ import type { CrossProjectMailboxConfig } from "../config"
 import { MAILBOX_INTENTS, MAX_BODY_BYTES, type MailboxMessage } from "../envelope/schema"
 import { launchTargetSession } from "../launch"
 import { MailboxStore } from "../mailbox/mailbox-store"
-import { readPresenceStatus, type PresenceStatus } from "../presence"
+import { type MailboxModeState, type ModeDetector, readPresenceStatus, type PresenceStatus } from "../presence"
 import type { ProjectEntry } from "../registry/types"
 import { readOutboundBudget } from "../visibility"
 import { buildSendEnvelope, type SendInput } from "./envelope-builder"
@@ -37,12 +37,24 @@ export interface ProjectMessageRegistry {
   listProjects(): Promise<ProjectEntry[]>
 }
 
+export const MESSAGE_INTERNAL_GUIDANCE = "internal session - use project_note"
+
+// Omitting modeDetector defaults to this external-resolving stub, preserving pre-split send behavior
+// for callers that never wired one. Only an explicitly-internal injected detector blocks a send.
+const EXTERNAL_DEFAULT_MODE_DETECTOR: Pick<ModeDetector, "currentMode" | "detect"> = {
+  currentMode: () => "external",
+  detect: async () => "external",
+}
+
 export interface ProjectMessageToolDeps {
   config: CrossProjectMailboxConfig
   thisProjectId: string
   thisRepoRoot: string
   thisProjectDisplayName: string
   registry: ProjectMessageRegistry
+  // Same injection contract as ProjectNoteToolDeps (T7). Optional; defaults to
+  // EXTERNAL_DEFAULT_MODE_DETECTOR when unset so pre-existing send fixtures stay green.
+  modeDetector?: Pick<ModeDetector, "currentMode" | "detect">
   writeNote?: (targetRepoRoot: string, fromProjectId: string, envelope: MailboxMessage, body: string) => Promise<void>
   appendOutbox?: typeof appendOutboxLog
   readPresence?: (projectId: string) => Promise<PresenceStatus>
@@ -166,6 +178,15 @@ export async function runProjectMessageList(deps: ProjectMessageToolDeps): Promi
   }
 }
 
+export async function resolveSendMode(
+  modeDetector: Pick<ModeDetector, "currentMode" | "detect">,
+  sessionId: string,
+): Promise<MailboxModeState> {
+  const current = modeDetector.currentMode()
+  if (current !== "unknown") return current
+  return modeDetector.detect(sessionId, "tool-exec")
+}
+
 function resolveFreshSendConfig(deps: ProjectMessageToolDeps): CrossProjectMailboxConfig {
   const read = validatePluginConfig(deps.thisRepoRoot)
   if (read.valid && read.config.cross_project_mailbox) {
@@ -193,15 +214,23 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
       supersedes: tool.schema.string().optional().describe("Optional messageId this note supersedes"),
       inReplyToMessageId: tool.schema.string().optional().describe("Optional parent messageId when replying to a received note"),
     },
-    execute: async (rawArgs) => {
+    execute: async (rawArgs, toolContext) => {
       const freshConfig = resolveFreshSendConfig(deps)
       if (freshConfig.enabled === false) {
         return JSON.stringify({ blocked: true, reason: "mailbox disabled" })
       }
 
+      // list (advisory budget read) is allowed in both modes; gate only the send path.
       if (rawArgs.mode === "list") {
         const listResult = await runProjectMessageList({ ...deps, config: freshConfig })
         return JSON.stringify(listResult)
+      }
+
+      const modeDetector = deps.modeDetector ?? EXTERNAL_DEFAULT_MODE_DETECTOR
+      const sessionId = (toolContext as { sessionID?: string })?.sessionID ?? ""
+      const mode = await resolveSendMode(modeDetector, sessionId)
+      if (mode === "internal") {
+        return JSON.stringify({ blocked: true, reason: MESSAGE_INTERNAL_GUIDANCE })
       }
 
       const effectiveBodyCap = Math.min(freshConfig.bounds.max_body_bytes, MAX_BODY_BYTES)
