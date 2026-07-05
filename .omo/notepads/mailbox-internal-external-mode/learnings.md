@@ -388,3 +388,7 @@ Updated user-facing documentation to reflect the new internal/external mode feat
 ### Verification
 - Verified that all documented tool names, field names, and guidance strings match the learnings notepad exactly.
 - Verified that no em/en dashes or AI slop words were introduced.
+
+## [2026-07-05T12:00:00Z] Cleanup
+
+The internal/external mode gate was proven correct via live e2e evidence (`.omo/evidence/20260705-mailbox-internal-external-v10-debug/`), and debug logging removed as final cleanup.
