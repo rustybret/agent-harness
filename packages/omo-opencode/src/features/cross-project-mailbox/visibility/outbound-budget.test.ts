@@ -5,6 +5,7 @@ import type { PresenceStatus } from "../presence"
 import type { ProjectEntry } from "../registry/types"
 import {
   hashOutboundBudget,
+  presenceLabel,
   readOutboundBudget,
   renderOutboundBudgetTable,
   selectOutboundBudgetInjection,
@@ -76,6 +77,20 @@ describe("readOutboundBudget", () => {
     expect(z?.presence).toBe("offline")
   })
 
+  it("maps an internal presence status straight through to the row presence field", async () => {
+    // given
+    const config = cfg({ senders: { "proj-b": { access: "allow", intent_budget: "plan" } } })
+
+    // when
+    const rows = await readOutboundBudget(config, registryOf(PROJECTS), {
+      readPresence: async () => "internal",
+    })
+
+    // then
+    expect(rows).toHaveLength(1)
+    expect(rows[0]?.presence).toBe("internal")
+  })
+
   it("reports unknown presence when the presence reader throws", async () => {
     // given
     const config = cfg({ senders: { "proj-b": { access: "allow", intent_budget: "plan" } } })
@@ -113,6 +128,17 @@ describe("readOutboundBudget", () => {
   })
 })
 
+describe("presenceLabel", () => {
+  it("labels internal presence as doc-drop and passes every other status through unchanged", () => {
+    // then
+    expect(presenceLabel("internal")).toBe("internal (doc-drop)")
+    expect(presenceLabel("live")).toBe("live")
+    expect(presenceLabel("stale")).toBe("stale")
+    expect(presenceLabel("offline")).toBe("offline")
+    expect(presenceLabel("unknown")).toBe("unknown")
+  })
+})
+
 describe("renderOutboundBudgetTable / hashOutboundBudget", () => {
   it("renders an advisory-marked markdown table with one line per row", () => {
     // given
@@ -128,6 +154,44 @@ describe("renderOutboundBudgetTable / hashOutboundBudget", () => {
     expect(table).toContain("Project B")
     expect(table).toContain("plan")
     expect(table).toContain("live")
+  })
+
+  it("renders the internal doc-drop label for an internal presence row", () => {
+    // given
+    const rows = [
+      {
+        targetProjectId: "proj-b",
+        displayName: "Project B",
+        grantedCeiling: "plan",
+        presence: "internal" as const,
+      },
+    ]
+
+    // when
+    const table = renderOutboundBudgetTable(rows)
+
+    // then
+    expect(table).toContain("internal (doc-drop)")
+  })
+
+  it("renders the raw presence token for non-internal rows with no regression", () => {
+    // given
+    const rows = [
+      { targetProjectId: "proj-a", displayName: "Project A", grantedCeiling: "plan", presence: "live" as const },
+      { targetProjectId: "proj-b", displayName: "Project B", grantedCeiling: "plan", presence: "stale" as const },
+      { targetProjectId: "proj-c", displayName: "Project C", grantedCeiling: "plan", presence: "offline" as const },
+      { targetProjectId: "proj-d", displayName: "Project D", grantedCeiling: "plan", presence: "unknown" as const },
+    ]
+
+    // when
+    const table = renderOutboundBudgetTable(rows)
+
+    // then
+    expect(table).toContain("| Project A | proj-a | plan | live |")
+    expect(table).toContain("| Project B | proj-b | plan | stale |")
+    expect(table).toContain("| Project C | proj-c | plan | offline |")
+    expect(table).toContain("| Project D | proj-d | plan | unknown |")
+    expect(table).not.toContain("doc-drop")
   })
 
   it("produces the same hash for equal rows and a different hash when a value changes", () => {

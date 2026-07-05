@@ -1,6 +1,7 @@
 export {
   hashOutboundBudget,
   OUTBOUND_BUDGET_MAX_TARGETS,
+  presenceLabel,
   readOutboundBudget,
   renderOutboundBudgetTable,
   selectOutboundBudgetInjection,

@@ -4,6 +4,7 @@ import type { Managers } from "../create-managers"
 import type { SkillContext } from "./skill-context"
 import type { PluginContext, ToolsRecord } from "./types"
 import type { ToolRegistryFactories } from "./tool-registry-factories"
+import type { ModeDetector } from "../features/cross-project-mailbox/presence"
 
 import { isInteractiveBashEnabled } from "../interactive-bash-availability"
 import { filterDisabledTools } from "../shared/disabled-tools"
@@ -35,6 +36,7 @@ export function createToolRegistry(args: {
   availableCategories: AvailableCategory[]
   interactiveBashEnabled?: boolean
   toolFactories?: Partial<ToolRegistryFactories>
+  mailboxModeDetector?: ModeDetector
 }): ToolRegistryResult {
   const {
     ctx,
@@ -44,6 +46,7 @@ export function createToolRegistry(args: {
     availableCategories,
     interactiveBashEnabled = isInteractiveBashEnabled(),
     toolFactories,
+    mailboxModeDetector,
   } = args
   const factories: ToolRegistryFactories = {
     ...defaultToolRegistryFactories,
@@ -64,7 +67,7 @@ export function createToolRegistry(args: {
     ...createMonitorToolsRecord({ pluginConfig, ctx, managers, factories }),
     ...createTaskToolsRecord({ taskSystemEnabled, pluginConfig, ctx, factories }),
     ...createHashlineToolsRecord({ pluginConfig, ctx, factories }),
-    ...createMailboxToolsRecord({ pluginConfig, ctx, factories }),
+    ...createMailboxToolsRecord({ pluginConfig, ctx, factories, modeDetector: mailboxModeDetector }),
   }
 
   const allToolNames = Object.keys(allTools)

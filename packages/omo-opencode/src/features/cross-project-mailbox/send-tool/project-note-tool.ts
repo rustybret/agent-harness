@@ -1,26 +1,25 @@
 import { type ToolDefinition, tool } from "@opencode-ai/plugin/tool"
 import { z } from "zod"
 
-import { validatePluginConfig } from '../../../config/validate';
+import { validatePluginConfig } from "../../../config/validate"
 import type { CrossProjectMailboxConfig } from "../config"
 import { MAILBOX_INTENTS, MAX_BODY_BYTES, type MailboxMessage } from "../envelope/schema"
-import { launchTargetSession } from "../launch"
 import { MailboxStore } from "../mailbox/mailbox-store"
-import { type MailboxModeState, type ModeDetector, readPresenceStatus, type PresenceStatus } from "../presence"
-import type { ProjectEntry } from "../registry/types"
-import { readOutboundBudget } from "../visibility"
+import type { MailboxModeState, ModeDetector } from "../presence"
 import { buildSendEnvelope, type SendInput } from "./envelope-builder"
 import { appendOutboxLog } from "./outbox-log"
-import { type PreflightReason, runSendPreflight } from "./send-preflight"
+import { type ProjectMessageRegistry, type SendResult } from "./project-message-tool"
+import { runSendPreflight } from "./send-preflight"
 
-export const IntentEnumSchema = z.enum(MAILBOX_INTENTS)
+export const NOTE_EXTERNAL_GUIDANCE = "external session; use project_message"
 
-export function createProjectMessageInputSchema(maxBodyBytes: number) {
+export type ProjectNoteExecResult = SendResult | { blocked: true; reason: string }
+
+export function createProjectNoteInputSchema(maxBodyBytes: number) {
   return z
     .object({
-      mode: z.enum(["send", "list"]).default("send"),
       targetProjectId: z.string(),
-      intent: IntentEnumSchema,
+      intent: z.enum(MAILBOX_INTENTS),
       category: z.string().optional(),
       body: z.string().max(maxBodyBytes),
       priority: z.number().default(0),
@@ -31,41 +30,18 @@ export function createProjectMessageInputSchema(maxBodyBytes: number) {
     .strict()
 }
 
-export const ProjectMessageInputSchema = createProjectMessageInputSchema(MAX_BODY_BYTES)
+export const ProjectNoteInputSchema = createProjectNoteInputSchema(MAX_BODY_BYTES)
 
-export interface ProjectMessageRegistry {
-  listProjects(): Promise<ProjectEntry[]>
-}
-
-export const MESSAGE_INTERNAL_GUIDANCE = "internal session - use project_note"
-
-// Omitting modeDetector defaults to this external-resolving stub, preserving pre-split send behavior
-// for callers that never wired one. Only an explicitly-internal injected detector blocks a send.
-const EXTERNAL_DEFAULT_MODE_DETECTOR: Pick<ModeDetector, "currentMode" | "detect"> = {
-  currentMode: () => "external",
-  detect: async () => "external",
-}
-
-export interface ProjectMessageToolDeps {
+export interface ProjectNoteToolDeps {
   config: CrossProjectMailboxConfig
   thisProjectId: string
   thisRepoRoot: string
   thisProjectDisplayName: string
   registry: ProjectMessageRegistry
-  // Same injection contract as ProjectNoteToolDeps (T7). Optional; defaults to
-  // EXTERNAL_DEFAULT_MODE_DETECTOR when unset so pre-existing send fixtures stay green.
-  modeDetector?: Pick<ModeDetector, "currentMode" | "detect">
+  modeDetector: Pick<ModeDetector, "currentMode" | "detect">
   writeNote?: (targetRepoRoot: string, fromProjectId: string, envelope: MailboxMessage, body: string) => Promise<void>
   appendOutbox?: typeof appendOutboxLog
-  readPresence?: (projectId: string) => Promise<PresenceStatus>
-  launchTarget?: (repoRoot: string, projectId: string, policy: CrossProjectMailboxConfig["launch_policy"]) => Promise<boolean>
-  launchPermissionAsk?: (target: string) => Promise<boolean>
 }
-
-export type SendResult =
-  | { ok: true; envelope: MailboxMessage; messageId: string; correlationId: string }
-  | { error: "target-not-found" | "reply-parent-not-found" }
-  | { blocked: true; reason: PreflightReason }
 
 async function defaultWriteNote(
   targetRepoRoot: string,
@@ -78,31 +54,13 @@ async function defaultWriteNote(
   await store.writeNote(envelope, body)
 }
 
-async function maybeLaunchOfflineTarget(
-  targetEntry: ProjectEntry,
-  deps: ProjectMessageToolDeps,
-): Promise<void> {
-  const policy = deps.config.launch_policy
-  if (policy === "disabled") return
-
-  const readPresence = deps.readPresence ?? ((projectId: string) => readPresenceStatus(projectId))
-  const status = await readPresence(targetEntry.projectId)
-  if (status !== "offline") return
-
-  const launch =
-    deps.launchTarget ??
-    ((repoRoot: string, projectId: string, launchPolicy: CrossProjectMailboxConfig["launch_policy"]) =>
-      launchTargetSession(repoRoot, {
-        policy: launchPolicy,
-        projectId,
-        launchPermissionAsk: deps.launchPermissionAsk,
-      }))
-  await launch(targetEntry.repoRoot, targetEntry.projectId, policy)
-}
-
-export async function runProjectMessageSend(
+// Fire-and-forget doc-drop: resolve target, build envelope, run receiver-protecting preflight
+// (allowlist + intent-budget + hop-check), write the note into the target's coordination_notes/,
+// and append the outbox log. NO presence probe and NO launch: those are sender-side liveness
+// concerns irrelevant to a pure file drop.
+export async function runProjectNoteSend(
   input: SendInput,
-  deps: ProjectMessageToolDeps,
+  deps: ProjectNoteToolDeps,
 ): Promise<SendResult> {
   const projects = await deps.registry.listProjects()
   const targetEntry =
@@ -130,8 +88,6 @@ export async function runProjectMessageSend(
   if (preflight.blocked) {
     return { blocked: true, reason: preflight.reason }
   }
-
-  await maybeLaunchOfflineTarget(targetEntry, deps)
 
   if (deps.writeNote) {
     await deps.writeNote(targetEntry.repoRoot, deps.thisProjectId, built.envelope, built.body)
@@ -164,31 +120,19 @@ export async function runProjectMessageSend(
   }
 }
 
-export async function runProjectMessageList(deps: ProjectMessageToolDeps): Promise<{
-  mode: "list"
-  advisory: string
-  rows: Awaited<ReturnType<typeof readOutboundBudget>>
-}> {
-  const readPresence = deps.readPresence ?? ((projectId: string) => readPresenceStatus(projectId))
-  const rows = await readOutboundBudget(deps.config, deps.registry, { readPresence })
-  return {
-    mode: "list",
-    advisory: "ADVISORY - target-side inbound validation remains authoritative.",
-    rows,
-  }
-}
-
-export async function resolveSendMode(
+// Resolve the current session mode; lazily detect when no detect has run yet for this session
+// (tool executed before the first idle/heartbeat). currentMode() is a zero-I/O memoized read;
+// only "unknown" triggers a real detect via the "tool-exec" trigger.
+export async function resolveNoteMode(
   modeDetector: Pick<ModeDetector, "currentMode" | "detect">,
   sessionId: string,
 ): Promise<MailboxModeState> {
   const current = modeDetector.currentMode()
   if (current !== "unknown") return current
-  const detected = await modeDetector.detect(sessionId, "tool-exec")
-  return detected
+  return modeDetector.detect(sessionId, "tool-exec")
 }
 
-function resolveFreshSendConfig(deps: ProjectMessageToolDeps): CrossProjectMailboxConfig {
+function resolveFreshSendConfig(deps: ProjectNoteToolDeps): CrossProjectMailboxConfig {
   const read = validatePluginConfig(deps.thisRepoRoot)
   if (read.valid && read.config.cross_project_mailbox) {
     return read.config.cross_project_mailbox
@@ -196,20 +140,19 @@ function resolveFreshSendConfig(deps: ProjectMessageToolDeps): CrossProjectMailb
   return deps.config
 }
 
-export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefinition {
-  const inputSchema = createProjectMessageInputSchema(MAX_BODY_BYTES)
+export function createProjectNoteTool(deps: ProjectNoteToolDeps): ToolDefinition {
+  const inputSchema = createProjectNoteInputSchema(MAX_BODY_BYTES)
   return tool({
-    description: "Send a note to another registered project's agent session",
+    description:
+      "Drop a fire-and-forget note into another registered project's coordination_notes/ for its idle-drain filewatcher (internal sessions only; no presence probe, no launch)",
     args: {
-      mode: tool.schema
-        .enum(["send", "list"])
+      targetProjectId: tool.schema
+        .string()
         .optional()
-        .default("send")
-        .describe("send delivers the note; list returns the ADVISORY outbound-budget table without sending"),
-      targetProjectId: tool.schema.string().optional().describe("Registered projectId or display name of the destination project (required for mode=send)"),
-      intent: tool.schema.enum(MAILBOX_INTENTS).optional().describe("Intent tier of this note (required for mode=send)"),
+        .describe("Registered projectId or display name of the destination project"),
+      intent: tool.schema.enum(MAILBOX_INTENTS).optional().describe("Intent tier of this note"),
       category: tool.schema.string().optional().describe("Optional task category; when set it gates the note in place of intent"),
-      body: tool.schema.string().optional().describe("Note body (required for mode=send)"),
+      body: tool.schema.string().optional().describe("Note body"),
       priority: tool.schema.number().optional().default(0).describe("Optional priority; higher drains first"),
       threadId: tool.schema.string().optional().describe("Optional correlation UUID for a fresh thread (ignored on replies)"),
       supersedes: tool.schema.string().optional().describe("Optional messageId this note supersedes"),
@@ -221,17 +164,12 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
         return JSON.stringify({ blocked: true, reason: "mailbox disabled" })
       }
 
-      // list (advisory budget read) is allowed in both modes; gate only the send path.
-      if (rawArgs.mode === "list") {
-        const listResult = await runProjectMessageList({ ...deps, config: freshConfig })
-        return JSON.stringify(listResult)
-      }
-
-      const modeDetector = deps.modeDetector ?? EXTERNAL_DEFAULT_MODE_DETECTOR
+      // Mode gate BEFORE preflight: an external-mode call short-circuits with guidance without
+      // touching preflight/allowlist. Lazy-detect closes the tool-executes-before-first-idle race.
       const sessionId = (toolContext as { sessionID?: string })?.sessionID ?? ""
-      const mode = await resolveSendMode(modeDetector, sessionId)
-      if (mode === "internal") {
-        return JSON.stringify({ blocked: true, reason: MESSAGE_INTERNAL_GUIDANCE })
+      const mode = await resolveNoteMode(deps.modeDetector, sessionId)
+      if (mode === "external") {
+        return JSON.stringify({ blocked: true, reason: NOTE_EXTERNAL_GUIDANCE })
       }
 
       const effectiveBodyCap = Math.min(freshConfig.bounds.max_body_bytes, MAX_BODY_BYTES)
@@ -241,7 +179,7 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
       }
 
       const input = inputSchema.parse(rawArgs)
-      const result = await runProjectMessageSend(input, { ...deps, config: freshConfig })
+      const result = await runProjectNoteSend(input, { ...deps, config: freshConfig })
       return JSON.stringify(result)
     },
   })

@@ -16,7 +16,11 @@ import { validateInbound } from "../validation"
 import { getServerBaseUrl } from "../../../shared/opencode-http-api"
 import { projectIdForRoot } from "../envelope/project-id"
 import {
+  createModeDetector,
   createPresenceHeartbeatHook,
+  type ModeDetector,
+  type ModeDetectorDeps,
+  type PresenceHeartbeatDeps,
   type PresenceHeartbeatHook,
 } from "../presence"
 import { createIdleDrainHook, type IdleDrainHookDeps } from "./idle-drain-hook"
@@ -123,13 +127,22 @@ function buildIdleDrainDeps(
   }
 }
 
-function buildPresenceHeartbeatHook(ctx: PluginContext): PresenceHeartbeatHook | null {
+export type PresenceHeartbeatOverrides = Pick<
+  PresenceHeartbeatDeps,
+  "writeRecord" | "homeDir" | "now"
+> &
+  Pick<ModeDetectorDeps, "readOwnRecord" | "settleMs">
+
+export function buildPresenceHeartbeatHook(
+  ctx: PluginContext,
+  overrides?: PresenceHeartbeatOverrides,
+  sharedModeDetector?: ModeDetector,
+): PresenceHeartbeatHook | null {
   const repoRoot = ctx.directory
-  const serverUrl = ctx.serverUrl?.toString() ?? getServerBaseUrl(ctx.client)
-  if (serverUrl === null) {
-    log("mailbox presence heartbeat disabled: no server base url")
-    return null
-  }
+  // Do NOT early-return on a null serverUrl: internal sessions must keep heartbeating so peers see
+  // freshness; the mode detector confirms internal vs external and the record is tagged accordingly.
+  const resolveServerUrl = (): string | null => ctx.serverUrl?.toString() ?? getServerBaseUrl(ctx.client)
+  const serverUrl = resolveServerUrl()
   let projectId: string
   try {
     projectId = projectIdForRoot(repoRoot)
@@ -137,16 +150,33 @@ function buildPresenceHeartbeatHook(ctx: PluginContext): PresenceHeartbeatHook |
     log("mailbox presence heartbeat disabled: projectId resolution failed", { error })
     return null
   }
-  return createPresenceHeartbeatHook({ projectId, repoRoot, serverUrl })
+  const modeDetector =
+    sharedModeDetector ??
+    createModeDetector({
+      resolveServerUrl,
+      repoRoot,
+      readOwnRecord: overrides?.readOwnRecord,
+      settleMs: overrides?.settleMs,
+    })
+  return createPresenceHeartbeatHook({
+    projectId,
+    repoRoot,
+    serverUrl,
+    modeDetector,
+    writeRecord: overrides?.writeRecord,
+    homeDir: overrides?.homeDir,
+    now: overrides?.now,
+  })
 }
 
 export function createMailboxHooks(
   ctx: PluginContext,
   config: CrossProjectMailboxConfig | undefined,
+  sharedModeDetector?: ModeDetector,
 ): MailboxHooks {
   if (!config?.enabled) return { mailboxIdleDrain: null, mailboxPresenceHeartbeat: null }
   return {
     mailboxIdleDrain: createIdleDrainHook(buildIdleDrainDeps(ctx, config)),
-    mailboxPresenceHeartbeat: buildPresenceHeartbeatHook(ctx),
+    mailboxPresenceHeartbeat: buildPresenceHeartbeatHook(ctx, undefined, sharedModeDetector),
   }
 }

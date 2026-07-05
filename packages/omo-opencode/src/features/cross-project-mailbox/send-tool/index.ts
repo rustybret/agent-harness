@@ -8,7 +8,9 @@ export {
   createProjectMessageInputSchema,
   createProjectMessageTool,
   IntentEnumSchema,
+  MESSAGE_INTERNAL_GUIDANCE,
   ProjectMessageInputSchema,
+  resolveSendMode,
   runProjectMessageSend,
 } from "./project-message-tool"
 export type {
@@ -16,3 +18,12 @@ export type {
   ProjectMessageToolDeps,
   SendResult,
 } from "./project-message-tool"
+export {
+  createProjectNoteInputSchema,
+  createProjectNoteTool,
+  NOTE_EXTERNAL_GUIDANCE,
+  ProjectNoteInputSchema,
+  resolveNoteMode,
+  runProjectNoteSend,
+} from "./project-note-tool"
+export type { ProjectNoteExecResult, ProjectNoteToolDeps } from "./project-note-tool"

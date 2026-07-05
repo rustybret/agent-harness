@@ -113,10 +113,15 @@ By default, the mailbox rejects deliveries from unconfigured sources. You must a
 
 ---
 
-### Step 3: Driving Delivery (The Agent Tool)
-Once configured, Sisyphus (or Hephaestus/Atlas) will automatically discover the `project_message` tool when `cross_project_mailbox.enabled` is `true`.
+### Step 3: Driving Delivery (The Agent Tools)
 
-#### Tool Schema
+Once configured, Sisyphus (or Hephaestus/Atlas) will automatically discover the coordination tools when `cross_project_mailbox.enabled` is `true`.
+
+#### The `project_message` Tool
+
+This tool is used in external sessions to send asynchronous, presence-aware coordination messages to target projects.
+
+##### Tool Schema
 ```json
 {
   "name": "project_message",
@@ -133,6 +138,47 @@ Once configured, Sisyphus (or Hephaestus/Atlas) will automatically discover the 
   }
 }
 ```
+
+##### Mode Gating Behavior
+
+If `project_message` is called in an internal session, the send operation is blocked and returns the following guidance:
+`"internal session - use project_note"`
+
+However, calling `project_message` with `mode: "list"` (advisory outbound-budget read) remains allowed in both internal and external modes.
+
+#### The `project_note` Tool
+
+This tool is a fire-and-forget doc-drop tool designed for internal sessions. It writes the note directly into the target's `coordination_notes/` directory without performing presence probing or target launching.
+
+##### Tool Schema
+
+```json
+{
+  "name": "project_note",
+  "arguments": {
+    "targetProjectId": "abc12345", // Target project to send note to
+    "body": "Markdown text describing the task or coordination request.",
+    "priority": 0, // Higher numbers are drained first
+    "threadId": "optional-uuid", // Correlation thread grouping (UUID v4)
+    "supersedes": "optional-message-uuid", // Optional message ID this replaces
+    "inReplyToMessageId": "optional-message-uuid" // Reply parent reference
+  }
+}
+```
+
+##### Mode Gating Behavior
+
+If `project_note` is called in an external session, the operation is blocked and returns the following guidance:
+`"external session; use project_message"`
+
+##### Guard Parity
+
+The `project_note` tool enforces the same receiver-protecting guards as `project_message`. These include:
+* Sender preflight allowlist validation.
+* Intent budget verification.
+* Hop count limits.
+* Outbox log appending.
+* Body size limits.
 
 #### File Inbound Structure
 The tool writes an envelope-wrapped Markdown file to `<target>/coordination_notes/<source-projectId>/<messageId>.md`:
@@ -177,16 +223,45 @@ The `category` field on `project_message` is optional. If omitted, the `intent` 
 
 ## Session Presence
 
-Active sessions maintain presence information to allow other projects to verify their status.
+Active sessions maintain presence information to allow other projects to verify their status. The mailbox classifies each session into one of two modes:
 
-* **Heartbeat File**: A JSON file located at `~/.omo/presence/<projectId>.json` is updated every 30 seconds while the session is active.
-* **Fields**: The heartbeat file contains the following fields:
-  * `serverUrl`: The URL of the local server.
-  * `sessionId`: The unique identifier of the active session.
-  * `pid`: The process ID of the session.
-  * `updatedAt`: The timestamp of the last update.
-* **Liveness Check**: The sender performs a liveness check by hitting the `serverUrl` API endpoint to confirm the session is alive.
-* **Staleness**: A heartbeat that is more than 30 seconds old is considered stale, indicating the session is down.
+* **Internal Mode**: Applies to plain `opencode` or `opencode --continue` TUI sessions. The mailbox is disabled by default for sending messages, and coordination is restricted to file-based doc-drops via the `project_note` tool.
+* **External Mode**: Applies to sessions launched via `opencode serve`, `opencode web`, or with an explicit `--port` flag. These sessions support full presence-aware message delivery via the `project_message` tool.
+
+### Mode Detection via the Listener Registry
+
+The opencode fork writes an on-disk listener registry record at `<xdg-state>/opencode/instances/<pid>.json` (`{pid, url, hostname, port, startedAt}`) whenever `Server.listen` binds a TCP socket, and removes it when the listener stops. The mode detector reads the record for its own pid on session start or resume:
+
+* Record present: the session is **external**, and the record's `url` is the real bound address published in the presence heartbeat.
+* Record absent (after two brief retries covering the fresh-listener race): the session is **internal**. A legacy fallback classifies the session external when an older host exposes a non-placeholder `ctx.serverUrl`.
+* Records whose `startedAt` predates the current process are rejected as pid-reuse leftovers from a hard kill.
+
+Activity endpoints are deliberately NOT used for detection: the host evicts idle sessions from `/session/status`, and idle is the normal resting state of an attended session.
+
+### Heartbeat File and Fields
+
+A JSON file located at `~/.omo/presence/<projectId>.json` is updated every 10 seconds while the session is active (30 second TTL). The heartbeat file contains the following fields:
+
+* `projectId`: The unique 8-character identifier of the project.
+* `repoRoot`: The absolute path to the repository root.
+* `mode`: The session mode, either `"internal"` or `"external"`.
+* `serverUrl`: The URL of the local server, or `null` for internal sessions.
+* `sessionId`: The unique identifier of the active session.
+* `pid`: The process ID of the session.
+* `heartbeatTs`: The timestamp of the last update.
+
+### Reachability Liveness Check
+
+The sender confirms a target's server is reachable with a `GET <serverUrl>/global/health` probe carrying the `x-opencode-directory: <repoRoot>` header. Any HTTP response (including auth-gated 401s) proves a live server; only a network-level failure marks the target unreachable. Attendance is carried by heartbeat freshness: a process that beats every 10 seconds is alive, whether or not its session is actively processing a prompt. If the target is in internal mode, the server URL is `null`, and the probe is bypassed.
+
+### Presence Statuses
+
+The presence reader resolves a target's status into one of the following values:
+
+* `live`: The target is in external mode, its heartbeat is fresh, and the health probe got an HTTP response.
+* `internal`: The target is in internal mode, and its heartbeat is fresh. The outbound budget table and TUI sidebar display this status as `internal (doc-drop)`.
+* `stale`: The target is in external mode with a fresh heartbeat, but the health probe could not connect.
+* `offline`: No heartbeat file exists, or the heartbeat timestamp is older than the TTL.
 
 ---
 

@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises"
 import os from "node:os"
 
+
 import { log } from "../../../shared/logger"
 import { getServerBasicAuthHeader } from "../../../shared/opencode-server-auth"
 import {
@@ -9,7 +10,7 @@ import {
   presenceRecordPath,
 } from "./presence-record"
 
-export type PresenceStatus = "live" | "stale" | "offline"
+export type PresenceStatus = "live" | "stale" | "offline" | "internal"
 
 const DEFAULT_PROBE_TIMEOUT_MS = 2_000
 
@@ -18,12 +19,15 @@ export interface ReadPresenceStatusDeps {
   probeTimeoutMs?: number
 }
 
-function isPresenceRecord(value: unknown): value is PresenceRecord {
+export function isPresenceRecord(value: unknown): value is PresenceRecord {
   if (typeof value !== "object" || value === null) return false
   const record = value as Record<string, unknown>
+  const mode = record["mode"]
+  const serverUrl = record["serverUrl"]
   return (
     typeof record["projectId"] === "string" &&
-    typeof record["serverUrl"] === "string" &&
+    (mode === "internal" || mode === "external") &&
+    (typeof serverUrl === "string" || serverUrl === null) &&
     typeof record["sessionId"] === "string" &&
     typeof record["heartbeatTs"] === "number"
   )
@@ -43,18 +47,30 @@ async function readRecord(projectId: string, homeDir: string): Promise<PresenceR
   }
 }
 
-async function defaultProbeSession(record: PresenceRecord): Promise<boolean> {
+function buildHealthUrl(serverUrl: string): string {
+  const base = serverUrl.replace(/\/$/, "")
+  return `${base}/global/health`
+}
+
+// Reachability-only liveness: ANY HTTP response (including 401/404) proves a live opencode
+// server behind the published URL; only a network-level failure means dead. Attendance is
+// carried by heartbeat freshness in readPresenceStatus (the process that beats every 10s is
+// alive), NOT by activity endpoints like /session/status, which the host evicts on idle — an
+// idle session is the NORMAL resting state of an attended external session, never "gone".
+export async function defaultProbeSession(record: PresenceRecord): Promise<boolean> {
+  if (record.serverUrl === null) return false
   const auth = getServerBasicAuthHeader()
-  const url = `${record.serverUrl.replace(/\/$/, "")}/session/${encodeURIComponent(record.sessionId)}`
+  const headers: Record<string, string> = { "x-opencode-directory": record.repoRoot }
+  if (auth) headers["Authorization"] = auth
   try {
-    const response = await fetch(url, {
+    await fetch(buildHealthUrl(record.serverUrl), {
       method: "GET",
-      headers: auth ? { Authorization: auth } : undefined,
+      headers,
       signal: AbortSignal.timeout(DEFAULT_PROBE_TIMEOUT_MS),
     })
-    return response.ok
+    return true
   } catch (error) {
-    log("[presence-reader] session probe failed", {
+    log("[presence-reader] health probe failed", {
       error: error instanceof Error ? error.message : String(error),
       sessionId: record.sessionId,
     })
@@ -88,6 +104,8 @@ export async function readPresenceStatus(
 
   const age = Date.now() - record.heartbeatTs
   if (age > PRESENCE_TTL_MS) return "offline"
+
+  if (record.mode === "internal") return "internal"
 
   const timeoutMs = deps.probeTimeoutMs ?? DEFAULT_PROBE_TIMEOUT_MS
   const alive = await raceProbe(record, deps.probeSession, timeoutMs)
