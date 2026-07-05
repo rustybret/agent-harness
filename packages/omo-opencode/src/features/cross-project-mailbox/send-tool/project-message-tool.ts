@@ -1,5 +1,6 @@
 import { type ToolDefinition, tool } from "@opencode-ai/plugin/tool"
 import { z } from "zod"
+import { log } from "../../../shared/logger"
 
 import { validatePluginConfig } from '../../../config/validate';
 import type { CrossProjectMailboxConfig } from "../config"
@@ -183,10 +184,10 @@ export async function resolveSendMode(
   sessionId: string,
 ): Promise<MailboxModeState> {
   const current = modeDetector.currentMode()
-  console.error("[DEBUG-mailbox-gate] resolveSendMode entry", { sessionId, current, detectorRef: String(modeDetector) })
+  log("[DEBUG-mailbox-gate] resolveSendMode entry", { sessionId, current, detectorRef: String(modeDetector) })
   if (current !== "unknown") return current
   const detected = await modeDetector.detect(sessionId, "tool-exec")
-  console.error("[DEBUG-mailbox-gate] resolveSendMode detected", { sessionId, detected })
+  log("[DEBUG-mailbox-gate] resolveSendMode detected", { sessionId, detected })
   return detected
 }
 
@@ -231,13 +232,13 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
 
       const modeDetector = deps.modeDetector ?? EXTERNAL_DEFAULT_MODE_DETECTOR
       const sessionId = (toolContext as { sessionID?: string })?.sessionID ?? ""
-      console.error("[DEBUG-mailbox-gate] execute entry", {
+      log("[DEBUG-mailbox-gate] execute entry", {
         sessionId,
         hasDepsModeDetector: deps.modeDetector !== undefined,
         usedFallback: deps.modeDetector === undefined,
       })
       const mode = await resolveSendMode(modeDetector, sessionId)
-      console.error("[DEBUG-mailbox-gate] execute resolved mode", { sessionId, mode })
+      log("[DEBUG-mailbox-gate] execute resolved mode", { sessionId, mode })
       if (mode === "internal") {
         return JSON.stringify({ blocked: true, reason: MESSAGE_INTERNAL_GUIDANCE })
       }
