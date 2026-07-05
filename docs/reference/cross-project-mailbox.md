@@ -228,13 +228,19 @@ Active sessions maintain presence information to allow other projects to verify 
 * **Internal Mode**: Applies to plain `opencode` or `opencode --continue` TUI sessions. The mailbox is disabled by default for sending messages, and coordination is restricted to file-based doc-drops via the `project_note` tool.
 * **External Mode**: Applies to sessions launched via `opencode serve`, `opencode web`, or with an explicit `--port` flag. These sessions support full presence-aware message delivery via the `project_message` tool.
 
-### Mode Detection and Self-Probing
+### Mode Detection via the Listener Registry
 
-The mode detector runs a self-probe on startup or resume. When no server URL is resolved, it defaults to internal. If a server URL is resolved, the detector probes the server's `/session/status` endpoint while passing the directory context. Finding the session ID in the status map classifies the session as external. When the session ID is absent, the detector retries up to two times before concluding internal. Any timeout or connection failure defaults to internal.
+The opencode fork writes an on-disk listener registry record at `<xdg-state>/opencode/instances/<pid>.json` (`{pid, url, hostname, port, startedAt}`) whenever `Server.listen` binds a TCP socket, and removes it when the listener stops. The mode detector reads the record for its own pid on session start or resume:
+
+* Record present: the session is **external**, and the record's `url` is the real bound address published in the presence heartbeat.
+* Record absent (after two brief retries covering the fresh-listener race): the session is **internal**. A legacy fallback classifies the session external when an older host exposes a non-placeholder `ctx.serverUrl`.
+* Records whose `startedAt` predates the current process are rejected as pid-reuse leftovers from a hard kill.
+
+Activity endpoints are deliberately NOT used for detection: the host evicts idle sessions from `/session/status`, and idle is the normal resting state of an attended session.
 
 ### Heartbeat File and Fields
 
-A JSON file located at `~/.omo/presence/<projectId>.json` is updated every 30 seconds while the session is active. The heartbeat file contains the following fields:
+A JSON file located at `~/.omo/presence/<projectId>.json` is updated every 10 seconds while the session is active (30 second TTL). The heartbeat file contains the following fields:
 
 * `projectId`: The unique 8-character identifier of the project.
 * `repoRoot`: The absolute path to the repository root.
@@ -244,19 +250,17 @@ A JSON file located at `~/.omo/presence/<projectId>.json` is updated every 30 se
 * `pid`: The process ID of the session.
 * `heartbeatTs`: The timestamp of the last update.
 
-### Directory-Scoped Liveness Check
+### Reachability Liveness Check
 
-The sender performs a liveness check to confirm the target session is active. Probes pass the target session's directory context via the `?directory=<repoRoot>` query parameter and the `x-opencode-directory: <repoRoot>` header. This ensures that multi-tenant `opencode serve` routing resolves the correct session.
-
-A target session is considered live only if its `sessionId` is actively tracked in the status map returned by the server. If the target is in internal mode, the server URL is `null`, and the liveness check is bypassed.
+The sender confirms a target's server is reachable with a `GET <serverUrl>/global/health` probe carrying the `x-opencode-directory: <repoRoot>` header. Any HTTP response (including auth-gated 401s) proves a live server; only a network-level failure marks the target unreachable. Attendance is carried by heartbeat freshness: a process that beats every 10 seconds is alive, whether or not its session is actively processing a prompt. If the target is in internal mode, the server URL is `null`, and the probe is bypassed.
 
 ### Presence Statuses
 
 The presence reader resolves a target's status into one of the following values:
 
-* `live`: The target is in external mode, and the liveness check succeeded.
+* `live`: The target is in external mode, its heartbeat is fresh, and the health probe got an HTTP response.
 * `internal`: The target is in internal mode, and its heartbeat is fresh. The outbound budget table and TUI sidebar display this status as `internal (doc-drop)`.
-* `stale`: The target is in external mode, but the liveness check failed or the session is not tracked by the server.
+* `stale`: The target is in external mode with a fresh heartbeat, but the health probe could not connect.
 * `offline`: No heartbeat file exists, or the heartbeat timestamp is older than the TTL.
 
 ---
