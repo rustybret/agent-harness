@@ -6,6 +6,7 @@ import type { MonitorManager } from "./features/monitor"
 import type { ModelFallbackControllerAccessor } from "./hooks/model-fallback"
 import type { PluginContext } from "./plugin/types"
 import type { ModelCacheState } from "./plugin-state"
+import type { ModeDetector } from "./features/cross-project-mailbox/presence"
 
 import { createCoreHooks } from "./plugin/hooks/create-core-hooks"
 import { createContinuationHooks } from "./plugin/hooks/create-continuation-hooks"
@@ -46,6 +47,7 @@ export function createHooks(args: {
   safeHookEnabled: boolean
   mergedSkills: LoadedSkill[]
   availableSkills: AvailableSkill[]
+  mailboxModeDetector?: ModeDetector
 }) {
   const {
     ctx,
@@ -58,6 +60,7 @@ export function createHooks(args: {
     safeHookEnabled,
     mergedSkills,
     availableSkills,
+    mailboxModeDetector,
   } = args
 
   const core = createCoreHooks({
@@ -69,6 +72,7 @@ export function createHooks(args: {
     monitorManager,
     isHookEnabled,
     safeHookEnabled,
+    mailboxModeDetector,
   })
 
   const continuation = createContinuationHooks({

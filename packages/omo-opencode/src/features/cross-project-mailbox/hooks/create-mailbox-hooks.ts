@@ -18,6 +18,7 @@ import { projectIdForRoot } from "../envelope/project-id"
 import {
   createModeDetector,
   createPresenceHeartbeatHook,
+  type ModeDetector,
   type ModeDetectorDeps,
   type PresenceHeartbeatDeps,
   type PresenceHeartbeatHook,
@@ -135,6 +136,7 @@ export type PresenceHeartbeatOverrides = Pick<
 export function buildPresenceHeartbeatHook(
   ctx: PluginContext,
   overrides?: PresenceHeartbeatOverrides,
+  sharedModeDetector?: ModeDetector,
 ): PresenceHeartbeatHook | null {
   const repoRoot = ctx.directory
   // Do NOT early-return on a null serverUrl: internal sessions must keep heartbeating so peers see
@@ -148,12 +150,14 @@ export function buildPresenceHeartbeatHook(
     log("mailbox presence heartbeat disabled: projectId resolution failed", { error })
     return null
   }
-  const modeDetector = createModeDetector({
-    resolveServerUrl,
-    repoRoot,
-    readOwnRecord: overrides?.readOwnRecord,
-    settleMs: overrides?.settleMs,
-  })
+  const modeDetector =
+    sharedModeDetector ??
+    createModeDetector({
+      resolveServerUrl,
+      repoRoot,
+      readOwnRecord: overrides?.readOwnRecord,
+      settleMs: overrides?.settleMs,
+    })
   return createPresenceHeartbeatHook({
     projectId,
     repoRoot,
@@ -168,10 +172,11 @@ export function buildPresenceHeartbeatHook(
 export function createMailboxHooks(
   ctx: PluginContext,
   config: CrossProjectMailboxConfig | undefined,
+  sharedModeDetector?: ModeDetector,
 ): MailboxHooks {
   if (!config?.enabled) return { mailboxIdleDrain: null, mailboxPresenceHeartbeat: null }
   return {
     mailboxIdleDrain: createIdleDrainHook(buildIdleDrainDeps(ctx, config)),
-    mailboxPresenceHeartbeat: buildPresenceHeartbeatHook(ctx),
+    mailboxPresenceHeartbeat: buildPresenceHeartbeatHook(ctx, undefined, sharedModeDetector),
   }
 }

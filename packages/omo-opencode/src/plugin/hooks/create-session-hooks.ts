@@ -3,6 +3,7 @@ import type { BackgroundManager } from "../../features/background-agent"
 import type { ModelFallbackControllerAccessor } from "../../hooks/model-fallback"
 import type { ModelCacheState } from "../../plugin-state"
 import type { PluginContext } from "../types"
+import type { ModeDetector } from "../../features/cross-project-mailbox/presence"
 
 import {
   createSessionNotification,
@@ -78,8 +79,9 @@ export function createSessionHooks(args: {
   modelFallbackControllerAccessor?: ModelFallbackControllerAccessor
   isHookEnabled: (hookName: HookName) => boolean
   safeHookEnabled: boolean
+  mailboxModeDetector?: ModeDetector
 }): SessionHooks {
-  const { ctx, pluginConfig, modelCacheState, backgroundManager, modelFallbackControllerAccessor, isHookEnabled, safeHookEnabled } = args
+  const { ctx, pluginConfig, modelCacheState, backgroundManager, modelFallbackControllerAccessor, isHookEnabled, safeHookEnabled, mailboxModeDetector } = args
   const safeHook = <T>(hookName: HookName, factory: () => T): T | null =>
     safeCreateHook(hookName, factory, { enabled: safeHookEnabled })
 
@@ -242,6 +244,7 @@ export function createSessionHooks(args: {
     pluginConfig,
     isHookEnabled,
     safeHookEnabled,
+    mailboxModeDetector,
   })
 
   return {

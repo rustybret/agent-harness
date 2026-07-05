@@ -38,6 +38,8 @@ import {
   warmLiveServerProbe,
 } from "../shared/live-server-route"
 import { startBackgroundCheck as startTmuxCheck } from "../tools/interactive-bash"
+import { createModeDetector, type ModeDetector } from "../features/cross-project-mailbox/presence"
+import { getServerBaseUrl } from "../shared/opencode-http-api"
 
 type HooksWithRuntimeLifecycle = Hooks & {
   "experimental.compaction.autocontinue"?: CompactionAutocontinueHook
@@ -210,10 +212,19 @@ export function createPluginModule(overrides: Partial<PluginModuleDeps> = {}): P
       runtimeSkillSourceUrl: runtimeSkillSource?.url,
     })
 
+    let mailboxModeDetector: ModeDetector | undefined
+    if (pluginConfig.cross_project_mailbox?.enabled) {
+      mailboxModeDetector = createModeDetector({
+        resolveServerUrl: () => input.serverUrl?.toString() ?? getServerBaseUrl(input.client),
+        repoRoot: input.directory,
+      })
+    }
+
     const toolsResult = await deps.createTools({
       ctx: input,
       pluginConfig,
       managers,
+      mailboxModeDetector,
     })
 
     const hooks = deps.createHooks({
@@ -227,6 +238,7 @@ export function createPluginModule(overrides: Partial<PluginModuleDeps> = {}): P
       safeHookEnabled,
       mergedSkills: toolsResult.mergedSkills,
       availableSkills: toolsResult.availableSkills,
+      mailboxModeDetector,
     })
 
     const pluginInterface = deps.createPluginInterface({

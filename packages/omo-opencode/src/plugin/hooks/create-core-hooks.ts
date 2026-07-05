@@ -4,6 +4,7 @@ import type { MonitorManager } from "../../features/monitor"
 import type { ModelFallbackControllerAccessor } from "../../hooks/model-fallback"
 import type { PluginContext } from "../types"
 import type { ModelCacheState } from "../../plugin-state"
+import type { ModeDetector } from "../../features/cross-project-mailbox/presence"
 
 import { createSessionHooks } from "./create-session-hooks"
 import { createToolGuardHooks } from "./create-tool-guard-hooks"
@@ -18,8 +19,9 @@ export function createCoreHooks(args: {
   monitorManager?: MonitorManager
   isHookEnabled: (hookName: HookName) => boolean
   safeHookEnabled: boolean
+  mailboxModeDetector?: ModeDetector
 }) {
-  const { ctx, pluginConfig, modelCacheState, backgroundManager, modelFallbackControllerAccessor, monitorManager, isHookEnabled, safeHookEnabled } = args
+  const { ctx, pluginConfig, modelCacheState, backgroundManager, modelFallbackControllerAccessor, monitorManager, isHookEnabled, safeHookEnabled, mailboxModeDetector } = args
 
   const session = createSessionHooks({
     ctx,
@@ -29,6 +31,7 @@ export function createCoreHooks(args: {
     modelFallbackControllerAccessor,
     isHookEnabled,
     safeHookEnabled,
+    mailboxModeDetector,
   })
 
   const tool = createToolGuardHooks({
