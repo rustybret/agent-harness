@@ -39,12 +39,22 @@ export function isListenerRecord(value: unknown): value is ListenerRecord {
   )
 }
 
+const PROCESS_START_SLACK_MS = 15_000
+
+// A record whose startedAt predates this process was written by a previous process that
+// received the same pid after a hard kill (no finalizer ran to remove it). Trusting it
+// would misclassify an internal session as external, so it is rejected.
+function isFromThisProcess(record: ListenerRecord): boolean {
+  const processStartMs = Date.now() - process.uptime() * 1_000
+  return record.startedAt >= processStartMs - PROCESS_START_SLACK_MS
+}
+
 export async function readOwnListenerRecord(pid: number = process.pid): Promise<ListenerRecord | null> {
   try {
     const content = await readFile(listenerRecordPath(pid), "utf8")
     const parsed: unknown = JSON.parse(content)
     if (!isListenerRecord(parsed)) return null
-    return parsed.pid === pid ? parsed : null
+    return parsed.pid === pid && isFromThisProcess(parsed) ? parsed : null
   } catch (error) {
     const err = error as NodeJS.ErrnoException
     if (err?.code !== "ENOENT" && !(error instanceof SyntaxError)) {
