@@ -22,7 +22,13 @@ const MAX_ABSENT_RETRIES = 2
 // The host SDK client falls back to this placeholder when Server.url is undefined at plugin init,
 // so a bare equality match means "no real bind was observed", NOT "bound on 4096". A REAL 4096 bind
 // is still detected external via the listener registry; this constant only guards the legacy path.
-const LEGACY_PLACEHOLDER_URLS = new Set(["http://localhost:4096", "http://localhost:4096/"])
+const LEGACY_PLACEHOLDER_URLS = new Set([
+  "http://localhost:4096",
+  "http://localhost:4096/",
+  // OpenCode host's plain-TUI in-process worker-RPC transport URL (no real listener bound), used whenever a session runs without --port/--hostname.
+  "http://opencode.internal",
+  "http://opencode.internal/",
+])
 
 export interface ModeDetectorDeps {
   /** Legacy fallback only: consulted when the host wrote no listener-registry record. */

@@ -72,6 +72,24 @@ describe("createModeDetector", () => {
     })
   })
 
+  describe("#given no listener record and the opencode.internal placeholder legacy url", () => {
+    it("#then detect returns internal", async () => {
+      // given
+      const readOwnRecord = jest.fn(async () => null)
+      const deps = makeDeps({ readOwnRecord, resolveServerUrl: () => "http://opencode.internal" })
+      const detector = createModeDetector(deps)
+
+      // when
+      const mode = await detector.detect("ses_1", "start")
+
+      // then
+      expect(mode).toBe("internal")
+      expect(detector.currentServerUrl()).toBeNull()
+      const detected = deps.logs.find((entry) => entry.message === "[mailbox-mode] detected")
+      expect(detected?.data).toMatchObject({ mode: "internal", reason: "no-listener-record" })
+    })
+  })
+
   describe("#given no listener record and a null legacy url", () => {
     it("#then detect returns internal", async () => {
       // given
