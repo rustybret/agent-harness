@@ -124,6 +124,7 @@ describe("createPresenceHeartbeatHook", () => {
       const detector = {
         detect: jest.fn(async () => "external" as const),
         currentMode: jest.fn(() => "external" as const),
+        currentServerUrl: jest.fn(() => null),
       }
       const { deps, writeRecord } = makeDeps({ modeDetector: detector })
       const hook = createPresenceHeartbeatHook(deps)
@@ -150,6 +151,7 @@ describe("createPresenceHeartbeatHook", () => {
       const detector = {
         detect: jest.fn(async () => "internal" as const),
         currentMode: jest.fn(() => "internal" as const),
+        currentServerUrl: jest.fn(() => null),
       }
       const { deps, writeRecord } = makeDeps({ modeDetector: detector })
       const hook = createPresenceHeartbeatHook(deps)
@@ -185,6 +187,7 @@ describe("createPresenceHeartbeatHook", () => {
             }),
         ),
         currentMode: jest.fn(() => mode),
+        currentServerUrl: jest.fn(() => null),
       }
       const { deps, writeRecord } = makeDeps({ modeDetector: detector })
       const hook = createPresenceHeartbeatHook(deps)
@@ -208,6 +211,31 @@ describe("createPresenceHeartbeatHook", () => {
     })
   })
 
+  describe("#given the detector resolved a real bound URL from the listener registry", () => {
+    it("#then the beat publishes the registry URL, not the legacy client-derived one", async () => {
+      // given: deps.serverUrl is the localhost:4096 placeholder; the registry knows the real bind
+      const detector = {
+        detect: jest.fn(async () => "external" as const),
+        currentMode: jest.fn(() => "external" as const),
+        currentServerUrl: jest.fn(() => "http://127.0.0.1:7719/"),
+      }
+      const { deps, writeRecord } = makeDeps({ modeDetector: detector })
+      const hook = createPresenceHeartbeatHook(deps)
+
+      // when
+      hook.onSessionActive("ses_1", "start")
+      await Promise.resolve()
+      await Promise.resolve()
+
+      // then
+      const record = writeRecord.mock.calls.at(-1)?.[0]
+      expect(record?.serverUrl).toBe("http://127.0.0.1:7719/")
+
+      // cleanup
+      hook.dispose()
+    })
+  })
+
   describe("#given detect() rejects", () => {
     it("#then the beat still runs so internal sessions keep heartbeating", async () => {
       // given
@@ -216,6 +244,7 @@ describe("createPresenceHeartbeatHook", () => {
           throw new Error("probe boom")
         }),
         currentMode: jest.fn(() => "external" as const),
+        currentServerUrl: jest.fn(() => null),
       }
       const { deps, writeRecord } = makeDeps({ modeDetector: detector })
       const hook = createPresenceHeartbeatHook(deps)

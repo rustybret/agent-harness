@@ -6,7 +6,6 @@ import { createProjectMessageTool, createProjectNoteTool } from "../tools"
 import { projectIdForRoot } from "../features/cross-project-mailbox/envelope"
 import {
   createModeDetector,
-  defaultProbeSession,
   type ModeDetector,
 } from "../features/cross-project-mailbox/presence"
 import { createProjectRegistry } from "../features/cross-project-mailbox/registry"
@@ -36,7 +35,6 @@ export function createMailboxToolsRecord(args: {
     createModeDetector({
       resolveServerUrl: () => ctx.serverUrl?.toString() ?? getServerBaseUrl(ctx.client),
       repoRoot,
-      probe: defaultProbeSession,
     })
 
   const sharedDeps = {

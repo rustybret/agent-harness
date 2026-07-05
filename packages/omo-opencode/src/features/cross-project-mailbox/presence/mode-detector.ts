@@ -1,7 +1,8 @@
 import { settleAfterSessionIdle } from "@oh-my-opencode/utils"
 
 import { log as sharedLog } from "../../../shared/logger"
-import type { PresenceMode, PresenceRecord } from "./presence-record"
+import { readOwnListenerRecord, type ListenerRecord } from "./instance-registry"
+import type { PresenceMode } from "./presence-record"
 
 export type ModeDetectorLog = (message: string, data?: unknown) => void
 
@@ -15,91 +16,79 @@ export type MailboxModeState = MailboxMode | "unknown"
 // Re-detection runs on a NEW sessionId OR trigger === "resume"; every other call returns the memoized value.
 export type ModeDetectTrigger = "start" | "resume" | "tool-exec"
 
-const DEFAULT_PROBE_TIMEOUT_MS = 2_000
 const DEFAULT_SETTLE_MS = 150
 const MAX_ABSENT_RETRIES = 2
 
+// The host SDK client falls back to this placeholder when Server.url is undefined at plugin init,
+// so a bare equality match means "no real bind was observed", NOT "bound on 4096". A REAL 4096 bind
+// is still detected external via the listener registry; this constant only guards the legacy path.
+const LEGACY_PLACEHOLDER_URLS = new Set(["http://localhost:4096", "http://localhost:4096/"])
+
 export interface ModeDetectorDeps {
+  /** Legacy fallback only: consulted when the host wrote no listener-registry record. */
   resolveServerUrl: () => string | null
   repoRoot: string
-  probe: (record: PresenceRecord) => Promise<boolean>
-  now?: () => number
+  /** Reads the opencode fork's on-disk listener record for THIS pid. */
+  readOwnRecord?: () => Promise<ListenerRecord | null>
   settleMs?: number
-  probeTimeoutMs?: number
   log?: ModeDetectorLog
 }
 
 export interface ModeDetector {
   detect(sessionId: string, trigger: ModeDetectTrigger): Promise<MailboxMode>
   currentMode(): MailboxModeState
+  /** Real bound URL for external sessions (registry-first), null for internal/unknown. */
+  currentServerUrl(): string | null
 }
-
-type ProbeOutcome = "present" | "absent" | "error"
 
 interface DetectionResult {
   mode: MailboxMode
+  serverUrl: string | null
   reason: string
 }
 
-async function raceProbeTimeout(promise: Promise<boolean>, timeoutMs: number): Promise<boolean> {
-  let timer: ReturnType<typeof setTimeout> | undefined
-  const timeout = new Promise<never>((_resolve, reject) => {
-    timer = setTimeout(() => reject(new Error(`mode-detect probe timed out after ${timeoutMs}ms`)), timeoutMs)
-  })
-  try {
-    return await Promise.race([promise, timeout])
-  } finally {
-    if (timer !== undefined) clearTimeout(timer)
-  }
-}
-
+// Detection ground truth is the host's listener registry (written by Server.listen when a TCP
+// socket binds, removed on stop): it is activity-independent (an idle session stays external),
+// identity-exact (keyed by our own pid), and carries the REAL bound URL — unlike HTTP self-probes
+// against /session/status, which the host evicts on idle, or ctx.serverUrl, which degrades to a
+// localhost:4096 placeholder whenever the plugin initializes before (or without) a listener.
 export function createModeDetector(deps: ModeDetectorDeps): ModeDetector {
-  const now = deps.now ?? Date.now
   const settleMs = deps.settleMs ?? DEFAULT_SETTLE_MS
-  const probeTimeoutMs = deps.probeTimeoutMs ?? DEFAULT_PROBE_TIMEOUT_MS
+  const readOwnRecord = deps.readOwnRecord ?? readOwnListenerRecord
   const log = deps.log ?? sharedLog
 
   let memoSessionId: string | null = null
   let memoMode: MailboxModeState = "unknown"
+  let memoServerUrl: string | null = null
 
-  function buildSelfRecord(serverUrl: string, sessionId: string): PresenceRecord {
-    return {
-      projectId: "self-probe",
-      repoRoot: deps.repoRoot,
-      mode: "external",
-      serverUrl,
-      sessionId,
-      pid: process.pid,
-      heartbeatTs: now(),
+  function legacyFallback(): DetectionResult {
+    const resolved = deps.resolveServerUrl()
+    if (resolved !== null && !LEGACY_PLACEHOLDER_URLS.has(resolved)) {
+      return { mode: "external", serverUrl: resolved, reason: "legacy-server-url" }
     }
+    return { mode: "internal", serverUrl: null, reason: "no-listener-record" }
   }
 
-  async function probeOnce(record: PresenceRecord): Promise<ProbeOutcome> {
+  async function readRecordSafely(): Promise<ListenerRecord | null> {
     try {
-      const live = await raceProbeTimeout(deps.probe(record), probeTimeoutMs)
-      return live ? "present" : "absent"
+      return await readOwnRecord()
     } catch {
-      return "error"
+      return null
     }
   }
 
-  async function runDetection(sessionId: string): Promise<DetectionResult> {
-    const serverUrl = deps.resolveServerUrl()
-    if (!serverUrl) return { mode: "internal", reason: "no-server-url" }
-
-    const record = buildSelfRecord(serverUrl, sessionId)
-    let outcome = await probeOnce(record)
-    if (outcome === "present") return { mode: "external", reason: "session-live" }
-    if (outcome === "error") return { mode: "internal", reason: "timeout" }
-
-    // Freshly-created-session race: reachable-but-absent -> settle and retry before concluding internal.
-    for (let attempt = 1; attempt <= MAX_ABSENT_RETRIES; attempt += 1) {
+  async function runDetection(): Promise<DetectionResult> {
+    let record = await readRecordSafely()
+    // Freshly-started-listener race: the record write and the first session event are
+    // near-simultaneous, so settle briefly before concluding no listener exists.
+    for (let attempt = 1; record === null && attempt <= MAX_ABSENT_RETRIES; attempt += 1) {
       await settleAfterSessionIdle(settleMs)
-      outcome = await probeOnce(record)
-      if (outcome === "present") return { mode: "external", reason: "session-live-retry" }
-      if (outcome === "error") return { mode: "internal", reason: "timeout" }
+      record = await readRecordSafely()
     }
-    return { mode: "internal", reason: "session-absent" }
+    if (record !== null) {
+      return { mode: "external", serverUrl: record.url, reason: "listener-record" }
+    }
+    return legacyFallback()
   }
 
   return {
@@ -108,9 +97,10 @@ export function createModeDetector(deps: ModeDetectorDeps): ModeDetector {
       if (!shouldRun && memoMode !== "unknown") return memoMode
 
       const from = memoMode
-      const { mode, reason } = await runDetection(sessionId)
+      const { mode, serverUrl, reason } = await runDetection()
       memoSessionId = sessionId
       memoMode = mode
+      memoServerUrl = serverUrl
 
       log("[mailbox-mode] detected", { mode, sessionId, trigger, reason })
       if (from !== "unknown" && from !== mode) {
@@ -120,6 +110,9 @@ export function createModeDetector(deps: ModeDetectorDeps): ModeDetector {
     },
     currentMode(): MailboxModeState {
       return memoMode
+    },
+    currentServerUrl(): string | null {
+      return memoServerUrl
     },
   }
 }

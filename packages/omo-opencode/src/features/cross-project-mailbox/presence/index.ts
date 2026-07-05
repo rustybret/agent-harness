@@ -20,6 +20,12 @@ export {
   type PresenceHeartbeatHook,
 } from "./presence-heartbeat-hook"
 export {
+  isListenerRecord,
+  listenerRecordPath,
+  readOwnListenerRecord,
+  type ListenerRecord,
+} from "./instance-registry"
+export {
   createModeDetector,
   type MailboxMode,
   type MailboxModeState,

@@ -18,7 +18,7 @@ import { projectIdForRoot } from "../envelope/project-id"
 import {
   createModeDetector,
   createPresenceHeartbeatHook,
-  defaultProbeSession,
+  type ModeDetectorDeps,
   type PresenceHeartbeatDeps,
   type PresenceHeartbeatHook,
 } from "../presence"
@@ -129,7 +129,8 @@ function buildIdleDrainDeps(
 export type PresenceHeartbeatOverrides = Pick<
   PresenceHeartbeatDeps,
   "writeRecord" | "homeDir" | "now"
->
+> &
+  Pick<ModeDetectorDeps, "readOwnRecord" | "settleMs">
 
 export function buildPresenceHeartbeatHook(
   ctx: PluginContext,
@@ -150,7 +151,8 @@ export function buildPresenceHeartbeatHook(
   const modeDetector = createModeDetector({
     resolveServerUrl,
     repoRoot,
-    probe: defaultProbeSession,
+    readOwnRecord: overrides?.readOwnRecord,
+    settleMs: overrides?.settleMs,
   })
   return createPresenceHeartbeatHook({
     projectId,

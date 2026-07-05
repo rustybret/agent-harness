@@ -287,11 +287,11 @@ describe("defaultProbeSession", () => {
     })
   }
 
-  describe("#given the status map contains the record sessionId", () => {
-    it("#then it probes /session/status with directory scope and returns live", async () => {
+  describe("#given the server responds to the health endpoint", () => {
+    it("#then it probes /global/health with directory header and returns live", async () => {
       // given
       const record = makeRecord({ serverUrl: "http://127.0.0.1:4096", repoRoot: "/repos/alpha" })
-      const fetchMock = stubFetch(async () => jsonResponse({ [record.sessionId]: { type: "idle" } }))
+      const fetchMock = stubFetch(async () => jsonResponse({ healthy: true, version: "1.0.0" }))
 
       // when
       const live = await defaultProbeSession(record)
@@ -301,38 +301,23 @@ describe("defaultProbeSession", () => {
       expect(fetchMock).toHaveBeenCalledTimes(1)
       const [calledUrl, init] = fetchMock.mock.calls[0]
       const parsedUrl = new URL(calledUrl)
-      expect(parsedUrl.pathname).toBe("/session/status")
-      expect(parsedUrl.searchParams.get("directory")).toBe(record.repoRoot)
+      expect(parsedUrl.pathname).toBe("/global/health")
       const headers = new Headers(init?.headers)
       expect(headers.get("x-opencode-directory")).toBe(record.repoRoot)
     })
   })
 
-  describe("#given the server 200s with an empty status map", () => {
-    it("#then it returns not-live because the session is not tracked", async () => {
-      // given
+  describe("#given an idle session behind a live server (status map would be empty)", () => {
+    it("#then it still returns live because reachability, not activity, is the liveness signal", async () => {
+      // given: /global/health responds fine even when every session is idle
       const record = makeRecord({ serverUrl: "http://127.0.0.1:4096" })
-      stubFetch(async () => jsonResponse({}))
+      stubFetch(async () => jsonResponse({ healthy: true, version: "1.0.0" }))
 
       // when
       const live = await defaultProbeSession(record)
 
       // then
-      expect(live).toBe(false)
-    })
-  })
-
-  describe("#given the server 200s with a map keyed by a different session (wrong directory)", () => {
-    it("#then it returns not-live because the record sessionId is absent", async () => {
-      // given
-      const record = makeRecord({ serverUrl: "http://127.0.0.1:4096" })
-      stubFetch(async () => jsonResponse({ ses_other: { type: "idle" } }))
-
-      // when
-      const live = await defaultProbeSession(record)
-
-      // then
-      expect(live).toBe(false)
+      expect(live).toBe(true)
     })
   })
 
@@ -352,17 +337,17 @@ describe("defaultProbeSession", () => {
     })
   })
 
-  describe("#given the server responds non-200", () => {
-    it("#then it returns false without inspecting the body", async () => {
+  describe("#given the server responds non-200 (e.g. auth-gated 401)", () => {
+    it("#then it still returns live: any HTTP response proves a reachable server", async () => {
       // given
       const record = makeRecord({ serverUrl: "http://127.0.0.1:4096" })
-      stubFetch(async () => new Response("nope", { status: 500 }))
+      stubFetch(async () => new Response("unauthorized", { status: 401 }))
 
       // when
       const live = await defaultProbeSession(record)
 
       // then
-      expect(live).toBe(false)
+      expect(live).toBe(true)
     })
   })
 

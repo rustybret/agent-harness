@@ -43,38 +43,38 @@ describe("buildPresenceHeartbeatHook", () => {
     }
   }
 
-  describe("#given the ctx exposes a real bound server tracking the session", () => {
-    it("#then it wires createModeDetector+defaultProbeSession and writes an external record", async () => {
+  describe("#given the host wrote a listener-registry record for this pid", () => {
+    it("#then it wires createModeDetector and writes an external record with the registry url", async () => {
       // given
       const repoRoot = await makeRepoRoot("omo-wire-ext-")
       const sessionId = "ses_wire_ext"
-      server = Bun.serve({
-        port: 0,
-        fetch(req) {
-          const url = new URL(req.url)
-          if (url.pathname === "/session/status") {
-            return Response.json({ [sessionId]: { type: "idle" } })
-          }
-          return new Response("not found", { status: 404 })
-        },
-      })
-      const serverUrl = `http://127.0.0.1:${server.port}`
+      const registryUrl = "http://127.0.0.1:7719/"
       const ctx = {
         directory: repoRoot,
-        serverUrl: new URL(serverUrl),
+        serverUrl: undefined,
         client: {},
       } as unknown as PluginContext
       const { records, writeRecord } = captureWrites()
 
       // when
-      const hook = buildPresenceHeartbeatHook(ctx, { writeRecord })
+      const hook = buildPresenceHeartbeatHook(ctx, {
+        writeRecord,
+        settleMs: 0,
+        readOwnRecord: async () => ({
+          pid: process.pid,
+          url: registryUrl,
+          hostname: "127.0.0.1",
+          port: 7719,
+          startedAt: Date.now(),
+        }),
+      })
       hook?.onSessionActive(sessionId, "start")
       await new Promise((resolve) => setTimeout(resolve, 120))
 
       // then
       const record = records.at(-1)
       expect(record?.mode).toBe("external")
-      expect(record?.serverUrl).toBe(new URL(serverUrl).toString())
+      expect(record?.serverUrl).toBe(registryUrl)
       expect(record?.sessionId).toBe(sessionId)
 
       // cleanup
@@ -82,7 +82,7 @@ describe("buildPresenceHeartbeatHook", () => {
     })
   })
 
-  describe("#given the ctx exposes no resolvable server url", () => {
+  describe("#given no listener record and no resolvable server url", () => {
     it("#then the detector reports internal and the heartbeat still writes a null-url record", async () => {
       // given
       const repoRoot = await makeRepoRoot("omo-wire-int-")
@@ -95,7 +95,11 @@ describe("buildPresenceHeartbeatHook", () => {
       const { records, writeRecord } = captureWrites()
 
       // when
-      const hook = buildPresenceHeartbeatHook(ctx, { writeRecord })
+      const hook = buildPresenceHeartbeatHook(ctx, {
+        writeRecord,
+        settleMs: 0,
+        readOwnRecord: async () => null,
+      })
       hook?.onSessionActive(sessionId, "start")
       await new Promise((resolve) => setTimeout(resolve, 120))
 

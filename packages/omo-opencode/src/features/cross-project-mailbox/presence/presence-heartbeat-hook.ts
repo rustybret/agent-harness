@@ -15,7 +15,7 @@ export interface PresenceHeartbeatDeps {
   now?: () => number
   intervalMs?: number
   writeRecord?: (record: PresenceRecord, homeDir?: string) => Promise<void>
-  modeDetector?: Pick<ModeDetector, "detect" | "currentMode">
+  modeDetector?: Pick<ModeDetector, "detect" | "currentMode" | "currentServerUrl">
 }
 
 export interface PresenceHeartbeatHook {
@@ -37,11 +37,14 @@ export function createPresenceHeartbeatHook(deps: PresenceHeartbeatDeps): Presen
     // "unknown" (no detector, or a detect not yet resolved) keeps the legacy external default so
     // peers still see freshness; only a confirmed "internal" mode publishes the null-url record.
     const isExternal = (detector?.currentMode() ?? "external") !== "internal"
+    // Registry-resolved URL wins: it is the REAL bound address. deps.serverUrl is the legacy
+    // client-derived value, which can be the localhost:4096 placeholder on older hosts.
+    const resolvedUrl = detector?.currentServerUrl() ?? deps.serverUrl
     return {
       projectId: deps.projectId,
       repoRoot: deps.repoRoot,
       mode: isExternal ? "external" : "internal",
-      serverUrl: isExternal ? deps.serverUrl : null,
+      serverUrl: isExternal ? resolvedUrl : null,
       sessionId,
       pid,
       heartbeatTs: now(),
