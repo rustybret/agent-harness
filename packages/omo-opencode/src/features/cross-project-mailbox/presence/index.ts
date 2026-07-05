@@ -27,6 +27,8 @@ export {
 } from "./instance-registry"
 export {
   createModeDetector,
+  getOrCreateModeDetector,
+  __resetModeDetectorRegistryForTests,
   type MailboxMode,
   type MailboxModeState,
   type ModeDetector,

@@ -1,3 +1,5 @@
+import path from "node:path"
+
 import { settleAfterSessionIdle } from "@oh-my-opencode/utils"
 
 import { log as sharedLog } from "../../../shared/logger"
@@ -121,4 +123,27 @@ export function createModeDetector(deps: ModeDetectorDeps): ModeDetector {
       return memoServerUrl
     },
   }
+}
+
+// OpenCode's host can invoke the plugin factory more than once per process (observed: two
+// "ENTRY - plugin loading" log lines with differing tool counts for the same directory). Each
+// invocation that calls createModeDetector() directly gets its own private memoization state,
+// so one invocation's heartbeat can resolve "internal" while a DIFFERENT invocation's tool
+// registry never primes its own detector before a gate check runs. Keying a singleton by the
+// resolved repo root ensures every invocation for the same project shares one memoized verdict.
+const detectorRegistry = new Map<string, ModeDetector>()
+
+export function getOrCreateModeDetector(deps: ModeDetectorDeps): ModeDetector {
+  const key = path.resolve(deps.repoRoot)
+  const existing = detectorRegistry.get(key)
+  if (existing !== undefined) return existing
+  const created = createModeDetector(deps)
+  detectorRegistry.set(key, created)
+  return created
+}
+
+// Test-only escape hatch: clears the process-wide singleton registry so unit tests do not leak
+// memoized mode/session state across test cases that reuse the same repoRoot.
+export function __resetModeDetectorRegistryForTests(): void {
+  detectorRegistry.clear()
 }

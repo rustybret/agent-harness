@@ -1,6 +1,11 @@
-import { describe, expect, it, jest } from "bun:test"
+import { describe, expect, it, jest, beforeEach } from "bun:test"
 
-import { createModeDetector, type ModeDetectorDeps } from "./mode-detector"
+import {
+  createModeDetector,
+  getOrCreateModeDetector,
+  __resetModeDetectorRegistryForTests,
+  type ModeDetectorDeps,
+} from "./mode-detector"
 import type { ListenerRecord } from "./instance-registry"
 
 type LogEntry = { message: string; data: unknown }
@@ -286,5 +291,37 @@ describe("createModeDetector", () => {
       // then
       expect(mode).toBe("internal")
     })
+  })
+})
+
+describe("getOrCreateModeDetector", () => {
+  beforeEach(() => {
+    __resetModeDetectorRegistryForTests()
+  })
+
+  it("#then two calls with the same repoRoot return the same instance", () => {
+    // given
+    const deps1 = makeDeps({ repoRoot: "/repos/alpha" })
+    const deps2 = makeDeps({ repoRoot: "/repos/alpha" })
+
+    // when
+    const instance1 = getOrCreateModeDetector(deps1)
+    const instance2 = getOrCreateModeDetector(deps2)
+
+    // then
+    expect(instance1).toBe(instance2)
+  })
+
+  it("#then two calls with different repoRoot values return different instances", () => {
+    // given
+    const deps1 = makeDeps({ repoRoot: "/repos/alpha" })
+    const deps2 = makeDeps({ repoRoot: "/repos/beta" })
+
+    // when
+    const instance1 = getOrCreateModeDetector(deps1)
+    const instance2 = getOrCreateModeDetector(deps2)
+
+    // then
+    expect(instance1).not.toBe(instance2)
   })
 })

@@ -38,7 +38,7 @@ import {
   warmLiveServerProbe,
 } from "../shared/live-server-route"
 import { startBackgroundCheck as startTmuxCheck } from "../tools/interactive-bash"
-import { createModeDetector, type ModeDetector } from "../features/cross-project-mailbox/presence"
+import { getOrCreateModeDetector, type ModeDetector } from "../features/cross-project-mailbox/presence"
 import { getServerBaseUrl } from "../shared/opencode-http-api"
 
 type HooksWithRuntimeLifecycle = Hooks & {
@@ -214,7 +214,7 @@ export function createPluginModule(overrides: Partial<PluginModuleDeps> = {}): P
 
     let mailboxModeDetector: ModeDetector | undefined
     if (pluginConfig.cross_project_mailbox?.enabled) {
-      mailboxModeDetector = createModeDetector({
+      mailboxModeDetector = getOrCreateModeDetector({
         resolveServerUrl: () => input.serverUrl?.toString() ?? getServerBaseUrl(input.client),
         repoRoot: input.directory,
       })
