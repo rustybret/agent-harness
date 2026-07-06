@@ -4,7 +4,9 @@ description: "macOS native desktop automation — screenshots, clicks, typing, k
 mcp:
   macos-cua:
     type: local
-    command: ["/opt/homebrew/bin/node", "/Users/brethoffman/Git/macos-cua/packages/mcp/dist/server.js"]
+    command: /opt/homebrew/bin/node
+    args:
+      - /Users/brethoffman/Git/macos-cua/packages/mcp/dist/server.js
     enabled: true
 ---
 
