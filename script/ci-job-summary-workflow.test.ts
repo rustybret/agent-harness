@@ -17,8 +17,6 @@ const workflowExpectations = [
     jobs: [
       "test",
       "typecheck",
-      "codex-compatibility",
-      "lazycodex-published-smoke",
       "build",
       "auto-commit-schema",
       "draft-release",
@@ -33,7 +31,6 @@ const workflowExpectations = [
     jobs: [
       "test",
       "typecheck",
-      "codex-compatibility",
       "preflight-trust",
       "release-metadata",
       "prepare-release-state",
@@ -44,8 +41,6 @@ const workflowExpectations = [
   { path: ".github/workflows/refresh-model-capabilities.yml", jobs: ["refresh"] },
   { path: ".github/workflows/stats.yml", jobs: ["stats"] },
   { path: ".github/workflows/sync-upstream.yml", jobs: ["sync"] },
-  { path: ".github/workflows/web-ci.yml", jobs: ["format-lint-typecheck-build"] },
-  { path: ".github/workflows/web-deploy.yml", jobs: ["deploy"] },
 ] as const satisfies readonly WorkflowExpectation[]
 
 function discoverWorkflowPaths(): readonly string[] {

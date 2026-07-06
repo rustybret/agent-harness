@@ -8,3 +8,9 @@
 *.json text eol=lf
 *.jsonc text eol=lf
 *.toml text eol=lf
+
+# Fork protection merge rules
+.github/workflows/** merge=ours
+AGENTS.md merge=ours
+CLAUDE.md merge=ours
+.gitmodules merge=ours

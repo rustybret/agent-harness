@@ -110,49 +110,6 @@ jobs:
           JOB_SUMMARY_NEXT: Start with the first TypeScript diagnostic; release jobs stay blocked until this is green.
         run: GITHUB_STEP_SUMMARY="$GITHUB_STEP_SUMMARY" bash .github/scripts/write-job-summary.sh
 
-  codex-compatibility:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: "1.3.12"
-
-      - name: Build vendored lsp-tools-mcp package
-        run: npm ci && npm run build
-        working-directory: packages/lsp-tools-mcp
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Build vendored lsp-daemon package
-        run: npm ci && npm run build
-        working-directory: packages/lsp-daemon
-
-      - name: Run Codex compatibility tests
-        run: bun run test:codex
-
-      - name: Write job summary
-        if: always()
-        shell: bash
-        env:
-          JOB_SUMMARY_TITLE: Release Codex compatibility (${{ matrix.os }})
-          JOB_SUMMARY_STATUS: ${{ job.status }}
-          JOB_SUMMARY_DETAILS: |
-            - Builds MCP runtime prerequisites.
-            - Runs `bun run test:codex` across the supported OS matrix.
-          JOB_SUMMARY_NEXT: Inspect the first failing Codex component or installer test for `${{ matrix.os }}`.
-        run: GITHUB_STEP_SUMMARY="$GITHUB_STEP_SUMMARY" bash .github/scripts/write-job-summary.sh
-
   preflight-trust:
     runs-on: ubuntu-latest
     needs: [release-metadata]
@@ -161,16 +118,6 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Require LazyCodex sync token
-        if: needs.release-metadata.outputs.dist_tag == ''
-        env:
-          LAZYCODEX_SYNC_TOKEN: ${{ secrets.LAZYCODEX_SYNC_TOKEN }}
-        run: |
-          if [ -z "$LAZYCODEX_SYNC_TOKEN" ]; then
-            echo "::error::LAZYCODEX_SYNC_TOKEN is required to push the Codex marketplace bundle to code-yeongyu/lazycodex."
-            exit 1
-          fi
-
       - name: Verify trusted publisher for release packages
         env:
           REPO: code-yeongyu/oh-my-openagent
@@ -186,15 +133,7 @@ jobs:
             exit 1
           fi
 
-          PLATFORMS=(darwin-arm64 darwin-x64 darwin-x64-baseline linux-x64 linux-x64-baseline linux-arm64 linux-x64-musl linux-x64-musl-baseline linux-arm64-musl windows-x64 windows-x64-baseline windows-arm64)
           ALL_PACKAGES=(oh-my-opencode oh-my-openagent)
-          if [ "${PUBLISH_LAZYCODEX}" = "true" ]; then
-            ALL_PACKAGES+=(lazycodex-ai)
-          fi
-          for plat in "${PLATFORMS[@]}"; do
-            ALL_PACKAGES+=("oh-my-opencode-${plat}")
-            ALL_PACKAGES+=("oh-my-openagent-${plat}")
-          done
 
           FAILED=()
           for pkg in "${ALL_PACKAGES[@]}"; do
@@ -331,13 +270,12 @@ jobs:
 
   prepare-release-state:
     runs-on: ubuntu-latest
-    needs: [test, typecheck, codex-compatibility, preflight-trust, release-metadata]
+    needs: [test, typecheck, preflight-trust, release-metadata]
     if: >-
       always() &&
       github.repository == 'code-yeongyu/oh-my-openagent' &&
       needs.test.result == 'success' &&
       needs.typecheck.result == 'success' &&
-      needs.codex-compatibility.result == 'success' &&
       needs.preflight-trust.result == 'success' &&
       needs.release-metadata.result == 'success'
     permissions:
@@ -465,17 +403,15 @@ jobs:
 
   publish-main:
     runs-on: ubuntu-latest
-    needs: [test, typecheck, codex-compatibility, preflight-trust, release-metadata, prepare-release-state, publish-platform]
+    needs: [test, typecheck, preflight-trust, release-metadata, prepare-release-state]
     if: >-
       always() &&
       github.repository == 'code-yeongyu/oh-my-openagent' &&
       needs.test.result == 'success' &&
       needs.typecheck.result == 'success' &&
-      needs.codex-compatibility.result == 'success' &&
       needs.preflight-trust.result == 'success' &&
       needs.release-metadata.result == 'success' &&
-      needs.prepare-release-state.result == 'success' &&
-      (inputs.skip_platform == true || needs.publish-platform.result == 'success')
+      needs.prepare-release-state.result == 'success'
     steps:
       - uses: actions/checkout@v5
         with:
@@ -497,33 +433,6 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
-
-      - name: Verify platform packages are published
-        env:
-          VERSION: ${{ needs.release-metadata.outputs.version }}
-        run: |
-          PLATFORMS=(darwin-arm64 darwin-x64 darwin-x64-baseline linux-x64 linux-x64-baseline linux-arm64 linux-x64-musl linux-x64-musl-baseline linux-arm64-musl windows-x64 windows-x64-baseline windows-arm64)
-          FAILED=()
-          for platform in "${PLATFORMS[@]}"; do
-            for family in oh-my-opencode oh-my-openagent; do
-              pkg="${family}-${platform}"
-              STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.npmjs.org/${pkg}/${VERSION}")
-              if [ "$STATUS" = "200" ]; then
-                echo "OK   ${pkg}@${VERSION}"
-              else
-                echo "MISS ${pkg}@${VERSION} (HTTP ${STATUS})"
-                FAILED+=("${pkg}")
-              fi
-            done
-          done
-
-          if [ ${#FAILED[@]} -gt 0 ]; then
-            echo "::error::Missing platform package(s); refusing to publish wrappers."
-            for pkg in "${FAILED[@]}"; do
-              echo "::error::  ${pkg}@${VERSION}"
-            done
-            exit 1
-          fi
 
       - name: Check if already published
         id: check
@@ -551,67 +460,25 @@ jobs:
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Check if lazycodex-ai already published
-        id: check-lazycodex
-        if: inputs.publish_lazycodex == true
-        env:
-          VERSION: ${{ needs.release-metadata.outputs.version }}
-        run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://registry.npmjs.org/lazycodex-ai/${VERSION}")
-          if [ "$STATUS" = "200" ]; then
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "✓ lazycodex-ai@${VERSION} already published"
-          else
-            echo "skip=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Update version
         if: >-
           steps.check.outputs.skip != 'true' ||
-          steps.check-openagent.outputs.skip != 'true' ||
-          (inputs.publish_lazycodex == true && steps.check-lazycodex.outputs.skip != 'true')
+          steps.check-openagent.outputs.skip != 'true'
         env:
           VERSION: ${{ needs.release-metadata.outputs.version }}
         run: |
           jq --arg v "$VERSION" '.version = $v' package.json > tmp.json && mv tmp.json package.json
 
-          for platform in darwin-arm64 darwin-x64 darwin-x64-baseline linux-x64 linux-x64-baseline linux-arm64 linux-x64-musl linux-x64-musl-baseline linux-arm64-musl windows-x64 windows-x64-baseline windows-arm64; do
-            package_dir="packages/oh-my-opencode-${platform}"
-            jq --arg v "$VERSION" '.version = $v' "${package_dir}/package.json" > tmp.json
-            mv tmp.json "${package_dir}/package.json"
-          done
-
-          jq --arg v "$VERSION" '.optionalDependencies = (.optionalDependencies | to_entries | map(.value = $v) | from_entries)' package.json > tmp.json && mv tmp.json package.json
-
       - name: Build main package
         if: >-
           steps.check.outputs.skip != 'true' ||
-          steps.check-openagent.outputs.skip != 'true' ||
-          (inputs.publish_lazycodex == true && steps.check-lazycodex.outputs.skip != 'true')
+          steps.check-openagent.outputs.skip != 'true'
         run: bun run build:lsp-tools-mcp && bun run build:lsp-daemon && bun run build
-
-      # Must run before every publish below: all three packages ship the plugin tree (lazycodex#45).
-      - name: Build Codex plugin components
-        if: >-
-          steps.check.outputs.skip != 'true' ||
-          steps.check-openagent.outputs.skip != 'true' ||
-          (inputs.publish_lazycodex == true && steps.check-lazycodex.outputs.skip != 'true')
-        env:
-          VERSION: ${{ needs.release-metadata.outputs.version }}
-          LAZYCODEX_RELEASE_VERSION: ${{ needs.release-metadata.outputs.version }}
-        run: |
-          jq --arg v "$VERSION" '.version = $v' packages/omo-codex/plugin/.codex-plugin/plugin.json > tmp.json
-          mv tmp.json packages/omo-codex/plugin/.codex-plugin/plugin.json
-          jq --arg v "$VERSION" '.version = $v' packages/omo-codex/plugin/package.json > tmp.json
-          mv tmp.json packages/omo-codex/plugin/package.json
-          npm --prefix packages/omo-codex/plugin ci
-          bun run --cwd packages/omo-codex/plugin build
 
       - name: Strip token auth from .npmrc to force OIDC
         if: >-
           steps.check.outputs.skip != 'true' ||
-          steps.check-openagent.outputs.skip != 'true' ||
-          (inputs.publish_lazycodex == true && steps.check-lazycodex.outputs.skip != 'true')
+          steps.check-openagent.outputs.skip != 'true'
         run: |
           for f in .npmrc "$HOME/.npmrc"; do
             if [ -f "$f" ]; then
@@ -662,87 +529,6 @@ jobs:
         run: |
           git checkout -- package.json
 
-      - name: Publish lazycodex-ai
-        if: inputs.publish_lazycodex == true && steps.check-lazycodex.outputs.skip != 'true'
-        env:
-          OMO_VERSION: ${{ needs.release-metadata.outputs.version }}
-          DIST_TAG: ${{ needs.release-metadata.outputs.dist_tag }}
-          NPM_CONFIG_PROVENANCE: true
-        run: |
-          jq --arg omo_version "$OMO_VERSION" '
-            .name = "lazycodex-ai" |
-            .version = $omo_version |
-            .bin = { "lazycodex-ai": "packages/omo-codex/scripts/install-local.mjs", "lazycodex": "packages/omo-codex/scripts/install-local.mjs" } |
-            .files = ["dist/cli", "dist/cli-node", "packages/omo-codex/scripts/install-local.mjs", "packages/omo-codex/scripts/install-dist", "packages/omo-codex/plugin", "packages/omo-codex/plugin/components/start-work-continuation/dist/cli.js", "packages/omo-codex/plugin/components/ulw-loop/dist/cli.js", "packages/omo-codex/plugin/.codex-plugin", "packages/omo-codex/marketplace.json", "packages/omo-codex/lazycodex-repository", "packages/lsp-tools-mcp/package.json", "packages/lsp-tools-mcp/dist", "packages/lsp-daemon/package.json", "packages/lsp-daemon/dist", "packages/git-bash-mcp/dist", "packages/shared-skills/package.json", "packages/shared-skills/index.mjs", "packages/shared-skills/skills"] |
-            .scripts = {} |
-            .dependencies = {} |
-            .devDependencies = {} |
-            .optionalDependencies = {} |
-            .peerDependencies = {}
-          ' package.json > tmp.json && mv tmp.json package.json
-
-          if [ -n "$DIST_TAG" ]; then
-            npm publish --access public --provenance --tag "$DIST_TAG" --loglevel verbose
-          else
-            npm publish --access public --provenance --tag latest --loglevel verbose
-          fi
-
-      - name: Smoke test published lazycodex-ai
-        if: inputs.publish_lazycodex == true && steps.check-lazycodex.outputs.skip != 'true'
-        env:
-          OMO_VERSION: ${{ needs.release-metadata.outputs.version }}
-          DIST_TAG: ${{ needs.release-metadata.outputs.dist_tag }}
-        run: |
-          set -euo pipefail
-
-          smoke_lazycodex_package() {
-            package_spec="$1"
-            for attempt in $(seq 1 12); do
-              SMOKE_DIR=$(mktemp -d)
-              export HOME="$SMOKE_DIR/home"
-              export CODEX_HOME="$SMOKE_DIR/codex"
-              export CODEX_LOCAL_BIN_DIR="$SMOKE_DIR/bin"
-              mkdir -p "$HOME" "$CODEX_HOME" "$CODEX_LOCAL_BIN_DIR" "$SMOKE_DIR/cwd"
-              cd "$SMOKE_DIR/cwd"
-
-              if npx_install_output=$(npx -y "$package_spec" --dry-run install --no-tui --codex-autonomous 2>&1) &&
-                 npx_doctor_output=$(npx -y "$package_spec" --dry-run doctor 2>&1) &&
-                 [ "$npx_install_output" = "npx --yes --package oh-my-openagent omo install --platform=codex --no-tui --codex-autonomous" ] &&
-                 [ "$npx_doctor_output" = "npx --yes --package oh-my-openagent omo doctor" ] &&
-                 npx -y "$package_spec" install --no-tui --codex-autonomous &&
-                 [ -x "$CODEX_LOCAL_BIN_DIR/omo" ] &&
-                 omo_version_output=$("$CODEX_LOCAL_BIN_DIR/omo" --version 2>&1) &&
-                 [ "$omo_version_output" = "$OMO_VERSION" ] &&
-                 sparkshell_output=$("$CODEX_LOCAL_BIN_DIR/omo" sparkshell echo lazycodex-smoke 2>&1) &&
-                 [ "$sparkshell_output" = "lazycodex-smoke" ]; then
-                echo "$npx_install_output"
-                echo "$npx_doctor_output"
-                echo "omo --version: $omo_version_output"
-                echo "omo sparkshell: $sparkshell_output"
-                cd "$GITHUB_WORKSPACE"
-                rm -rf "$SMOKE_DIR"
-                return 0
-              fi
-
-              cd "$GITHUB_WORKSPACE"
-              rm -rf "$SMOKE_DIR"
-              echo "Waiting for ${package_spec} registry propagation (attempt ${attempt}/12)"
-              sleep 10
-            done
-            echo "::error::Published LazyCodex smoke failed for ${package_spec}"
-            return 1
-          }
-
-          smoke_lazycodex_package "lazycodex-ai@${OMO_VERSION}"
-          if [ -z "$DIST_TAG" ]; then
-            smoke_lazycodex_package "lazycodex-ai@latest"
-          fi
-
-      - name: Restore package.json after lazycodex-ai publish attempt
-        if: always() && inputs.publish_lazycodex == true && steps.check-lazycodex.outputs.skip != 'true'
-        run: |
-          git checkout -- package.json
-
       - name: Write job summary
         if: always()
         shell: bash
@@ -750,38 +536,17 @@ jobs:
           JOB_SUMMARY_TITLE: Wrapper package publish
           JOB_SUMMARY_STATUS: ${{ job.status }}
           JOB_SUMMARY_DETAILS: |
-            - Verifies platform packages exist before wrapper publish.
-            - Publishes `oh-my-opencode`, `oh-my-openagent`, and optionally `lazycodex-ai`.
-            - Smoke-tests the published LazyCodex package when it was published.
-          JOB_SUMMARY_NEXT: Check package existence probes first, then npm publish logs and the LazyCodex smoke section.
+            - Publishes `oh-my-opencode` and `oh-my-openagent`.
+          JOB_SUMMARY_NEXT: Check npm publish logs.
         run: GITHUB_STEP_SUMMARY="$GITHUB_STEP_SUMMARY" bash .github/scripts/write-job-summary.sh
-
-  publish-platform:
-    needs: [test, typecheck, codex-compatibility, preflight-trust, release-metadata, prepare-release-state]
-    if: >-
-      always() &&
-      github.repository == 'code-yeongyu/oh-my-openagent' &&
-      inputs.skip_platform != true &&
-      needs.test.result == 'success' &&
-      needs.typecheck.result == 'success' &&
-      needs.codex-compatibility.result == 'success' &&
-      needs.preflight-trust.result == 'success' &&
-      needs.release-metadata.result == 'success' &&
-      needs.prepare-release-state.result == 'success'
-    uses: ./.github/workflows/publish-platform.yml
-    with:
-      version: ${{ needs.release-metadata.outputs.version }}
-      dist_tag: ${{ needs.release-metadata.outputs.dist_tag }}
-    secrets: inherit
 
   release:
     runs-on: ubuntu-latest
-    needs: [release-metadata, publish-main, publish-platform]
+    needs: [release-metadata, publish-main]
     if: >-
       always() &&
       needs.release-metadata.result == 'success' &&
-      needs.publish-main.result == 'success' &&
-      (inputs.skip_platform == true || needs.publish-platform.result == 'success')
+      needs.publish-main.result == 'success'
     steps:
       - uses: actions/checkout@v5
         with:
@@ -893,96 +658,6 @@ jobs:
             git push origin "v${VERSION}"
           fi
 
-      - name: Checkout LazyCodex marketplace
-        if: needs.release-metadata.outputs.dist_tag == ''
-        uses: actions/checkout@v5
-        with:
-          repository: code-yeongyu/lazycodex
-          path: lazycodex-marketplace
-          token: ${{ secrets.LAZYCODEX_SYNC_TOKEN }}
-          fetch-depth: 0
-
-      - name: Sync LazyCodex Codex marketplace
-        if: needs.release-metadata.outputs.dist_tag == ''
-        env:
-          VERSION: ${{ needs.release-metadata.outputs.version }}
-          LAZYCODEX_RELEASE_VERSION: ${{ needs.release-metadata.outputs.version }}
-        run: |
-          jq --arg v "$VERSION" '.version = $v' packages/omo-codex/plugin/.codex-plugin/plugin.json > tmp.json
-          mv tmp.json packages/omo-codex/plugin/.codex-plugin/plugin.json
-          jq --arg v "$VERSION" '.version = $v' packages/omo-codex/plugin/package.json > tmp.json
-          mv tmp.json packages/omo-codex/plugin/package.json
-          npm --prefix packages/omo-codex/plugin ci
-          bun run build:git-bash-mcp
-          bun run build:lsp-tools-mcp
-          bun run build:lsp-daemon
-          bun build packages/omo-opencode/src/cli/index.ts --outdir dist/cli --target bun --format esm
-          bun run build:cli-node
-          bun run --cwd packages/omo-codex/plugin build
-          bun run script/sync-lazycodex-marketplace.ts "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/lazycodex-marketplace"
-          cd "$GITHUB_WORKSPACE/lazycodex-marketplace"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
-          git add .agents/plugins/marketplace.json .github/workflows/pr-source-guidance.yml plugins/omo
-          if git diff --cached --quiet; then
-            echo "LazyCodex marketplace already up to date"
-          else
-            git commit -m "chore: sync Codex marketplace v${VERSION}"
-            git push origin HEAD:main
-          fi
-
-      - name: Resolve LazyCodex release payload
-        id: lazycodex-release-state
-        if: needs.release-metadata.outputs.dist_tag == ''
-        env:
-          PREVIOUS_LAZYCODEX_VERSION: ${{ needs.release-metadata.outputs.previous_lazycodex_version }}
-        run: |
-          set -euo pipefail
-
-          if [ -z "$PREVIOUS_LAZYCODEX_VERSION" ]; then
-            echo "No previous lazycodex-ai package found"
-            echo "lazycodex_changed=true" >> "$GITHUB_OUTPUT"
-            echo "previous_lazycodex_version=none" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          STATE_DIR="$(mktemp -d)"
-          trap 'rm -rf "$STATE_DIR"' EXIT
-          PACKAGE_TGZ="$(npm pack "lazycodex-ai@${PREVIOUS_LAZYCODEX_VERSION}" --pack-destination "$STATE_DIR" --silent)"
-          tar -xzf "$STATE_DIR/$PACKAGE_TGZ" -C "$STATE_DIR"
-
-          PREVIOUS_PACKAGE_ROOT="$STATE_DIR/package"
-          PREVIOUS_MARKETPLACE_ROOT="$STATE_DIR/previous-lazycodex"
-          CURRENT_MARKETPLACE_ROOT="$GITHUB_WORKSPACE/lazycodex-marketplace"
-          bun run script/sync-lazycodex-marketplace.ts "$PREVIOUS_PACKAGE_ROOT" "$PREVIOUS_MARKETPLACE_ROOT" --previous-payload
-
-          if diff -qr "$PREVIOUS_MARKETPLACE_ROOT/.agents/plugins/marketplace.json" "$CURRENT_MARKETPLACE_ROOT/.agents/plugins/marketplace.json" &&
-             diff -qr "$PREVIOUS_MARKETPLACE_ROOT/.github/workflows/pr-source-guidance.yml" "$CURRENT_MARKETPLACE_ROOT/.github/workflows/pr-source-guidance.yml" &&
-             diff -qr "$PREVIOUS_MARKETPLACE_ROOT/plugins/omo" "$CURRENT_MARKETPLACE_ROOT/plugins/omo"; then
-            echo "LazyCodex payload unchanged from lazycodex-ai@${PREVIOUS_LAZYCODEX_VERSION}"
-            echo "lazycodex_changed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "LazyCodex payload changed from lazycodex-ai@${PREVIOUS_LAZYCODEX_VERSION}"
-            echo "lazycodex_changed=true" >> "$GITHUB_OUTPUT"
-          fi
-          echo "previous_lazycodex_version=${PREVIOUS_LAZYCODEX_VERSION}" >> "$GITHUB_OUTPUT"
-
-      - name: Create LazyCodex GitHub release
-        if: needs.release-metadata.outputs.dist_tag == '' && steps.lazycodex-release-state.outputs.lazycodex_changed == 'true'
-        env:
-          VERSION: ${{ needs.release-metadata.outputs.version }}
-          PREVIOUS_LAZYCODEX_VERSION: ${{ steps.lazycodex-release-state.outputs.previous_lazycodex_version }}
-          GH_TOKEN: ${{ secrets.LAZYCODEX_SYNC_TOKEN }}
-        run: |
-          {
-            printf '%s\n' "Synced Codex Light marketplace payload from oh-my-openagent v${VERSION}."
-            printf '%s\n' ""
-            printf '%s\n' "Compared against: lazycodex-ai@${PREVIOUS_LAZYCODEX_VERSION}"
-          } > /tmp/lazycodex-release-notes.md
-
-          gh release view "v${VERSION}" --repo code-yeongyu/lazycodex >/dev/null 2>&1 || \
-            gh release create "v${VERSION}" --repo code-yeongyu/lazycodex --target main --title "v${VERSION}" --notes-file /tmp/lazycodex-release-notes.md
-
       - name: Create GitHub release
         env:
           VERSION: ${{ needs.release-metadata.outputs.version }}
@@ -1018,7 +693,6 @@ jobs:
           JOB_SUMMARY_DETAILS: |
             - Applies and commits release state when needed.
             - Creates or reuses the release tag.
-            - Syncs LazyCodex marketplace payload and creates GitHub releases.
             - Attempts the protected `master` mirror update after release.
-          JOB_SUMMARY_NEXT: Inspect the first failing release-state, marketplace sync, or GitHub release step.
+          JOB_SUMMARY_NEXT: Inspect the first failing release-state or GitHub release step.
         run: GITHUB_STEP_SUMMARY="$GITHUB_STEP_SUMMARY" bash .github/scripts/write-job-summary.sh

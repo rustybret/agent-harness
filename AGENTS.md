@@ -4,6 +4,14 @@
 
 **Generated:** 2026-06-23 | **Commit:** 065534023 | **Branch:** dev | **Release:** v4.13.0
 
+## FORK SCOPE AND MAINTAINABILITY POLICY
+
+This repository is a private fork scoped exclusively to support and optimize **Ultimate Edition (OpenCode plugin)** development.
+- **Exclusion of Codex, Claude, and Web:** Codex-related packages (`packages/omo-codex/`), Claude integration shims, and the marketing website (`packages/web/`) are unmaintained and omitted from active workspace packaging, builds, and CI pipelines to preserve local resource footprints (e.g. AFT indexer memory usage).
+- **Submodules Dropped:** Pinned git submodules under `packages/shared-skills/upstreams/` have been unlinked and purged. The materialize scripts gracefully exit 0 when upstreams are absent.
+- **Direct Deployment:** We publish wrappers directly to local and origin scopes. Release workflows do not generate platform binaries or sync lazycodex marketplace manifests.
+- **Rebase-Free Upstream Sync:** Upstream merges pull from the mirror via explicit git merge commits with `merge=ours` to protect local config edits, bypassing destructive rebases.
+
 ## STOP. QA IS MANDATORY. NON-NEGOTIABLE. EVERY SINGLE TIME YOU TOUCH AN OPENCODE- OR CODEX-CONNECTED COMPONENT.
 
 > **IF YOUR CHANGE TOUCHES ANYTHING WIRED INTO OPENCODE OR INTO THE CODEX LIGHT EDITION, YOU MUST QA IT. ALWAYS. EVERY SINGLE TIME. NO EXCEPTIONS. THERE IS NO "TOO SMALL TO SKIP". THERE IS NO "IT OBVIOUSLY WORKS".**

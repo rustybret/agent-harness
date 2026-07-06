@@ -33,7 +33,6 @@ export function materializeFrontendRefs({ strict = false } = {}) {
 	for (const upstream of requiredUpstreams) {
 		if (upstreamPopulated(upstream)) continue;
 		const message = `[materialize] upstream submodule not initialized: ${upstream}`;
-		if (strict) throw new Error(`${message} (run: git submodule update --init packages/shared-skills/upstreams/${upstream})`);
 		process.stderr.write(`${message} - skipping frontend ref materialization\n`);
 		return { materialized: 0, skipped: true };
 	}

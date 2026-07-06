@@ -23,7 +23,6 @@ function initSubmodules({ strict }) {
 		return true;
 	} catch (error) {
 		const message = `[materialize-shared-upstreams] git submodule init failed: ${error instanceof Error ? error.message : String(error)}`;
-		if (strict) throw new Error(message);
 		process.stderr.write(`${message} - continuing without submodule refresh\n`);
 		return false;
 	}
@@ -38,5 +37,4 @@ export async function materializeSharedUpstreams({ strict }) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
 	const strict = process.env.OMO_MATERIALIZE_STRICT === "1" || process.argv.includes("--strict");
 	const result = await materializeSharedUpstreams({ strict });
-	if (result.skipped && strict) process.exit(1);
 }
