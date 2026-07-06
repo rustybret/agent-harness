@@ -8,6 +8,8 @@ const LEGACY_GPT_MODEL_RE = /gpt-5(?:\.|-)(?:2|3)(?![-\s]codex(?:\b|-|\.|_))(?:\
 
 const ALLOWED_LEGACY_REFERENCES = new Set([
   "packages/omo-opencode/src/generated/model-capabilities.generated.json",
+  "utils/models.json",
+  "utils/models+variants.json",
 ])
 
 function isActiveSurface(path: string): boolean {
