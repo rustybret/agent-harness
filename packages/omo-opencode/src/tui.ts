@@ -26,6 +26,31 @@ type SolidRuntime<Node> = {
   readonly setProp: (node: Node, name: string, value: unknown) => unknown
 }
 
+type SolidSignals = Pick<typeof import("solid-js"), "createSignal">
+
+// Signals must come from the HOST's solid-js instance (the OpenCode TUI rewrites
+// the "solid-js" specifier to its runtime module) so the slot's children() memo
+// tracks our reads and re-renders on writes. Without solid-js the sidebar still
+// renders, just statically (no live updates until remount).
+function createSignalPair<T>(runtime: SolidSignals | null, initial: T): readonly [() => T, (value: T) => void] {
+  if (runtime) {
+    const [get, set] = runtime.createSignal(initial)
+    return [
+      get,
+      (value: T): void => {
+        set(() => value)
+      },
+    ]
+  }
+  let current = initial
+  return [
+    () => current,
+    (value: T): void => {
+      current = value
+    },
+  ]
+}
+
 // Lower order renders higher: 150 sorts the mailbox above Magic Context (external DEFAULT_SLOT_ORDER 200).
 export const MAILBOX_SLOT_ORDER = 150
 export const OMO_SLOT_ORDER = 900
@@ -33,7 +58,7 @@ export const OMO_SLOT_ORDER = 900
 type SidebarSlotRegistration<Node> = {
   readonly order: number
   readonly slots: {
-    readonly sidebar_content: () => Node
+    readonly sidebar_content: () => () => Node
   }
 }
 
@@ -44,6 +69,10 @@ type RegisterSidebarContentSlotInput<Node> = {
   readonly renderMailbox: () => Node
 }
 
+// The slot registry invokes each renderer ONCE and resolves the result through
+// solid's children() memo. Returning the render thunk (instead of a materialized
+// tree) lets that memo re-run whenever a signal read inside the thunk changes,
+// which is what makes live count updates and the collapse toggle repaint.
 function registerSidebarContentSlot<Node>({
   registerSlot,
   requestRender,
@@ -53,13 +82,13 @@ function registerSidebarContentSlot<Node>({
   registerSlot({
     order: MAILBOX_SLOT_ORDER,
     slots: {
-      sidebar_content: renderMailbox,
+      sidebar_content: () => renderMailbox,
     },
   })
   registerSlot({
     order: OMO_SLOT_ORDER,
     slots: {
-      sidebar_content: renderSidebar,
+      sidebar_content: () => renderSidebar,
     },
   })
   requestRender()
@@ -164,29 +193,38 @@ const module: TuiPluginModule = {
     if (!solid) {
       return
     }
+    const solidJs = await import("solid-js").catch((error) => {
+      log("[tui-sidebar] solid-js unavailable; sidebar renders statically", { error })
+      return null
+    })
 
     const directory = api.state.path.directory
     if ((await loadPluginValidation(directory)).config.tui?.sidebar?.enabled === false) {
       return
     }
 
-    let currentView = await readView(directory)
-    let currentKey = viewKey(currentView)
+    const initialView = await readView(directory)
+    let currentKey = viewKey(initialView)
     let disposed = false
     let inFlight = false
     let timer: ReturnType<typeof setTimeout> | null = null
 
-    let mailboxCollapsed: boolean = resolveOmoCollapsed(readTuiPreferencesFileSync())
+    const [view, setView] = createSignalPair<SidebarView>(solidJs, initialView)
+    const [collapsed, setCollapsed] = createSignalPair<boolean>(
+      solidJs,
+      resolveOmoCollapsed(readTuiPreferencesFileSync()),
+    )
 
     const toggleMailbox = (): void => {
-      mailboxCollapsed = !mailboxCollapsed
-      queueTuiPreferenceUpdate(["mailbox", "collapsed"], mailboxCollapsed)
+      const next = !collapsed()
+      setCollapsed(next)
+      queueTuiPreferenceUpdate(["mailbox", "collapsed"], next)
       api.renderer.requestRender()
     }
 
     const mailboxToggle: MailboxToggleOpts = {
       get collapsed() {
-        return mailboxCollapsed
+        return collapsed()
       },
       onToggle: toggleMailbox,
     }
@@ -198,8 +236,8 @@ const module: TuiPluginModule = {
       requestRender: () => {
         api.renderer.requestRender()
       },
-      renderSidebar: () => materialize(buildViewNodes(currentView, api.theme.current), solid),
-      renderMailbox: () => materialize(buildMailboxNodes(currentView, api.theme.current, mailboxToggle), solid),
+      renderSidebar: () => materialize(buildViewNodes(view(), api.theme.current), solid),
+      renderMailbox: () => materialize(buildMailboxNodes(view(), api.theme.current, mailboxToggle), solid),
     })
 
     const schedule = (): void => {
@@ -216,8 +254,8 @@ const module: TuiPluginModule = {
         const nextView = await readView(directory)
         const nextKey = viewKey(nextView)
         if (nextKey !== currentKey) {
-          currentView = nextView
           currentKey = nextKey
+          setView(nextView)
           api.renderer.requestRender()
         }
       } catch (error) {

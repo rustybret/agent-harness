@@ -289,9 +289,9 @@ function mailboxNodes(
 ): ViewNode[] {
   if (!mailbox) return []
 
-  const headerProps: Record<string, unknown> = { fg: theme.info }
-  if (toggle?.onToggle) headerProps.onMouseDown = toggle.onToggle
-  const titleText = text(headerProps, `${toggle?.collapsed ? "▶" : "▼"} Mailbox`)
+  const headerRowProps: Record<string, unknown> = { flexDirection: "row", width: "100%" }
+  if (toggle?.onToggle) headerRowProps.onMouseDown = toggle.onToggle
+  const titleText = box(headerRowProps, [text({ fg: theme.info }, `${toggle?.collapsed ? "▶" : "▼"} Mailbox`)])
 
   if (toggle?.collapsed) {
     const summaryLine = mailboxAllZero(mailbox)

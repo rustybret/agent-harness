@@ -18,6 +18,23 @@ function flattenText(nodes: readonly ViewNode[]): { text: string; props: Readonl
   return out
 }
 
+function findMailboxHeaderRow(nodes: readonly ViewNode[]): ViewNode | undefined {
+  let found: ViewNode | undefined
+  const walk = (node: ViewNode): void => {
+    if (found) return
+    const hasMailboxText = (node.children ?? []).some(
+      (child) => child.kind === "text" && (child.text ?? "").includes("Mailbox"),
+    )
+    if (node.kind === "box" && hasMailboxText) {
+      found = node
+      return
+    }
+    for (const child of node.children ?? []) walk(child)
+  }
+  for (const node of nodes) walk(node)
+  return found
+}
+
 const mailboxState: MailboxSidebarState = {
   inboundUnread: 2,
   inboundProcessed: 5,
@@ -281,21 +298,22 @@ describe("tui sidebar renderView", () => {
     expect(collapsedTexts.length).toBeLessThan(expandedTexts.length)
     expect(collapsedTexts.some((entry) => entry.text.includes("Mailbox"))).toBe(true)
     expect(collapsedTexts.some((entry) => entry.text.includes("Unread"))).toBe(false)
-    const header = collapsedTexts.find((entry) => entry.text.includes("Mailbox"))
-    expect(header?.props.onMouseDown).toBe(onToggle)
+    const headerRow = findMailboxHeaderRow(collapsed)
+    expect(headerRow?.props.onMouseDown).toBe(onToggle)
   })
 
-  it("#given an expanded mailbox with a toggle #when building nodes #then the header carries onMouseDown", () => {
+  it("#given an expanded mailbox with a toggle #when building nodes #then the header row box carries onMouseDown", () => {
     // given
     const view = computeView({ ...activeSections, mailbox: mailboxState })
     const onToggle = (): void => {}
 
     // when
     const nodes = buildMailboxNodes(view, theme, { collapsed: false, onToggle })
-    const header = flattenText(nodes).find((entry) => entry.text.includes("Mailbox"))
+    const headerRow = findMailboxHeaderRow(nodes)
 
     // then
-    expect(header?.props.onMouseDown).toBe(onToggle)
+    expect(headerRow?.props.onMouseDown).toBe(onToggle)
+    expect(headerRow?.props.width).toBe("100%")
   })
 
   it("#given a collapsed mailbox with activity #when building nodes #then header shows In/Out summary line", () => {
