@@ -1,6 +1,7 @@
 import {
   isInternalPromptDispatchAccepted,
 } from "../../../shared/prompt-async-gate"
+import { isSessionActive } from "../../../shared/session-idle-settle"
 import { log } from "../../../shared/logger"
 import type {
   InternalPromptDispatchArgs,
@@ -37,6 +38,7 @@ export interface MailboxStorePort {
   reclaimStale(sessionMessageIds: Set<string>): Promise<void>
   drainUnread(maxNotes: number): Promise<UnreadMessage[]>
   reserve(messageId: string): Promise<string | undefined>
+  unreserve(messageId: string): Promise<void>
   quarantine(messageId: string, reason: QuarantineReason, detail?: string): Promise<void>
   markDispatched(entry: Omit<PendingEntry, "state">): Promise<void>
 }
@@ -152,6 +154,12 @@ async function processNote(
     queueBehavior: "defer",
   })
   if (!isInternalPromptDispatchAccepted(dispatchResult)) {
+    await store.unreserve(note.messageId).catch((error) => {
+      log("[mailbox-idle-drain] failed to unreserve note", {
+        error: error instanceof Error ? error.message : String(error),
+        messageId: note.messageId,
+      })
+    })
     return false
   }
 
@@ -170,6 +178,12 @@ export function createIdleDrainHook(deps: IdleDrainHookDeps): {
   return {
     "session.idle": async ({ sessionId }: { sessionId: string }): Promise<void> => {
       if (!sessionId) return
+
+      const isActive = await isSessionActive(deps.client, sessionId).catch(() => false)
+      if (isActive) {
+        log("[mailbox-idle-drain] skipped: session is active", { sessionId })
+        return
+      }
 
       const freshConfig = resolveFreshConfig(deps)
 

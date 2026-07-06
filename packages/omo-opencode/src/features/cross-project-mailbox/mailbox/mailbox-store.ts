@@ -219,6 +219,10 @@ export class MailboxStore {
     }
   }
 
+  async unreserve(messageId: string): Promise<void> {
+    await this.returnToUnread(messageId)
+  }
+
   private async returnToUnread(messageId: string): Promise<void> {
     const { inbox } = this.dirs()
     const reservedPath = path.join(inbox, `${RESERVED_PREFIX}${messageId}${NOTE_SUFFIX}`)

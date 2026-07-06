@@ -16,6 +16,7 @@ export interface PresenceHeartbeatDeps {
   intervalMs?: number
   writeRecord?: (record: PresenceRecord, homeDir?: string) => Promise<void>
   modeDetector?: Pick<ModeDetector, "detect" | "currentMode" | "currentServerUrl">
+  onBeat?: (sessionId: string) => Promise<void>
 }
 
 export interface PresenceHeartbeatHook {
@@ -59,6 +60,13 @@ export function createPresenceHeartbeatHook(deps: PresenceHeartbeatDeps): Presen
         projectId: deps.projectId,
       })
     })
+    if (deps.onBeat) {
+      deps.onBeat(currentSessionId).catch((error) => {
+        log("[presence-heartbeat] onBeat callback failed", {
+          error: error instanceof Error ? error.message : String(error),
+        })
+      })
+    }
   }
 
   return {

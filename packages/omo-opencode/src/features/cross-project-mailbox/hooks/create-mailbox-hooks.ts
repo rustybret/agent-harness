@@ -129,7 +129,7 @@ function buildIdleDrainDeps(
 
 export type PresenceHeartbeatOverrides = Pick<
   PresenceHeartbeatDeps,
-  "writeRecord" | "homeDir" | "now"
+  "writeRecord" | "homeDir" | "now" | "onBeat"
 > &
   Pick<ModeDetectorDeps, "readOwnRecord" | "settleMs">
 
@@ -166,6 +166,7 @@ export function buildPresenceHeartbeatHook(
     writeRecord: overrides?.writeRecord,
     homeDir: overrides?.homeDir,
     now: overrides?.now,
+    onBeat: overrides?.onBeat,
   })
 }
 
@@ -175,8 +176,18 @@ export function createMailboxHooks(
   sharedModeDetector?: ModeDetector,
 ): MailboxHooks {
   if (!config?.enabled) return { mailboxIdleDrain: null, mailboxPresenceHeartbeat: null }
+  const mailboxIdleDrain = createIdleDrainHook(buildIdleDrainDeps(ctx, config))
+  const mailboxPresenceHeartbeat = buildPresenceHeartbeatHook(
+    ctx,
+    {
+      onBeat: async (sessionId) => {
+        await mailboxIdleDrain["session.idle"]({ sessionId })
+      },
+    },
+    sharedModeDetector,
+  )
   return {
-    mailboxIdleDrain: createIdleDrainHook(buildIdleDrainDeps(ctx, config)),
-    mailboxPresenceHeartbeat: buildPresenceHeartbeatHook(ctx, undefined, sharedModeDetector),
+    mailboxIdleDrain,
+    mailboxPresenceHeartbeat,
   }
 }

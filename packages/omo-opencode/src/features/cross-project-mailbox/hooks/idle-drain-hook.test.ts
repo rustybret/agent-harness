@@ -101,6 +101,7 @@ function makeHarness(opts: {
   const drainUnread = jest.fn(async () => notes)
   const reserveResult = "reserveResult" in opts ? opts.reserveResult : "/inbox/.delivering-id.md"
   const reserve = jest.fn(async () => reserveResult)
+  const unreserve = jest.fn(async () => undefined)
   const quarantine = jest.fn(async () => undefined)
   const markDispatched = jest.fn(async () => undefined)
   const addDispatchSent = jest.fn(async () => undefined)
@@ -116,7 +117,7 @@ function makeHarness(opts: {
     () => opts.freshConfigRead ?? { valid: true, config: { cross_project_mailbox: config } },
   )
 
-  const store: MailboxStorePort = { reclaimStale, drainUnread, reserve, quarantine, markDispatched }
+  const store: MailboxStorePort = { reclaimStale, drainUnread, reserve, unreserve, quarantine, markDispatched }
   const pending: PendingStorePort = { addDispatchSent }
   const digest: DigestStorePort = { checkAndRecord }
   const limiter: RateLimiterPort = { checkRateLimit }
@@ -461,6 +462,47 @@ describe("createIdleDrainHook", () => {
       // then
       expect(spies.dispatchInternalPrompt).toHaveBeenCalledTimes(1)
       expect(spies.validateInbound.mock.calls[0][1]).toBe(goodConfig)
+    })
+  })
+
+  describe("#given an active session status", () => {
+    it("#then the handler early-outs before resolving primary or scanning mailbox", async () => {
+      // given
+      const { deps, spies } = makeHarness({ primary: "sisyphus" })
+      deps.client.session = {
+        status: jest.fn(async () => ({
+          data: {
+            ses_1: { type: "busy" },
+          },
+        })),
+        promptAsync: jest.fn(async () => ({})),
+      } as any
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(spies.resolveActivePrimaryAgent).not.toHaveBeenCalled()
+      expect(spies.makeMailboxStore).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("#given a note reserved but dispatchInternalPrompt is rejected", () => {
+    it("#then calls unreserve to release the note immediately", async () => {
+      // given
+      const { deps, spies } = makeHarness({ primary: "sisyphus" })
+      spies.dispatchInternalPrompt.mockResolvedValue({ status: "reserved" })
+      const store = deps.makeMailboxStore("/repos/beta", "alpha-id") as any
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(spies.dispatchInternalPrompt).toHaveBeenCalledTimes(1)
+      expect(store.unreserve).toHaveBeenCalledWith("11111111-1111-1111-1111-111111111111")
+      expect(store.markDispatched).not.toHaveBeenCalled()
     })
   })
 })
