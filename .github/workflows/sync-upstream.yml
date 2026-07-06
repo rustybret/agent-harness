@@ -113,10 +113,14 @@ jobs:
           echo "PR created for branch ${BRANCH}"
           exit 1
 
-      - name: Summary
+      - name: Write job summary
         if: always()
-        run: |
-          echo "=== Sync Summary ==="
-          echo "dev SHA: $(git rev-parse origin/dev 2>/dev/null || echo 'unknown')"
-          echo "fork/local SHA: $(git rev-parse origin/fork/local 2>/dev/null || echo 'unknown')"
-          echo "upstream/${{ env.UPSTREAM_BRANCH }} SHA: $(git rev-parse upstream/${{ env.UPSTREAM_BRANCH }} 2>/dev/null || echo 'unknown')"
+        shell: bash
+        env:
+          JOB_SUMMARY_TITLE: Sync upstream status
+          JOB_SUMMARY_STATUS: ${{ job.status }}
+          JOB_SUMMARY_DETAILS: |
+            - Syncs pristine upstream dev branch to origin/dev.
+            - Rebases local customizations or opens a conflict PR.
+          JOB_SUMMARY_NEXT: If conflicts occurred, follow the conflict PR instructions to resolve manually.
+        run: GITHUB_STEP_SUMMARY="$GITHUB_STEP_SUMMARY" bash .github/scripts/write-job-summary.sh

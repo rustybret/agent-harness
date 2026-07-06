@@ -15,7 +15,6 @@ const workflowExpectations = [
   {
     path: ".github/workflows/ci.yml",
     jobs: [
-      "block-master-pr",
       "test",
       "typecheck",
       "codex-compatibility",
@@ -25,8 +24,8 @@ const workflowExpectations = [
       "draft-release",
     ],
   },
-  { path: ".github/workflows/cla.yml", jobs: ["cla"] },
   { path: ".github/workflows/lint-workflows.yml", jobs: ["actionlint"] },
+  { path: ".github/workflows/local-build.yml", jobs: ["build"] },
   { path: ".github/workflows/package-labels.yml", jobs: ["ensure-labels", "label-pull-request", "label-issue"] },
   { path: ".github/workflows/publish-platform.yml", jobs: ["build", "publish"] },
   {
@@ -43,8 +42,8 @@ const workflowExpectations = [
     ],
   },
   { path: ".github/workflows/refresh-model-capabilities.yml", jobs: ["refresh"] },
-  { path: ".github/workflows/sisyphus-agent.yml", jobs: ["agent"] },
   { path: ".github/workflows/stats.yml", jobs: ["stats"] },
+  { path: ".github/workflows/sync-upstream.yml", jobs: ["sync"] },
   { path: ".github/workflows/web-ci.yml", jobs: ["format-lint-typecheck-build"] },
   { path: ".github/workflows/web-deploy.yml", jobs: ["deploy"] },
 ] as const satisfies readonly WorkflowExpectation[]
