@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test"
-import { mkdirSync, rmSync, writeFileSync } from "node:fs"
+import { existsSync, mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 
+import { clearPluginConfigFileDetectionCache } from "../../../shared"
 import { loadOmoConfig } from "./model-resolution-config"
 
 describe("model-resolution-config", () => {
@@ -25,8 +26,16 @@ describe("model-resolution-config", () => {
       tmpdir(),
       `omo-model-resolution-config-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     )
+    const projectConfigPath = join(process.cwd(), ".opencode", "oh-my-openagent.jsonc")
+    const projectConfigBackupPath = projectConfigPath + ".bak"
+    let backedUp = false
 
     try {
+      if (existsSync(projectConfigPath)) {
+        renameSync(projectConfigPath, projectConfigBackupPath)
+        backedUp = true
+        clearPluginConfigFileDetectionCache()
+      }
       mkdirSync(testConfigDir, { recursive: true })
       process.env.OPENCODE_CONFIG_DIR = testConfigDir
       writeFileSync(
@@ -39,6 +48,10 @@ describe("model-resolution-config", () => {
 
       expect(config?.agents?.atlas?.model).toBe("opencode-go/kimi-k2.6")
     } finally {
+      if (backedUp) {
+        renameSync(projectConfigBackupPath, projectConfigPath)
+        clearPluginConfigFileDetectionCache()
+      }
       rmSync(testConfigDir, { recursive: true, force: true })
     }
   })

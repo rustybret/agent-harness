@@ -324,8 +324,8 @@ describe("model-resolution check", () => {
       // #given Qwen Max is configured for planner agents before the bundled snapshot has an exact entry
       const info = getModelResolutionInfoWithOverrides({
         agents: {
-          prometheus: { model: "opencode-go/qwen3.7-max" },
-          atlas: { model: "opencode-go/qwen3.7-max" },
+          prometheus: { model: "opencode-go/qwen4.0-max" },
+          atlas: { model: "opencode-go/qwen4.0-max" },
         },
       })
 
