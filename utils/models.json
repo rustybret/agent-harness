@@ -1488,7 +1488,13 @@
       "key": "openrouter/tencent/hunyuan-a13b-instruct"
     },
     {
+      "key": "openrouter/tencent/hy3"
+    },
+    {
       "key": "openrouter/tencent/hy3-preview"
+    },
+    {
+      "key": "openrouter/tencent/hy3:free"
     },
     {
       "key": "openrouter/thedrummer/cydonia-24b-v4.1"

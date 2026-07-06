@@ -56,6 +56,57 @@ describe("provider model ID transforms", () => {
 		}
 	})
 
+	test("maps bare gemini preview aliases for gateway and google providers", () => {
+		// #given bare gemini IDs that providers expose under -preview names
+		const scenarios = [
+			{
+				provider: "google",
+				model: "gemini-3.1-pro",
+				expected: "gemini-3.1-pro-preview",
+			},
+			{
+				provider: "google",
+				model: "gemini-3-flash",
+				expected: "gemini-3-flash-preview",
+			},
+			{
+				provider: "github-copilot",
+				model: "gemini-3.1-pro",
+				expected: "gemini-3.1-pro-preview",
+			},
+			{
+				provider: "vercel",
+				model: "google/gemini-3.1-pro",
+				expected: "google/gemini-3.1-pro-preview",
+			},
+		] as const
+
+		for (const scenario of scenarios) {
+			// #when the provider transform is applied
+			const result = transformModelForProvider(scenario.provider, scenario.model)
+
+			// #then the bare alias is rewritten to the -preview provider ID
+			expect(result).toBe(scenario.expected)
+		}
+	})
+
+	test("leaves custom prefixed gemini model IDs untouched", () => {
+		// #given custom config model IDs that embed a gemini name mid-string
+		const scenarios = [
+			{ provider: "google", model: "antigravity-gemini-3.1-pro" },
+			{ provider: "google", model: "antigravity-gemini-3-flash" },
+			{ provider: "github-copilot", model: "antigravity-gemini-3.1-pro" },
+		] as const
+
+		for (const scenario of scenarios) {
+			// #when the provider transform is applied
+			const result = transformModelForProvider(scenario.provider, scenario.model)
+
+			// #then the custom model ID passes through without a -preview rewrite
+			expect(result).toBe(scenario.model)
+		}
+	})
+
 	test("produces identical results for non-Anthropic providers", () => {
 		// #given non-Anthropic provider/model pairs
 		const scenarios = [

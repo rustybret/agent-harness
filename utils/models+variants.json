@@ -2960,7 +2960,23 @@
       ]
     },
     {
+      "key": "openrouter/tencent/hy3",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
       "key": "openrouter/tencent/hy3-preview",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "key": "openrouter/tencent/hy3:free",
       "variants": [
         "high",
         "low",
