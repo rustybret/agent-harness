@@ -790,6 +790,126 @@
       ]
     },
     {
+      "key": "openai/gpt-5.6",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.6-fast",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.6-luna",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.6-luna-fast",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.6-luna-pro",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.6-pro",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.6-sol",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.6-sol-fast",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.6-sol-pro",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.6-terra",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.6-terra-fast",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openai/gpt-5.6-terra-pro",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
       "key": "opencode/big-pickle",
       "variants": []
     },
@@ -1111,8 +1231,28 @@
       ]
     },
     {
+      "key": "opencode/grok-4.5",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
       "key": "opencode/grok-build-0.1",
-      "variants": []
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "key": "opencode/hy3-free",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
     },
     {
       "key": "opencode/kimi-k2.5",
@@ -1177,23 +1317,23 @@
       "variants": []
     },
     {
-      "key": "openrouter/aion-labs/aion-1.0",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
-    },
-    {
-      "key": "openrouter/aion-labs/aion-1.0-mini",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
-    },
-    {
       "key": "openrouter/aion-labs/aion-2.0",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "key": "openrouter/aion-labs/aion-3.0",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "key": "openrouter/aion-labs/aion-3.0-mini",
       "variants": [
         "high",
         "low",
@@ -1533,14 +1673,6 @@
       ]
     },
     {
-      "key": "openrouter/google/gemini-2.5-flash-lite-preview-09-2025",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
-    },
-    {
       "key": "openrouter/google/gemini-2.5-pro",
       "variants": [
         "high",
@@ -1761,10 +1893,6 @@
       "variants": []
     },
     {
-      "key": "openrouter/liquid/lfm-2-24b-a2b",
-      "variants": []
-    },
-    {
       "key": "openrouter/liquid/lfm-2.5-1.2b-instruct:free",
       "variants": []
     },
@@ -1979,6 +2107,14 @@
     {
       "key": "openrouter/morph/morph-v3-large",
       "variants": []
+    },
+    {
+      "key": "openrouter/nex-agi/nex-n2-mini",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
     },
     {
       "key": "openrouter/nex-agi/nex-n2-pro",
@@ -2395,6 +2531,66 @@
       ]
     },
     {
+      "key": "openrouter/openai/gpt-5.6-luna",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.6-luna-pro",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.6-sol",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.6-sol-pro",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.6-terra",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/openai/gpt-5.6-terra-pro",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "none",
+        "xhigh"
+      ]
+    },
+    {
       "key": "openrouter/openai/gpt-audio",
       "variants": []
     },
@@ -2672,22 +2868,6 @@
       ]
     },
     {
-      "key": "openrouter/poolside/laguna-xs.2",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
-    },
-    {
-      "key": "openrouter/poolside/laguna-xs.2:free",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
-    },
-    {
       "key": "openrouter/qwen/qwen-2.5-72b-instruct",
       "variants": []
     },
@@ -2944,14 +3124,6 @@
       ]
     },
     {
-      "key": "openrouter/switchpoint/router",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
-    },
-    {
       "key": "openrouter/tencent/hunyuan-a13b-instruct",
       "variants": [
         "high",
@@ -3017,19 +3189,43 @@
     },
     {
       "key": "openrouter/x-ai/grok-4.20",
-      "variants": []
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
     },
     {
       "key": "openrouter/x-ai/grok-4.20-multi-agent",
-      "variants": []
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
     },
     {
       "key": "openrouter/x-ai/grok-4.3",
-      "variants": []
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "key": "openrouter/x-ai/grok-4.5",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
     },
     {
       "key": "openrouter/x-ai/grok-build-0.1",
-      "variants": []
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
     },
     {
       "key": "openrouter/xiaomi/mimo-v2.5",

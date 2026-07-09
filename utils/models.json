@@ -429,6 +429,42 @@
       "key": "openai/gpt-5.5-fast"
     },
     {
+      "key": "openai/gpt-5.6"
+    },
+    {
+      "key": "openai/gpt-5.6-fast"
+    },
+    {
+      "key": "openai/gpt-5.6-luna"
+    },
+    {
+      "key": "openai/gpt-5.6-luna-fast"
+    },
+    {
+      "key": "openai/gpt-5.6-luna-pro"
+    },
+    {
+      "key": "openai/gpt-5.6-pro"
+    },
+    {
+      "key": "openai/gpt-5.6-sol"
+    },
+    {
+      "key": "openai/gpt-5.6-sol-fast"
+    },
+    {
+      "key": "openai/gpt-5.6-sol-pro"
+    },
+    {
+      "key": "openai/gpt-5.6-terra"
+    },
+    {
+      "key": "openai/gpt-5.6-terra-fast"
+    },
+    {
+      "key": "openai/gpt-5.6-terra-pro"
+    },
+    {
       "key": "opencode/big-pickle"
     },
     {
@@ -543,7 +579,13 @@
       "key": "opencode/gpt-5.5-pro"
     },
     {
+      "key": "opencode/grok-4.5"
+    },
+    {
       "key": "opencode/grok-build-0.1"
+    },
+    {
+      "key": "opencode/hy3-free"
     },
     {
       "key": "opencode/kimi-k2.5"
@@ -582,13 +624,13 @@
       "key": "openrouter/ai21/jamba-large-1.7"
     },
     {
-      "key": "openrouter/aion-labs/aion-1.0"
-    },
-    {
-      "key": "openrouter/aion-labs/aion-1.0-mini"
-    },
-    {
       "key": "openrouter/aion-labs/aion-2.0"
+    },
+    {
+      "key": "openrouter/aion-labs/aion-3.0"
+    },
+    {
+      "key": "openrouter/aion-labs/aion-3.0-mini"
     },
     {
       "key": "openrouter/aion-labs/aion-rp-llama-3.1-8b"
@@ -753,9 +795,6 @@
       "key": "openrouter/google/gemini-2.5-flash-lite"
     },
     {
-      "key": "openrouter/google/gemini-2.5-flash-lite-preview-09-2025"
-    },
-    {
       "key": "openrouter/google/gemini-2.5-pro"
     },
     {
@@ -859,9 +898,6 @@
     },
     {
       "key": "openrouter/kwaipilot/kat-coder-pro-v2"
-    },
-    {
-      "key": "openrouter/liquid/lfm-2-24b-a2b"
     },
     {
       "key": "openrouter/liquid/lfm-2.5-1.2b-instruct:free"
@@ -1015,6 +1051,9 @@
     },
     {
       "key": "openrouter/morph/morph-v3-large"
+    },
+    {
+      "key": "openrouter/nex-agi/nex-n2-mini"
     },
     {
       "key": "openrouter/nex-agi/nex-n2-pro"
@@ -1197,6 +1236,24 @@
       "key": "openrouter/openai/gpt-5.5-pro"
     },
     {
+      "key": "openrouter/openai/gpt-5.6-luna"
+    },
+    {
+      "key": "openrouter/openai/gpt-5.6-luna-pro"
+    },
+    {
+      "key": "openrouter/openai/gpt-5.6-sol"
+    },
+    {
+      "key": "openrouter/openai/gpt-5.6-sol-pro"
+    },
+    {
+      "key": "openrouter/openai/gpt-5.6-terra"
+    },
+    {
+      "key": "openrouter/openai/gpt-5.6-terra-pro"
+    },
+    {
       "key": "openrouter/openai/gpt-audio"
     },
     {
@@ -1294,12 +1351,6 @@
     },
     {
       "key": "openrouter/poolside/laguna-xs-2.1:free"
-    },
-    {
-      "key": "openrouter/poolside/laguna-xs.2"
-    },
-    {
-      "key": "openrouter/poolside/laguna-xs.2:free"
     },
     {
       "key": "openrouter/qwen/qwen-2.5-72b-instruct"
@@ -1482,9 +1533,6 @@
       "key": "openrouter/stepfun/step-3.7-flash"
     },
     {
-      "key": "openrouter/switchpoint/router"
-    },
-    {
       "key": "openrouter/tencent/hunyuan-a13b-instruct"
     },
     {
@@ -1525,6 +1573,9 @@
     },
     {
       "key": "openrouter/x-ai/grok-4.3"
+    },
+    {
+      "key": "openrouter/x-ai/grok-4.5"
     },
     {
       "key": "openrouter/x-ai/grok-build-0.1"
