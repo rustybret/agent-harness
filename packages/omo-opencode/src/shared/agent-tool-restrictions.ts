@@ -57,6 +57,10 @@ const AGENT_RESTRICTIONS: Record<string, Record<string, boolean>> = {
   "sisyphus-junior": {
     task: false,
   },
+
+  prometheus: {
+    project_mailbox_drain: false,
+  },
 }
 
 type AgentToolRestrictionsOptions = {

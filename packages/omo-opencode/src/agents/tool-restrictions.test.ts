@@ -195,6 +195,20 @@ describe("read-only agent tool restrictions", () => {
     })
   })
 
+  describe("Prometheus", () => {
+    test("denies manual mailbox drain while retaining read-only mailbox peek", () => {
+      // given
+      const agentName = "prometheus"
+
+      // when
+      const restrictions = getAgentToolRestrictions(agentName)
+
+      // then
+      expect(restrictions["project_mailbox_drain"]).toBe(false)
+      expect(restrictions["project_mailbox_peek"]).toBeUndefined()
+    })
+  })
+
   describe("Sisyphus GPT variants", () => {
     test("does not force-deny apply_patch for GPT or Claude models", () => {
       // given

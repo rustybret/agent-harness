@@ -130,10 +130,11 @@ export async function sessionLatestAssistantBlocksInternalPrompt<TInput>(args: {
   const messages = session.messages.bind(session)
 
   try {
+    const baseQuery = getPromptQuery(args.input)
     const response = await withDispatchTimeout(
       messages({
         path: { id: args.sessionID },
-        query: getPromptQuery(args.input),
+        query: { ...baseQuery, limit: 10 },
       }),
       args.timeoutMs,
       `[prompt-async-gate] ${args.sessionName} session.messages`,

@@ -66,10 +66,12 @@ interface Spies {
   reclaimStale: ReturnType<typeof jest.fn>
   drainUnread: ReturnType<typeof jest.fn>
   reserve: ReturnType<typeof jest.fn>
+  unreserve: ReturnType<typeof jest.fn>
   quarantine: ReturnType<typeof jest.fn>
   markDispatched: ReturnType<typeof jest.fn>
   addDispatchSent: ReturnType<typeof jest.fn>
   checkAndRecord: ReturnType<typeof jest.fn>
+  rollback: ReturnType<typeof jest.fn>
   checkRateLimit: ReturnType<typeof jest.fn>
   validateInbound: ReturnType<typeof jest.fn>
   buildTriagePrompt: ReturnType<typeof jest.fn>
@@ -106,8 +108,14 @@ function makeHarness(opts: {
   const markDispatched = jest.fn(async () => undefined)
   const addDispatchSent = jest.fn(async () => undefined)
   const checkAndRecord = jest.fn(async () => ({ isDuplicate: opts.duplicate ?? false }))
+  const rollback = jest.fn(async () => undefined)
   const checkRateLimit = jest.fn(async () => ({ limited: opts.rateLimited ?? false }))
-  const validateInbound = jest.fn(() => opts.validation ?? ({ valid: true } as ValidationResult))
+  const validateInbound = jest.fn((envelope, config, validationOpts) => {
+    if (validationOpts?.duplicateLoop) {
+      return { valid: false, reason: "duplicate-loop", detail: "dup" }
+    }
+    return opts.validation ?? ({ valid: true } as ValidationResult)
+  })
   const buildTriagePrompt = jest.fn(() => "TRIAGE_TEXT")
   const dispatchInternalPrompt = jest.fn(async () => ({ status: "dispatched", response: {} }) as const)
   const getSessionMessages = jest.fn(async () => opts.sessionMessages ?? [])
@@ -119,7 +127,7 @@ function makeHarness(opts: {
 
   const store: MailboxStorePort = { reclaimStale, drainUnread, reserve, unreserve, quarantine, markDispatched }
   const pending: PendingStorePort = { addDispatchSent }
-  const digest: DigestStorePort = { checkAndRecord }
+  const digest: DigestStorePort = { checkAndRecord, rollback }
   const limiter: RateLimiterPort = { checkRateLimit }
 
   const makeMailboxStore = jest.fn(() => store)
@@ -150,10 +158,12 @@ function makeHarness(opts: {
       reclaimStale,
       drainUnread,
       reserve,
+      unreserve,
       quarantine,
       markDispatched,
       addDispatchSent,
       checkAndRecord,
+      rollback,
       checkRateLimit,
       validateInbound,
       buildTriagePrompt,
@@ -324,7 +334,8 @@ describe("createIdleDrainHook", () => {
       // then
       expect(spies.quarantine).not.toHaveBeenCalled()
       expect(spies.dispatchInternalPrompt).not.toHaveBeenCalled()
-      expect(spies.reserve).not.toHaveBeenCalled()
+      expect(spies.reserve).toHaveBeenCalledTimes(1)
+      expect(spies.unreserve).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -334,7 +345,6 @@ describe("createIdleDrainHook", () => {
       const { deps, spies } = makeHarness({
         primary: "sisyphus",
         duplicate: true,
-        validation: { valid: false, reason: "duplicate-loop", detail: "dup" },
       })
       const hook = createIdleDrainHook(deps)
 
@@ -342,8 +352,8 @@ describe("createIdleDrainHook", () => {
       await hook["session.idle"]({ sessionId: "ses_1" })
 
       // then
-      expect(spies.validateInbound).toHaveBeenCalledTimes(1)
-      expect(spies.validateInbound.mock.calls[0][2]).toEqual({ duplicateLoop: true })
+      expect(spies.validateInbound).toHaveBeenCalledTimes(2)
+      expect(spies.validateInbound.mock.calls[1][2]).toEqual({ duplicateLoop: true })
       expect(spies.quarantine).toHaveBeenCalledTimes(1)
       expect(spies.quarantine.mock.calls[0][1]).toBe("duplicate-loop")
       expect(spies.dispatchInternalPrompt).not.toHaveBeenCalled()

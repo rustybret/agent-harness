@@ -1070,6 +1070,7 @@ describe("executeSyncContinuation - toast cleanup error paths", () => {
       task: true,
       call_omo_agent: true,
       question: false,
+      project_mailbox_drain: false,
       ...TEAM_TOOL_DENIALS,
     })
   })

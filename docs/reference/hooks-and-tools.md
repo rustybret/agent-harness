@@ -161,6 +161,8 @@ The tools system exposes capabilities to agents based on configuration profiles.
 | `team_shutdown_request`| `team_mode.enabled: true`| Requests lead or member termination on task completion. | OMO v4.0 |
 | `team_approve_shutdown`| `team_mode.enabled: true`| Lead acknowledges and executes a member's shutdown request. | OMO v4.0 |
 | `team_reject_shutdown` | `team_mode.enabled: true`| Lead denies a member's shutdown, providing reason feedback. | OMO v4.0 |
+| `project_mailbox_peek` | `cross_project_mailbox.enabled: true` | Lists unread inbound coordination notes without reserving or consuming files. | OMO v4.10 |
+| `project_mailbox_drain` | `cross_project_mailbox.enabled: true` | Consumes unread inbound notes synchronously, returning envelope metadata and full bodies without waiting for `session.idle`. Denied for Prometheus. | OMO v4.10 |
 | `project_message` | `cross_project_mailbox.enabled: true` | Sends an asynchronous, intent budgeted coordination note to another registered project. Supports `mode: "list"` probe mode, optional `category` field, and `launch_policy` behavior. Gated to external sessions; blocked in internal sessions with guidance to use `project_note`. | OMO v4.10 |
 | `project_note` | `cross_project_mailbox.enabled: true` | Sends a fire-and-forget coordination note directly to a target project's mailbox. Gated to internal sessions; blocked in external sessions with guidance to use `project_message`. | OMO v4.10 |
 

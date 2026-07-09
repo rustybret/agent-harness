@@ -26,7 +26,8 @@ The Cross-Project Mailbox is an OmO feature that enables independent OpenCode re
 1. **Registry (`~/.omo/project-registry.json`)**: A local registry tracking observed repositories, mapping unique 8-character `projectId` tags to absolute filesystem paths.
 2. **MailboxStore**: Manages message states (reservation, confirmation, quarantine, stale reclamation) via atomic filesystem locks to prevent race conditions.
 3. **Idle-Drain Hook**: Injected into `session.idle` events. It checks incoming notes in `coordination_notes/` when the session becomes idle, then sequentially drains eligible messages into the active prompt stream via `dispatchInternalPrompt`.
-4. **Project Message Tool (`project_message`)**: Surfaced to agents to send intent-budgeted, preflight-checked, envelope-wrapped notes to target repositories.
+4. **Manual Receive Tools (`project_mailbox_peek`, `project_mailbox_drain`)**: Let agents inspect or consume inbound notes on demand when work cannot wait for a `session.idle` edge.
+5. **Project Message Tool (`project_message`)**: Surfaced to agents to send intent-budgeted, preflight-checked, envelope-wrapped notes to target repositories.
 
 ---
 
@@ -179,6 +180,32 @@ The `project_note` tool enforces the same receiver-protecting guards as `project
 * Hop count limits.
 * Outbox log appending.
 * Body size limits.
+
+#### The `project_mailbox_peek` Tool
+
+This read-only receive-side tool lists unread inbound notes across registered sender projects without reserving, renaming, or consuming any files. It returns `fromProjectId`, `messageId`, `timestamp`, `intent`, and a 200-character `bodyPreview` for each pending note.
+
+##### Tool Schema
+
+```json
+{
+  "name": "project_mailbox_peek",
+  "arguments": {}
+}
+```
+
+#### The `project_mailbox_drain` Tool
+
+This receive-side tool explicitly consumes unread notes without waiting for `session.idle`. It applies the same inbound validation, same-pair rate limit, and duplicate-loop digest checks as the idle-drain hook, archives delivered notes under `processed/`, and returns each delivered envelope plus full body in the tool result. It is denied for Prometheus sessions; `project_mailbox_peek` remains available to every agent.
+
+##### Tool Schema
+
+```json
+{
+  "name": "project_mailbox_drain",
+  "arguments": {}
+}
+```
 
 #### File Inbound Structure
 The tool writes an envelope-wrapped Markdown file to `<target>/coordination_notes/<source-projectId>/<messageId>.md`:

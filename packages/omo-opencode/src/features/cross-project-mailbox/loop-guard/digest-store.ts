@@ -84,6 +84,19 @@ export class BodyDigestStore {
     return { isDuplicate: false }
   }
 
+  async rollback(note: {
+    fromProjectId: string
+    toProjectId: string
+    correlationId: string
+    body: string
+  }): Promise<void> {
+    const digest = sha256(normalizeBody(note.body))
+    const key = `${note.fromProjectId}:${note.toProjectId}:${note.correlationId}:${digest}`
+    const data = await this.read()
+    const live = data.entries.filter((entry) => entry.key !== key)
+    await this.atomicWrite({ entries: live })
+  }
+
   async pruneExpired(): Promise<void> {
     const nowMs = this.now()
     const data = await this.read()

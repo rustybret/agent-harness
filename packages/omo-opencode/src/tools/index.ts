@@ -33,6 +33,10 @@ export {
 } from "./task"
 export { createHashlineEditTool } from "./hashline-edit"
 export {
+  createProjectMailboxDrainTool,
+  createProjectMailboxPeekTool,
+} from "../features/cross-project-mailbox/manual-drain"
+export {
   createProjectMessageTool,
   createProjectNoteTool,
 } from "../features/cross-project-mailbox/send-tool"

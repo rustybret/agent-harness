@@ -22,6 +22,8 @@ import {
   createHashlineEditTool,
   createLookAt,
   createMonitorTools,
+  createProjectMailboxDrainTool,
+  createProjectMailboxPeekTool,
   createProjectMessageTool,
   createProjectNoteTool,
   createSessionManagerTools,
@@ -53,6 +55,8 @@ export type ToolRegistryFactories = {
   createTaskList: typeof createTaskList
   createTaskUpdateTool: typeof createTaskUpdateTool
   createHashlineEditTool: typeof createHashlineEditTool
+  createProjectMailboxDrainTool: typeof createProjectMailboxDrainTool
+  createProjectMailboxPeekTool: typeof createProjectMailboxPeekTool
   createProjectMessageTool: typeof createProjectMessageTool
   createProjectNoteTool: typeof createProjectNoteTool
   createTeamApproveShutdownTool: typeof createTeamApproveShutdownTool
@@ -87,6 +91,8 @@ export const defaultToolRegistryFactories: ToolRegistryFactories = {
   createTaskList,
   createTaskUpdateTool,
   createHashlineEditTool,
+  createProjectMailboxDrainTool,
+  createProjectMailboxPeekTool,
   createProjectMessageTool,
   createProjectNoteTool,
   createTeamApproveShutdownTool,

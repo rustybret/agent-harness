@@ -2,6 +2,7 @@ const { beforeEach, describe, expect, mock, spyOn, test } = require("bun:test")
 import { tool } from "@opencode-ai/plugin"
 
 import { OhMyOpenCodeConfigSchema, type OhMyOpenCodeConfig } from "../config"
+import { CrossProjectMailboxConfigSchema } from "../features/cross-project-mailbox/config"
 import * as openclawRuntimeDispatch from "../openclaw/runtime-dispatch"
 import type { ToolsRecord } from "./types"
 
@@ -65,6 +66,8 @@ const toolFactories: NonNullable<Parameters<typeof createToolRegistry>[0]["toolF
   createTaskList: mock(() => fakeTool),
   createTaskUpdateTool: mock(() => fakeTool),
   createHashlineEditTool: mock(() => fakeTool),
+  createProjectMailboxDrainTool: mock(() => fakeTool),
+  createProjectMailboxPeekTool: mock(() => fakeTool),
   createTeamApproveShutdownTool: mock(() => fakeTool),
   createTeamCreateTool: mock(() => fakeTool),
   createTeamDeleteTool: mock(() => fakeTool),
@@ -283,6 +286,72 @@ describe("#given team_mode configuration", () => {
     const registeredTeamToolNames = Object.keys(result.filteredTools).filter((toolName) => toolName.startsWith("team_"))
 
     expect(registeredTeamToolNames).toHaveLength(0)
+  })
+})
+
+describe("#given cross_project_mailbox configuration", () => {
+  test("#when enabled #then mailbox send and manual receive tools are registered", () => {
+    // given
+    syncSessionCreatedCallbacks.length = 0
+
+    // when
+    const result = createToolRegistry({
+      ctx: { directory: "/tmp" } as Parameters<typeof createToolRegistry>[0]["ctx"],
+      pluginConfig: createPluginConfig({
+        cross_project_mailbox: CrossProjectMailboxConfigSchema.parse({ enabled: true }),
+      }),
+      managers: {
+        backgroundManager: {},
+        tmuxSessionManager: {},
+        skillMcpManager: {},
+      } as Parameters<typeof createToolRegistry>[0]["managers"],
+      skillContext: {
+        mergedSkills: [],
+        availableSkills: [],
+        browserProvider: "playwright",
+        disabledSkills: new Set(),
+      },
+      availableCategories: [],
+      toolFactories,
+    })
+
+    // then
+    expect(result.filteredTools).toHaveProperty("project_mailbox_peek")
+    expect(result.filteredTools).toHaveProperty("project_mailbox_drain")
+    expect(result.filteredTools).toHaveProperty("project_message")
+    expect(result.filteredTools).toHaveProperty("project_note")
+  })
+
+  test("#when disabled #then no cross-project mailbox tools are registered", () => {
+    // given
+    syncSessionCreatedCallbacks.length = 0
+
+    // when
+    const result = createToolRegistry({
+      ctx: { directory: "/tmp" } as Parameters<typeof createToolRegistry>[0]["ctx"],
+      pluginConfig: createPluginConfig({
+        cross_project_mailbox: CrossProjectMailboxConfigSchema.parse({ enabled: false }),
+      }),
+      managers: {
+        backgroundManager: {},
+        tmuxSessionManager: {},
+        skillMcpManager: {},
+      } as Parameters<typeof createToolRegistry>[0]["managers"],
+      skillContext: {
+        mergedSkills: [],
+        availableSkills: [],
+        browserProvider: "playwright",
+        disabledSkills: new Set(),
+      },
+      availableCategories: [],
+      toolFactories,
+    })
+
+    // then
+    expect(result.filteredTools).not.toHaveProperty("project_mailbox_peek")
+    expect(result.filteredTools).not.toHaveProperty("project_mailbox_drain")
+    expect(result.filteredTools).not.toHaveProperty("project_message")
+    expect(result.filteredTools).not.toHaveProperty("project_note")
   })
 })
 

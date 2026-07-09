@@ -8,10 +8,19 @@ import type {
   InternalPromptDispatchResult,
 } from "../../../shared/prompt-async-gate"
 import type { CrossProjectMailboxConfig } from "../config"
-import type { PendingEntry, QuarantineReason, UnreadMessage } from "../mailbox/types"
+import type { PendingEntry, UnreadMessage } from "../mailbox/types"
 import type { ProjectEntry } from "../registry/types"
 import type { buildTriagePrompt } from "../triage/template"
 import type { validateInbound } from "../validation/validate-inbound"
+import {
+  reserveValidatedDelivery,
+  rollbackReservedDelivery,
+  type DigestStorePort,
+  type MailboxStorePort,
+  type RateLimiterPort,
+} from "../manual-drain/delivery-pipeline"
+
+export type { DigestStorePort, MailboxStorePort, RateLimiterPort } from "../manual-drain/delivery-pipeline"
 
 export const IDLE_DRAIN_SOURCE = "cross-project-mailbox-idle-drain"
 
@@ -34,30 +43,8 @@ function resolveFreshConfig(deps: IdleDrainHookDeps): CrossProjectMailboxConfig 
 type AsyncDispatchArgs = Extract<InternalPromptDispatchArgs, { mode: "async" }>
 type DispatchClient = AsyncDispatchArgs["client"]
 
-export interface MailboxStorePort {
-  reclaimStale(sessionMessageIds: Set<string>): Promise<void>
-  drainUnread(maxNotes: number): Promise<UnreadMessage[]>
-  reserve(messageId: string): Promise<string | undefined>
-  unreserve(messageId: string): Promise<void>
-  quarantine(messageId: string, reason: QuarantineReason, detail?: string): Promise<void>
-  markDispatched(entry: Omit<PendingEntry, "state">): Promise<void>
-}
-
 export interface PendingStorePort {
   addDispatchSent(entry: Omit<PendingEntry, "state">): Promise<void>
-}
-
-export interface DigestStorePort {
-  checkAndRecord(note: {
-    fromProjectId: string
-    toProjectId: string
-    correlationId: string
-    body: string
-  }): Promise<{ isDuplicate: boolean }>
-}
-
-export interface RateLimiterPort {
-  checkRateLimit(fromProjectId: string, toProjectId: string): Promise<{ limited: boolean }>
 }
 
 export interface PluginConfigReadResult {
@@ -115,38 +102,20 @@ async function processNote(
   sessionId: string,
   note: UnreadMessage,
 ): Promise<boolean> {
-  const envelope = note.envelope
-
-  const duplicate = await digestStore.checkAndRecord({
-    fromProjectId: envelope.fromProjectId,
-    toProjectId: envelope.toProjectId,
-    correlationId: envelope.correlationId,
-    body: note.body,
+  const reserved = await reserveValidatedDelivery({
+    deps,
+    config,
+    store,
+    digestStore,
+    rateLimiter,
+    note,
   })
-  if (duplicate.isDuplicate) {
-    const dupResult = deps.validateInbound(envelope, config, { duplicateLoop: true })
-    await store.quarantine(note.messageId, dupResult.reason ?? "duplicate-loop", dupResult.detail ?? "")
-    return false
-  }
-
-  const rateLimit = await rateLimiter.checkRateLimit(envelope.fromProjectId, envelope.toProjectId)
-  if (rateLimit.limited) {
-    return false
-  }
-
-  const validation = deps.validateInbound(envelope, config)
-  if (!validation.valid) {
-    await store.quarantine(note.messageId, validation.reason ?? "malformed", validation.detail ?? "")
-    return false
-  }
-
-  const reservedPath = await store.reserve(note.messageId)
-  if (reservedPath === undefined) {
+  if (reserved.status !== "reserved") {
     return false
   }
 
   const triageText = deps.buildTriagePrompt(
-    { ...envelope, body: note.body },
+    { ...note.envelope, body: note.body },
     { projectDisplayName: deps.projectDisplayName },
   )
   const dispatchResult = await deps.dispatchInternalPrompt({
@@ -154,11 +123,11 @@ async function processNote(
     queueBehavior: "defer",
   })
   if (!isInternalPromptDispatchAccepted(dispatchResult)) {
-    await store.unreserve(note.messageId).catch((error) => {
-      log("[mailbox-idle-drain] failed to unreserve note", {
-        error: error instanceof Error ? error.message : String(error),
-        messageId: note.messageId,
-      })
+    await rollbackReservedDelivery({
+      store,
+      digestStore,
+      note,
+      logPrefix: "[mailbox-idle-drain] dispatch rejection",
     })
     return false
   }
@@ -166,7 +135,7 @@ async function processNote(
   await store.markDispatched({
     messageId: note.messageId,
     sessionId,
-    reservedPath,
+    reservedPath: reserved.reservedPath,
     dispatchedAt: Date.now(),
   })
   return true
