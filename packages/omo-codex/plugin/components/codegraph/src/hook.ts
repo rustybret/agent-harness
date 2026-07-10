@@ -1,14 +1,23 @@
 import { execFile, spawn } from "node:child_process";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { cwd as processCwd, env as processEnv, stdin as processStdin, stdout as processStdout } from "node:process";
+import {
+	cwd as processCwd,
+	env as processEnv,
+	stderr as processStderr,
+	stdin as processStdin,
+	stdout as processStdout,
+} from "node:process";
 import type { Readable } from "node:stream";
 import { fileURLToPath } from "node:url";
 
-import { buildCodegraphEnv } from "../../../../../utils/src/codegraph/env.ts";
+import { buildCodegraphChildEnv, buildCodegraphEnv } from "../../../../../utils/src/codegraph/env.ts";
 import { buildCodegraphInitGuidanceForToolResult } from "../../../../../utils/src/codegraph/guidance.ts";
 import { resolveCodegraphCommand } from "../../../../../utils/src/codegraph/resolve.ts";
+import { shouldExcludeCodegraphProject } from "../../../../../utils/src/codegraph/workspace.ts";
 import { getCodexOmoConfig } from "../../../shared/src/config-loader.ts";
+import { pruneCodegraphProjectStoresBestEffort } from "./cache-gc.js";
+import { sweepCodegraphZombiesBestEffort } from "./hook-sweep.js";
 import { resolveCodegraphCommandInvocation, SESSION_START_CWD_ENV } from "./session-start-worker.js";
 import type {
 	HookStdout,
@@ -57,9 +66,24 @@ export async function executeCodegraphSessionStartHook(options: SessionStartHook
 	const projectRoot = resolveProjectRoot(input, options.cwd ?? processCwd());
 	const homeDir = resolveHomeDir(env);
 	const config = options.config ?? getCodexOmoConfig({ cwd: projectRoot, env, homeDir });
+	pruneCodegraphProjectStoresBestEffort(homeDir, { debugLog: writeDebugLog });
+	await sweepCodegraphZombiesBestEffort({
+		env,
+		homeDir,
+		...(config.trustedCodegraphInstallDir === undefined ? {} : { trustedCodegraphInstallDir: config.trustedCodegraphInstallDir }),
+		log: writeDebugLog,
+	}, options.sweepZombies);
 
 	if (config.codegraph?.enabled === false) {
 		return { action: "skipped-disabled", exitCode: 0 };
+	}
+	const excludedRoots = config.codegraph?.excluded_roots;
+	const exclusion = shouldExcludeCodegraphProject(projectRoot, {
+		homeDir,
+		...(excludedRoots === undefined ? {} : { excludedRoots }),
+	});
+	if (exclusion.excluded) {
+		return { action: "skipped-excluded", exitCode: 0 };
 	}
 
 	const isInitialized = await (options.statusProbe ?? isCodegraphProjectInitialized)({
@@ -75,7 +99,11 @@ export async function executeCodegraphSessionStartHook(options: SessionStartHook
 	(options.spawnWorker ?? spawnDetachedWorker)({
 		args: [options.workerCliPath ?? defaultWorkerCliPath(), "hook", "session-start-worker"],
 		command: process.execPath,
-		env: { ...env, [SESSION_START_CWD_ENV]: projectRoot },
+		env: buildCodegraphChildEnv({
+			ambientEnv: env,
+			codegraphEnv: { [SESSION_START_CWD_ENV]: projectRoot },
+			runtimeEnv: env,
+		}),
 	});
 	writeHookJson(options.stdout ?? processStdout);
 	return { action: "spawned", exitCode: 0 };
@@ -95,11 +123,16 @@ async function isCodegraphProjectInitialized(options: {
 	if (!resolved.exists) return false;
 
 	const invocation = resolveCodegraphCommandInvocation(resolved.command, [...resolved.argsPrefix, "status", "--json"]);
-	const status = await runStatusProbe(options.projectRoot, invocation.command, invocation.args, {
+	const codegraphEnv = {
 		...buildCodegraphEnv({ homeDir: options.homeDir }),
 		...(options.trustedCodegraphInstallDir === undefined ? {} : { CODEGRAPH_INSTALL_DIR: options.trustedCodegraphInstallDir }),
-		...definedEnv(options.env),
-	});
+	};
+	const status = await runStatusProbe(
+		options.projectRoot,
+		invocation.command,
+		invocation.args,
+		buildCodegraphChildEnv({ ambientEnv: options.env, codegraphEnv, runtimeEnv: options.env }),
+	);
 	if (status.exitCode !== 0 || status.timedOut) return false;
 	return codegraphStatusSaysInitialized(status.stdout);
 }
@@ -117,7 +150,7 @@ function runStatusProbe(
 			{
 				cwd: projectRoot,
 				encoding: "utf8",
-				env: { ...process.env, ...env },
+				env,
 				maxBuffer: 1024 * 1024,
 				timeout: STATUS_PROBE_TIMEOUT_MS,
 				windowsHide: true,
@@ -142,10 +175,6 @@ function codegraphStatusSaysInitialized(stdout: string): boolean {
 	if (typeof status !== "string") return false;
 	const normalized = status.toLowerCase();
 	return (normalized.includes("initialized") || normalized.includes("ready")) && !normalized.includes("not initialized") && !normalized.includes("uninitialized");
-}
-
-function definedEnv(env: Record<string, string | undefined>): Record<string, string> {
-	return Object.fromEntries(Object.entries(env).filter((entry): entry is [string, string] => entry[1] !== undefined));
 }
 
 function provisionedBinFromInstallDir(installDir: string | undefined): string | null {
@@ -186,6 +215,11 @@ function writeHookJson(stdout: HookStdout): void {
 		},
 	};
 	stdout.write(`${JSON.stringify(output)}\n`);
+}
+
+function writeDebugLog(message: string): void {
+	if (processEnv["OMO_CODEGRAPH_DEBUG"] !== "1") return;
+	processStderr.write(`${message}\n`);
 }
 
 function spawnDetachedWorker(invocation: WorkerSpawnInvocation): void {

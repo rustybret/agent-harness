@@ -1,6 +1,6 @@
 # shared-skills — Cross-Harness SKILL.md Bundle (Skills)
 
-**Generated:** 2026-06-17
+**Generated:** 2026-07-03
 
 ## OVERVIEW
 
@@ -18,9 +18,15 @@ Per-skill layout: `SKILL.md` (YAML frontmatter `name:` + single-line `descriptio
 skills/ (source)
   ├─ build:shared-skills-assets (root) → cp -R skills dist/skills          # literal copy, no transform
   ├─ skills-loader-core → loadSkillsFromDir(sharedSkillsRootPath(), scope:"shared")   # OpenCode runtime
-  └─ omo-codex/plugin/scripts/sync-skills.mjs → plugin/skills/             # copy + adaptSkillForCodex()
-        (inserts Codex Harness Tool Compatibility sections; overlays start-work/review-work;
-         filters out tests, caches, and source metadata) → ships to ~/.codex/.../skills/
+  └─ omo-codex/plugin/scripts/sync-skills.mjs → plugin/skills/             # the only transformer
+        1. copies 7 omo-codex COMPONENT skills FIRST (comment-checker, lsp, rules, teammode,
+           ulw-loop, ulw-plan, ultrawork from plugin/components/*/skills/*); same-named shared
+           skills are skipped → ulw-plan/ultrawork in Codex come from components, NOT from here
+        2. copies remaining shared skills EXCEPT ultraresearch (codexHiddenSharedSkillNames)
+        3. adaptSkillForCodex(): inserts Codex Harness Tool Compatibility sections; overlays
+           start-work/review-work/ulw-research; writes agents/openai.yaml display metadata
+           with the "(OmO) " prefix; filters out tests, caches, and source metadata
+        → ships to ~/.codex/.../skills/
 ```
 
 ## FRONTEND THIRD-PARTY REFS — SUBMODULE-ONLY + BUILD-MATERIALIZE (DMCA-safe)
@@ -37,7 +43,7 @@ upstreams/{open-design,taste-skill,ui-ux-pro-max,designpowers}   # pinned submod
 ```
 
 - The materialized files are GITIGNORED (`skills/frontend/.gitignore`) so they are never committed; a `skills/frontend/.npmignore` overrides that `.gitignore` for npm pack so the materialized refs DO ship. The lazycodex marketplace sync is a raw file copy and ships whatever is on disk after the plugin build materialized it.
-- The §4 project-original design docs (`README.md`, `_INDEX.md`, `design-system-architecture.md`, `react-dev-tooling-skill.md`) and all of `references/perfection/*` stay committed (un-ignored in `.gitignore`).
+- The §5 project-original design docs (`README.md`, `_INDEX.md`, `aside.md`, `design-system-architecture.md`, `react-dev-tooling-skill.md`) and all of `references/perfection/*` stay committed (un-ignored in `.gitignore`).
 - ATTRIBUTION pins each upstream's SHA (`Pinned upstream commit:`); `script/update-frontend-upstreams.mjs` bumps the submodules + rewrites the pins (`--check` verifies pins == submodule HEAD, no network). `provenance-gate.test.ts` fails CI if any third-party path is committed, the materialize set is missing, or a pin drifts. `materialize-frontend-refs.test.ts` covers the allowed `SKILL.md` description quoting normalization.
 - Submodule init is non-fatal ONLY in `script/agent/setup.sh` (offline devs get a working tree minus brand refs); the plugin build chain runs it `--strict` so CI/publish ship a complete package.
 
@@ -53,4 +59,6 @@ upstreams/{open-design,taste-skill,ui-ux-pro-max,designpowers}   # pinned submod
 - **Test files, caches, and source metadata are excluded** when Codex copies skills.
 - **`lcx-` prefix = Codex-only** (no OpenCode counterpart). Frontmatter has NO `location:` field (unlike `.agents/skills/`).
 - **Packaging is pinned** by `omo-opencode/src/shared-skills-package.test.ts` (workspace inclusion + `files` entries + every skill parses).
+- **Skill CONTENT is pinned by contract tests** — edit a skill and its contract test together: `frontend-skill-contract.test.ts` (concrete-reference / Aside provenance / live-URL clone via getComputedStyle / seeded imagen drafts / slop-animation ban), `skills/visual-qa/scripts/skill-prompt-contract.test.ts` (motion capture, CJK, Node `visual-qa.mjs` bundle — not `bun cli.ts`), `depersonalization-gate.test.ts` (personal tokens scrubbed from ultimate-browsing + ulw-research), `frontend-thirdparty-manifest.test.ts`, `upstreams.test.ts`, plus Codex-side `omo-codex/plugin/test/ulw-research-epistemic-contract.test.mjs` (claim-graph is the single claim store; "claim ledger" wording is banned) and `omo-codex/plugin/components/ulw-loop/test/skill-contract.test.ts`.
+- **ulw-plan is dual-maintained by hand** (here AND `omo-codex/plugin/components/ultrawork/skills/ulw-plan/`) — sync-skills does NOT copy the shared version to Codex; keep both in step.
 - Parent: [`packages/AGENTS.md`](../AGENTS.md).

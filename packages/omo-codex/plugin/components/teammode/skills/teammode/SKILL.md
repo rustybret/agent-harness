@@ -19,7 +19,7 @@ Use a TEAM when EITHER holds:
 - one task still needs exploration, yet its GOAL is already clear - parallel investigation under
   a fixed objective.
 
-Use plain subagents (`$ulw` / `multi_agent_v1.spawn_agent`) - NOT a team - when EITHER holds:
+Use plain subagents (`$ulw` / `multi_agent_v1.spawn_agent` / flat `spawn_agent` on `multi_agent_v2`) - NOT a team - when EITHER holds:
 - the work IS perfectly isolated, so there is no coordination cost worth paying; or
 - the GOAL is still ambiguous, where one mind should resolve direction before any fan-out.
 
@@ -39,7 +39,7 @@ merge), not the keystrokes.
 ## Compose by part, ownership, or perspective - not by job title
 
 A team is ALWAYS two or more members - never a single-member team. One worker on an isolated
-job is a subagent (`multi_agent_v1.spawn_agent`), not a team; if you end up with a single member,
+job is a spawned subagent, not a team; if you end up with a single member,
 either split off a second distinct slice or drop the team and use a subagent.
 
 Compose the team from what you actually KNOW about the work. Ground the split in real knowledge
@@ -68,7 +68,7 @@ node "<skill-root>/scripts/team.mjs" set-status   --team <session_id> --id A --s
 node "<skill-root>/scripts/team.mjs" worktree-add    --team <session_id> --id A [--base-branch <branch>]
 node "<skill-root>/scripts/team.mjs" worktree-remove --team <session_id> --id A [--force]
 node "<skill-root>/scripts/team.mjs" integrate       --team <session_id> [--id A]
-node "<skill-root>/scripts/team.mjs" archive      --team <session_id> [--id A]
+node "<skill-root>/scripts/team.mjs" archive      --team <session_id> [--id A] [--note "<...>"]
 node "<skill-root>/scripts/team.mjs" delete       --team <session_id> [--force]
 node "<skill-root>/scripts/team.mjs" status       --team <session_id>
 ```
@@ -79,6 +79,13 @@ log), `guide.md` (the auto-generated member field manual), and `artifacts/` (a s
 space). `{session_id}` is the leader's Codex session id when you can pass it via `--session`;
 otherwise the script generates a stable handle. Re-running `init` is a safe no-op. Every mutating
 subcommand rewrites `guide.md`, so the manual always matches the current team.
+
+Mutating subcommands take a per-team state lock before reading and rewriting `team.json`. It is
+safe to run independent `add-member`, `bind-thread`, `set-status`, `archive`, `delete`, `guide`,
+and worktree mutation commands concurrently against the same team: they serialize and each command
+reads the latest committed state before writing. If a command reports that team state is locked,
+do not treat the intended mutation as complete; retry after the named command finishes, or inspect
+`.omo/teams/{session_id}/.team.lock/owner.json` if the previous command crashed.
 
 ## Create the team and its threads
 
@@ -103,7 +110,7 @@ subcommand rewrites `guide.md`, so the manual always matches the current team.
    lose in the sidebar without this link.
 
 Every team member is a real Codex thread created with `codex_app.create_thread` - this is strict,
-not a preference. NEVER substitute `multi_agent_v1.spawn_agent`, or any other in-process subagent,
+not a preference. NEVER substitute a spawned in-process subagent (`multi_agent_v1.spawn_agent` or flat `spawn_agent`)
 for a team member: a spawned agent is an ephemeral helper that does not show up as a team thread,
 cannot carry the `[team name] <member name>` title, and cannot be inspected, titled, archived, or
 re-opened with the `codex_app.*` thread tools - which defeats the entire point of a durable team.
@@ -183,12 +190,17 @@ result against that todo's acceptance criteria before you integrate.
 
 DISBAND the team the moment it is no longer needed. A team exists only to do its work; once that
 work is done, or the user no longer wants it, do not leave it lying around - archive every member,
-then delete the team state. A finished team that is never disbanded is a leak.
+then delete the team state only after archival evidence is clean or preserved. A finished team that
+is never disbanded is a leak.
 
 - `archive` closes the team: notify each active member, copy anything useful into `artifacts/`,
-  archive each member thread with `codex_app.set_thread_archived`, then `archive` flips the team
-  and all members to archived. If a thread-archive tool is unavailable, record that in the team log
-  and tell the user - never pretend a member was archived.
+  then try to archive each member thread with `codex_app.set_thread_archived`. Treat Codex App
+  failures such as "Ambiguous Codex thread id" or a thread id that is ambiguous across hosts as an
+  app-thread archival blocker, not as a team-state blocker: record the failure in the team log,
+  tell the user which member thread was not proven archived, and continue the team-state archive
+  with `archive --note "<blocker>"`. Never pretend a member thread was archived. Do not delete the
+  team state after an app-thread archival blocker unless the evidence has been copied elsewhere or
+  the user explicitly accepts that evidence loss.
 - `delete` removes `.omo/teams/{session_id}` and refuses while the team is unarchived or any member
   is still active unless `--force`.
 - When the work wraps up, land it the way the user asked: `integrate --team <id>` for a direct merge

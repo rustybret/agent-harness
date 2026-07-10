@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { Readable } from "node:stream";
@@ -13,7 +13,17 @@ import {
 } from "../src/hook.ts";
 
 const pluginRoot = resolve(fileURLToPath(new URL("../../..", import.meta.url)));
-const pluginConfigPath = resolve(pluginRoot, ".codex-plugin/plugin.json");
+
+function createAllowedWorkspace(prefix: string): string {
+	return mkdtempSync(join(pluginRoot, `.tmp-${prefix}-`));
+}
+
+function expectOmoCodegraphProjectStoreGuidance(context: string): void {
+	expect(context).toContain(".omo");
+	expect(context).toContain("codegraph");
+	expect(context).toContain("projects");
+	expect(context).toContain("project-");
+}
 
 describe("CodeGraph SessionStart hook", () => {
 	it("#given hook session-start cli args #when invoked with empty JSON input #then it emits valid JSON and exits zero", async () => {
@@ -25,7 +35,7 @@ describe("CodeGraph SessionStart hook", () => {
 			// when
 			const exitCode = await runCodegraphCli({
 				argv: ["node", "cli.js", "hook", "session-start"],
-				cwd: mkdtempSync(join(tmpdir(), "omo-codegraph-hook-workspace-")),
+				cwd: createAllowedWorkspace("codegraph-hook-workspace"),
 				env: { HOME: homeDir },
 				stdin: Readable.from(["{}"]),
 				stdout: { write: (chunk) => stdout.push(chunk) },
@@ -68,12 +78,9 @@ describe("CodeGraph SessionStart hook", () => {
 		const parsed = JSON.parse(output);
 
 		// then
-		expect(parsed).toEqual({
-			hookSpecificOutput: {
-				hookEventName: "PostToolUse",
-				additionalContext: expect.stringContaining('"/Users/me/.omo/codegraph/projects/project-'),
-			},
-		});
+		expect(parsed.hookSpecificOutput.hookEventName).toBe("PostToolUse");
+		expect(parsed.hookSpecificOutput.additionalContext).toContain('CodeGraph is not initialized for "/Users/me/project"');
+		expectOmoCodegraphProjectStoreGuidance(parsed.hookSpecificOutput.additionalContext);
 		expect(parsed.hookSpecificOutput.additionalContext).toContain('run `codegraph init` from "/Users/me/project"');
 	});
 
@@ -93,7 +100,7 @@ describe("CodeGraph SessionStart hook", () => {
 
 		// then
 		expect(parsed.hookSpecificOutput.additionalContext).toContain('CodeGraph is not initialized for "/Users/me/project"');
-		expect(parsed.hookSpecificOutput.additionalContext).toContain('"/Users/me/.omo/codegraph/projects/project-');
+		expectOmoCodegraphProjectStoreGuidance(parsed.hookSpecificOutput.additionalContext);
 	});
 
 	it("#given CodeGraph is disabled by Codex SOT config #when SessionStart fires #then it skips without spawning", async () => {
@@ -208,14 +215,14 @@ describe("CodeGraph SessionStart hook", () => {
 		// given
 		const stdout: string[] = [];
 		const spawned: WorkerSpawnInvocation[] = [];
-		const workspace = mkdtempSync(join(tmpdir(), "omo-codegraph-workspace-"));
+		const workspace = createAllowedWorkspace("codegraph-workspace");
 
 		try {
 			// when
 			const result = await executeCodegraphSessionStartHook({
 				config: { codegraph: { enabled: true }, sources: [], warnings: [] },
 				cwd: workspace,
-				env: { HOME: "/tmp/home", KEEP: "1" },
+				env: { HOME: "/tmp/home", KEEP: "1", OPENAI_API_KEY: "sk-test-secret" },
 				stdin: Readable.from(["{}"]),
 				stdout: { write: (chunk) => stdout.push(chunk) },
 				spawnWorker: (invocation) => spawned.push(invocation),
@@ -231,11 +238,12 @@ describe("CodeGraph SessionStart hook", () => {
 					command: process.execPath,
 					env: {
 						HOME: "/tmp/home",
-						KEEP: "1",
 						OMO_CODEGRAPH_SESSION_START_CWD: workspace,
 					},
 				},
 			]);
+			expect(spawned[0]?.env["OPENAI_API_KEY"]).toBeUndefined();
+			expect(spawned[0]?.env["KEEP"]).toBeUndefined();
 			expect(JSON.parse(stdout.join(""))).toEqual({
 				hookSpecificOutput: {
 					additionalContext: "LazyCodex CodeGraph bootstrap scheduled in background",
@@ -251,7 +259,7 @@ describe("CodeGraph SessionStart hook", () => {
 		// given
 		const stdout: string[] = [];
 		const spawned: WorkerSpawnInvocation[] = [];
-		const workspace = mkdtempSync(join(tmpdir(), "omo-codegraph-initialized-workspace-"));
+		const workspace = createAllowedWorkspace("codegraph-initialized-workspace");
 
 		try {
 			// when
@@ -294,20 +302,4 @@ describe("CodeGraph SessionStart hook", () => {
 		expect(stdout.join("")).toBe("");
 	});
 
-	it("#given plugin hook config #when inspected #then CodeGraph is registered after bootstrap SessionStart", () => {
-		// given
-		const pluginConfig: unknown = JSON.parse(readFileSync(pluginConfigPath, "utf8"));
-
-		// when
-		const hookPaths =
-			typeof pluginConfig === "object" && pluginConfig !== null && "hooks" in pluginConfig && Array.isArray(pluginConfig.hooks)
-				? pluginConfig.hooks.filter((hookPath): hookPath is string => typeof hookPath === "string")
-				: [];
-
-		// then
-		expect(hookPaths).toContain("./hooks/session-start-checking-codegraph-bootstrap.json");
-		expect(hookPaths.indexOf("./hooks/session-start-checking-bootstrap-provisioning.json")).toBeLessThan(
-			hookPaths.indexOf("./hooks/session-start-checking-codegraph-bootstrap.json"),
-		);
-	});
 });

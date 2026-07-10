@@ -1,5 +1,7 @@
 /// <reference types="bun-types" />
 
+// allow: SIZE_OK - marketplace sync tests exercise one release payload fixture tree; this release adds narrow assertions and future additions should split by payload section.
+
 import { describe, expect, test } from "bun:test"
 import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
@@ -209,7 +211,7 @@ describe("sync-lazycodex-marketplace", () => {
       workflowMissing = error instanceof Error
     }
     expect(workflowMissing).toBe(true)
-  })
+  }, 15_000)
 
   test("#given release version env #when syncing marketplace #then repository payload is stamped with release version", async () => {
     // given

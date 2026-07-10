@@ -67,7 +67,7 @@ describe("model-capability-aliases", () => {
     })
   })
 
-  test("resolves GitHub Copilot dotted Claude Opus directly as canonical", () => {
+  test("treats GitHub Copilot dotted Claude Opus 4.7 as canonical since models.dev now serves it natively", () => {
     const result = resolveModelIDAlias("github-copilot/claude-opus-4.7")
 
     expect(result).toEqual({
