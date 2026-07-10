@@ -8,7 +8,8 @@ import type { PluginContext } from "../../../plugin/types"
 import type { CrossProjectMailboxConfig } from "../config"
 import { BodyDigestStore, SamePairRateLimiter } from "../loop-guard"
 import { MailboxStore, PendingDeliveryStore } from "../mailbox"
-import { resolveActivePrimaryAgent } from "../primary-resolver"
+import { resolveSessionAgent } from "../../../plugin/session-agent-resolver"
+import { normalizePrimaryAgent, resolveActivePrimaryAgent } from "../primary-resolver"
 import { createProjectRegistry } from "../registry"
 import type { ProjectEntry } from "../registry/types"
 import { buildTriagePrompt } from "../triage"
@@ -106,7 +107,11 @@ function buildIdleDrainDeps(
     directory: ctx.directory,
     projectDisplayName: path.basename(repoRoot),
     client: ctx.client as IdleDrainHookDeps["client"],
-    resolveActivePrimaryAgent,
+    resolveActivePrimaryAgent: async (sessionId) => {
+      const cachedPrimary = resolveActivePrimaryAgent(sessionId)
+      if (cachedPrimary !== undefined) return cachedPrimary
+      return normalizePrimaryAgent(await resolveSessionAgent(ctx.client, sessionId))
+    },
     getRegisteredProjects: () => {
       refreshSnapshot()
       return projectsSnapshot
