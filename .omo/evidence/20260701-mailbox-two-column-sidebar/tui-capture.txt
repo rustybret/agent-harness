@@ -1,0 +1,17 @@
+     Valid, present, and loadable.                                                                                                                              ▼ Mailbox                            █
+                                                                                                                                                                                                     █
+  ┃                                                                                                                                                             In                                   █
+  ┃  # Todos                                                                                                                                                    Unread                             2 █
+  ┃                                                                                                                                                             Done                               0 █
+  ┃  [✓] git: fetch upstream + fast-forward local dev + origin/dev to upstream/dev — verify SHAs match                                                                                               █
+  ┃  [✓] git: rebase fork/local onto dev, take upstream on conflicts — verify clean rebase                                                                      Out                                  █
+  ┃  [✓] git: push fork/local to rustybret/agent-harness — verify force-with-lease success                                                                      Pending                            1 █
+  ┃  [✓] GitHub: trigger + wait for local-build CI — verify run succeeded                                                                                       Read                               1 ▀
+  ┃  [✓] local: bun run build — verify dist/index.js > 5MB                                                                                                      Failed                             0
+  ┃
+
+     + Thought: 412ms                                                                                                                                             ▼ Magic Context           v0.30.3
+
+     All 5 steps complete:                                                                                                                                       11.6% / 17.5%          116K / 1.0M
+
+     ┌─────────────────────────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐     System                   41K (35%)

@@ -1,0 +1,29 @@
+F3 — Real End-to-End QA (re-run after fixes)
+Date: 2026-06-02
+Working dir: /Volumes/Topper2TB/Git/agent-harness
+
+=== Step 1: Fresh sync run ===
+Triggered run #26839284669 (sync-upstream.yml -f upstream_branch=dev)
+status=completed conclusion=success
+Note: graceful-skip-on-workflow-changes design => success is correct behavior.
+
+=== Step 2: Topology post-sync ===
+dev == upstream/dev          : PASS (git diff --exit-code clean)
+ahead/behind origin/dev...upstream/dev : 0  0  (fully synced)
+fork/local descends dev      : PASS (merge-base --is-ancestor)
+default branch               : fork/local (expected)
+
+=== Step 3: Build + typecheck ===
+typecheck exit: 0  (tsgo --noEmit + 12 package tsconfigs)  => PASS
+build exit:     0  (index.js 2.66 MB + JSON schema generated) => PASS
+
+=== Step 4: Rollback dry-check (NOT executed) ===
+backup/main-pre-migration-20260601 = 045206c5e19b15cd4fadd25bc4a738dabedfee43 (matches expected) PASS
+bundle verify: "records a complete history" (sha1, HEAD 54d31b4ae) PASS
+origin/main = 045206c5e19b15cd4fadd25bc4a738dabedfee43 (matches expected) PASS
+
+=== Step 5: CI pre-existing failure confirmation ===
+git status --short bun.lock => empty (clean) => CI bun install failure confirmed pre-existing, not our regression.
+
+=== VERDICT ===
+Scenarios [6/6 pass] | Sync run [success] | Build [pass] | Rollback [valid] | VERDICT: APPROVE

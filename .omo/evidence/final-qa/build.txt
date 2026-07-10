@@ -1,0 +1,10 @@
+
+$ bun run script/patch-node-require-shim.ts
+Patched Node/Electron require shim in dist/index.js
+Bundled 658 modules in 55ms
+
+  index.js  2.64 MB  (entry point)
+
+$ bun run script/build-schema.ts
+Generating JSON Schema...
+✓ JSON Schema generated: assets/oh-my-opencode.schema.json

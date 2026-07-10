@@ -1,0 +1,4 @@
+[fake-openai] listening 54899
+[fake-openai] call=1 phase=peek bytes=138870
+[fake-openai] call=2 phase=drain bytes=138707
+[fake-openai] call=3 phase=done bytes=139627

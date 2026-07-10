@@ -1,0 +1,26 @@
+=== Task 1 Scenario 1: Verify Configurations ===
+
+1. opencode-godot-lsp in server-definitions.ts:
+  "opencode-godot-lsp": "npm install -g opencode-godot-lsp",
+  gdscript: { command: ["opencode-godot-lsp", "--stdio"], extensions: [".gd", ".gdscript"] },
+
+2. CMakeLists.txt cmake mapping in language-mappings.ts:
+  "CMakeLists.txt": "cmake",
+
+3. glsl_analyzer in server-definitions.ts:
+  "glsl_analyzer": "See https://github.com/nolanderc/glsl-analyzer",
+  glsl: { command: ["glsl_analyzer"], extensions: [".glsl", ".vert", ".frag", ".geom", ".tesc", ".tese", ".comp"] },
+
+4. wgsl_analyzer in server-definitions.ts:
+  "wgsl_analyzer": "cargo install wgsl_analyzer",
+  wgsl: { command: ["wgsl_analyzer"], extensions: [".wgsl"] },
+
+5. lemminx in server-definitions.ts:
+  "lemminx": "See https://github.com/eclipse/lemminx",
+  lemminx: { command: ["lemminx"], extensions: [".xml", ".xsl"] },
+
+6. cmake-language-server in server-definitions.ts:
+  "cmake-language-server": "pip install cmake-language-server",
+  cmake: { command: ["cmake-language-server"], extensions: [".cmake", "CMakeLists.txt"] },
+
+RESULT: 6/6 PASS

@@ -1,0 +1,5 @@
+=== Task 2 Scenario 1: Test Resolution Logic ===
+
+Command: bun test src/tools/lsp/server-resolution.test.ts
+RESULT: PASS - 5/5 tests pass, 0 fail, 10 expect() calls
+Duration: 203ms

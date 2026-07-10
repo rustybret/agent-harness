@@ -1,0 +1,20 @@
+Bundle Path: /Volumes/Topper2TB/Git/agent-harness/.omo/evidence/agent-harness-pre-migration-20260601.bundle
+Bundle Size: 77M (80530432 bytes)
+
+Bundle Verify Output:
+The bundle contains these 370 refs:
+18e749cf843cb433d5360fd08777e3b4a2fa3d3b refs/heads/FEAT-AgentBuilder
+b15e5761b4fd49d723f005fc30748b69c93c9599 refs/heads/Stable
+54d31b4aeb14b60eca3b3285ea9a5bed2db5b25f refs/heads/main
+9f029b9445775830ac4a8f896452f45edfd8aeb2 refs/heads/my-changes
+045206c5e19b15cd4fadd25bc4a738dabedfee43 refs/remotes/origin/HEAD
+b15e5761b4fd49d723f005fc30748b69c93c9599 refs/remotes/origin/Stable
+...
+/tmp/agent-harness-pre-migration-20260601.bundle is okay
+
+Backup Branch Name: backup/main-pre-migration-20260601
+Backup Branch SHA: 045206c5e19b15cd4fadd25bc4a738dabedfee43
+
+Old Main SHA: 045206c5e19b15cd4fadd25bc4a738dabedfee43
+
+Verification Result: PASSED

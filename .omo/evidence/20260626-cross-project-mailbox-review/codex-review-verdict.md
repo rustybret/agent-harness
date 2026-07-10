@@ -1,0 +1,25 @@
+REJECT-WITH-FIXES
+
+1. location = todo 1 / References, line 95. Problem: bad references. Quote: `packages/omo-opencode/src/config/schema/index.ts` and `team-mode.ts (mirror the 11-field schema style + .describe())`. `schema/index.ts` does not exist; `team-mode.ts` is only a re-export. Concrete fix: cite `packages/omo-opencode/src/config/schema.ts`, `packages/omo-opencode/src/config/schema/oh-my-opencode-config.ts`, and `packages/team-core/src/config.ts`.
+
+2. location = todo 4, lines 118-124. Problem: hidden design decision. Quote: “Prove whether… If the current primary is NOT reliably observable, degrade v1…” A worker must decide behavior mid-task. Concrete fix: decide now: v1 uses last-known agent from `claude-code-session-state` plus documented accuracy; any probe is validation only.
+
+3. location = todo 8, line 159. Problem: retrigger edge is unresolved. Quote: “drain also on an agent-change/session-status edge OR expose a `mailbox_check_now` path; if neither is reliable…” Concrete fix: choose one executable v1 path. Prefer deterministic `message.updated`/`session.status` agent update retrigger if available; otherwise explicitly scope v1 to “next idle/user turn” and remove `mailbox_check_now`.
+
+4. location = dependency matrix, lines 74-80. Problem: internal contradictions. Quote: todo 5 “Can parallelize with 6*,7*” while todo 6 “Depends on 1,2,5”; todo 10 “Blocks 8” while todo 8 says parallel with 10. Concrete fix: make 5 strictly before 6/7, make 10 a dependency of 8 or define a stub interface, and add todo 1 as a dependency for todo 11 because line 188 says render only when `enabled`.
+
+5. location = todo 5 / todo 8, lines 130, 159, 163. Problem: exactly-once ack state is underspecified. Quote: “Drain = rename to `.delivering-...` -> on successful injection, move to `processed/`” and “ack only after `messageId` confirmed in session history.” There is no durable pending-ack state between accepted dispatch and later history confirmation. Concrete fix: add a pending-delivery sidecar/store with sessionId, messageIds, reserved paths, dispatch result, and recovery rules; stale reclaim must not duplicate accepted-but-unacked messages.
+
+6. location = todo 3, line 110. Problem: project discovery hides a judgment call. Quote: “Auto-discover opencode projects (scan known opencode session/project state).” Concrete fix: name exact sources and order: register current `ctx.directory`; optionally merge OpenClaw registry from `packages/openclaw-core/src/session-registry*.ts`; no broad undefined scan.
+
+7. location = todo 11, line 188. Problem: outbound status has no data source. Quote: “showing inbound … and outbound (recently sent) note status.” The wire writes only into target repos. Concrete fix: either remove outbound from v1 or specify how it is computed, e.g. scan registered target repos for `coordination_notes/<currentProjectId>/{unread,processed,rejected}`.
+
+8. location = todo 2 / Scope guardrail, lines 101, 105, 43. Problem: path safety is asserted but not fully executable. Quote: “reject `..`, path separators, and symlinks escaping the repo root” but tests only cover `sanitizeProjectId("../../etc")`. Concrete fix: define projectId as slug plus stable hash of `realpath(repoRoot)`, verify final paths remain inside target root, reject symlinked mailbox dirs escaping root, and add those tests.
+
+9. location = todo 8 / todo 10, lines 160, 177. Problem: no-auto-reply is asserted, not test-locked. Quote: “never write a reply from the hook” and “do NOT auto-reply.” Concrete fix: add hook tests that spy on send/write APIs and assert drain never calls `project_message` or mailbox send; only explicit tool calls may write replies.
+
+10. location = Scope / todo 8, lines 37, 163. Problem: no auto-spawn is not directly tested. Quote: “MUST NOT auto-spawn or auto-resume an OpenCode session” and todo 8 only checks drain behavior. Concrete fix: add integration/real-harness assertions that no extra session is created: fake client has no `session.create`, sandbox session list/count changes only for the manually started receiver session.
+
+11. location = Scope / todo 8 references, lines 38, 162. Problem: no live-primary switching is not test-locked, and cloning team wake code risks `body.agent`. Quote: “MUST NOT switch/override the live session's primary agent” and “clone” team idle wake pattern. Concrete fix: require mailbox prompt bodies omit `agent`, `model`, `variant`, and routing helpers; add tests asserting the dispatched prompt input has no agent override.
+
+12. location = todo 12 / Commit strategy, lines 197, 236. Problem: commit hygiene is vague. Quote: “document + a guard/ignore note” and “coordination_notes/ mailbox runtime files are NEVER staged.” Concrete fix: add an actual ignore/guard: `coordination_notes/` ignored, QA runs `git check-ignore`, and commit workflow fails if `git diff --cached --name-only` contains `coordination_notes/`.

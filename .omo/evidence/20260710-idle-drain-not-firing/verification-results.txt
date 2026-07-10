@@ -1,0 +1,15 @@
+RED (before fix):
+Command: bun test packages/omo-opencode/src/features/cross-project-mailbox/hooks/idle-drain-hook.test.ts
+Result: 17 pass, 1 fail. Failure: expected dispatchInternalPrompt to be called 1 time; received 0.
+
+GREEN targeted test (after fix):
+Command: bun test packages/omo-opencode/src/features/cross-project-mailbox/hooks/idle-drain-hook.test.ts
+Result: 18 pass, 0 fail, 62 expect() calls. Ran 18 tests across 1 file.
+
+GREEN cross-project-mailbox suite:
+Command: bun test packages/omo-opencode/src/features/cross-project-mailbox
+Result: 421 pass, 0 fail, 856 expect() calls. Ran 421 tests across 31 files.
+
+GREEN typecheck:
+Command: bun run typecheck
+Result: exit code 0. tsgo root, script tsconfig, and workspace package tsconfigs completed.

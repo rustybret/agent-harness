@@ -1,0 +1,125 @@
+=== Task 6: Receive-side authoritative validation + quarantine ===
+Date: 2026-06-27T04:04:19Z
+Worktree: /Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/cross-project-mailbox
+Command: bun test packages/omo-opencode/src/features/cross-project-mailbox/validation/
+
+=== VERBOSE TEST RUN (each rejection class asserted) ===
+bun test v1.3.14 (0d9b296a)
+
+ 18 pass
+ 0 fail
+ 25 expect() calls
+Ran 18 tests across 1 file. [83.00ms]
+
+=== PER-TEST NAMES (rejection classes covered) ===
+bun test
+packages/omo-opencode/src/features/cross-project-mailbox/validation/validate-inbound.test.ts
+Mac-Studio.lan
+INTENT_LADDER
+Mac-Studio.lan
+#given the documented privilege ladder
+Mac-Studio.lan
+#when read in order
+Mac-Studio.lan
+#then ranks question lowest and plan highest
+#when read in order &amp;gt; #given the documented privilege ladder &amp;gt; INTENT_LADDER
+withinBudget
+Mac-Studio.lan
+#given a note intent below the ceiling
+Mac-Studio.lan
+#when compared
+Mac-Studio.lan
+#then returns true
+#when compared &amp;gt; #given a note intent below the ceiling &amp;gt; withinBudget
+#given a note intent equal to the ceiling
+Mac-Studio.lan
+#when compared
+Mac-Studio.lan
+#then returns true
+#when compared &amp;gt; #given a note intent equal to the ceiling &amp;gt; withinBudget
+#given a note intent above the ceiling
+Mac-Studio.lan
+#when compared
+Mac-Studio.lan
+#then returns false
+#when compared &amp;gt; #given a note intent above the ceiling &amp;gt; withinBudget
+validateInbound
+Mac-Studio.lan
+#given an explicit allow sender
+Mac-Studio.lan
+#when validating a note within budget
+Mac-Studio.lan
+#then result is valid
+#when validating a note within budget &amp;gt; #given an explicit allow sender &amp;gt; validateInbound
+#given an explicit deny sender
+Mac-Studio.lan
+#when validating
+Mac-Studio.lan
+#then result is unauthorized
+#when validating &amp;gt; #given an explicit deny sender &amp;gt; validateInbound
+#given an unlisted sender with default allow-all
+Mac-Studio.lan
+#when validating a question-intent note
+Mac-Studio.lan
+#then result is valid
+#when validating a question-intent note &amp;gt; #given an unlisted sender with default allow-all &amp;gt; validateInbound
+#given an unlisted sender with default allow-none
+Mac-Studio.lan
+#when validating
+Mac-Studio.lan
+#then result is unauthorized
+#when validating &amp;gt; #given an unlisted sender with default allow-none &amp;gt; validateInbound
+#given an explicit sender with an impl budget ceiling
+Mac-Studio.lan
+#when the note intent is below the ceiling
+Mac-Studio.lan
+#then result is valid
+#when the note intent is below the ceiling &amp;gt; #given an explicit sender with an impl budget ceiling &amp;gt; validateInbound
+#when the note intent is at the ceiling
+Mac-Studio.lan
+#then result is valid
+#when the note intent is at the ceiling &amp;gt; #given an explicit sender with an impl budget ceiling &amp;gt; validateInbound
+#when the note intent is over the ceiling
+Mac-Studio.lan
+#then result is over-budget and is not downgraded
+#when the note intent is over the ceiling &amp;gt; #given an explicit sender with an impl budget ceiling &amp;gt; validateInbound
+#given an unlisted sender allowed by allow-all
+Mac-Studio.lan
+#when the note intent is quick (above the lowest ceiling)
+Mac-Studio.lan
+#then result is over-budget
+#when the note intent is quick (above the lowest ceiling) &amp;gt; #given an unlisted sender allowed by allow-all &amp;gt; validateInbound
+#when the note intent is question (the lowest ceiling)
+Mac-Studio.lan
+#then result is valid
+#when the note intent is question (the lowest ceiling) &amp;gt; #given an unlisted sender allowed by allow-all &amp;gt; validateInbound
+#given a note at the max hop count
+Mac-Studio.lan
+#when validating
+Mac-Studio.lan
+#then result is hop-exceeded
+#when validating &amp;gt; #given a note at the max hop count &amp;gt; validateInbound
+#given a note below the max hop count
+Mac-Studio.lan
+#when access and budget also pass
+Mac-Studio.lan
+#then result is valid
+#when access and budget also pass &amp;gt; #given a note below the max hop count &amp;gt; validateInbound
+#given a note missing a required field
+Mac-Studio.lan
+#when validating a note with an undefined messageId
+Mac-Studio.lan
+#then result is malformed
+#when validating a note with an undefined messageId &amp;gt; #given a note missing a required field &amp;gt; validateInbound
+#given the rate-limit concern that belongs to todo 7
+Mac-Studio.lan
+#when inspecting the rejection reason type
+Mac-Studio.lan
+#then RejectionReason never includes rate-limited
+#when inspecting the rejection reason type &amp;gt; #given the rate-limit concern that belongs to todo 7 &amp;gt; validateInbound
+#given a note flagged as a duplicate loop
+Mac-Studio.lan
+#when validating with duplicateLoop true
+Mac-Studio.lan
+#then result is duplicate-loop
+#when validating with duplicateLoop true &amp;gt; #given a note flagged as a duplicate loop &amp;gt; validateInbound

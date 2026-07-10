@@ -1,0 +1,55 @@
+
+  ┃                                                                                                                                                             agent-harness main session           █
+  ┃  # bash_watch [taskId=bash-98cbac7d, timeoutMs=60000]                                                                                                                                            █
+  ┃                                                                                                                                                             Context                              █
+  ┃  Task bash-98cbac7d: completed (exit 0) 12s                                                                                                                 294,892 tokens                       █
+  ┃  Waited 17ms; task exited (completed, exit 0).                                                                                                              29% used                             █
+  ┃                                                                                                                                                             $3.48 spent                          █
+                                                                                                                                                                                                     █
+  ┃                                                                                                                                                             ▼ Mailbox                            █
+  ┃  $ tmux capture-pane -t mailbox-toggle-qa -p | sed -n '1,55p' | cat -A | grep -n "Mailbox" ; echo ===; tmux capture-pane -t mailbox-toggle-qa -p | grep                                          █
+  ┃  -n "." | tail -40                                                                                                                                          In                                   █
+  ┃                                                                                                                                                             Unread                             2 █
+  ┃  ===                                                                                                                                                        Done                               3 █
+  ┃  21:                                                                                                                  ▄                                                                          █
+  ┃  22:                                                                                 █▀▀█ █▀▀█ █▀▀█ █▀▀▄ █▀▀▀ █▀▀█ █▀▀█ █▀▀█                                Out                                  █
+  ┃  23:                                                                                 █  █ █  █ █▀▀▀ █  █ █    █  █ █  █ █▀▀▀                                Pending                            1 █
+  ┃  24:                                                                                 ▀▀▀▀ █▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀                                Read                               1 █
+  ┃  27:                                                               ┃                                                                                        Failed                             0 █
+  ┃  28:                                                               ┃  Ask anything... "Fix a TODO in the codebase"                                                                               █
+  ┃  29:                                                               ┃                                                                                                                             █
+  ┃  30:                                                               ┃  Sisyphus - Ultraworker · Claude Sonnet 5 Anthropic · medium                             ▶ Magic Context           v0.30.5  █
+  ┃  31:                                                               ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               29.4% / 30%            294K / 1.0M  █
+  ┃  …                                                                                                                                                                                               █
+  ┃                                                                                                                                                              Historian                     idle
+  ┃  Click to expand                                                                                                                                             Memories                    157/87
+  ┃                                                                                                                                                              Status              C:104 Q:52 N:0
+
+     + Thought: 7.4s
+
+  ┃                                                                                                                                                               ▶ AFT                     v0.42.0
+  ┃  $ cd /Volumes/Topper2TB/Git/agent-harness && mkdir -p coordination_notes/cloudhome-5aa53d2c && printf -- '---\nprotocolVersion: 1\nmessageId: "qa-          Search Index                     ●
+  ┃  toggle-1"\ncorrelationId: "qa-toggle-1"\nfromProjectId: "cloudhome-5aa53d2c"\ntoProjectId: "agent-harness-0367cd71"\nintent: "question"\ntimestamp: %s\     Semantic Index                   ●
+  ┃  nhopCount: 1\nhopPath: ["cloudhome-5aa53d2c"]\n---\n\nQA toggle test note one.\n' "$(date +%s)000" > coordination_notes/cloudhome-5aa53d2c/qa-toggle-1.     Code Health                  ● ● ●
+  ┃  md && cp coordination_notes/cloudhome-5aa53d2c/qa-toggle-1.md coordination_notes/cloudhome-5aa53d2c/qa-toggle-2.md && sed -i '' 's/qa-toggle-1/qa-          Compression             830K / 47%
+  ┃  toggle-2/' coordination_notes/cloudhome-5aa53d2c/qa-toggle-2.md && ls coordination_notes/cloudhome-5aa53d2c/
+  ┃
+  ┃  processed                                                                                                                                                  ▼ MCP
+  ┃  qa-toggle-1.md                                                                                                                                             • codegraph Connected
+  ┃  qa-toggle-2.md                                                                                                                                             • context7 Connected
+  ┃                                                                                                                                                             • gclouddrivemcp Connected
+                                                                                                                                                                • grep_app Connected
+     + Thought: 9.2s                                                                                                                                            • lsp Connected
+                                                                                                                                                                • websearch Connected
+     $ tmux kill-session -t mailbox-toggle-qa 2>/dev/null; cd /Volumes/Topper2TB/Git/agent-harness && tmux new-session -d -s mailbox-toggle-qa -x 200 -y 55
+       "opencode -c" && sleep 14 && tmux capture-pane -t mailbox-toggle-qa -p | grep -n "Mailbox\|Unread\|Pending\|Magic" | head                                LSP
+                                                                                                                                                                LSPs are disabled
+     ▣  Sisyphus - Ultraworker · Claude Fable 5
+                                                                                                                                                                ┌──────────────────────────────────┐
+  ┃                                                                                                                                                             │                                  │
+  ┃
+  ┃                                                                                                                                                             /Volumes/Topper2TB/Git/agent-harness:
+  ┃  Sisyphus - Ultraworker · Claude Fable 5 Anthropic                                                                                                          fork/local
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+                                                                                                                       294.9K (29%) · $3.48  ctrl+p commands    • OpenCode 1.17.13
+

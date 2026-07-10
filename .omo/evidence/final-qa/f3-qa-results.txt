@@ -1,0 +1,72 @@
+F3 — Real End-to-End QA: fork-parity-reconfigure plan
+Date: 2026-06-02
+Working dir: /Volumes/Topper2TB/Git/agent-harness
+
+================================================================
+SCENARIO RESULTS
+================================================================
+
+S1. Fresh sync-upstream workflow run .................... FAIL
+    Run: https://github.com/rustybret/agent-harness/actions/runs/26837603074
+    conclusion=failure, status=completed
+    Failed step: "Fast-forward dev to upstream/dev"
+    Root cause (REAL, not pre-existing CI noise):
+      git push origin dev rejected:
+      "! [remote rejected] dev -> dev (refusing to allow a GitHub App
+       to create or update workflow .github/workflows/publish.yml
+       without `workflows` permission)"
+    Why now: upstream/dev advanced to include a change to
+      .github/workflows/publish.yml. The sync workflow's GITHUB_TOKEN
+      lacks `workflows` permission, so it cannot push any upstream
+      delta that touches a workflow file. Sync is broken for the
+      entire class of "upstream changed a workflow file" updates.
+    Downstream steps "Rebase fork/local onto new dev" and
+      "Create conflict PR" were SKIPPED (never ran).
+
+S2. Topology intact post-sync .......................... PASS
+    origin/dev   = 61fd97ef4fecb644f2fb2a511ab7951abd3681fd
+    upstream/dev = 61fd97ef4fecb644f2fb2a511ab7951abd3681fd
+    fork/local   = 2ea8769bdf154c205fdc5ddb73d446b75187058e
+    dev == upstream/dev ............... PASS (push rejected, no drift)
+    fork/local descends dev ........... PASS
+    default branch = fork/local ....... PASS
+    Note: topology is intact only because the failed push left dev
+    unchanged; it was already at parity from a prior successful sync.
+
+S3. Typecheck (bun run typecheck) ...................... PASS (exit 0)
+
+S4. Build (bun run build) .............................. PASS (exit 0)
+    index.js 2.64 MB; JSON schema generated OK.
+
+S5. Rollback dry-check ................................. PASS
+    backup/main-pre-migration-20260601 = 045206c5e19b15cd4fadd25bc4a738dabedfee43
+      (matches expected) ............. PASS
+    bundle verify: "The bundle records a complete history." PASS
+    origin/main = 045206c5e19b15cd4fadd25bc4a738dabedfee43 (preserved) PASS
+
+S6. CI --frozen-lockfile failure is pre-existing ....... PASS
+    Reproduced on dev @ 61fd97ef4: bun install --frozen-lockfile
+    exit 1 ("lockfile had changes, but lockfile is frozen").
+    Confirmed pre-existing upstream issue, NOT a migration regression.
+
+================================================================
+SUMMARY
+================================================================
+Scenarios passing: 5/6 (S1 sync run FAILED)
+Sync run:  FAILURE (real blocker: missing `workflows` token permission)
+Build:     PASS
+Typecheck: PASS
+Rollback:  VALID
+
+VERDICT: REJECT
+
+Rationale: The sync-upstream workflow is the central deliverable of
+the fork-parity-reconfigure plan. On a fresh real-world run it FAILED
+to push because upstream advanced with a .github/workflows/ change and
+the workflow token lacks `workflows` permission. This is a genuine
+defect in the delivered automation, not pre-existing CI noise. It must
+be fixed (grant the sync workflow a token with workflow scope, e.g. a
+PAT/app token with `workflows` permission, or split workflow-file
+updates) before the plan can be approved. All other gates (build,
+typecheck, rollback, topology) pass; the frozen-lockfile CI failure is
+separately confirmed pre-existing.

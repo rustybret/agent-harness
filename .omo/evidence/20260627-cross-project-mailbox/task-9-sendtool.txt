@@ -1,0 +1,65 @@
+TASK 9 — project_message send tool + send-side preflight
+=========================================================
+Worktree: /Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/cross-project-mailbox
+Date: 2026-06-27
+
+NEW FILES
+---------
+packages/omo-opencode/src/features/cross-project-mailbox/send-tool/
+  envelope-builder.ts        buildSendEnvelope + findProcessedParent (tamper-evident hop fields)
+  send-preflight.ts          runSendPreflight (defense-in-depth send-side validation)
+  outbox-log.ts              appendOutboxLog -> .omo/mailbox-outbox.jsonl (plain JSONL append)
+  project-message-tool.ts    createProjectMessageTool factory + runProjectMessageSend + strict Zod input schema
+  index.ts                   barrel
+  project-message-tool.test.ts  full given/when/then suite (bun:test, all I/O injected)
+
+TEST RESULT
+-----------
+$ bun test packages/omo-opencode/src/features/cross-project-mailbox/send-tool/
+bun test v1.3.14 (0d9b296a)
+ 13 pass
+ 0 fail
+ 32 expect() calls
+Ran 13 tests across 1 file. [131.00ms]
+exit=0
+
+DIAGNOSTICS
+-----------
+aft_inspect on send-tool/ -> diagnostics: 0 errors, 0 warnings.
+tsgo --noEmit -p packages/omo-opencode/tsconfig.json -> no errors in cross-project-mailbox/send-tool
+(pre-existing project-wide errors elsewhere are unrelated to this task and predate it).
+
+THREE CASES DESCRIBED
+---------------------
+1. FRESH SEND (no inReplyToMessageId)
+   input { targetProjectId:"proj-b", intent:"quick", body:"hello" }
+   -> note written at <targetBRoot>/coordination_notes/proj-c/<messageId>.md (body contains "hello")
+   -> envelope.hopCount === 0
+   -> envelope.hopPath === ["proj-c"]   (thisProjectId only)
+   -> envelope.correlationId is a freshly generated UUID (threadId not provided)
+   -> outbox appended: exactly one JSONL line { sentAt, toProjectId:"proj-b", messageId, intent:"quick", correlationId, body(<=100 chars) }
+   Variant: threadId provided on a fresh send -> correlationId === threadId, hopCount === 0.
+
+2. REPLY (inReplyToMessageId points at a processed parent note)
+   parent at THIS repo coordination_notes/proj-a/processed/<parentId>.md with hopCount=1, hopPath=["proj-a","proj-b"], correlationId="original-corr"
+   input { targetProjectId:"proj-a", intent:"quick", body:"reply", inReplyToMessageId:parentId }
+   -> envelope.hopCount === 2 (parent.hopCount + 1)
+   -> envelope.hopPath === ["proj-a","proj-b","proj-c"] (parent.hopPath + thisProjectId)
+   -> envelope.correlationId === "original-corr" (inherited; threadId input IGNORED even when present)
+   -> envelope.inReplyToMessageId === parentId
+
+3. ERROR / BLOCK CASES (no file written, no outbox line)
+   - reply parent not found     -> { error: "reply-parent-not-found" }   (writeCalls=0, outboxCalls=0)
+   - target not in registry      -> { error: "target-not-found" }         (writeCalls=0, outboxCalls=0)
+   - preflight over-budget       -> { blocked: true, reason: "over-budget" }
+   - preflight unauthorized      -> { blocked: true, reason: "unauthorized" } (writeCalls=0, outboxCalls=0)
+   - preflight hop cap reached   -> { blocked: true, reason: "hop-exceeded" }
+   - strict schema rejects raw hopCount / hopPath / correlationId inputs (Zod .strict() unknown-key failure)
+
+INVARIANTS HELD
+---------------
+- hopCount/hopPath/correlationId are NEVER tool inputs (Zod .strict() rejects them).
+- Target projectId validated against the registry before any write.
+- Send-side preflight runs BEFORE writeNote (preflight blocks => no note, no outbox line).
+- Outbox lives at <repoRoot>/.omo/mailbox-outbox.jsonl (under repo root, not coordination_notes/).
+- No hook auto-invokes this tool; manual agent tool only.

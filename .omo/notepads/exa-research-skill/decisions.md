@@ -1,0 +1,3 @@
+- Created \`exa-research\` as a Tier 3 skill-embedded MCP to avoid context bloat in the main session.
+- Used \`x-api-key\` header for authentication to keep the URL clean and secure.
+- Documented the distinction between Exa and Tavily to guide agent selection.

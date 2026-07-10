@@ -1,0 +1,20 @@
+[2026-07-02T08:51:05.035Z] [mailbox-idle-drain] injected notes {"sessionId":"ses_1","injected":1}
+[2026-07-02T08:51:05.036Z] [mailbox-idle-drain] skipped: primary not eligible {"sessionId":"ses_1","primary":"prometheus","eligible":["sisyphus"]}
+[2026-07-02T08:51:05.036Z] [mailbox-idle-drain] candidates found {"sessionId":"ses_1","sender":"alpha-id","count":1}
+[2026-07-02T08:51:05.036Z] [mailbox-idle-drain] candidates found {"sessionId":"ses_1","sender":"alpha-id","count":1}
+[2026-07-02T08:51:05.036Z] [mailbox-idle-drain] injected notes {"sessionId":"ses_1","injected":1}
+[2026-07-02T08:51:05.037Z] [mailbox-idle-drain] candidates found {"sessionId":"ses_1","sender":"alpha-id","count":1}
+[2026-07-02T08:51:05.037Z] [mailbox-idle-drain] injected notes {"sessionId":"ses_1","injected":1}
+[2026-07-02T08:51:05.037Z] [mailbox-idle-drain] candidates found {"sessionId":"ses_1","sender":"alpha-id","count":1}
+[2026-07-02T08:51:05.037Z] [mailbox-idle-drain] candidates found {"sessionId":"ses_1","sender":"alpha-id","count":1}
+[2026-07-02T08:51:05.037Z] [mailbox-idle-drain] candidates found {"sessionId":"ses_1","sender":"alpha-id","count":1}
+[2026-07-02T08:51:05.037Z] [mailbox-idle-drain] candidates found {"sessionId":"ses_1","sender":"alpha-id","count":1}
+[2026-07-02T08:51:05.037Z] [mailbox-idle-drain] injected notes {"sessionId":"ses_1","injected":1}
+[2026-07-02T08:51:05.037Z] [mailbox-idle-drain] skipped: permissionless config {"sessionId":"ses_1"}
+[2026-07-02T08:51:05.037Z] [mailbox-idle-drain] candidates found {"sessionId":"ses_1","sender":"alpha-id","count":1}
+[2026-07-02T08:51:05.037Z] [mailbox-idle-drain] injected notes {"sessionId":"ses_1","injected":1}
+[2026-07-02T08:51:05.037Z] [mailbox-idle-drain] skipped: permissionless config {"sessionId":"ses_1"}
+[2026-07-02T08:51:05.038Z] [mailbox-idle-drain] skipped: disabled {"sessionId":"ses_1"}
+[2026-07-02T08:51:05.038Z] [mailbox-idle-drain] candidates found {"sessionId":"ses_1","sender":"alpha-id","count":1}
+[2026-07-02T08:51:05.038Z] [mailbox-idle-drain] injected notes {"sessionId":"ses_1","injected":1}
+[2026-07-02T08:51:05.040Z] mailbox load session messages failed {"error":"TypeError: undefined is not an object (evaluating 'this._client')","sessionId":"ses_x"}

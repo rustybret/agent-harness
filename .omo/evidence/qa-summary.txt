@@ -1,0 +1,31 @@
+=== QA SUMMARY: game-native-lsp-integration ===
+Date: 2026-05-15T03:01:07Z
+
+Task 1 Scenario 1 (Config Verification): 6/6 PASS
+  - opencode-godot-lsp in server-definitions.ts: PASS
+  - CMakeLists.txt cmake mapping in language-mappings.ts: PASS
+  - glsl_analyzer in server-definitions.ts: PASS
+  - wgsl_analyzer in server-definitions.ts: PASS
+  - lemminx in server-definitions.ts: PASS
+  - cmake-language-server in server-definitions.ts: PASS
+
+Task 1 Scenario 2 (Build Check): PASS
+  - bun run build: completed successfully
+
+Task 2 Scenario 1 (Test Resolution Logic): 5/5 PASS
+  - bun test src/tools/lsp/server-resolution.test.ts: 5 pass, 0 fail
+
+Task 2 Scenario 2 (Missing File Fallback): PASS
+  - .xyz extension returns not_configured status: PASS
+
+Edge Cases (7 tested): 7/7 PASS
+  - .gd → gdscript language ID: PASS
+  - .glsl → glsl language ID: PASS
+  - .wgsl → wgsl language ID: PASS
+  - .cmake → cmake language ID: PASS
+  - CMakeLists.txt → cmake language ID: PASS
+  - CMakeLists.txt → cmake server resolution: PASS
+  - Ansible YAML detection (not broken): PASS
+  - Non-Ansible YAML → yaml-ls (not broken): PASS
+
+Scenarios [8/8 pass] | Integration [6/6] | Edge Cases [7 tested] | VERDICT: ALL PASS

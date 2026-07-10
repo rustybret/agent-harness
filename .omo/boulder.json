@@ -1,0 +1,389 @@
+{
+  "active_plan": null,
+  "started_at": "2026-07-04T07:03:06.688Z",
+  "session_ids": [
+    "opencode:ses_12859ccc7ffeqfp9uzpCKBsAwW"
+  ],
+  "session_origins": {
+    "opencode:ses_12859ccc7ffeqfp9uzpCKBsAwW": "direct"
+  },
+  "plan_name": "mailbox-internal-external-mode",
+  "agent": "atlas",
+  "task_sessions": {
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "The shared `ModeDetector` instance IS correctly threaded from `create-plugin-module.ts` \u2192 `createTools`/`createHooks` \u2192 `createToolRegistry`/`createMailboxSessionHooks` \u2192 `createMailboxToolsRecord`/`createMailboxHooks` (verified by direct code read \u2014 this was fixed in a prior round).",
+      "session_id": "opencode:ses_0cdc935caffeBX5sWLLh8E6mtE",
+      "agent": "Sisyphus-Junior",
+      "category": "ultrabrain",
+      "updated_at": "2026-07-05T12:18:17.747Z",
+      "started_at": "2026-07-05T12:18:17.747Z",
+      "status": "running"
+    }
+  },
+  "active_work_id": null,
+  "status": "idle",
+  "updated_at": "2026-07-05T12:18:17.747Z",
+  "schema_version": 2,
+  "works": {
+    "provider-quirks-normalizer-legacy": {
+      "work_id": "provider-quirks-normalizer-legacy",
+      "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.sisyphus/plans/provider-quirks-normalizer.md",
+      "plan_name": "provider-quirks-normalizer",
+      "started_at": "2026-05-10T21:33:55.013Z",
+      "session_ids": [
+        "opencode:ses_1ec307cf8ffecS9luvjuG6Ql6E",
+        "opencode:ses_1ec278a82ffdS43wHtpOGHyqX7",
+        "opencode:ses_1ec2752d2ffef0cBTvbnnvApyk",
+        "opencode:ses_1ec0eaabfffeUtj8Oh5GF04HR6",
+        "opencode:ses_1ec0e5889ffe7hiL8htGzeJRAZ",
+        "opencode:ses_1ec0e4df2ffd1sj0CU9tmnpfD4",
+        "opencode:ses_1ec0e0f9dffem1AIks52qpY0T8",
+        "opencode:ses_1ec0d8ccdffeOx5PPxBcWLuy2h",
+        "opencode:ses_1ec0d09ddffe6Jq9uVNz5fD0nD",
+        "opencode:ses_1ec0c9ce2ffezzZ5wTH46FWZLw"
+      ],
+      "session_origins": {
+        "opencode:ses_1ec307cf8ffecS9luvjuG6Ql6E": "direct",
+        "opencode:ses_1ec278a82ffdS43wHtpOGHyqX7": "appended",
+        "opencode:ses_1ec2752d2ffef0cBTvbnnvApyk": "appended",
+        "opencode:ses_1ec0eaabfffeUtj8Oh5GF04HR6": "appended",
+        "opencode:ses_1ec0e5889ffe7hiL8htGzeJRAZ": "appended",
+        "opencode:ses_1ec0e4df2ffd1sj0CU9tmnpfD4": "appended",
+        "opencode:ses_1ec0e0f9dffem1AIks52qpY0T8": "appended",
+        "opencode:ses_1ec0d8ccdffeOx5PPxBcWLuy2h": "appended",
+        "opencode:ses_1ec0d09ddffe6Jq9uVNz5fD0nD": "appended",
+        "opencode:ses_1ec0c9ce2ffezzZ5wTH46FWZLw": "appended"
+      },
+      "agent": "atlas",
+      "task_sessions": {
+        "todo:1": {
+          "task_key": "todo:1",
+          "task_label": "1",
+          "task_title": "Delegate Hook Implementation to Hephaestus",
+          "session_id": "ses_1ec1ee91dffd1iV9Y65s5ux1uh",
+          "agent": "Sisyphus-Junior",
+          "updated_at": "2026-05-10T22:04:38.200Z"
+        },
+        "final-wave:f1": {
+          "task_key": "final-wave:f1",
+          "task_label": "F1",
+          "task_title": "**Plan Compliance Audit** \u2014 `oracle`",
+          "session_id": "ses_1ec0c9ce2ffezzZ5wTH46FWZLw",
+          "agent": "oracle",
+          "updated_at": "2026-05-10T22:12:58.387Z"
+        }
+      }
+    },
+    "game-native-lsp-integration-904c266f": {
+      "work_id": "game-native-lsp-integration-904c266f",
+      "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.sisyphus/plans/game-native-lsp-integration.md",
+      "plan_name": "game-native-lsp-integration",
+      "status": "active",
+      "started_at": "2026-05-15T00:53:29.678Z",
+      "updated_at": "2026-05-15T02:04:39.059Z",
+      "session_ids": [
+        "opencode:ses_1d771a1d3ffeUpKhlzU0SqjHgM",
+        "opencode:ses_1d6a057abffemK7GHrLhNUFWI7",
+        "opencode:ses_1d69fde26ffeKFANRfOlR6sKPL",
+        "opencode:ses_1d69f9da2ffeGNGPo0gxXsQA7u",
+        "opencode:ses_1d69f1164ffeH2mEmdlKtNdCWb"
+      ],
+      "session_origins": {
+        "opencode:ses_1d771a1d3ffeUpKhlzU0SqjHgM": "direct",
+        "opencode:ses_1d6a057abffemK7GHrLhNUFWI7": "appended",
+        "opencode:ses_1d69fde26ffeKFANRfOlR6sKPL": "appended",
+        "opencode:ses_1d69f9da2ffeGNGPo0gxXsQA7u": "appended",
+        "opencode:ses_1d69f1164ffeH2mEmdlKtNdCWb": "appended"
+      },
+      "agent": "atlas",
+      "task_sessions": {
+        "final-wave:f1": {
+          "task_key": "final-wave:f1",
+          "task_label": "F1",
+          "task_title": "**Plan Compliance Audit** \u2014 `oracle`",
+          "session_id": "ses_1d69f1164ffeH2mEmdlKtNdCWb",
+          "agent": "oracle",
+          "updated_at": "2026-05-15T02:04:39.059Z"
+        }
+      }
+    },
+    "fork-parity-reconfigure-20612ce3": {
+      "work_id": "fork-parity-reconfigure-20612ce3",
+      "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.omo/plans/fork-parity-reconfigure.md",
+      "plan_name": "fork-parity-reconfigure",
+      "status": "completed",
+      "started_at": "2026-06-01T05:08:16.368Z",
+      "updated_at": "2026-06-02T18:23:39.223Z",
+      "session_ids": [
+        "opencode:ses_1c837d0b1ffes2jQSs4zvNmLYz",
+        "opencode:ses_17b038f0dffegQYih74wdBXYCx",
+        "opencode:ses_17b03095effeHlsqv5u5tU9vOl",
+        "opencode:ses_17b025f06ffevQb7UGT2NpIT0n",
+        "opencode:ses_17b01b51affeLTAUxcPGvoIg4E",
+        "opencode:ses_1768fe12cffeIdAc5pVAYUyynJ",
+        "opencode:ses_1768f75aeffePwwPwL6VoVAIv3",
+        "opencode:ses_1768f13d2ffekENr6ARZEOIvvL",
+        "opencode:ses_1768e8dbbffePrlMm2juje1FgZ",
+        "opencode:ses_17672d421ffeI05ludjnWtQeVB",
+        "opencode:ses_176724091ffeYZYYL5oews295P",
+        "opencode:ses_17671a21affeOBqy01SZ6wv4wk"
+      ],
+      "session_origins": {
+        "opencode:ses_1c837d0b1ffes2jQSs4zvNmLYz": "direct",
+        "opencode:ses_17b038f0dffegQYih74wdBXYCx": "appended",
+        "opencode:ses_17b03095effeHlsqv5u5tU9vOl": "appended",
+        "opencode:ses_17b025f06ffevQb7UGT2NpIT0n": "appended",
+        "opencode:ses_17b01b51affeLTAUxcPGvoIg4E": "appended",
+        "opencode:ses_1768fe12cffeIdAc5pVAYUyynJ": "appended",
+        "opencode:ses_1768f75aeffePwwPwL6VoVAIv3": "appended",
+        "opencode:ses_1768f13d2ffekENr6ARZEOIvvL": "appended",
+        "opencode:ses_1768e8dbbffePrlMm2juje1FgZ": "appended",
+        "opencode:ses_17672d421ffeI05ludjnWtQeVB": "appended",
+        "opencode:ses_176724091ffeYZYYL5oews295P": "appended",
+        "opencode:ses_17671a21affeOBqy01SZ6wv4wk": "appended"
+      },
+      "agent": "atlas",
+      "task_sessions": {
+        "todo:1": {
+          "task_key": "todo:1",
+          "task_label": "1",
+          "task_title": "Retarget `ci.yml` to trigger on `fork/local` instead of `dev`/`master`",
+          "session_id": "opencode:ses_17bd3f772ffeXLuBflw40lsGb2",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "started_at": "2026-06-01T05:12:07.910Z",
+          "ended_at": "2026-06-01T17:13:00.520Z",
+          "elapsed_ms": 43252610,
+          "status": "completed",
+          "updated_at": "2026-06-01T17:13:00.520Z"
+        },
+        "todo:3": {
+          "task_key": "todo:3",
+          "task_label": "3",
+          "task_title": "Build forensic inventory of the 61 fork commits",
+          "session_id": "opencode:ses_17e104977ffe4IlJbxQZlB32pQ",
+          "agent": "Sisyphus-Junior",
+          "category": "deep",
+          "started_at": "2026-06-01T06:45:00.270Z",
+          "status": "completed",
+          "updated_at": "2026-06-01T14:30:59.217Z",
+          "ended_at": "2026-06-01T14:30:59.217Z",
+          "elapsed_ms": 27958947
+        },
+        "todo:8": {
+          "task_key": "todo:8",
+          "task_label": "8",
+          "task_title": "Rewrite sync-upstream.yml to rebase two-branch strategy",
+          "session_id": "opencode:ses_17bd547e2ffe1OMxVM0wLUxl4K",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-06-01T17:11:51.313Z",
+          "started_at": "2026-06-01T17:11:28.342Z",
+          "status": "completed",
+          "ended_at": "2026-06-01T17:11:51.313Z",
+          "elapsed_ms": 22971
+        },
+        "todo:11": {
+          "task_key": "todo:11",
+          "task_label": "11",
+          "task_title": "Rewrite fork-maintenance-guide.md for the two-branch model",
+          "session_id": "opencode:ses_17bd1fbcaffeKEsFHVGapbOrms",
+          "agent": "Sisyphus-Junior",
+          "category": "writing",
+          "updated_at": "2026-06-01T17:17:57.851Z",
+          "started_at": "2026-06-01T17:15:10.840Z",
+          "status": "completed",
+          "ended_at": "2026-06-01T17:17:57.851Z",
+          "elapsed_ms": 167011
+        },
+        "todo:18": {
+          "task_key": "todo:18",
+          "task_label": "18",
+          "task_title": "Manual CI run on fork/local + rollback runbook validation",
+          "session_id": "opencode:ses_17b0a11edffeqJFTEZ0Snd6Ute",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "updated_at": "2026-06-01T20:58:26.370Z",
+          "started_at": "2026-06-01T20:54:15.155Z",
+          "status": "completed",
+          "ended_at": "2026-06-01T20:58:26.370Z",
+          "elapsed_ms": 251215
+        },
+        "final-wave:f1": {
+          "task_key": "final-wave:f1",
+          "task_label": "F1",
+          "task_title": "**Plan Compliance Audit** \u2014 `oracle`",
+          "session_id": "opencode:ses_17671a21affeOBqy01SZ6wv4wk",
+          "agent": "Sisyphus-Junior",
+          "category": "deep",
+          "started_at": "2026-06-02T18:04:34.842Z",
+          "status": "completed",
+          "updated_at": "2026-06-02T18:21:17.655Z",
+          "ended_at": "2026-06-02T18:21:17.655Z",
+          "elapsed_ms": 1002813
+        }
+      },
+      "ended_at": "2026-06-02T18:23:39.223Z",
+      "elapsed_ms": 134122855
+    },
+    "cross-project-agent-mailbox-ee582043": {
+      "work_id": "cross-project-agent-mailbox-ee582043",
+      "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.omo/plans/cross-project-agent-mailbox.md",
+      "plan_name": "cross-project-agent-mailbox",
+      "status": "completed",
+      "started_at": "2026-06-27T03:25:17.875Z",
+      "ended_at": "2026-06-27T05:44:03.107Z",
+      "updated_at": "2026-06-27T05:44:03.107Z",
+      "worktree_path": null,
+      "pr_branch": "feat/cross-project-mailbox",
+      "session_ids": [
+        "opencode:ses_12859ccc7ffeqfp9uzpCKBsAwW"
+      ],
+      "session_origins": {
+        "opencode:ses_12859ccc7ffeqfp9uzpCKBsAwW": "direct"
+      },
+      "agent": "atlas",
+      "task_sessions": {},
+      "elapsed_ms": 8325232
+    },
+    "mailbox-tui-sidebar-and-hot-reload-1973f90b": {
+      "work_id": "mailbox-tui-sidebar-and-hot-reload-1973f90b",
+      "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.omo/plans/mailbox-tui-sidebar-and-hot-reload.md",
+      "plan_name": "mailbox-tui-sidebar-and-hot-reload",
+      "status": "completed",
+      "started_at": "2026-06-30T19:04:06.587Z",
+      "updated_at": "2026-06-30T21:19:21.789Z",
+      "session_ids": [
+        "opencode:ses_12859ccc7ffeqfp9uzpCKBsAwW"
+      ],
+      "session_origins": {
+        "opencode:ses_12859ccc7ffeqfp9uzpCKBsAwW": "direct"
+      },
+      "agent": "atlas",
+      "task_sessions": {
+        "todo:1": {
+          "task_key": "todo:1",
+          "task_label": "1",
+          "task_title": "Schema + loader: inject populated mailbox default POST-MERGE (keep root field optional)",
+          "session_id": "opencode:ses_0e6127b3fffe1Awbp4sGTDj4Mn",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-06-30T19:19:46.552Z",
+          "started_at": "2026-06-30T19:18:14.385Z",
+          "status": "completed",
+          "ended_at": "2026-06-30T19:19:46.552Z",
+          "elapsed_ms": 92167
+        },
+        "todo:4": {
+          "task_key": "todo:4",
+          "task_label": "4",
+          "task_title": "Auto-provision: fix the trigger (T1 makes merged config always populated) + stub writes enabled:true",
+          "session_id": "opencode:ses_0e6050dbdffet5b7Kqpw44I4WS",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-06-30T19:53:31.587Z",
+          "started_at": "2026-06-30T19:30:47.689Z",
+          "status": "completed",
+          "ended_at": "2026-06-30T19:53:31.587Z",
+          "elapsed_ms": 1363898
+        },
+        "todo:8": {
+          "task_key": "todo:8",
+          "task_label": "8",
+          "task_title": "C2: populate sections.mailbox in readView (active+idle) + extend viewKey",
+          "session_id": "opencode:ses_0e5e5c297ffeJUXKzSh0QbtlwQ",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-06-30T20:02:07.557Z",
+          "started_at": "2026-06-30T20:01:21.688Z",
+          "status": "completed",
+          "ended_at": "2026-06-30T20:02:07.557Z",
+          "elapsed_ms": 45869
+        },
+        "todo:9": {
+          "task_key": "todo:9",
+          "task_label": "9",
+          "task_title": "C2/C3: render the mailbox section in buildViewNodes (counts + \u25b6/\u25bc + onMouseDown)",
+          "session_id": "opencode:ses_0e5ded1b5ffeWTslAndA014QTj",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-06-30T20:08:58.770Z",
+          "started_at": "2026-06-30T20:08:10.536Z",
+          "status": "completed",
+          "ended_at": "2026-06-30T20:08:58.770Z",
+          "elapsed_ms": 48234
+        },
+        "todo:10": {
+          "task_key": "todo:10",
+          "task_label": "10",
+          "task_title": "C3: tui.ts collapse closure - seed, toggle, persist, requestRender",
+          "session_id": "opencode:ses_0e5d8b4caffepiMnDORk5PtMZJ",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-06-30T20:14:50.009Z",
+          "started_at": "2026-06-30T20:14:13.405Z",
+          "status": "completed",
+          "ended_at": "2026-06-30T20:14:50.009Z",
+          "elapsed_ms": 36604
+        },
+        "final-wave:f1": {
+          "task_key": "final-wave:f1",
+          "task_label": "F1",
+          "task_title": "Plan compliance audit - every todo's acceptance criteria met; ROOT mailbox field STILL optional (NO per-layer `.default()`) with the populated default injected ONCE post-merge in both loaders; a layered user `enabled:false` + project-omitted survives the shallow merge as false; auto-provision trigger fires on an absent PROJECT-layer file (not on merged-config falsiness) AND uses `detectPluginConfigFile` (not hardcoded `.opencode/oh-my-openagent.jsonc`) to detect existing configs; tui-preferences uses jsonc-parser `modify`/`applyEdits` (NOT comment-json, NOT JSON round-trip) and preserves sibling comments (verify citation is `package.json:33` not `:31`); outbound 3-state ack over a tail-bounded read/parse/stat window; effective body cap = `min(config.bounds.max_body_bytes, 32768)`; T6 hot-reload uses `deps.thisRepoRoot` (NOT `deps.directory` which does not exist on `ProjectMessageToolDeps`); lazy reload via the READ-ONLY `validatePluginConfig` (NOT `loadPluginConfig`) on both send + drain with last-good fallback; permissionless early-out; collapse persisted to `\"oh-my-openagent\"` key via `queueTuiPreferenceUpdate([\"mailbox\",\"collapsed\"], ...)` (path arg MUST be `[\"mailbox\",\"collapsed\"]` \u2014 helper prepends the root prefix internally). Cite file:line for each.",
+          "session_id": "opencode:ses_0e59b6e74ffeTf5MKeXNkWJPNR",
+          "agent": "oracle",
+          "started_at": "2026-06-30T20:29:25.040Z",
+          "status": "completed",
+          "updated_at": "2026-06-30T21:19:21.789Z",
+          "ended_at": "2026-06-30T21:19:21.789Z",
+          "elapsed_ms": 2996749
+        }
+      },
+      "worktree_path": "/Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/mailbox-tui-sidebar",
+      "ended_at": "2026-06-30T21:21:01.663434Z"
+    },
+    "project-message-iteration-932473e2": {
+      "work_id": "project-message-iteration-932473e2",
+      "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.omo/plans/project-message-iteration.md",
+      "plan_name": "project-message-iteration",
+      "status": "completed",
+      "started_at": "2026-07-01T19:28:34.663Z",
+      "ended_at": "2026-07-01T23:45:00.000Z",
+      "updated_at": "2026-07-01T23:45:00.000Z",
+      "worktree_path": null,
+      "pr_branch": "feat/project-message-iteration",
+      "merge_commit": "887eb491d",
+      "session_ids": [
+        "opencode:ses_12859ccc7ffeqfp9uzpCKBsAwW"
+      ],
+      "session_origins": {
+        "opencode:ses_12859ccc7ffeqfp9uzpCKBsAwW": "direct"
+      },
+      "agent": "atlas",
+      "task_sessions": {}
+    },
+    "mailbox-internal-external-mode-03ebde92": {
+      "work_id": "mailbox-internal-external-mode-03ebde92",
+      "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.omo/plans/mailbox-internal-external-mode.md",
+      "plan_name": "mailbox-internal-external-mode",
+      "status": "completed",
+      "started_at": "2026-07-04T07:03:06.688Z",
+      "updated_at": "2026-07-05T12:18:17.747Z",
+      "worktree_path": null,
+      "pr_branch": "feat/mailbox-internal-external-mode",
+      "session_ids": [
+        "opencode:ses_12859ccc7ffeqfp9uzpCKBsAwW"
+      ],
+      "session_origins": {
+        "opencode:ses_12859ccc7ffeqfp9uzpCKBsAwW": "direct"
+      },
+      "agent": "atlas",
+      "task_sessions": {},
+      "ended_at": "2026-07-05T14:47:33.000Z",
+      "merge_commit": "0f381309c"
+    }
+  },
+  "worktree_path": null
+}

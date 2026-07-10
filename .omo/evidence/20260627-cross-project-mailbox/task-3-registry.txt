@@ -1,0 +1,86 @@
+Task 3 — Project Registry (~/.omo/project-registry.json) — QA Evidence
+======================================================================
+Date: 2026-06-27
+Worktree: .local-ignore/worktrees/cross-project-mailbox
+
+WHAT WAS BUILT
+--------------
+New directory: packages/omo-opencode/src/features/cross-project-mailbox/registry/
+  - types.ts                 ProjectEntry, RegistryData, ProjectNotFoundError (typed)
+  - project-registry.ts      ProjectRegistry class: atomic R/W (temp+rename) + advisory
+                             .lock file (O_EXCL via fs.open "wx") with stale-lock reaping
+                             + try/finally release; defaultRegistryPath() +
+                             createProjectRegistry() factory.
+  - index.ts                 barrel re-exporting public symbols
+  - project-registry.test.ts 10 given/when/then bun:test cases
+
+REGISTRY FILE FORMAT
+--------------------
+~/.omo/project-registry.json
+  { "projects": [{ projectId, repoRoot, displayName, lastSeen }] }
+projectId is produced ONLY by projectIdForRoot() imported from ../envelope/project-id.ts
+(the one shared canonicalizer). realpath() is applied before computing the id.
+
+DISCOVERY ORDER (as specified, EXACT)
+-------------------------------------
+1. registerProject(repoRoot) — caller passes ctx.directory for the session.
+2. Existing registry entries merged by the atomic read-merge-write (upsert by projectId).
+3. discoverFromOpenClaw(path) reads reply-session-registry.jsonl line by line; each line
+   with { projectPath } is registered as a HINT (does NOT replace existing entries, does
+   NOT auto-promote). Invalid JSON lines, lines without projectPath, and unresolvable
+   paths (realpath throws) are skipped silently.
+NO broad filesystem scan. NO opencode session-DB scan.
+
+CONCURRENCY SAFETY
+------------------
+registerProject takes the .lock before read-merge-write. atomicWrite writes to
+"<path>.tmp-registry-<uuid>.json" then fs.rename (POSIX-atomic). Lock released in
+finally even on error. Test "five concurrent registerProject" asserts the JSON parses
+and all 5 entries are present (no corruption).
+
+SORT ORDER
+----------
+listProjects() returns recency-then-alpha: newest lastSeen first; ties broken by
+displayName localeCompare ascending. Verified by two tests (distinct timestamps; equal
+timestamps -> alpha).
+
+COMMANDS RUN + OUTPUT
+---------------------
+$ bun test packages/omo-opencode/src/features/cross-project-mailbox/registry/
+bun test v1.3.14 (0d9b296a)
+ 10 pass
+ 0 fail
+ 20 expect() calls
+Ran 10 tests across 1 file. [333.00ms]
+
+$ bunx tsgo --noEmit -p packages/omo-opencode/tsconfig.json  (filtered to registry/)
+  -> no errors in cross-project-mailbox/registry
+
+TEST CASES (all GREEN)
+----------------------
+1. empty registry + two roots -> both entries; keys == projectIdForRoot(realpath(root))
+2. same root twice -> one entry (idempotent merge), lastSeen updated
+3. two entries -> resolveTargetRepoRoot(id) returns canonical repoRoot
+4. unknown projectId -> throws typed ProjectNotFoundError
+5. 5 concurrent registerProject -> valid JSON, all entries present (no corruption)
+6. distinct lastSeen -> sorted newest-first
+7. equal lastSeen -> ordered alpha by displayName
+8. discoverFromOpenClaw with projectPath lines -> hint entries added, invalid lines skipped
+9. discoverFromOpenClaw -> existing entries not replaced (count stays correct)
+10. missing openclaw file -> tolerated silently (no throw, no entries)
+
+STAGED DIFF STAT
+----------------
+ registry/index.ts                  |   3 +
+ registry/project-registry.test.ts  | 223 ++++++
+ registry/project-registry.ts       | 224 ++++++
+ registry/types.ts                  |  17 ++
+ 4 files changed, 467 insertions(+)
+
+NOTE ON QA SCOPE
+----------------
+This task implements a pure-TS storage/discovery module (registry file under ~/.omo/).
+It is not yet wired into any OpenCode hook/tool/event, so no live harness surface is
+exercised by this change. Behavior is locked by the bun:test suite above. Wiring the
+registry into the plugin (the caller doing registerProject(ctx.directory) on load) is a
+later todo and will carry the opencode-qa live-harness evidence at that point.

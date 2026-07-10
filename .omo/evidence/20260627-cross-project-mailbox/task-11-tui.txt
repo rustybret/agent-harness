@@ -1,0 +1,86 @@
+TASK 11 — TUI sidebar mailbox section
+======================================
+Worktree: /Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/cross-project-mailbox
+Date: 2026-06-27
+
+WHAT WAS BUILT
+--------------
+New dir: packages/omo-opencode/src/features/cross-project-mailbox/sidebar/
+  - mailbox-sidebar.ts  : readMailboxSidebarState(repoRoot, config) -> MailboxSidebarState | null
+  - mailbox-sidebar.test.ts : 5 given/when/then tests (inbound, outbound, disabled)
+  - index.ts            : barrel
+
+Modified (existing TUI sidebar surface, extended not replaced):
+  - tui-sidebar/state-types.ts   : added optional `mailbox?: MailboxSidebarState | null` to the
+                                   `active` SidebarView variant (backward-compatible; existing
+                                   renders without a mailbox field stay valid).
+  - tui-sidebar/compute-view.ts  : added optional `mailbox` to ComputeViewSections; computeView
+                                   spreads it into the active view ONLY when defined (so existing
+                                   exact-equality tests with no mailbox key still pass); viewKey
+                                   includes stableMailboxKey = [inboundUnread, inboundProcessed,
+                                   recentSentCount] so render de-dup reacts to mailbox changes.
+  - tui-sidebar/compute-view.test.ts : added 3 mailbox fixture tests.
+
+DATA SHAPE CONFIRMED FROM SOURCE (not assumed)
+----------------------------------------------
+- MailboxStore.dirs(): inbox = <repoRoot>/coordination_notes/<fromProjectId>/ ; unread notes are
+  `*.md` files stored DIRECTLY in that dir (isUnreadNoteFile: isFile, ends .md, not dotfile).
+  processed = <inbox>/processed/. => inbound counting scans coordination_notes/<sender>/ for *.md
+  (unread) and coordination_notes/<sender>/processed/*.md (processed).
+- OutboxEntry from send-tool/outbox-log.ts: { sentAt, toProjectId, messageId, intent,
+  correlationId, body }. Log path = <repoRoot>/.omo/mailbox-outbox.jsonl (one JSON per line;
+  last line = most recent).
+- CrossProjectMailboxConfig.enabled gates the whole section (disabled => null).
+
+NON-BLOCKING / GRACEFUL-DEGRADATION
+-----------------------------------
+All I/O is plain fs.readdir/readFile wrapped in readDirSafe / try-catch: missing
+coordination_notes dir, missing sender dir, or missing outbox log all return zeros/[] rather
+than throwing. No tmux, no cross-repo reads — outbound status uses only the local outbox log.
+
+TEST RESULTS
+------------
+$ bun test packages/omo-opencode/src/features/cross-project-mailbox/sidebar/
+  5 pass / 0 fail / 13 expect() calls  (1 file)
+
+  Cases:
+    1. two unread + one processed  -> inboundUnread===2, inboundProcessed===1
+    2. empty coordination_notes    -> inboundUnread===0, inboundProcessed===0
+    3. five outbox JSONL entries   -> recentSentCount===5, recentSent ids === [msg-4,msg-3,msg-2]
+                                      (last 3, most-recent first)
+    4. missing outbox log file     -> recentSentCount===0, recentSent===[]
+    5. config.enabled === false    -> returns null
+
+$ bun test packages/omo-opencode/src/features/tui-sidebar/
+  60 pass / 0 fail / 112 expect() calls  (10 files)  — existing 57 + new 3, zero regressions
+
+  New compute-view cases:
+    - active sections + enabled mailbox  -> view.mailbox === mailboxSection
+    - active sections + null mailbox     -> view.mailbox is null
+    - two active views differing only in mailbox inboundUnread (1 vs 2) -> viewKey differs
+
+TDD ORDER
+---------
+Tests written FIRST (mailbox-sidebar.test.ts + 3 compute-view cases), confirmed referencing
+not-yet-existing readMailboxSidebarState / mailbox field, THEN implemented to green.
+
+TYPECHECK
+---------
+$ bunx tsgo --noEmit -p packages/omo-opencode/tsconfig.json
+  Only error is PRE-EXISTING and UNRELATED:
+    recovery-hook.test-support.ts(41,3): TS2741 Property 'cross_project_mailbox' missing
+  That file is NOT in my changed set (git diff --name-only HEAD confirms). My three changed
+  source files + new sidebar files produce zero type errors.
+
+REGRESSION ARGUMENT
+-------------------
+mailbox is an OPTIONAL field on the active variant and an OPTIONAL section input. computeView
+omits the key entirely when sections.mailbox is undefined, so the existing exact-`toEqual`
+fixtures (idle / broken / active-no-mailbox / live-loop) are byte-identical to before. Consumers
+tui.ts and snapshot-builder.ts compile unchanged because the new field is optional. Verified by
+the full tui-sidebar suite staying 60/60 green.
+
+NOTE: No real-harness opencode QA (spawned TUI) was run for this state-only change — this todo
+adds count state to the compute layer; the render pipeline (state -> ViewNode tree) is untouched.
+Full opencode-qa skill TUI smoke is owed at integration time when the render wiring consumes
+this state.

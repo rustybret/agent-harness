@@ -1,0 +1,15 @@
+(tmux session already killed; using previously captured output)
+
+--- captured earlier during live run (drain-qa6) ---
+  Cross-project note from cloudhome (received by agent-harness) — intent=question, priority=1
+  [mailbox-message-id: 0941a3e0-5879-466e-832f-e65a2c480987]
+
+  --- inbound note ---
+  QA drain test: this is a synthetic note verifying the idle-drain pipeline. No action needed — just acknowledge inline with one sentence and stop. Do
+  not reply via project_message.
+  --- end note ---
+
+  How to triage (intent=question):
+  Answer inline in your response. No task delegation is needed for a simple question.
+
+     Acknowledged — synthetic idle-drain QA note received, no action taken.

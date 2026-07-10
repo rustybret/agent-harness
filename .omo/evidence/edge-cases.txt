@@ -1,0 +1,17 @@
+=== Additional Edge Cases ===
+
+--- Language ID Mappings ---
+.gd → gdscript: PASS
+.glsl → glsl: PASS
+.wgsl → wgsl: PASS
+.cmake → cmake: PASS
+CMakeLists.txt → cmake: PASS
+
+--- CMakeLists.txt Resolution ---
+findServerForPath(CMakeLists.txt) → status=not_installed, server.id=cmake: PASS
+
+--- Ansible YAML Detection (not broken) ---
+Ansible playbook.yml → server.id=ansible-ls: PASS
+Non-Ansible docker-compose.yml → server.id=yaml-ls: PASS
+
+RESULT: 7/7 edge cases PASS

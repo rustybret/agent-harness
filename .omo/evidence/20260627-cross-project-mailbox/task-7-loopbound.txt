@@ -1,0 +1,58 @@
+TASK 7 - Ping-pong / loop-bounding store
+=========================================
+Worktree: /Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/cross-project-mailbox
+New dir : packages/omo-opencode/src/features/cross-project-mailbox/loop-guard/
+
+FILES
+-----
+- types.ts        : DigestEntry, RateLimitEntry interfaces
+- digest-store.ts : normalizeBody(), BodyDigestStore (durable .digests.json, atomic temp+rename)
+- rate-limiter.ts : SamePairRateLimiter (durable .rate-limits.json, 60s window, atomic writes)
+- drain-order.ts  : orderForDrain(notes, max) priority DESC then timestamp ASC, sliced, non-mutating
+- index.ts        : barrel
+- loop-guard.test.ts : full given/when/then suite (bun:test)
+
+DESIGN NOTES
+------------
+- Digest key = "fromProjectId:toProjectId:correlationId:sha256(normalizeBody(body))"
+  Exact-match dedup. Different correlationId => distinct thread => NOT a duplicate.
+- TTL in MINUTES converted to ms by caller (body_digest_ttl_min * 60_000). Store takes ttlMs.
+  Entry counts as live while now - recordedAt <= ttlMs; expired entries pruned on read.
+- Digests persist to <repoRoot>/coordination_notes/.digests.json and survive re-instantiation
+  (proved by the "survives restart" fixture using two separate store instances).
+- Rate limiter: per-(from,to) pair, 60_000ms window. Returns { limited:true } AT or OVER the limit.
+  Rate-limit is TRANSIENT: it only signals "skip this pair for now". It does NOT quarantine,
+  does NOT set a QuarantineReason, the note stays unread for the next drain.
+- orderForDrain returns a top-N SELECTION from a copy ([...notes]); the input array is never mutated,
+  so low-priority remainder is NOT dropped (caller keeps the rest queued).
+- SHA256 via Bun.CryptoHasher (no node:crypto import for hashing). Atomic writes via
+  open(wx) temp + fs.rename, mirroring MailboxStore / PendingDeliveryStore.
+
+FIXTURE -> WHAT IT PROVES
+-------------------------
+normalizeBody                       : trim + CRLF->LF + whitespace-run collapse + space-after-newline collapse
+digest first occurrence allowed     : isDuplicate=false on fresh pair; entry persisted to .digests.json
+digest duplicate within TTL         : second identical (normalized) call => isDuplicate=true
+digest expired TTL                  : injected clock advances past ttlMs => isDuplicate=false (new window)
+digest different correlationId      : same body, same pair, different correlationId => NOT duplicate
+digest persists across instantiation: new store instance on same path sees prior entry => duplicate
+rate below limit (5 of 6)           : limited=false
+rate at limit (7th of limit 6)      : limited=true
+rate different pairs not limited    : pair A saturated, pair B => limited=false
+rate window reset after 60s         : injected clock +60_001ms => limited=false
+drain priority desc, timestamp asc  : exact ordering asserted across mixed priority/timestamp
+drain max cap, remainder queued     : max=3 => exactly 3 returned, input length unchanged (8)
+drain starvation safety             : 4 high + 4 low, max=4 => all 4 high; low remainder intact in input
+
+TEST RUN
+--------
+$ cd /Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/cross-project-mailbox
+$ bun test packages/omo-opencode/src/features/cross-project-mailbox/loop-guard/
+
+bun test
+ 13 pass
+ 0 fail
+ 22 expect() calls
+Ran 13 tests across 1 file.
+
+RESULT: GREEN (13 passed, 0 failed).

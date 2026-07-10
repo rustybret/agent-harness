@@ -1,0 +1,45 @@
+# Task 1 — CrossProjectMailboxConfigSchema — Evidence
+Date: 2026-06-27
+Worktree: .local-ignore/worktrees/cross-project-mailbox
+
+## Files
+NEW:      packages/omo-opencode/src/features/cross-project-mailbox/config.ts
+NEW:      packages/omo-opencode/src/features/cross-project-mailbox/config.test.ts
+MODIFIED: packages/omo-opencode/src/config/schema/oh-my-opencode-config.ts  (cross_project_mailbox top-level field)
+MODIFIED: packages/omo-opencode/src/config/schema.ts                        (barrel re-export)
+MODIFIED: assets/oh-my-opencode.schema.json                                 (regenerated)
+
+## TDD: tests written first, confirmed RED on missing impl
+$ bun test packages/omo-opencode/src/features/cross-project-mailbox/config.test.ts
+error: Cannot find module './config' ...  -> 0 pass / 1 fail / 1 error  (failed for the right reason)
+
+## After implementation — GREEN
+$ bun test packages/omo-opencode/src/features/cross-project-mailbox/config.test.ts
+ 7 pass / 0 fail / 17 expect() calls
+
+## Full config suite — GREEN (no regression)
+$ bun test packages/omo-opencode/src/config
+ 124 pass / 0 fail / 246 expect() calls  (13 files)
+
+## Schema regeneration
+$ bun run build:schema
+ ✓ JSON Schema generated: assets/oh-my-opencode.schema.json
+$ grep -n cross_project_mailbox assets/oh-my-opencode.schema.json
+ 6656:    "cross_project_mailbox": {        # property definition present
+ 7083:    "cross_project_mailbox",          # listed in required/ordering
+
+## Schema fields implemented (all snake_case, Zod v4, .describe() on each)
+ enabled: boolean (default false)
+ intake_eligible_agents: OverridableAgentNameSchema[] (default ["sisyphus"])
+ interrupt_policy: enum idle-drain|allow-interrupt|block-idle-input (default idle-drain; only idle-drain implemented)
+ default_sender_access: enum allow-all|allow-none (default allow-none)
+ senders: record<projectId, { access: allow|deny (default allow), intent_budget: question|quick|impl|review|work-loop|plan }> (default {})
+ bounds: { max_hops 4, max_notes_per_drain 5, same_pair_rate_limit_per_min 6, body_digest_ttl_min 60, max_body_bytes 32768, reservation_ttl_ms 120000 } (default resolves nested defaults via parse)
+
+## Negative-path coverage (Zod throws as expected)
+ - intake_eligible_agents: ["bogus-agent"]            -> throws (OverridableAgentNameSchema)
+ - senders.*.intent_budget: "not-a-real-tier"         -> throws (enum)
+ - interrupt_policy: "bogus-policy"                   -> throws (enum)
+
+## Wiring
+ cross_project_mailbox added at TOP LEVEL of OhMyOpenCodeConfigSchema (NOT under experimental), .optional().default({}).

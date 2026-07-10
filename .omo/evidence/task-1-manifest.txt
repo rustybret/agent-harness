@@ -1,0 +1,52 @@
+old main sha: 045206c5e19b15cd4fadd25bc4a738dabedfee43
+upstream/dev sha: f01738268e79839405852f907ae7d6349f12e3f6
+origin branch count: 52
+
+feature branch shas:
+  origin/fix/1694-fallback-model-ids c37e23f244c59a038c785115c69459530c2bbc58
+  origin/fix/agent-usage-reminder-subagent-exclusion 4f8286c56105c953b83fd8c123ab225c38aa1033
+  origin/fix/background-agent-tool-permissions 95491675e8232e01d2ca16987728ec5bd04db917
+  origin/fix/docs-outdated-audit c25dbb94b299605feb7d0633103d1f178664edd3
+  origin/fix/fallback-sync-model-ui 2bb211c979791260e4a3569f94f0c4dc2e787f4f
+  origin/fix/google-provider-model-transform 4c7b81986ace2919fd365a854a7476bf51029772
+  origin/fix/hashline-output-pattern-separator 55c8952668a57f0d6efa8224fe7f8387bf4b3bf3
+  origin/fix/inherit-parent-session-tools 271929a9e42e99c32b9866ade43e65fc84429c96
+  origin/fix/issue-1681 a56a8bb241eafce85785c1f6a63853fc37eb34d1
+  origin/fix/issue-1746-mcp-output-guard 8b44d3b7b5f3262eb32644f4e7be7b365ed65eb4
+  origin/fix/issue-1918-command-discovery deef9d864b0eeb820b483e17bf6d046337bf6e4d
+  origin/fix/issue-2102-hephaestus-auto-commit 96d27ff56bf1c4540b8c74e219ec80c4e0b3a393
+  origin/fix/issue-2238 9f94c5f1784f20cd3359762d3ccb37c50cfe3cd3
+  origin/fix/issue-2241 8b71559113a95e03b198982bbd4fa9d23703bd0d
+  origin/fix/issue-2292 d46946c85f65e015bc634f70021d6d97b3af718b
+  origin/fix/issue-2301 b1946a6397174bdd257d1bdc40ab0706751eb311
+  origin/fix/issue-2301-v2 ca7aeefc2a7c9ec5a3ec4dccd7742d9482c22ebb
+  origin/fix/issue-2330 7874669de07685a9ab0977eb51d1b40318887c1f
+  origin/fix/issue-2375-run-in-background-default 1c0bc9748ee950172f3db9881a98c7f26dfaced7
+  origin/fix/issue-2386-agent-summaries-type 943dd365208c4e4f1eabdaebee74ab8f671310b2
+  origin/fix/issue-2393-model-fallback-patterns fd7faff7920bd144bbe41eff4874431a3dc1ee08
+  origin/fix/issue-2408-vertex-schema-compat 5073cc6b156d7ffd94a11ad9122a1b2136e5cfd4
+  origin/fix/issue-2441-cubic-await 9eefbfe3103e8651807a6b008e4c27ee8c57398d
+  origin/fix/issue-461-windows-installer 6ba1d675b94f36d84e26c2021d9ef51633947707
+  origin/fix/merge-skill-into-slashcommand 17d3184e7a98b25c3270c65c323f2ff31b506e74
+  origin/fix/plan-progress-zero-checkbox ef8f22caba516585e7d8d741f0369a51e3286afd
+  origin/fix/plug-resource-leaks f92d2e8f7f0b37c8d28bcbc686cf5e0267a128a3
+  origin/fix/ripgrep-cpu-throttle 594c97d36b3e47001dd8798b9af68b47534031e1
+  origin/fix/run-early-exit 5c2a215fca7510fc6048d823060da2e39bc17a96
+  origin/fix/runtime-fallback-variant-loss 9ca259dcdc837ac5706aaaa49ca4cf55dbfc8d69
+  origin/fix/subagent-self-execute 21ddd55162cc8c631f1a23c52eddd03d9aebfaa3
+  origin/fix/support-oh-my-openagent-config-name f6ca8bc934b69a5a5f861e8120c907116e63f9a1
+  origin/master a5db86ee1593cdf6379db9400ddce5ee783c9f5d
+  origin/my-changes 9f029b9445775830ac4a8f896452f45edfd8aeb2
+  origin/omo-ultrawork-web 682e11f126b78611133a0aac388cbcd789adf21f
+  origin/refactor/background-manager-ai-slop-cleanup-tdd 78c9ad3e7f9abdb97bf21c1e0d44735a07084f15
+
+submodule gitlink: 160000 commit 855c71401288859b1eec398bae6bd61548fc319f packages/lsp-tools-mcp
+submodule url: https://github.com/rustybret/lsp-tools-mcp
+submodule branch: <unset>
+
+source artifacts:
+  /tmp/agent-harness-pre-refs-20260601.txt
+  /tmp/agent-harness-old-main-sha.txt
+  /tmp/agent-harness-pre-submodule.txt
+  /tmp/agent-harness-pre-gitmodules.txt
+  /tmp/agent-harness-origin-branches-20260601.txt

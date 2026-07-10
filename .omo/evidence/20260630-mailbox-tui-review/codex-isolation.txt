@@ -1,0 +1,5 @@
+isolated CODEX_HOME=/tmp/codex-review-home.sOqNve
+ccd4a92b26ce4d907b52f7e2cd122e134506bed8  /Users/brethoffman/.codex/config.toml
+EXIT=0
+--- real ~/.codex untouched check ---
+ccd4a92b26ce4d907b52f7e2cd122e134506bed8  /Users/brethoffman/.codex/config.toml

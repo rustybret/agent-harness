@@ -1,0 +1,25 @@
+Adversarial high-accuracy review of a work PLAN (no code yet). This is ROUND 3.
+
+Read this file fresh, in full, from the repo you are launched in:
+  .omo/plans/cross-project-agent-mailbox.md
+
+CONTEXT: The plan designs a new omo OpenCode feature — a cross-project agent mailbox. A sender agent writes ONE markdown note (YAML front-matter envelope + body) into a TARGET repo at <target-repo>/coordination_notes/<source-projectId>/<messageId>.md. The target repo's live session drains its inbox on session.idle through the omo dispatchInternalPrompt gate, after an intake-eligibility gate (default sisyphus only) and receive-side authoritative validation (access allowlist + intent-budget ceiling + hop cap + body-digest loop check), quarantining rejects. The worker that executes this plan gets NO further interview, so it must be decision-complete.
+
+This is the THIRD review pass. Round 2 raised 6 items; the plan was revised to address ALL of them. Verify EACH against the CURRENT text — do not assume any is fixed. Cite exact todo number + quote the line.
+1. Todo 6 vs Todo 7 contradiction on rate-limited notes (one said quarantine, the other said stay-queued). Claimed fix: rate-limit is now an explicit TRANSIENT re-queue in todo 7 (never quarantine); only `duplicate-loop` quarantines via todo 6; the reason enum dropped `rate-limited`.
+2. Todo 1 receiver-policy config shape was ambiguous (access: allow-all|allow-none|string[] conflated membership with mode). Claimed fix: now top-level `default_sender_access` (allow-all|allow-none) + a `senders` map keyed by sender projectId with `{access: allow|deny, intent_budget}`; membership-with-allow IS the allowlist. Verify todos 6 and 9 use this SAME shape (no leftover string[] semantics).
+3. Todo 9 hopCount had no trusted parent to increment from (agent could forge hop count to evade the loop cap). Claimed fix: agent can NEVER supply hopCount/hopPath/correlationId; a FRESH send => hop 0 + hopPath=[thisProjectId] + new correlationId; a REPLY (`inReplyToMessageId`) reads the parent envelope from THIS repo's own processed/ store and derives hop=parent+1, appends thisProjectId, carries parent.correlationId; unknown parent => typed reply-parent-not-found error (no write). Verify this is consistent with todo 2's envelope fields and that `inReplyToMessageId` is a real input.
+4. Todo 5/8 ack-state conflict (ack after history-confirm vs ack after dispatch). Claimed fix: `.pending.json` now carries explicit `state` = `dispatch_sent` | `history_confirmed`; ONLY history_confirmed may ack; a dispatch_sent entry re-checks session history on reclaim and requeues once past reservation_ttl_ms with the body-digest dup-guard preventing a double.
+5. Todo 14 isolation wording was muddy. Claimed fix: now states the REAL ~/.local/share/opencode/opencode.db session count is identical before/after because the test runs under an isolated XDG_DATA_HOME; only the sandbox DB grows.
+6. Todo 10/11 Wave-4-vs-parallel mismatch in the dependency matrix. Claimed fix: matrix + todo bodies corrected (10 parallel with 9 only; 11 parallel with none).
+
+YOUR JOB:
+- Verify each of the 6 items is genuinely resolved in the CURRENT text (cite todo# + quoted line).
+- Full adversarial standards pass for decision-completeness: every todo needs concrete file references, executable acceptance criteria (happy + failure + evidence path), a consistent dependency matrix (no cycles; matrix must agree with each todo's "Blocked by/Blocks/parallel with" annotation), clear scope fidelity, and safety-invariant test ownership (no-auto-spawn, no-auto-reply, no-primary-switch, gate-only injection).
+- Hunt specifically for NEW contradictions introduced by the round-2 edits: the todo-1 schema-shape change ripples into todos 6 and 9; the todo-9 hop-derivation change ripples into todo 2's envelope and the inReplyToMessageId field. Verify those ripples are consistent.
+
+VERDICT FORMAT — start your reply with exactly one line:
+  VERDICT: APPROVE
+or
+  VERDICT: REJECT-WITH-FIXES
+Then: for each of the 6 round-2 items, one line "ITEM n: RESOLVED|NOT-RESOLVED — todo# + quoted evidence". Then, if REJECT, a numbered list of at most 5 TRUE blockers, each with exact todo/line + quoted text + the specific change required. A blocker is something that would make a capable developer guess or that creates a build/test-time contradiction. Do NOT list style nits as blockers. APPROVE by default; reject only for true blockers.

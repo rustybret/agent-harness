@@ -1,0 +1,25 @@
+You are an independent, adversarial plan reviewer. This is ROUND 2 of a required two-reviewer high-accuracy gate. The prior round REJECTED-WITH-FIXES; the plan has been revised. Output a single verdict on the FIRST line: APPROVE or REJECT-WITH-FIXES. Then a numbered list (each: location = todo N / section, the problem, the concrete fix). Do not rubber-stamp; verify against the current text, do not assume fixes landed.
+
+Read these two files (inside the current working directory):
+- .omo/plans/cross-project-agent-mailbox.md   (the REVISED plan under review)
+- .omo/drafts/cross-project-agent-mailbox.md   (decision record: WHY each fork was resolved — do not relitigate resolved user decisions, but verify the plan implements them)
+
+The plan: a new omo (OpenCode plugin) feature module — a per-repo on-disk file mailbox letting agents in different repos pass work requests, modeled on team_mode's inbox. Config flag, default OFF. Idle-drain delivery through the mandatory dispatchInternalPrompt gate; intake-eligibility (default sisyphus); receive-side validation + quarantine; hop/rate/body-digest loop bounds; a send tool; a section in the existing TUI sidebar. 14 todos / 5 waves + F1-F4 + one human-monitored e2e.
+
+Your round-1 verdict raised 12 issues. VERIFY each is genuinely resolved in the CURRENT text (cite todo/line); flag any that is only partially fixed or newly broken:
+1. Todo 1 references — should now cite packages/team-core/src/config.ts (real 11-field schema) and config/schema.ts barrel; NOT schema/index.ts (does not exist) and NOT treat team-mode.ts as the schema (it is a re-export).
+2. Todo 4 — should now DECIDE v1 = last-known agent (probe is validation-only), not a mid-task branch.
+3. Todo 8 retrigger edge — should now be ONE decided behavior (drain only on session.idle; documented v1 limitation), not an OR-list.
+4. Dependency matrix — todo 10 must block 8 (8 depends on 10); todo 5 strictly before 6/7; todo 1 a dep of todo 11; no cycles; Blocked-by lines match the matrix.
+5. Todo 5 — should now define a durable pending-delivery store for exactly-once across dispatch-vs-history-confirm, with a reservation TTL.
+6. Todo 3 — discovery should now be an exact ordered source list (register ctx.directory; merge registry; OpenClaw hints only); no broad/undefined scan.
+7. Todo 11 — outbound status should now have a real data source (a sender-side outbox log written by todo 9).
+8. Todo 2 — projectId should be slug+hash of realpath(repoRoot), with an assertPathWithinRoot final-path check + symlink-escape rejection, and the SAME canonicalizer shared with the registry (todo 3).
+9. Todo 8/10 — no-auto-reply should now be test-locked (spy asserts the drain never calls the send/project_message API).
+10. Scope/Todo 8 — no-auto-spawn should now be test-asserted (no session-create call; no extra session), and no-primary-switch test-locked (dispatched prompt omits agent/model/variant).
+11. Todo 12 — commit hygiene should now be concrete: .gitignore entries + a staged-path guard + a git check-ignore acceptance test.
+12. Static audit ownership — some todo (12) should own running prompt-async-route-audit.test.ts green, with the new files NOT added to the raw-prompt allowlist.
+
+Spot-check that cited paths exist by reading them under packages/omo-opencode/src/, packages/team-core/, packages/utils/ (e.g. packages/team-core/src/config.ts, packages/omo-opencode/src/config/schema.ts, packages/omo-opencode/src/config/schema/oh-my-opencode-config.ts, packages/omo-opencode/src/hooks/team-session-events/team-idle-wake-hint.ts, packages/omo-opencode/src/shared/prompt-async-gate.ts, packages/omo-opencode/src/tools/delegate-task/constants.ts, packages/omo-opencode/src/tui.ts). Report any cited path that does NOT exist or whose described content is wrong.
+
+Then run your full standards pass on the CURRENT text: decision-completeness (zero-context worker), references, acceptance criteria (happy+failure+evidence, agent-executable, only the final-wave e2e may be human), dependency-matrix consistency, scope fidelity (Must/Must-NOT), safety-invariant test ownership, and any remaining gaps. If all resolved, APPROVE and list only optional improvements. Quote the line you object to.

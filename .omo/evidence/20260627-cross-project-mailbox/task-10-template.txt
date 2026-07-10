@@ -1,0 +1,87 @@
+# Task 10 — Injected-prompt triage template
+
+## Test run
+```
+bun test v1.3.14 (0d9b296a)
+
+ 12 pass
+ 0 fail
+ 42 expect() calls
+Ran 12 tests across 1 file. [97.00ms]
+```
+
+## Rendered templates per intent
+```
+========== intent=question ==========
+Cross-project note from Auth Service (display) (received by Gateway (display)) — intent=question, priority=0
+
+--- inbound note ---
+Please look at the failing CI job on the auth service and tell me what broke.
+--- end note ---
+
+How to triage (intent=question):
+Answer inline in your response. No task delegation is needed for a simple question.
+
+Do NOT auto-reply. Do not call project_message() automatically from this context. If a reply is warranted, make an explicit, reasoned project_message() call only after deciding that a reply is appropriate and what it should contain.
+
+========== intent=quick ==========
+Cross-project note from Auth Service (display) (received by Gateway (display)) — intent=quick, priority=0
+
+--- inbound note ---
+Please look at the failing CI job on the auth service and tell me what broke.
+--- end note ---
+
+How to triage (intent=quick):
+Delegate via task() to the appropriate category (for example category="quick"). This is a bounded, single-session task.
+
+Do NOT auto-reply. Do not call project_message() automatically from this context. If a reply is warranted, make an explicit, reasoned project_message() call only after deciding that a reply is appropriate and what it should contain.
+
+========== intent=impl ==========
+Cross-project note from Auth Service (display) (received by Gateway (display)) — intent=impl, priority=0
+
+--- inbound note ---
+Please look at the failing CI job on the auth service and tell me what broke.
+--- end note ---
+
+How to triage (intent=impl):
+Delegate via task() to the appropriate category (for example category="unspecified-high" or category="deep"). This is an implementation task.
+
+Do NOT auto-reply. Do not call project_message() automatically from this context. If a reply is warranted, make an explicit, reasoned project_message() call only after deciding that a reply is appropriate and what it should contain.
+
+========== intent=review ==========
+Cross-project note from Auth Service (display) (received by Gateway (display)) — intent=review, priority=0
+
+--- inbound note ---
+Please look at the failing CI job on the auth service and tell me what broke.
+--- end note ---
+
+How to triage (intent=review):
+Delegate to oracle (subagent_type="oracle") or a review-category task() for code or design review.
+
+Do NOT auto-reply. Do not call project_message() automatically from this context. If a reply is warranted, make an explicit, reasoned project_message() call only after deciding that a reply is appropriate and what it should contain.
+
+========== intent=work-loop ==========
+Cross-project note from Auth Service (display) (received by Gateway (display)) — intent=work-loop, priority=0
+
+--- inbound note ---
+Please look at the failing CI job on the auth service and tell me what broke.
+--- end note ---
+
+How to triage (intent=work-loop):
+Consider delegating to atlas (subagent_type="atlas") for multi-step orchestration of this work-loop.
+
+Do NOT auto-reply. Do not call project_message() automatically from this context. If a reply is warranted, make an explicit, reasoned project_message() call only after deciding that a reply is appropriate and what it should contain.
+
+========== intent=plan ==========
+Cross-project note from Auth Service (display) (received by Gateway (display)) — intent=plan, priority=0
+
+--- inbound note ---
+Please look at the failing CI job on the auth service and tell me what broke.
+--- end note ---
+
+How to triage (intent=plan):
+Plan inline as Sisyphus, or surface to user for explicit approval before any planning work begins. Prometheus is not auto-spawnable and requires explicit user intent.
+
+Do NOT auto-reply. Do not call project_message() automatically from this context. If a reply is warranted, make an explicit, reasoned project_message() call only after deciding that a reply is appropriate and what it should contain.
+
+```

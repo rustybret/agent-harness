@@ -1,0 +1,11 @@
+# opencode-qa common self-check
+worktree=/Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/idle-drain
+skill_script=/Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/idle-drain/.agents/skills/opencode-qa/scripts/lib/common.sh
+PASS: dependencies present (opencode sqlite3 curl jq tmux)
+PASS: oqa_db_path -> /Users/brethoffman/.local/share/opencode/opencode.db
+PASS: oqa_sql_escape quotes single quotes
+PASS: oqa_free_port -> 63802
+PASS: isolated XDG sandbox auto-removed on exit (/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/oqa-xdg.XXXXXX.Hruh67Urvi)
+PASS: isolated HOME points inside sandbox
+PASS: isolated HOME preserves HOME-based opencode shim
+PASS: common.sh self-check

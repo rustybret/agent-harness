@@ -1,7 +1,4 @@
 # Dependencies
-.omo/*
-!.omo/rules/
-!.omo/rules/**
 packages/*/.omo/*
 .sisyphus/*
 !.sisyphus/rules/
@@ -68,3 +65,12 @@ utils/models-verbose.json
 # cross-project agent mailbox
 coordination_notes/
 .omo/mailbox-outbox.jsonl
+
+# Agent workspace (.omo): this fork TRACKS .omo/ (evidence, notepads, plans, drafts,
+# boulder.json, rules). Only ephemeral runtime state stays ignored. These rules are at
+# end-of-file so they override earlier global patterns (plans/, *.log). See PROJECT_RULES.
+!.omo/plans/
+!.omo/plans/**
+!.omo/evidence/**/*.log
+.omo/run-continuation/
+.omo/**/.DS_Store

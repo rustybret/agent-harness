@@ -1,0 +1,39 @@
+Task 5 - Atomic mailbox storage + reservation + ack + durable pending store
+Date: 2026-06-27
+Worktree: .local-ignore/worktrees/cross-project-mailbox
+
+## NEW FILES
+packages/omo-opencode/src/features/cross-project-mailbox/mailbox/
+  - types.ts                  (PendingEntry, PendingState, UnreadMessage, MailboxDir, QuarantineReason)
+  - pending-delivery-store.ts (PendingDeliveryStore, durable .pending.json, atomic temp+rename)
+  - mailbox-store.ts          (MailboxStore: writeNote/parseNote/listUnread/reserve/ack/quarantine/drainUnread/reclaimStale)
+  - index.ts                  (barrel)
+  - mailbox-store.test.ts     (given/when/then, bun:test, temp dirs)
+
+## DESIGN NOTES (patterns cloned)
+- Reservation = fs.rename to `.delivering-<id>.md` (atomic on POSIX), exactly like team-core/team-mailbox/reservation.ts
+- ack = rename reserved (or plain) note into processed/<id>.md, like team-core ack.ts
+- Atomic write = open(wx) temp in same dir + rename, like boulder/project-registry atomicWrite
+- Note format = YAML front-matter + "---\n" delimiter + Markdown body via envelope/schema.ts serializeEnvelope/parseEnvelope
+- assertPathWithinRoot + safeMessageIdFilename guard EVERY file op under coordination_notes/
+- Stale reclaim 4-case logic (A history_confirmed -> ack; B dispatch_sent+in history -> confirm+ack;
+  C dispatch_sent+absent past TTL -> return to unread + remove pending; D no entry -> return to unread)
+- drainUnread = latest-per-supersede-chain, priority-desc then timestamp-asc; does NOT reserve, does NOT delete superseded
+
+## COMMAND: bun test (mailbox dir)
+$ bun test packages/omo-opencode/src/features/cross-project-mailbox/mailbox/
+ 13 pass
+ 0 fail
+ 39 expect() calls
+Ran 13 tests across 1 file.
+
+## COMMAND: typecheck (mailbox files filter)
+$ bunx tsgo --noEmit -p packages/omo-opencode/tsconfig.json | grep mailbox/...
+(no output -> zero type errors in new mailbox files)
+
+## TEST CASES COVERED
+storage round-trip; reserve -> .delivering + drop from listUnread; double-reserve idempotent (undefined);
+ack moves to processed + pending history_confirmed; quarantine -> rejected/ + reason.json;
+reclaimStale A/B/C/D; supersede chain (drainUnread picks B, A stays on disk);
+priority-desc/timestamp-asc ordering; 5 concurrent writeNote -> 5 distinct files;
+PendingDeliveryStore durable round-trip across new instance.

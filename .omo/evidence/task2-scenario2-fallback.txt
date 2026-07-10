@@ -1,0 +1,5 @@
+=== Task 2 Scenario 2: Missing File Fallback ===
+
+Test: findServerForPath with .xyz extension
+Result: status=not_configured, extension=.xyz
+VERDICT: PASS - unhandled extension returns not_configured status

@@ -1,0 +1,23 @@
+# Task 2 — Envelope schema + projectId/path guards
+
+Date: 2026-06-27T03:40:26Z
+Worktree: .local-ignore/worktrees/cross-project-mailbox
+
+## Files created
+
+?? packages/omo-opencode/src/features/cross-project-mailbox/envelope/
+
+## Command: bun test (envelope dir)
+```
+bun test v1.3.14 (0d9b296a)
+
+ 22 pass
+ 0 fail
+ 28 expect() calls
+Ran 22 tests across 3 files. [115.00ms]
+```
+
+## Typecheck (envelope files only — zero errors; unrelated pre-existing errors from another todo's config schema excluded)
+```
+(no envelope/ type errors)
+```

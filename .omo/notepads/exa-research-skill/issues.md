@@ -1,0 +1,6 @@
+- Corrected Exa tool names in `SKILL.md`: changed from generic `search`/`find_similar`/`get_contents` to the specific `web_search_exa`, `web_fetch_exa`, and `web_search_advanced_exa` as required by the plan.
+- Replaced bulleted comparison with a table-style decision guide for Exa vs Tavily.
+- Expanded failure handling to include 401, 429, timeouts, and empty results.
+- Corrected the failure handling documentation to reflect that anonymous access is possible but limited.
+- Restored `web_search_advanced_exa` documentation which was missing in the previous iteration.
+- Added notes about tool availability being dependent on the API key.

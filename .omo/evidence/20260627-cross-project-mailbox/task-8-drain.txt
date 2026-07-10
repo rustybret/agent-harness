@@ -1,0 +1,76 @@
+TASK 8 — session.idle idle-drain hook (cross-project-mailbox)
+==============================================================
+Date: 2026-06-27
+Worktree: .local-ignore/worktrees/cross-project-mailbox
+
+WHAT WAS BUILT
+--------------
+packages/omo-opencode/src/features/cross-project-mailbox/hooks/
+  - idle-drain-hook.ts   createIdleDrainHook(deps) -> { "session.idle": (input) => Promise<void> }
+  - idle-drain-hook.test.ts  11 given/when/then tests (bun:test, full dependency injection)
+  - index.ts             barrel
+
+DRAIN FLOW (one idle event)
+---------------------------
+1. falsy sessionId -> return early (no spawn, no inject)             [SAFETY B]
+2. resolveActivePrimaryAgent(sessionId)
+3. primary not in config.intake_eligible_agents -> return early (note stays unread)
+4. getRegisteredProjects() as senders
+5. per sender mailbox (coordination_notes/<senderId>/):
+   a. reclaimStale(currentSessionMessageIds)
+   b. drainUnread(max_notes_per_drain)
+   c. per note:
+      - digestStore.checkAndRecord -> isDuplicate => validateInbound(note, cfg, {duplicateLoop:true}) -> quarantine "duplicate-loop"
+      - rateLimiter.checkRateLimit -> limited => skip (LEFT UNREAD, not quarantined)
+      - validateInbound(note, cfg) -> invalid => quarantine(reason, detail) -> skip
+      - reserve(messageId) -> undefined => skip (already reserved)
+      - buildTriagePrompt(note, {projectDisplayName})
+      - dispatchInternalPrompt({ mode:"async", input:{ path, body:{parts:[{type:text}]}, query } })  [no agent/model/variant]  [SAFETY A]
+      - addDispatchSent({messageId, sessionId, reservedPath, dispatchedAt})
+6. capped at max_notes_per_drain total injections per idle cycle
+NOTE: ack is DEFERRED to reclaimStale()/history-confirm on a later cycle. The hook NEVER acks.
+
+TEST RESULT
+-----------
+$ bun test packages/omo-opencode/src/features/cross-project-mailbox/hooks/
+bun test v1.3.14 (0d9b296a)
+ 11 pass
+ 0 fail
+ 43 expect() calls
+Ran 11 tests across 1 file. [82.00ms]
+
+TYPECHECK
+---------
+$ cd packages/omo-opencode && bunx tsgo --noEmit -p tsconfig.json | grep cross-project-mailbox/hooks
+(no output -> zero type errors in the new hook files)
+
+SAFETY INVARIANTS — EACH ASSERTED BY A TEST
+-------------------------------------------
+[A] No agent/model/variant on dispatched prompt input
+    test: "#then SAFETY-A: dispatched prompt input carries no agent/model/variant key"
+    asserts Object.keys(input) excludes agent/model/variant AND the dispatch args object has no such property.
+[B] No session-create / resume on nil session
+    test: "#then SAFETY-B: the hook returns early with zero session/store activity"
+    asserts resolveActivePrimaryAgent / makeMailboxStore / dispatch / reserve / quarantine all 0 calls when sessionId === "".
+[C] Hook never writes a note / sends a reply
+    test: "#then SAFETY-C: the hook never writes a note or sends a reply"
+    asserts the injected MailboxStore port exposes no writeNote and the PendingStore port has no send/write surface; the hook only calls drain/reserve/quarantine/ack-deferred + addDispatchSent.
+[D] Plan-intent note does not spawn prometheus
+    test: "#then SAFETY-D: no prometheus spawn occurs and the note is dispatched normally"
+    given a note intent="plan": dispatchInternalPrompt called once, serialized dispatch args contain no "prometheus", buildTriagePrompt received intent="plan".
+
+ADDITIONAL BEHAVIOURAL COVERAGE
+-------------------------------
+- happy path: validate + checkAndRecord + reserve + buildTriagePrompt + dispatch(1) + addDispatchSent(messageId), no ack
+- ineligible primary (prometheus): nothing validated/dispatched/reserved
+- reserve() undefined (raced): no dispatch, no addDispatchSent
+- validateInbound unauthorized: quarantine("unauthorized"), no dispatch
+- rate limited: NOT quarantined, NOT dispatched, NOT reserved (stays unread, retried next idle)
+- duplicate body: validateInbound called with {duplicateLoop:true}, quarantine("duplicate-loop"), no dispatch
+- max_notes_per_drain cap = 1: drainUnread called with 1, dispatch called once
+
+NO-REGRESSION NOTE
+------------------
+New directory only (hooks/). No existing file modified. The hook is NOT yet wired into
+create-session-hooks.ts (registration is a later todo); this task delivers the factory + tests only,
+so there is zero blast radius on the running session tier.
