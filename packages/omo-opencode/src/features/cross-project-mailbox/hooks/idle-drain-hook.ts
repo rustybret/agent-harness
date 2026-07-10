@@ -61,7 +61,7 @@ export interface IdleDrainHookDeps {
   directory: string
   projectDisplayName: string
   client: DispatchClient
-  resolveActivePrimaryAgent: (sessionId: string) => string | undefined
+  resolveActivePrimaryAgent: (sessionId: string) => string | undefined | Promise<string | undefined>
   getRegisteredProjects: () => ProjectEntry[]
   makeMailboxStore: (targetRoot: string, fromProjectId: string) => MailboxStorePort
   makePendingStore: (targetRoot: string) => PendingStorePort
@@ -165,7 +165,7 @@ export function createIdleDrainHook(deps: IdleDrainHookDeps): {
         return
       }
 
-      const primary = deps.resolveActivePrimaryAgent(sessionId)
+      const primary = await deps.resolveActivePrimaryAgent(sessionId)
       if (primary === undefined || !isEligiblePrimary(freshConfig, primary)) {
         log("[mailbox-idle-drain] skipped: primary not eligible", {
           sessionId,

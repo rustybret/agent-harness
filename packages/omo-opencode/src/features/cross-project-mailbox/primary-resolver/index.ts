@@ -1,1 +1,1 @@
-export { resolveActivePrimaryAgent } from "./resolver"
+export { normalizePrimaryAgent, resolveActivePrimaryAgent } from "./resolver"
