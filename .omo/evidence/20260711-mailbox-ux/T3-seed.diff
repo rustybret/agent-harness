@@ -1,0 +1,11 @@
+--- /var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-test-7rosSc/.config/opencode/oh-my-openagent.jsonc.before	2026-07-10 22:43:34
++++ /var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-test-7rosSc/.config/opencode/oh-my-openagent.jsonc	2026-07-10 22:43:34
+@@ -1,4 +1,7 @@
+ // My config
+ {
+-  "other": true
++  "other": true,
++  "cross_project_mailbox": {
++    "default_sender_access": "allow-all"
++  }
+ }

@@ -13,6 +13,7 @@ import { createPluginDispose } from "../plugin-dispose"
 import { createPluginInterface } from "../plugin-interface"
 import { loadPluginConfig } from "../plugin-config"
 import { createModelCacheState } from "../plugin-state"
+import { seedUserDefaultSenderAccess } from "../features/cross-project-mailbox/config/seed-user-default"
 import {
   createCompactionAutocontinueHandler,
   createSessionCompactingHandler,
@@ -61,6 +62,7 @@ export type PluginModuleDeps = {
   initLiveServerRoute: typeof initLiveServerRoute
   setLiveParentWakeRoutingDisabled: typeof setLiveParentWakeRoutingDisabled
   warmLiveServerProbe: typeof warmLiveServerProbe
+  seedUserDefaultSenderAccess: typeof seedUserDefaultSenderAccess
   loadPluginConfig: typeof loadPluginConfig
   recordPluginTelemetry: typeof recordPluginTelemetry
   initI18n: typeof initI18n
@@ -92,6 +94,7 @@ const defaultPluginModuleDeps: PluginModuleDeps = {
   initLiveServerRoute,
   setLiveParentWakeRoutingDisabled,
   warmLiveServerProbe,
+  seedUserDefaultSenderAccess,
   loadPluginConfig,
   recordPluginTelemetry,
   initI18n,
@@ -131,6 +134,8 @@ export function createPluginModule(overrides: Partial<PluginModuleDeps> = {}): P
     }
 
     deps.injectServerAuthIntoClient(input.client)
+
+    deps.seedUserDefaultSenderAccess()
 
     const pluginConfig = deps.loadPluginConfig(input.directory, input)
     try {
