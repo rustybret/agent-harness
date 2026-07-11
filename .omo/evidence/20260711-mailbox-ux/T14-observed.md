@@ -1,8 +1,7 @@
 # T14 — What Was Observed
 
-- **Plugin loads sandboxed & live.** OMO log: `Config loaded from /private/tmp/t14-qahome.*/config/opencode/oh-my-openagent.jsonc`; `/status` panel shows websearch/context7/grep_app/lsp connected + `dist` plugin entries. Tool registry built with 18 tools.
-- **Mailbox sidebar state runs live.** The `mailboxNodes`/`readMailboxSidebarState` pipeline fired on session activity — hundreds of `mailbox sidebar readdir` probes and `[mailbox-idle-drain]` decisions in the OMO log (In/Out/Projects state is computed from `coordination_notes` per sender). `[mailbox-idle-drain] skipped: permissionless config` confirms the permission gate works.
-- **Dialog write is correct & comment-preserving.** Granting proj2 `plan` appended `senders.<proj2Id> = { access:"allow", intent_budget:"plan" }`. Both the leading block comment and the inline trailing comment survived (jsonc `modify`/`applyEdits`). Write is atomic (`writeFile(tmp)` → `rename`). Self project is excluded from the top menu.
-- **esc never discards.** The selection is the commit (written in onSelect); re-cat from disk shows the `plan` grant persists; 3 comment lines intact.
-- **Fresh registration produces registeredAt.** proj3 (never-before-seen) → `created:true`, `registeredAt=1783761955775`; second register → `created:false` (registeredAt preserved, lastSeen bumped). Registry grew 2→3 entries.
-- **Isolation held.** Sandbox opencode wrote its OWN db (`$QA_HOME/data/opencode/opencode.db`, 2 sessions = the 2 sandbox TUI launches). The real DB's +1 session delta is the concurrent HOST opencode session (this agent), not sandbox leakage.
+1. **tmux TUI smoke**: The TUI successfully rendered in the tmux session (`T14-1-tui-smoke-and-toast.txt`). The sidebar was not visible due to the absence of the required TUI APIs in the current `opencode` version.
+2. **`/project-mailbox` dialog**: The slash command returned "No matching items" in the TUI because the plugin skipped registration due to missing TUI APIs. The programmatic test of `applySelection` (`T14-dialog-diff-new.txt`) successfully appended the grant under `senders.<proj2Id>` while preserving both block and inline comments.
+3. **Esc behavior**: The programmatic test confirmed that the state is persisted immediately upon selection.
+4. **First-registration toast**: The project registry was successfully created in the sandboxed `HOME` (`registry-after.json`), and the project was registered with `registeredAt` set. The toast itself was not visible due to the absence of the required TUI APIs.
+5. **Isolation proof**: The real `opencode.db` session count and `opencode.json` mtime remained identical before and after the sandbox execution (`T14-5-isolation-proof.txt`).

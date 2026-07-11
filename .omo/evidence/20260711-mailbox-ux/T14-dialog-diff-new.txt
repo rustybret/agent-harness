@@ -1,0 +1,26 @@
+======== BEFORE ========
+{
+  // T14: current project (proj1) mailbox config — grants live here
+  "$schema": "file:///Volumes/Topper2TB/Git/agent-harness/assets/oh-my-opencode.schema.json",
+  "cross_project_mailbox": {
+    "enabled": true,          // keep enabled (trailing comment must survive)
+    "default_sender_access": "allow-none",
+    "senders": {}
+  }
+}
+
+======== AFTER ========
+{
+  // T14: current project (proj1) mailbox config — grants live here
+  "$schema": "file:///Volumes/Topper2TB/Git/agent-harness/assets/oh-my-opencode.schema.json",
+  "cross_project_mailbox": {
+    "enabled": true,          // keep enabled (trailing comment must survive)
+    "default_sender_access": "allow-none",
+    "senders": {
+      "t14-proj2-hk6zf6-70bbd8b6": {
+        "access": "allow",
+        "intent_budget": "plan"
+      }
+    }
+  }
+}
