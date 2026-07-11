@@ -29,110 +29,119 @@ export function registerProjectMailboxCommand(api: any, deps: { directory: strin
   const registry = createProjectRegistry()
   const resolver = createLiveMailboxConfigResolver(deps.directory, { enabled: true } as any)
 
+  // @opentui/keymap only recognizes commands nested under Layer.commands (its
+  // RESERVED_LAYER_FIELDS allowlist is target/targetMode/priority/bindings/commands);
+  // any command fields placed flat on the layer are silently dropped with no
+  // error, registering an empty layer. namespace: "palette" is required for
+  // slash-command search to surface the entry.
   api.keymap.registerLayer({
-    name: "omo.mailbox.projects",
-    title: "Project Mailbox",
-    slashName: "project-mailbox",
-    description: "manage connected projects",
-    run: async () => {
-      const entries = await registry.listProjects()
-      const selfEntry = entries.find((e) => e.repoRoot === deps.directory)
-      const selfProjectId = selfEntry?.projectId ?? "unknown"
+    commands: [
+      {
+        name: "omo.mailbox.projects",
+        title: "Project Mailbox",
+        slashName: "project-mailbox",
+        desc: "manage connected projects",
+        namespace: "palette",
+        run: async () => {
+          const entries = await registry.listProjects()
+          const selfEntry = entries.find((e) => e.repoRoot === deps.directory)
+          const selfProjectId = selfEntry?.projectId ?? "unknown"
 
-      const renderTopMenu = async () => {
-        const config = await resolver.resolve()
-        const topMenu = buildTopMenu(entries, config, selfProjectId)
-        
-        const options = topMenu.map((row) => ({
-          title: row.label,
-          description: row.state,
-          value: row,
-        }))
+          const renderTopMenu = async () => {
+            const config = await resolver.resolve()
+            const topMenu = buildTopMenu(entries, config, selfProjectId)
 
-        api.ui.dialog.replace(() =>
-          api.ui.DialogSelect({
-            title: "Project Mailbox",
-            options,
-            onSelect: (selectedRow: any) => {
-              const submenu = buildSubmenu(selectedRow)
-              const subOptions = submenu.map((opt) => ({
-                title: opt.label,
-                value: opt,
-              }))
+            const options = topMenu.map((row) => ({
+              title: row.label,
+              description: row.state,
+              value: row,
+            }))
 
-              api.ui.dialog.replace(() =>
-                api.ui.DialogSelect({
-                  title: `Project Mailbox > ${selectedRow.label}`,
-                  options: subOptions,
-                  onSelect: (selectedOpt: any) => {
-                    queueWrite(async () => {
-                      const opencodeDirPath = join(deps.directory, ".opencode")
-                      let detected = detectPluginConfigFile(opencodeDirPath, {
-                        basenames: [CONFIG_BASENAME],
-                        legacyBasenames: [LEGACY_CONFIG_BASENAME],
-                      })
+            api.ui.dialog.replace(() =>
+              api.ui.DialogSelect({
+                title: "Project Mailbox",
+                options,
+                onSelect: (selectedRow: any) => {
+                  const submenu = buildSubmenu(selectedRow)
+                  const subOptions = submenu.map((opt) => ({
+                    title: opt.label,
+                    value: opt,
+                  }))
 
-                      if (detected.format === "none") {
-                        autoProvisionMailboxConfig(deps.directory)
-                        detected = detectPluginConfigFile(opencodeDirPath, {
-                          basenames: [CONFIG_BASENAME],
-                          legacyBasenames: [LEGACY_CONFIG_BASENAME],
-                        })
-                      }
+                  api.ui.dialog.replace(() =>
+                    api.ui.DialogSelect({
+                      title: `Project Mailbox > ${selectedRow.label}`,
+                      options: subOptions,
+                      onSelect: (selectedOpt: any) => {
+                        queueWrite(async () => {
+                          const opencodeDirPath = join(deps.directory, ".opencode")
+                          let detected = detectPluginConfigFile(opencodeDirPath, {
+                            basenames: [CONFIG_BASENAME],
+                            legacyBasenames: [LEGACY_CONFIG_BASENAME],
+                          })
 
-                      if (detected.format === "none") {
-                        throw new Error("Failed to provision config file")
-                      }
+                          if (detected.format === "none") {
+                            autoProvisionMailboxConfig(deps.directory)
+                            detected = detectPluginConfigFile(opencodeDirPath, {
+                              basenames: [CONFIG_BASENAME],
+                              legacyBasenames: [LEGACY_CONFIG_BASENAME],
+                            })
+                          }
 
-                      const configPath = detected.path
-                      let text = ""
-                      try {
-                        text = await readFile(configPath, "utf8")
-                      } catch (err) {
-                        text = ""
-                      }
+                          if (detected.format === "none") {
+                            throw new Error("Failed to provision config file")
+                          }
 
-                      let nextText: string
-                      try {
-                        nextText = applySelection(text, selectedRow.projectId, selectedOpt.choice)
-                      } catch (err) {
-                        if (err instanceof MalformedConfigError) {
+                          const configPath = detected.path
+                          let text = ""
+                          try {
+                            text = await readFile(configPath, "utf8")
+                          } catch (err) {
+                            text = ""
+                          }
+
+                          let nextText: string
+                          try {
+                            nextText = applySelection(text, selectedRow.projectId, selectedOpt.choice)
+                          } catch (err) {
+                            if (err instanceof MalformedConfigError) {
+                              api.ui.toast({
+                                title: "Mailbox Error",
+                                message: err.message,
+                                variant: "error",
+                              })
+                              return
+                            }
+                            throw err
+                          }
+
+                          const tmp = `${configPath}.${randomUUID()}.tmp`
+                          await mkdir(dirname(configPath), { recursive: true })
+                          await writeFile(tmp, nextText, "utf8")
+                          await rename(tmp, configPath)
+
+                          clearPluginConfigFileDetectionCache()
+                          resolver.invalidate()
+
+                          await renderTopMenu()
+                        }).catch((err) => {
                           api.ui.toast({
                             title: "Mailbox Error",
-                            message: err.message,
+                            message: err instanceof Error ? err.message : String(err),
                             variant: "error",
                           })
-                          return
-                        }
-                        throw err
-                      }
-
-                      const tmp = `${configPath}.${randomUUID()}.tmp`
-                      await mkdir(dirname(configPath), { recursive: true })
-                      await writeFile(tmp, nextText, "utf8")
-                      await rename(tmp, configPath)
-                      
-                      clearPluginConfigFileDetectionCache()
-                      resolver.invalidate()
-                      
-                      // Re-render top menu after successful write
-                      await renderTopMenu()
-                    }).catch((err) => {
-                      api.ui.toast({
-                        title: "Mailbox Error",
-                        message: err instanceof Error ? err.message : String(err),
-                        variant: "error",
-                      })
+                        })
+                      },
                     })
-                  },
-                })
-              )
-            },
-          })
-        )
-      }
+                  )
+                },
+              })
+            )
+          }
 
-      await renderTopMenu()
-    },
+          await renderTopMenu()
+        },
+      },
+    ],
   })
 }

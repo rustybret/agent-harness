@@ -38,15 +38,25 @@ describe("registerProjectMailboxCommand", () => {
     // No throw, just returns
   })
 
-  it("registers the command and handles the write path", async () => {
+  it("registers the command nested under Layer.commands with a palette namespace", async () => {
     registerProjectMailboxCommand(api, { directory: tempDir })
     expect(api.keymap.registerLayer).toHaveBeenCalled()
 
     const layer = api.keymap.registerLayer.mock.calls[0][0]
-    expect(layer.name).toBe("omo.mailbox.projects")
+    expect(layer.commands).toHaveLength(1)
+
+    const command = layer.commands[0]
+    expect(command.name).toBe("omo.mailbox.projects")
+    expect(command.slashName).toBe("project-mailbox")
+    expect(command.namespace).toBe("palette")
+  })
+
+  it("handles the write path when the registered command runs", async () => {
+    registerProjectMailboxCommand(api, { directory: tempDir })
+    const command = api.keymap.registerLayer.mock.calls[0][0].commands[0]
 
     // Run the command
-    await layer.run()
+    await command.run()
 
     // Should show top menu
     expect(api.ui.dialog.replace).toHaveBeenCalled()
@@ -75,7 +85,7 @@ describe("registerProjectMailboxCommand", () => {
     await writeFile(configPath, initialConfig, "utf8")
 
     registerProjectMailboxCommand(api, { directory: tempDir })
-    await api.keymap.registerLayer.mock.calls[0][0].run()
+    await api.keymap.registerLayer.mock.calls[0][0].commands[0].run()
     
     // Simulate selecting project-a and changing to "impl"
     const topMenuProps = api.ui.DialogSelect.mock.calls[0][0]
@@ -105,7 +115,7 @@ describe("registerProjectMailboxCommand", () => {
     await writeFile(configPath, "{", "utf8")
 
     registerProjectMailboxCommand(api, { directory: tempDir })
-    await api.keymap.registerLayer.mock.calls[0][0].run()
+    await api.keymap.registerLayer.mock.calls[0][0].commands[0].run()
 
     const topMenuProps = api.ui.DialogSelect.mock.calls[0][0]
     topMenuProps.onSelect({ projectId: "project-a", label: "project-a", state: "Disabled" })
