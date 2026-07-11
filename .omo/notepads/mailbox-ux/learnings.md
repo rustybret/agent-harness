@@ -88,3 +88,16 @@
   1. `applySelection` returns the modified JSONC string. The TUI must write this string back to the config file atomically and then immediately call `invalidate()` on the live config resolver (`createLiveMailboxConfigResolver`) so subsequent permission checks and menu rebuilds see the updated permissions without waiting for TTL expiry.
   2. When `applySelection` throws `MalformedConfigError`, T10 should catch it, display an error toast (`api.ui.toast`), and keep the user on the submenu without writing to disk.
   3. When rendering `DialogSelect` options from `buildSubmenu(row)`, use `option.label` for the display title (which includes `✓ ` for the active state) and `option.choice` when passing the user's selection to `applySelection`.
+
+## T7: Presence detail, cache, and last-seen formatting (C data layer)
+
+- Implemented `readPresenceDetail(projectId, homeDir?, deps?)` in `presence/presence-reader.ts` returning `Promise<{ status: PresenceStatus | "missing"; heartbeatTs: number | null }>`. Reuses `readRecord` and `raceProbe` + `probeSession` logic. `readPresenceStatus` now delegates to `readPresenceDetail` and maps `"missing"` to `"offline"`, keeping existing behavior 100% unchanged.
+- Implemented `createPresenceCache(ttlMs = 10_000, options?)` in `presence/presence-cache.ts` returning `{ get, resolve, invalidate }`. Single-flights concurrent calls per `projectId` and caches resolved `PresenceDetail` for `ttlMs` (10s by default).
+- Implemented `lastSeenLabel(ageMs)` in `presence/last-seen-label.ts` formatting age in milliseconds into `"Last seen <n> <unit> ago"` using the largest whole unit of seconds/minutes/hours/days (`1500s` -> `"Last seen 25 minutes ago"`, `59s` -> `"Last seen 59 seconds ago"`, `1 day exactly` -> `"Last seen 1 day ago"`). For `ageMs >= 7_776_000_000` (90 days), `null`, `undefined`, or negative values, returns `"Last seen a long time ago"`.
+- Exported `readPresenceDetail`, `PresenceDetail`, `createPresenceCache`, `PresenceCache`, `lastSeenLabel`, and `MAX_LAST_SEEN_AGE_MS` from `presence/index.ts`.
+- **Gotchas for T9 (Sidebar Projects section)**:
+  1. T9 should construct `createPresenceCache(10_000)` once per sidebar/TUI lifecycle and call `cache.get(projectId)` (or `cache.resolve(projectId)`) during `readMailboxSidebarState`. Because the cache single-flights and holds results for 10s, polling every 1s (`POLL_INTERVAL_MS = 1_000`) will execute at most 1 probe per project per 10s.
+  2. When mapping `PresenceDetail` to sidebar rows:
+     - `status === "live" || status === "internal"` -> presence `"online"`, green dot (`success`).
+     - `status === "stale"` -> presence `"~"`, orange dot (`warning`).
+     - `status === "offline" || status === "missing"` -> presence `lastSeenLabel(detail.heartbeatTs ? Date.now() - detail.heartbeatTs : null)`, grey dot (`muted`).

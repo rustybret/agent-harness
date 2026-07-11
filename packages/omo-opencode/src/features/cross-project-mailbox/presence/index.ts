@@ -10,10 +10,20 @@ export {
 export {
   defaultProbeSession,
   isPresenceRecord,
+  readPresenceDetail,
   readPresenceStatus,
+  type PresenceDetail,
   type PresenceStatus,
   type ReadPresenceStatusDeps,
 } from "./presence-reader"
+export {
+  createPresenceCache,
+  type PresenceCache,
+} from "./presence-cache"
+export {
+  MAX_LAST_SEEN_AGE_MS,
+  lastSeenLabel,
+} from "./last-seen-label"
 export {
   createPresenceHeartbeatHook,
   type PresenceHeartbeatDeps,
