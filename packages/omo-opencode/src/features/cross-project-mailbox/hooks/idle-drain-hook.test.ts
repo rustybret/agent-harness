@@ -382,9 +382,11 @@ describe("createIdleDrainHook", () => {
     })
   })
 
-  describe("#given a sender's access is flipped in config between two idle drains", () => {
-    it("#then the second drain observes the new permission via a fresh per-drain config read", async () => {
+  describe("#given a sender's access is flipped after the live-config TTL", () => {
+    it("#then the next idle drain observes the new permission", async () => {
       // given
+      let now = 0
+      const nowSpy = jest.spyOn(Date, "now").mockImplementation(() => now)
       const denyConfig = makeConfig({
         default_sender_access: "allow-none",
         senders: { "alpha-id": { access: "deny", intent_budget: "impl" } },
@@ -401,13 +403,18 @@ describe("createIdleDrainHook", () => {
       spies.validatePluginConfig.mockImplementation(() => reads.shift())
       const hook = createIdleDrainHook(deps)
 
-      // when
-      await hook["session.idle"]({ sessionId: "ses_1" })
-      await hook["session.idle"]({ sessionId: "ses_1" })
+      try {
+        // when
+        await hook["session.idle"]({ sessionId: "ses_1" })
+        now = 3_000
+        await hook["session.idle"]({ sessionId: "ses_1" })
 
-      // then
-      expect(spies.validateInbound).toHaveBeenCalled()
-      expect(spies.validateInbound.mock.calls.at(-1)?.[1]).toBe(allowConfig)
+        // then
+        expect(spies.validateInbound).toHaveBeenCalled()
+        expect(spies.validateInbound.mock.calls.at(-1)?.[1]).toBe(allowConfig)
+      } finally {
+        nowSpy.mockRestore()
+      }
     })
   })
 

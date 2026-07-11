@@ -53,3 +53,18 @@
 - **Read-only dir test**: Must create the directory with `mkdir` before calling `chmod` to make it read-only — `mkdtemp` only creates the parent.
 - **Stash hazard**: `git stash` in this worktree can contain stale modifications from prior tasks (e.g., `idle-drain-hook.ts`, `manual-drain/index.ts`). Always `git diff` after stash pop to verify only expected files changed.
 - **File persistence with `write` tool**: The AFT `write` tool may not persist files to the worktree filesystem in some edge cases. Use `bash` with `cat > file << 'EOF'` as a fallback when files disappear after write.
+
+## T6: Live mailbox config resolution
+
+- `createLiveMailboxConfigResolver` defers `validatePluginConfig` into a promise microtask, so concurrent callers share one in-flight config read before any caller can start a duplicate read.
+- The production cache TTL defaults to exactly 3000ms. Cached calls perform no validation or filesystem-stat work; expiry causes one fresh merged-config read.
+- `invalidate()` increments a generation and drops both cached and in-flight references, so the next call reads immediately while a superseded read cannot repopulate the cache.
+- Resolution applies `applyMailboxDefault` after validation and returns the startup snapshot on invalid config or any thrown read/defaulting error.
+- The same resolver instance is injected into message, note, peek/drain dependencies by `createMailboxToolsRecord`; permission preflight, advisory budget reads, and inbound validation receive the resolved operation-time config.
+- The isolated OpenCode TUI smoke passed with the host DB session count unchanged (5814 before and after). The SSE self-test did not observe `server.connected` within its 15-second window; deterministic mailbox tests remain the direct behavioral proof for T6.
+
+## T6 Follow-up: Wire live-config resolver into production idle-drain hook deps
+
+- Wired `createLiveMailboxConfigResolver` into `buildIdleDrainDeps` in `packages/omo-opencode/src/features/cross-project-mailbox/hooks/create-mailbox-hooks.ts`.
+- This ensures the production idle-drain hook (`idle-drain-hook.ts`) uses the TTL-cached/single-flight config resolver instead of falling back to per-call config validation.
+- Verified that all 440 tests in `packages/omo-opencode/src/features/cross-project-mailbox` pass successfully.
