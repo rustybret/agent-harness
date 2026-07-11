@@ -1,0 +1,60 @@
+=== ISOLATION PROOF (T14) ===
+Sandbox QA_HOME: /var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M
+Real HOME: /Users/brethoffman (separate path from sandbox)
+
+--- BEFORE snapshot (captured at task start, §9§) ---
+~/.config/opencode           mtime: Jul 11 02:13:26 2026
+~/.local/share/opencode/opencode.db  mtime: Jul 11 02:14:41 2026  shasum: 0fc2416d794117234997f27845186dd0aeb7f966
+
+--- AFTER (now) mtime+size via macOS stat ---
+/Users/brethoffman/.config/opencode  mtime=1783761336  size=1216
+/Users/brethoffman/.local/share/opencode/opencode.db  mtime=1783761581  size=21726007296
+
+mtime=1752... epoch conversion for reference:
+02:14:41 2026-07-11 => epoch 1783761281
+
+--- HONEST INTERPRETATION ---
+The real ~/.local/share/opencode/opencode.db mtime advanced (02:14:41 -> ~02:19:41)
+and ~/.config/opencode mtime advanced. This is NOT the sandbox writing to real HOME:
+this QA runs INSIDE a live real opencode session (the harness itself), which
+continuously writes its own db/config while this task executes. The sandbox opencode
+was launched with HOME=$QA_HOME and all XDG_* pointed under the mktemp dir, so it
+physically cannot write to /Users/brethoffman.
+
+Proof the sandbox is fully separate:
+Sandbox tree wrote ONLY under: /var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M
+--- files created under sandbox (data dir) ---
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache/bun
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache/bun/@t@
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache/aft
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache/aft/bin
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache/aft/bin/v0.46.0
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache/aft/lsp-packages
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache/aft/lsp-packages/%40biomejs%2Fbiome
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache/opencode
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache/opencode/bin
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache/opencode/packages
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache/opencode/packages/@cortexkit
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache/opencode/skills
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache/opencode/skills/security-review
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/cache/opencode/skills/security-research
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/config
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/config/opencode
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/config/opencode/node_modules
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/config/opencode/node_modules/zod
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/config/opencode/node_modules/shebang-regex
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/config/opencode/node_modules/fast-check
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/config/opencode/node_modules/.bin
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/config/opencode/node_modules/toml
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/config/opencode/node_modules/@opencode-ai
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/config/opencode/node_modules/find-my-way-ts
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/config/opencode/node_modules/@ai-sdk
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/config/opencode/node_modules/multipasta
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/config/opencode/node_modules/detect-libc
+/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.vulDpyIz2M/config/opencode/node_modules/kubernetes-types
+
+No project-registry.json was ever created under real HOME:
+/Users/brethoffman/.omo/project-registry.json
+(empty result above = none in real HOME)

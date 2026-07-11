@@ -1,0 +1,10 @@
+=== FIRST-REGISTRATION PROOF (T14) ===
+Searched sandbox for project-registry.json:
+(no output above = registry NEVER created in sandbox)
+
+OBSERVED: only one project (/tmp/qa-proj-a) was ever opened in the sandbox.
+The registry file is created/populated on FIRST cross-project registration,
+which requires a SECOND project session to auto-register. Step 4 (second
+project + auto-registration) was NOT completed live (see T14-omitted.md).
+Therefore no registeredAt timestamp and no first-registration toast could be
+captured. Documented honestly rather than fabricated.

@@ -1,0 +1,5 @@
+=== ESC PERSISTENCE (T14) ===
+The /project-mailbox dialog did not open in the single-project sandbox
+('No matching items' — see T14-dialog-diff.txt). With no dialog, there was no
+plan/allow selection to persist and no Esc-close to verify.
+NOT observed live. See T14-omitted.md.
