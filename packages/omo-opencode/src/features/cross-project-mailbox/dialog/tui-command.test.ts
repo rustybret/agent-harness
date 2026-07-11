@@ -98,4 +98,27 @@ describe("registerProjectMailboxCommand", () => {
     expect(updatedConfig).toContain('"access": "allow"')
     expect(updatedConfig).toContain('"intent_budget": "impl"')
   })
+
+  it("shows a toast with the host toast shape for malformed config errors", async () => {
+    const configPath = join(tempDir, ".opencode", "oh-my-openagent.jsonc")
+    await mkdir(join(tempDir, ".opencode"), { recursive: true })
+    await writeFile(configPath, "{", "utf8")
+
+    registerProjectMailboxCommand(api, { directory: tempDir })
+    await api.keymap.registerLayer.mock.calls[0][0].run()
+
+    const topMenuProps = api.ui.DialogSelect.mock.calls[0][0]
+    topMenuProps.onSelect({ projectId: "project-a", label: "project-a", state: "Disabled" })
+
+    const subMenuProps = api.ui.DialogSelect.mock.calls[1][0]
+    subMenuProps.onSelect({ choice: "impl", value: "impl", label: "impl" })
+
+    await new Promise((resolve) => setTimeout(resolve, 50))
+
+    expect(api.ui.toast).toHaveBeenCalledWith({
+      title: "Mailbox Error",
+      message: expect.stringContaining("Malformed JSONC configuration text"),
+      variant: "error",
+    })
+  })
 })
