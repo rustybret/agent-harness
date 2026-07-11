@@ -99,8 +99,8 @@ export function registerProjectMailboxCommand(api: any, deps: { directory: strin
                         if (err instanceof MalformedConfigError) {
                           api.ui.toast({
                             title: "Mailbox Error",
-                            description: err.message,
-                            type: "error",
+                            message: err.message,
+                            variant: "error",
                           })
                           return
                         }
@@ -120,8 +120,8 @@ export function registerProjectMailboxCommand(api: any, deps: { directory: strin
                     }).catch((err) => {
                       api.ui.toast({
                         title: "Mailbox Error",
-                        description: err instanceof Error ? err.message : String(err),
-                        type: "error",
+                        message: err instanceof Error ? err.message : String(err),
+                        variant: "error",
                       })
                     })
                   },
