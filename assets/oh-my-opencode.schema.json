@@ -6703,7 +6703,7 @@
         },
         "default_sender_access": {
           "default": "allow-none",
-          "description": "Default access for source projects not listed in senders",
+          "description": "Default access for source projects not listed in senders. User-level config conventionally seeds 'allow-all'; the unlisted-sender ceiling is 'question'.",
           "type": "string",
           "enum": [
             "allow-all",
