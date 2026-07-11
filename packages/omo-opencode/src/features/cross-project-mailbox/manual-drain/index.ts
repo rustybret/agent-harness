@@ -1,6 +1,5 @@
 import { type ToolDefinition, tool } from "@opencode-ai/plugin/tool"
 
-import { validatePluginConfig as defaultValidatePluginConfig } from "../../../config/validate"
 import type { CrossProjectMailboxConfig } from "../config"
 import type { MailboxMessage } from "../envelope/schema"
 import type { PendingEntry, UnreadMessage } from "../mailbox/types"
@@ -29,10 +28,7 @@ export interface ManualMailboxToolDeps {
   makeDigestStore: (repoRoot: string) => DigestStorePort
   makeRateLimiter: (repoRoot: string) => RateLimiterPort
   validateInbound: typeof validateInbound
-  validatePluginConfig?: (directory: string) => {
-    valid: boolean
-    config: { cross_project_mailbox?: CrossProjectMailboxConfig }
-  }
+  liveConfigResolver?: { resolve: () => Promise<CrossProjectMailboxConfig> }
 }
 
 export interface PendingMailboxPreview {
@@ -53,10 +49,10 @@ export interface SkippedMailboxNote {
   reason: string
 }
 
-function resolveFreshConfig(deps: ManualMailboxToolDeps): CrossProjectMailboxConfig {
-  const validatePluginConfig = deps.validatePluginConfig ?? defaultValidatePluginConfig
-  const read = validatePluginConfig(deps.repoRoot)
-  if (read.valid && read.config.cross_project_mailbox) return read.config.cross_project_mailbox
+async function resolveFreshConfig(deps: ManualMailboxToolDeps): Promise<CrossProjectMailboxConfig> {
+  if (deps.liveConfigResolver) {
+    return deps.liveConfigResolver.resolve()
+  }
   return deps.config
 }
 
@@ -88,7 +84,7 @@ export async function runProjectMailboxDrain(deps: ManualMailboxToolDeps): Promi
   drained: DrainedMailboxNote[]
   skipped: SkippedMailboxNote[]
 }> {
-  const config = resolveFreshConfig(deps)
+  const config = await resolveFreshConfig(deps)
   if (config.enabled === false) return { drained: [], skipped: [{ messageId: "", reason: "mailbox disabled" }] }
 
   const maxNotes = config.bounds.max_notes_per_drain

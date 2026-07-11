@@ -33,7 +33,8 @@ function isPermissionlessConfig(config: CrossProjectMailboxConfig): boolean {
   return !Object.values(config.senders ?? {}).some((sender) => sender.access === "allow")
 }
 
-function resolveFreshConfig(deps: IdleDrainHookDeps): CrossProjectMailboxConfig {
+async function resolveFreshConfig(deps: IdleDrainHookDeps): Promise<CrossProjectMailboxConfig> {
+  if (deps.liveConfigResolver) return deps.liveConfigResolver.resolve()
   const read = deps.validatePluginConfig(deps.directory)
   const fresh = read.config?.cross_project_mailbox
   if (read.valid && fresh) return fresh
@@ -73,6 +74,7 @@ export interface IdleDrainHookDeps {
     args: InternalPromptDispatchArgs,
   ) => Promise<InternalPromptDispatchResult>
   getSessionMessages: (sessionId: string) => Promise<string[]>
+  liveConfigResolver?: { resolve: () => Promise<CrossProjectMailboxConfig> }
 }
 
 function buildDispatchArgs(
@@ -154,7 +156,7 @@ export function createIdleDrainHook(deps: IdleDrainHookDeps): {
         return
       }
 
-      const freshConfig = resolveFreshConfig(deps)
+      const freshConfig = await resolveFreshConfig(deps)
 
       if (freshConfig.enabled === false) {
         log("[mailbox-idle-drain] skipped: disabled", { sessionId })

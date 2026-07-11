@@ -1,7 +1,7 @@
 import { type ToolDefinition, tool } from "@opencode-ai/plugin/tool"
 import { z } from "zod"
 
-import { validatePluginConfig } from '../../../config/validate';
+import { validatePluginConfig } from "../../../config/validate"
 import type { CrossProjectMailboxConfig } from "../config"
 import { MAILBOX_INTENTS, MAX_BODY_BYTES, type MailboxMessage } from "../envelope/schema"
 import { launchTargetSession } from "../launch"
@@ -60,6 +60,7 @@ export interface ProjectMessageToolDeps {
   readPresence?: (projectId: string) => Promise<PresenceStatus>
   launchTarget?: (repoRoot: string, projectId: string, policy: CrossProjectMailboxConfig["launch_policy"]) => Promise<boolean>
   launchPermissionAsk?: (target: string) => Promise<boolean>
+  liveConfigResolver?: { resolve: () => Promise<CrossProjectMailboxConfig> }
 }
 
 export type SendResult =
@@ -188,7 +189,10 @@ export async function resolveSendMode(
   return detected
 }
 
-function resolveFreshSendConfig(deps: ProjectMessageToolDeps): CrossProjectMailboxConfig {
+async function resolveFreshSendConfig(deps: ProjectMessageToolDeps): Promise<CrossProjectMailboxConfig> {
+  if (deps.liveConfigResolver) {
+    return deps.liveConfigResolver.resolve()
+  }
   const read = validatePluginConfig(deps.thisRepoRoot)
   if (read.valid && read.config.cross_project_mailbox) {
     return read.config.cross_project_mailbox
@@ -216,7 +220,7 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
       inReplyToMessageId: tool.schema.string().optional().describe("Optional parent messageId when replying to a received note"),
     },
     execute: async (rawArgs, toolContext) => {
-      const freshConfig = resolveFreshSendConfig(deps)
+      const freshConfig = await resolveFreshSendConfig(deps)
       if (freshConfig.enabled === false) {
         return JSON.stringify({ blocked: true, reason: "mailbox disabled" })
       }
