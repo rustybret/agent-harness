@@ -3,6 +3,7 @@ export interface ProjectEntry {
   repoRoot: string
   displayName: string
   lastSeen: number
+  registeredAt?: number
 }
 
 export interface RegistryData {
