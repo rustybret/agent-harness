@@ -240,6 +240,9 @@ const module: TuiPluginModule = {
       renderMailbox: () => materialize(buildMailboxNodes(view(), api.theme.current, mailboxToggle), solid),
     })
 
+    const { registerProjectMailboxCommand } = await import("./features/cross-project-mailbox/dialog/tui-command")
+    registerProjectMailboxCommand(api, { directory })
+
     const schedule = (): void => {
       timer = setTimeout(tick, POLL_INTERVAL_MS)
     }

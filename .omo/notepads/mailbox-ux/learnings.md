@@ -101,3 +101,16 @@
      - `status === "live" || status === "internal"` -> presence `"online"`, green dot (`success`).
      - `status === "stale"` -> presence `"~"`, orange dot (`warning`).
      - `status === "offline" || status === "missing"` -> presence `lastSeenLabel(detail.heartbeatTs ? Date.now() - detail.heartbeatTs : null)`, grey dot (`muted`).
+
+## T9 Learnings
+- `tui-sidebar` tests are very strict about the exact structure of `ViewNode`s. When reusing layouts like `outboundBudgetRow`, be aware that tests might expect specific node types (e.g., `text` vs `box`) at specific indices.
+- `MailboxSidebarState` now includes `projects: ProjectPresenceRow[]`.
+- `readProjectPresenceRows` was extracted to `projects-presence.ts` to keep `mailbox-sidebar.ts` under the 200-LOC soft ceiling.
+- `tui-command.ts` (T10) was partially present in the worktree from an interrupted run, causing typecheck errors. I fixed the imports to make typecheck pass but left it untracked to keep the T9 commit clean.
+
+## T10 Learnings
+- `registerProjectMailboxCommand` is wired into `tui.ts` after `registerSidebarContentSlot`.
+- T11 will need to add its own wiring call to `tui.ts` right after this one.
+- The dialog write chain uses a local `writeChain` promise to serialize writes, similar to `tui-preferences.ts`.
+- `detectPluginConfigFile` is used to find the config file, and `autoProvisionMailboxConfig` is used to create a stub if it doesn't exist.
+- `clearPluginConfigFileDetectionCache` must be called after provisioning or modifying the config file to ensure subsequent reads see the new file.
