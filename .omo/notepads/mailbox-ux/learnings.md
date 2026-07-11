@@ -201,3 +201,7 @@ n- T11 was successfully verified and the plan file was updated.
 - Fixed the broken import path in `packages/omo-opencode/src/features/cross-project-mailbox/__tests__/two-repo-integration.test.ts` from four levels (`../../../../`) to three levels (`../../../`) for both `OhMyOpenCodeConfigSchema` and `mergeConfigs`.
 - Verified that the test file and the full mailbox suite pass successfully (519 tests passed).
 - Verified that `lsp_diagnostics` is clean on the test file.
+
+## T14: opencode-qa manual evidence
+- **TUI APIs**: The current `opencode` version (1.17.18) does not expose the required TUI dialog APIs (`api.keymap.registerLayer`, `api.ui.DialogSelect`). The plugin correctly detects this and skips the registration of the slash command. Therefore, the dialog could not be observed live in the TUI. The exact onSelect write-path was driven programmatically instead to prove comment preservation and atomic writes.
+- **Isolation**: The `opencode-qa` skill's `tui-smoke.sh` script provides a robust way to test the TUI in an isolated XDG sandbox. However, when testing features that require specific models, the sandbox must be provided with the correct `models.json` cache, or the TUI will fail to start the session.
