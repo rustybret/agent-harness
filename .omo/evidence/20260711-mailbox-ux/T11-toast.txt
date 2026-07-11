@@ -1,0 +1,112 @@
+T11 - First-registration toast (A TUI side)
+=============================================
+
+WHAT WAS TESTED
+----------------
+1. Pure decision function decideRegistrationToast(selfEntry, prefs) in
+   packages/omo-opencode/src/features/cross-project-mailbox/dialog/registration-notice.ts
+   -- full matrix: no entry / entry with no registeredAt (legacy project) / fresh
+   entry with unset marker / entry with marker already true / marker set for a
+   DIFFERENT projectId (still shows) / malformed prefs shape (tolerant, treated
+   as unset).
+2. Pure decision function decideLegacySendersNoticeFromContent(content) -- null
+   (file absent), valid senders array, empty senders array, corrupted/unparseable
+   JSON.
+3. consumeLegacySendersNotice(flagPath, deps) -- the flag-consume orchestration
+   with injected readFile/deleteFile deps (no mock.module, per repo's
+   mock-module-lifecycle-audit invariant): missing file no-ops, valid file shows
+   + deletes (dedup), corrupted JSON logs + deletes + never shows, delete failure
+   after a shown notice flips the in-memory hasToastedLegacy guard, guard already
+   true silently retries the delete without re-showing (both delete-fails and
+   delete-succeeds sub-cases).
+4. Wiring: tui.ts's existing poll tick (tick(), unchanged infra -- same
+   schedule()/inFlight/disposed guards T9/T10 already established) now also
+   calls runRegistrationToastCheck(api, directory) and
+   runLegacySendersNoticeCheck(api, legacySendersNoticeState) per tick, both of
+   which feature-detect api.ui?.toast and never throw.
+
+COMMAND
+-------
+bun test packages/omo-opencode/src/features/cross-project-mailbox/dialog/registration-notice.test.ts
+
+OUTPUT
+------
+bun test v1.3.14 (0d9b296a)
+
+ 16 pass
+ 0 fail
+ 26 expect() calls
+Ran 16 tests across 1 file. [95.00ms]
+
+Full package suite (regression check, same command scope required by the task spec):
+bun test packages/omo-opencode/src/features/cross-project-mailbox
+
+bun test v1.3.14 (0d9b296a)
+
+ 518 pass
+ 0 fail
+ 1092 expect() calls
+Ran 518 tests across 39 files. [1379.00ms]
+
+tui.test.ts (existing suite covering the poll tick/registration wiring, confirms no
+regression from the new calls added to tick()):
+bun test packages/omo-opencode/src/tui.test.ts
+
+bun test v1.3.14 (0d9b296a)
+
+ 5 pass
+ 0 fail
+ 12 expect() calls
+Ran 5 tests across 1 file. [306.00ms]
+
+Workspace typecheck:
+bun run typecheck:packages
+(exits 0, no output -- tsgo --noEmit across all 27 workspace tsconfig projects
+ including packages/omo-opencode/tsconfig.json)
+
+lsp_diagnostics on both touched files: "No diagnostics found" for both
+packages/omo-opencode/src/tui.ts and
+packages/omo-opencode/src/features/cross-project-mailbox/dialog/registration-notice.ts.
+
+QA HAPPY PATH
+-------------
+Decision-matrix + marker-write unit tests above are the QA happy path: they
+prove decideRegistrationToast fires exactly once per project per prefs file
+(marker-set case returns show:false) and that legacy-senders consumption is a
+single-consumer dedup via file deletion. Live toast confirmation (actually
+booting the TUI and observing api.ui.toast fire) is deferred to Wave 4's
+integration evidence pass per the task spec ("live toast additionally confirmed
+later").
+
+QA FAILURE PATH (malformed prefs file)
+---------------------------------------
+Asserted in the same test run above: the test that feeds decideRegistrationToast
+a prefs object where "mailbox" is a string instead of a nested object. The
+tolerant walk in decideRegistrationToast treats any non-object segment as
+"marker unset" and returns show:true -- matching readTuiPreferencesFileSync's
+own tolerant-read contract (malformed root -> {}). The corresponding marker
+WRITE path is a no-op-safe call to the existing queueTuiPreferenceUpdate seam
+(see tui-preferences.ts:98-111), which already resolves to a silent skip when
+the shared preferences file itself is malformed at read-back time (the
+"malformed file" branch) -- no new failure mode was introduced; T11 only reuses
+this existing write seam, it does not duplicate or reimplement it.
+
+WHY THIS IS ENOUGH
+------------------
+The full accept-once-per-project decision surface is unit-tested exhaustively
+(6 cases for the registration toast decision fn, 4 for the legacy-senders
+content decision fn, 7 for the full consume orchestration including both
+delete-failure branches). The wiring into tui.ts is a 2-line addition to the
+existing poll tick with no new control flow -- tui.test.ts's existing 5 tests
+(covering tick scheduling, dispose, error handling) continue to pass unmodified,
+proving the wiring did not disturb T9/T10's established poll infrastructure.
+Combined with a clean workspace-wide typecheck and zero LSP diagnostics on both
+touched files, this is sufficient confidence for a pure-decision +
+thin-orchestrator change; the residual risk (a live toast literally rendering
+in a running TUI) is explicitly deferred to the plan's Wave 4 integration
+evidence pass, as directed by the task spec itself.
+
+WHAT WAS OMITTED
+-----------------
+No secrets, tokens, or credential-bearing output were produced by these tests;
+nothing was redacted.

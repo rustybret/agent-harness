@@ -247,6 +247,8 @@ const module: TuiPluginModule = {
       timer = setTimeout(tick, POLL_INTERVAL_MS)
     }
 
+    const legacySendersState = { hasToastedLegacy: false }
+
     const tick = async (): Promise<void> => {
       if (disposed || inFlight) {
         if (!disposed) schedule()
@@ -260,6 +262,12 @@ const module: TuiPluginModule = {
           currentKey = nextKey
           setView(nextView)
           api.renderer.requestRender()
+        }
+
+        if ((api.ui as any)?.toast) {
+          const { runRegistrationToastCheck, runLegacySendersNoticeCheck } = await import("./features/cross-project-mailbox/dialog/registration-notice")
+          await runLegacySendersNoticeCheck(api, legacySendersState)
+          await runRegistrationToastCheck(api, directory)
         }
       } catch (error) {
         handleTuiPollError(error)

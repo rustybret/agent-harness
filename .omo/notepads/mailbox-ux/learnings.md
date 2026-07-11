@@ -108,9 +108,69 @@
 - `readProjectPresenceRows` was extracted to `projects-presence.ts` to keep `mailbox-sidebar.ts` under the 200-LOC soft ceiling.
 - `tui-command.ts` (T10) was partially present in the worktree from an interrupted run, causing typecheck errors. I fixed the imports to make typecheck pass but left it untracked to keep the T9 commit clean.
 
+## T9 Fix: Dead-code duplicate `readProjectPresenceRows` bug
+- **Bug**: `mailbox-sidebar.ts` had a private copy of `readProjectPresenceRows` (lines ~89-145) with `statusText = "~"` for the live/internal case (copy-paste error — should be `"online"`). Meanwhile `projects-presence.ts` had the correct version with `statusText = "online"` but was orphaned/unused dead code.
+- **Fix**: Deleted the private duplicate from `mailbox-sidebar.ts`, wired the import from `projects-presence.ts`, and fixed the call site to use `registry.listProjects?.bind(registry)` to match the external function's `(config, listProjects?, deps?)` signature.
+- **Test fix**: Updated the test expectation from `statusText === "~"` to `statusText === "online"` for the live case — the test was encoding the bug.
+- **idle-drain-hook.ts**: The type-signature change (`ValidatePluginConfigPort` return type updated to `PluginConfigValidation`) was required for `bun run typecheck:packages` to pass; included in this commit.
+- `dialog/tui-command.ts` (T10) and `dialog/tui-command.test.ts` were already committed in `7421ddbcb` — they were NOT part of T9's scope and were not staged. T10's `tui.ts` wiring was also pre-committed.
+
+## T9 Fix: Dead-code duplicate `readProjectPresenceRows` bug
+- **Bug**: `mailbox-sidebar.ts` had a private copy of `readProjectPresenceRows` (lines ~89-145) with `statusText = "~"` for the live/internal case (copy-paste error — should be `"online"`). Meanwhile `projects-presence.ts` had the correct version with `statusText = "online"` but was orphaned/unused dead code.
+- **Fix**: Deleted the private duplicate from `mailbox-sidebar.ts`, wired the import from `projects-presence.ts`, and fixed the call site to use `registry.listProjects?.bind(registry)` to match the external function's `(config, listProjects?, deps?)` signature.
+- **Test fix**: Updated the test expectation from `statusText === "~"` to `statusText === "online"` for the live case — the test was encoding the bug.
+- **idle-drain-hook.ts**: The type-signature change (`ValidatePluginConfigPort` return type updated to `PluginConfigValidation`) was required for `bun run typecheck:packages` to pass; included in this commit.
+- `dialog/tui-command.ts` (T10) and `dialog/tui-command.test.ts` were already committed in `7421ddbcb` — they were NOT part of T9's scope and were not staged. T10's `tui.ts` wiring was also pre-committed.
+
+## T9 Fix: Dead-code duplicate `readProjectPresenceRows` bug
+- **Bug**: `mailbox-sidebar.ts` had a private copy of `readProjectPresenceRows` (lines ~89-145) with `statusText = "~"` for the live/internal case (copy-paste error). Meanwhile `projects-presence.ts` had the correct version with `statusText = "online"` but was orphaned/unused dead code.
+- **Fix**: Deleted the private duplicate from `mailbox-sidebar.ts`, wired the import from `projects-presence.ts`, and fixed the call site to use `registry.listProjects?.bind(registry)` to match the external function's `(config, listProjects?, deps?)` signature.
+- **Test fix**: Updated the test expectation from `statusText === "~"` to `statusText === "online"` for the live case, since that was encoding the bug.
+- **idle-drain-hook.ts**: This file's type-signature change (`ValidatePluginConfigPort` return type) was needed for `bun run typecheck:packages` to pass; included in the T9 commit.
+
 ## T10 Learnings
 - `registerProjectMailboxCommand` is wired into `tui.ts` after `registerSidebarContentSlot`.
 - T11 will need to add its own wiring call to `tui.ts` right after this one.
 - The dialog write chain uses a local `writeChain` promise to serialize writes, similar to `tui-preferences.ts`.
 - `detectPluginConfigFile` is used to find the config file, and `autoProvisionMailboxConfig` is used to create a stub if it doesn't exist.
 - `clearPluginConfigFileDetectionCache` must be called after provisioning or modifying the config file to ensure subsequent reads see the new file.
+
+## T11: First-registration toast (A TUI side)
+
+- Found a partial, incorrect draft of `registration-notice.ts`/`.test.ts` and a
+  stray `patch-tui.cjs` helper already sitting untracked in the worktree from a
+  prior interrupted attempt (git status showed them, git stash list had 4
+  unrelated `feat/project-mailbox-ux` WIP stashes not touching T11). Deleted all
+  three and reimplemented from a clean read of T3/T4/tui-preferences.ts, per the
+  "re-read your own diff before claiming done" directive — the draft used
+  synchronous `readFileSync`/`unlinkSync` with `mock.module("node:fs", ...)` in
+  its test, which this repo's `mock-module-lifecycle-audit.test.ts` invariant
+  discourages; the final version uses `node:fs/promises` for the I/O
+  orchestrators and pure dependency-injected functions (`readFile`/`deleteFile`
+  callbacks) for the unit-testable core, with zero `mock.module` calls.
+- `TuiToast` (from `@opencode-ai/plugin/tui`, confirmed by reading the upstream
+  fork checked out locally at `/Volumes/Topper2TB/Git/opencode/packages/plugin/src/tui.ts:226-231`)
+  has fields `{ variant?: "info"|"success"|"warning"|"error", title?: string,
+  message: string, duration?: number }` — NOT `{title, description, type}` as
+  the stray draft's `tui-command.ts` calls used for error toasts. T11's toasts
+  use `{ variant: "success"|"info", message: "..." }`.
+- `runRegistrationToastCheck`/`runLegacySendersNoticeCheck` take `api: any` (not
+  a narrower structural type) to match the existing `registerProjectMailboxCommand`
+  pattern in `tui-command.ts:23`, because the local `@opencode-ai/plugin` types
+  installed in this worktree do not export `TuiPluginApi` in a form that
+  narrows cleanly to `{ ui?: { toast?: ... } }` without an incompatible-signature
+  typecheck error (`(input: TuiToast) => void` is not assignable to
+  `(input: unknown) => void`).
+- T3's legacy-senders-notice flag file path is derived via
+  `getSidecarPath(configPath)` then `join(dirname(sidecarPath), "legacy-senders-notice.json")`
+  — reuse this exact derivation (via `getOpenCodeConfigDirs` + `detectPluginConfigFile`
+  + `getSidecarPath` from `@oh-my-opencode/utils`), do not hardcode a path.
+- `legacySendersNoticeState` (the `hasToastedLegacy` in-memory guard) is created
+  once per `tui()` invocation (i.e., per TUI session) and threaded through every
+  poll tick by reference, mirroring how `collapsed`/`inFlight`/`disposed` are
+  already scoped in `tui.ts`.
+
+## T11: First-registration toast
+- `api.ui?.toast` takes `message` and `variant` (not `description` and `type` as used in `tui-command.ts`).
+- `tui.ts` poll tick is a good place to wire up periodic checks like `runRegistrationToastCheck` and `runLegacySendersNoticeCheck`.
+- `queueTuiPreferenceUpdate` is a safe, atomic way to write to `tui-preferences.jsonc`.
