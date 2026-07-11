@@ -68,3 +68,23 @@
 - Wired `createLiveMailboxConfigResolver` into `buildIdleDrainDeps` in `packages/omo-opencode/src/features/cross-project-mailbox/hooks/create-mailbox-hooks.ts`.
 - This ensures the production idle-drain hook (`idle-drain-hook.ts`) uses the TTL-cached/single-flight config resolver instead of falling back to per-call config validation.
 - Verified that all 440 tests in `packages/omo-opencode/src/features/cross-project-mailbox` pass successfully.
+
+## T6 recovery after the shared-worktree race
+
+- The earlier parallel T5-T8 attempt raced on this worktree and destroyed or scattered the uncommitted T6 changes across the working tree and stashes.
+- Recovery used the surviving `config/live-config.ts` and `config/live-config.test.ts` drafts plus the relevant hunks from `stash@{2}` (`plugin/tool-registry-mailbox-tools.ts`) and `stash@{3}` (`hooks/idle-drain-hook.ts` and `manual-drain/index.ts`). The stale `hooks/create-mailbox-hooks.ts` hunk in `stash@{3}` was deliberately excluded because it belonged to already-committed T5 scope.
+- The final production idle-drain path constructs the TTL-cached resolver inside `createIdleDrainHook` when one is not injected. This corrects the earlier follow-up note above: `hooks/create-mailbox-hooks.ts` remains untouched.
+
+## T8: Pure menu model for /project-mailbox dialog
+
+- Implemented `buildTopMenu`, `buildSubmenu`, `applySelection`, and `MalformedConfigError` in `dialog/menu-model.ts` (pure module, zero TUI imports).
+- `buildTopMenu` filters out the self project and sorts alphabetically by `displayName`, tie-breaking deterministically by `projectId`.
+- Collision handling: if multiple displayed projects share the same `displayName` (or stripped `projectId` when `displayName` is empty), their labels use the full `projectId` (which includes the `-hash` suffix). Singletons use the bare `displayName`.
+- `buildSubmenu` returns options (`Disabled`, `question`, `impl`, `plan`) where the currently selected state has `✓ ` prepended to `label` (`✓ impl`) and `selected: true`. Both `choice` and `value` fields are provided on `SubmenuOption` for clean consumption by T10.
+- `applySelection` uses `jsonc-parser`'s `modify` and `applyEdits` to preserve comments and formatting byte-for-byte outside the edited span.
+- When disabling an unlisted project (or a project without `intent_budget`), `applySelection` sets `access="deny"` and `intent_budget="question"` so Zod validation (`SenderConfigSchema`) passes. If the project already had an `intent_budget`, disabling preserves that existing `intent_budget`.
+- `applySelection` performs strict syntax checking via `parse(configText, errors)` and throws `MalformedConfigError` on syntax errors or non-object roots.
+- **Gotchas for T10 (TUI dialog wiring)**:
+  1. `applySelection` returns the modified JSONC string. The TUI must write this string back to the config file atomically and then immediately call `invalidate()` on the live config resolver (`createLiveMailboxConfigResolver`) so subsequent permission checks and menu rebuilds see the updated permissions without waiting for TTL expiry.
+  2. When `applySelection` throws `MalformedConfigError`, T10 should catch it, display an error toast (`api.ui.toast`), and keep the user on the submenu without writing to disk.
+  3. When rendering `DialogSelect` options from `buildSubmenu(row)`, use `option.label` for the display title (which includes `✓ ` for the active state) and `option.choice` when passing the user's selection to `applySelection`.
