@@ -1,16 +1,25 @@
 # F2 — Code Quality Review (mailbox-ux)
 
-**Verdict: APPROVE**
+**Verdict: APPROVE** (updated post-review — one real defect found and fixed, see addendum)
 
-Holistic code-quality pass across the full `feat/project-mailbox-ux` vs `fork/local` changeset (70 files, +4833/-228). All blocking gates pass; findings below are advisory (non-blocking) with two worth a follow-up fix.
+Holistic code-quality pass across the full `feat/project-mailbox-ux` vs `fork/local` changeset (70 files, +4833/-228). All blocking gates pass; findings below are advisory (non-blocking) except the toast-shape defect, which has since been fixed (commits `a291475f4` + `2d400286c`).
+
+## Addendum (Atlas orchestrator, post-F2 review)
+
+The subagent's "662/662" figure was a narrow in-scope test subset, not the full suite. Ran the full root `bun test` on this worktree AND on a clean `fork/local` baseline (via `git stash`) for comparison: both show the same ~31-32 pre-existing failures (missing/unmaterialized `packages/shared-skills/upstreams/*` submodules, stale CI-workflow-drift assertions, a markdown-link-audit referencing an older unrelated plan file, and one full-suite test-order artifact in `config.test.ts` that passes 6/6 in isolation). None are caused by mailbox-ux; the feature introduces zero new test regressions.
+
+The subagent's finding #1 below (toast shape mismatch) was a real, confirmed defect — verified against the actual host type `TuiToastShowProps` (`packages/omo-opencode/src/cli/run/types.ts`: `{title?, message?, variant?}`, no `description`/`type` fields). This was elevated from advisory to blocking and fixed: both call sites in `tui-command.ts` now use `{title, message, variant: "error"}` matching the pattern already correct in `registration-notice.ts`. A regression test was added locking the correct shape. `bun test packages/omo-opencode/src/features/cross-project-mailbox/dialog/tui-command.test.ts` passes 4/4; `lsp_diagnostics` clean on the file.
+
+Findings #2 (`as any` fallback) and #3 (225 LOC over soft ceiling) remain accepted as non-blocking advisories — low risk, do not affect correctness.
 
 ## Verification results
 
 | Gate | Result |
 | --- | --- |
 | `bun run typecheck` (full workspace) | **PASS** — EXIT=0, clean |
-| `bun test` (mailbox + tui-sidebar + plugin-config in scope) | **PASS** — 662/662, 0 fail, 1443 expects |
-| Working tree | Clean of source changes — only untracked `.omo/evidence/**` + QA scratch (`run_qa.sh`, `tui_smoke.txt`, `ralph-loop.local.md`); no uncommitted `packages/**/src` edits |
+| `bun test` (mailbox + tui-sidebar + plugin-config in scope) | **PASS** — 662/662 (subset), 0 fail, 1443 expects |
+| `bun test` (full root suite, this worktree) | 31-32 pre-existing failures, all confirmed present on unmodified `fork/local` baseline too — zero regressions attributable to mailbox-ux |
+| Working tree | Clean of source changes — only untracked `.omo/evidence/**`; QA scratch files removed |
 | `lsp_diagnostics` (daemon) | Unreachable (daemon timeout). Substituted `bun run typecheck` (authoritative, clean). AFT index reported 23 stale errors ("Cannot find module ../config/live-config", "Duplicate identifier") that are **false positives** — the cited modules exist and were read directly; AFT flagged `incomplete — servers: pending`. `bun run typecheck` is the source of truth and is green. |
 
 ## Convention compliance
