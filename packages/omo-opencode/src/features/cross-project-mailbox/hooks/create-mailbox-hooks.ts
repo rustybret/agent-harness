@@ -6,6 +6,7 @@ import { validatePluginConfig } from "../../../config/validate"
 import { dispatchInternalPrompt } from "../../../shared/prompt-async-gate"
 import type { PluginContext } from "../../../plugin/types"
 import type { CrossProjectMailboxConfig } from "../config"
+import { createLiveMailboxConfigResolver } from "../config/live-config"
 import { BodyDigestStore, SamePairRateLimiter } from "../loop-guard"
 import { MailboxStore, PendingDeliveryStore } from "../mailbox"
 import { resolveSessionAgent } from "../../../plugin/session-agent-resolver"
@@ -87,6 +88,7 @@ function buildIdleDrainDeps(
   config: CrossProjectMailboxConfig,
 ): IdleDrainHookDeps {
   const repoRoot = ctx.directory
+  const liveConfigResolver = createLiveMailboxConfigResolver(repoRoot, config)
   const registry = createProjectRegistry()
   let projectsSnapshot: ProjectEntry[] = []
   const refreshSnapshot = (): void => {
@@ -113,6 +115,7 @@ function buildIdleDrainDeps(
     directory: ctx.directory,
     projectDisplayName: path.basename(repoRoot),
     client: ctx.client as IdleDrainHookDeps["client"],
+    liveConfigResolver,
     resolveActivePrimaryAgent: async (sessionId) => {
       const cachedPrimary = resolveActivePrimaryAgent(sessionId)
       if (cachedPrimary !== undefined) return cachedPrimary
