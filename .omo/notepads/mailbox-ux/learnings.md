@@ -39,3 +39,17 @@
   - **Behavior**: The entries in the config are NOT modified or deleted. The flag file is just a signal for the TUI to show a toast.
 - **Idempotency**: Uses `readAppliedMigrations` and `writeAppliedMigrations` with the key `2026-07-mailbox-default-sender-access-allow-all`.
 - **Comment preservation**: Uses `jsonc-parser`'s `modify` and `applyEdits` instead of `JSON.stringify` to preserve user comments and formatting.
+
+## T5: Auto self-registration on session start
+
+### Implementation
+- `ensureSelfRegistered` in `registry/self-registration.ts` wraps `registry.registerProject` in a try/catch that catches EVERYTHING — session start must never break.
+- On success, logs `[cross-project-mailbox] self-registration` with `repoRoot` and `created`.
+- On failure, logs `[cross-project-mailbox] self-registration failed` with error details and returns `null`.
+- Wired as fire-and-forget (`void ensureSelfRegistered(...)`) inside `buildIdleDrainDeps` after `refreshSnapshot()`, which is only called when `config.enabled` is true.
+
+### Gotchas
+- **macOS `/var` vs `/private/var`**: `registerProject` calls `realpathSync` internally, which resolves macOS symlinks. Tests comparing `repoRoot` must also use `realpathSync` on the expected path, or the assertion fails with `/var/...` vs `/private/var/...`.
+- **Read-only dir test**: Must create the directory with `mkdir` before calling `chmod` to make it read-only — `mkdtemp` only creates the parent.
+- **Stash hazard**: `git stash` in this worktree can contain stale modifications from prior tasks (e.g., `idle-drain-hook.ts`, `manual-drain/index.ts`). Always `git diff` after stash pop to verify only expected files changed.
+- **File persistence with `write` tool**: The AFT `write` tool may not persist files to the worktree filesystem in some edge cases. Use `bash` with `cat > file << 'EOF'` as a fallback when files disappear after write.

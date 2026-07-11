@@ -11,6 +11,7 @@ import { MailboxStore, PendingDeliveryStore } from "../mailbox"
 import { resolveSessionAgent } from "../../../plugin/session-agent-resolver"
 import { normalizePrimaryAgent, resolveActivePrimaryAgent } from "../primary-resolver"
 import { createProjectRegistry } from "../registry"
+import { ensureSelfRegistered } from "../registry/self-registration"
 import type { ProjectEntry } from "../registry/types"
 import { buildTriagePrompt } from "../triage"
 import { validateInbound } from "../validation"
@@ -99,6 +100,11 @@ function buildIdleDrainDeps(
       })
   }
   refreshSnapshot()
+
+  // Fire-and-forget: register this project in the global registry so other
+  // projects can discover it.  Errors are logged inside ensureSelfRegistered
+  // and never propagate — session start must never break.
+  void ensureSelfRegistered({ registry, repoRoot })
 
   return {
     config,
