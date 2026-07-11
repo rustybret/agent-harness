@@ -171,7 +171,7 @@
 - QA happy: `T12-schema.diff`. QA failure: any structural (non-description) schema diff → investigate before commit.
 - Commit: `chore(schema): document machine-global default_sender_access convention`
 
-**T13. Two-repo end-to-end integration test**
+**T13. Two-repo end-to-end integration test** — ✅ DONE (commit `a5fa3c984`; four-stage integration test: auto-registration (T5) + deep-merge allow-all (T1/T3) + applySelection (T8) + live resolver (T6) + readMailboxSidebarState (T9); 13/13 tests green, 37 expect() calls, 0 fail, wall-clock <1s)
 - Do: extend `features/cross-project-mailbox/__tests__/two-repo-integration.test.ts` (pattern at :76-77) with a full new-world flow: temp HOME + two temp repos → (1) simulate session start on both → both auto-registered (T5), `created:true` once each; (2) receiver has NO senders entry + user-level seeded `allow-all` (T3 output as fixture) + deep-merge (T1) → sender's `question`-tier note passes `validateInbound`, `impl`-tier rejected over-budget; (3) apply `applySelection(receiverConfig, sender, "plan")` (T8) → LIVE resolver (T6) → `impl` now passes without any restart/rebuild of tools; (4) `readMailboxSidebarState` (T9) reports the sender as connected with presence from a written presence record.
 - References: files per todo above; `two-repo-integration.test.ts` harness.
 - Acceptance: single test file proves A+B+D+C interlock; runs in `bun test` under 30s.
