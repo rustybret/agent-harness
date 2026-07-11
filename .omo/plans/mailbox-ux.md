@@ -164,7 +164,7 @@
 
 ### Wave 4 — integration, schema, evidence (3 todos)
 
-**T12. Schema description + regeneration**
+**T12. Schema description + regeneration** — ✅ DONE (commit `cd104e8c6`; `default_sender_access` `.describe()` updated to document machine-global convention; `assets/oh-my-opencode.schema.json` regenerated via `bun run build:schema`; diff is description-text-only, 2 files/2 lines changed; 518/518 mailbox suite green, typecheck clean)
 - Do: update `config.ts` `default_sender_access` `.describe()` to note the machine-global convention (user-level config seeds `allow-all`; unlisted-sender ceiling is `question`). Run `bun run build:schema`; commit regenerated `assets/oh-my-opencode.schema.json`. Re-run T2 stub-compliance test.
 - References: `config.ts:48-51`; AGENTS.md COMMANDS (build:schema); assets schema :6704-6711.
 - Acceptance: schema JSON contains the new description; git diff shows ONLY description-level changes; stub test green.
