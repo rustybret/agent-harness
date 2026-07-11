@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import path from "node:path"
 
-import { describe, expect, test } from "bun:test"
+import { describe, expect, spyOn, test } from "bun:test"
 
 import { projectIdForRoot } from "../envelope/project-id"
 import { ProjectRegistry } from "./project-registry"
@@ -28,8 +28,8 @@ describe("ProjectRegistry", () => {
         const root2 = makeRepoRoot("two")
 
         // when
-        await registry.registerProject(root1)
-        await registry.registerProject(root2)
+        const firstResult = await registry.registerProject(root1)
+        const secondResult = await registry.registerProject(root2)
 
         // then
         const projects = await registry.listProjects()
@@ -40,6 +40,9 @@ describe("ProjectRegistry", () => {
           projectIdForRoot(realpathSync(root2)),
         ].sort()
         expect(ids).toEqual(expected)
+        expect(firstResult).toEqual({ created: true })
+        expect(secondResult).toEqual({ created: true })
+        expect(projects.every((entry) => entry.registeredAt === entry.lastSeen)).toBe(true)
       })
     })
   })
@@ -52,15 +55,52 @@ describe("ProjectRegistry", () => {
         const root = makeRepoRoot("idem")
 
         // when
-        await registry.registerProject(root)
-        const firstSeen = (await registry.listProjects())[0]?.lastSeen ?? 0
+        const firstResult = await registry.registerProject(root)
+        const firstEntry = (await registry.listProjects())[0]
         await new Promise((resolve) => setTimeout(resolve, 5))
-        await registry.registerProject(root)
+        const secondResult = await registry.registerProject(root)
 
         // then
         const projects = await registry.listProjects()
         expect(projects).toHaveLength(1)
-        expect(projects[0]?.lastSeen ?? 0).toBeGreaterThanOrEqual(firstSeen)
+        expect(firstResult).toEqual({ created: true })
+        expect(secondResult).toEqual({ created: false })
+        expect(projects[0]?.registeredAt).toBe(firstEntry?.registeredAt)
+        expect(projects[0]?.lastSeen ?? 0).toBeGreaterThan(firstEntry?.lastSeen ?? 0)
+      })
+    })
+  })
+
+  describe("#given a legacy entry without registeredAt", () => {
+    describe("#when the same root is registered again", () => {
+      test("#then it is not treated as created and registeredAt is not backfilled", async () => {
+        // given
+        const registryPath = makeRegistryPath()
+        const root = makeRepoRoot("legacy")
+        const canonicalRoot = realpathSync(root)
+        writeFileSync(
+          registryPath,
+          JSON.stringify({
+            projects: [
+              {
+                projectId: projectIdForRoot(canonicalRoot),
+                repoRoot: canonicalRoot,
+                displayName: path.basename(canonicalRoot),
+                lastSeen: 1,
+              },
+            ],
+          }),
+        )
+        const registry = new ProjectRegistry(registryPath)
+
+        // when
+        const result = await registry.registerProject(root)
+
+        // then
+        const entry = (await registry.listProjects())[0]
+        expect(result).toEqual({ created: false })
+        expect(entry).not.toHaveProperty("registeredAt")
+        expect(entry?.lastSeen ?? 0).toBeGreaterThan(1)
       })
     })
   })
@@ -99,26 +139,54 @@ describe("ProjectRegistry", () => {
     })
   })
 
-  describe("#given five concurrent registerProject calls to the same file", () => {
+  describe("#given five concurrent registerProject calls for the same root", () => {
     describe("#when all resolve", () => {
-      test("#then the registry JSON is valid and all entries are present", async () => {
+      test("#then exactly one reports created and the registry JSON remains valid", async () => {
         // given
         const registryPath = makeRegistryPath()
         const registry = new ProjectRegistry(registryPath)
-        const roots = Array.from({ length: 5 }, (_unused, index) => makeRepoRoot(`conc-${index}`))
+        const root = makeRepoRoot("conc-same")
 
         // when
-        await Promise.all(roots.map((root) => registry.registerProject(root)))
+        const results = await Promise.all(
+          Array.from({ length: 5 }, () => registry.registerProject(root)),
+        )
 
         // then
         const raw = await readFile(registryPath, "utf8")
         const parsed: unknown = JSON.parse(raw)
         expect(parsed).toHaveProperty("projects")
         const projects = await registry.listProjects()
-        expect(projects).toHaveLength(5)
-        const ids = new Set(projects.map((entry) => entry.projectId))
-        for (const root of roots) {
-          expect(ids.has(projectIdForRoot(realpathSync(root)))).toBe(true)
+        expect(projects).toHaveLength(1)
+        expect(results.filter((result) => result.created)).toHaveLength(1)
+      })
+    })
+  })
+
+  describe("#given a valid registry file and a contended live lock", () => {
+    describe("#when lock acquisition times out", () => {
+      test("#then registration rejects without corrupting the registry file", async () => {
+        // given
+        const registryPath = makeRegistryPath()
+        const registry = new ProjectRegistry(registryPath)
+        const existingRoot = makeRepoRoot("lock-existing")
+        await registry.registerProject(existingRoot)
+        writeFileSync(`${registryPath}.lock`, `project-registry\n${process.pid}\n1\n`)
+        const nowSpy = spyOn(Date, "now")
+          .mockReturnValueOnce(0)
+          .mockReturnValueOnce(0)
+          .mockReturnValue(16_000)
+
+        try {
+          // when / then
+          await expect(registry.registerProject(makeRepoRoot("lock-blocked"))).rejects.toThrow(
+            "Timed out acquiring lock",
+          )
+          const raw = await readFile(registryPath, "utf8")
+          expect(() => JSON.parse(raw)).not.toThrow()
+          expect(await registry.listProjects()).toHaveLength(1)
+        } finally {
+          nowSpy.mockRestore()
         }
       })
     })

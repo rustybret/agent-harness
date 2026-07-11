@@ -27,11 +27,13 @@ function sortEntries(entries: readonly ProjectEntry[]): ProjectEntry[] {
 function isProjectEntry(value: unknown): value is ProjectEntry {
   if (typeof value !== "object" || value === null) return false
   const record = value as Record<string, unknown>
+  const registeredAt = record["registeredAt"]
   return (
     typeof record["projectId"] === "string" &&
     typeof record["repoRoot"] === "string" &&
     typeof record["displayName"] === "string" &&
-    typeof record["lastSeen"] === "number"
+    typeof record["lastSeen"] === "number" &&
+    (registeredAt === undefined || typeof registeredAt === "number")
   )
 }
 
@@ -118,20 +120,26 @@ export function createProjectRegistry(registryPath?: string): ProjectRegistry {
 export class ProjectRegistry {
   constructor(private readonly registryPath: string) {}
 
-  async registerProject(repoRoot: string): Promise<void> {
+  async registerProject(repoRoot: string): Promise<{ created: boolean }> {
     const canonicalRoot = realpathSync(repoRoot)
     const projectId = projectIdForRoot(canonicalRoot)
-    const entry: ProjectEntry = {
-      projectId,
-      repoRoot: canonicalRoot,
-      displayName: path.basename(canonicalRoot),
-      lastSeen: Date.now(),
-    }
-    await this.withRegistryLock(async () => {
+    return this.withRegistryLock(async () => {
       const data = await this.readRegistry()
+      const existing = data.projects.find((entry) => entry.projectId === projectId)
+      const created = existing === undefined
+      const now = Date.now()
+      const entry: ProjectEntry = {
+        ...(existing ?? {}),
+        projectId,
+        repoRoot: canonicalRoot,
+        displayName: path.basename(canonicalRoot),
+        lastSeen: now,
+        ...(created ? { registeredAt: now } : {}),
+      }
       const merged = data.projects.filter((existing) => existing.projectId !== projectId)
       merged.push(entry)
       await this.atomicWrite({ projects: sortEntries(merged) })
+      return { created }
     })
   }
 

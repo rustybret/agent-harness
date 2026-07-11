@@ -8,6 +8,7 @@ import type {
   InternalPromptDispatchResult,
 } from "../../../shared/prompt-async-gate"
 import type { CrossProjectMailboxConfig } from "../config"
+import { createLiveMailboxConfigResolver } from "../config/live-config"
 import type { PendingEntry, UnreadMessage } from "../mailbox/types"
 import type { ProjectEntry } from "../registry/types"
 import type { buildTriagePrompt } from "../triage/template"
@@ -33,13 +34,6 @@ function isPermissionlessConfig(config: CrossProjectMailboxConfig): boolean {
   return !Object.values(config.senders ?? {}).some((sender) => sender.access === "allow")
 }
 
-function resolveFreshConfig(deps: IdleDrainHookDeps): CrossProjectMailboxConfig {
-  const read = deps.validatePluginConfig(deps.directory)
-  const fresh = read.config?.cross_project_mailbox
-  if (read.valid && fresh) return fresh
-  return deps.config
-}
-
 type AsyncDispatchArgs = Extract<InternalPromptDispatchArgs, { mode: "async" }>
 type DispatchClient = AsyncDispatchArgs["client"]
 
@@ -52,7 +46,7 @@ export interface PluginConfigReadResult {
   config: { cross_project_mailbox?: CrossProjectMailboxConfig }
 }
 
-export type ValidatePluginConfigPort = (directory: string) => PluginConfigReadResult
+export type ValidatePluginConfigPort = (directory: string) => import("../../../config/validate").PluginConfigValidation
 
 export interface IdleDrainHookDeps {
   config: CrossProjectMailboxConfig
@@ -73,6 +67,7 @@ export interface IdleDrainHookDeps {
     args: InternalPromptDispatchArgs,
   ) => Promise<InternalPromptDispatchResult>
   getSessionMessages: (sessionId: string) => Promise<string[]>
+  liveConfigResolver?: { resolve: () => Promise<CrossProjectMailboxConfig> }
 }
 
 function buildDispatchArgs(
@@ -144,6 +139,12 @@ async function processNote(
 export function createIdleDrainHook(deps: IdleDrainHookDeps): {
   "session.idle": (input: { sessionId: string }) => Promise<void>
 } {
+  const liveConfigResolver =
+    deps.liveConfigResolver ??
+    createLiveMailboxConfigResolver(deps.directory, deps.config, {
+      validate: deps.validatePluginConfig,
+    })
+
   return {
     "session.idle": async ({ sessionId }: { sessionId: string }): Promise<void> => {
       if (!sessionId) return
@@ -154,7 +155,7 @@ export function createIdleDrainHook(deps: IdleDrainHookDeps): {
         return
       }
 
-      const freshConfig = resolveFreshConfig(deps)
+      const freshConfig = await liveConfigResolver.resolve()
 
       if (freshConfig.enabled === false) {
         log("[mailbox-idle-drain] skipped: disabled", { sessionId })

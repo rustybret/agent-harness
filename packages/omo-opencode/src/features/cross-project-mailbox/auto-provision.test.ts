@@ -5,6 +5,7 @@ import os from "node:os"
 import path from "node:path"
 
 import { OhMyOpenCodeConfigSchema } from "../../config"
+import { parseJsonc } from "../../shared/jsonc-parser"
 import { CONFIG_BASENAME, LEGACY_CONFIG_BASENAME } from "../../shared/plugin-identity"
 import { autoProvisionMailboxConfig } from "./auto-provision"
 
@@ -39,16 +40,36 @@ describe("autoProvisionMailboxConfig", () => {
       expect(existsSync(stubPath())).toBe(true)
     })
 
-    it("#then the written stub parses to enabled true with allow-none and empty senders", () => {
+    it("#then the written stub contains only mailbox senders and usage comments", () => {
       // given / when
       autoProvisionMailboxConfig(repoRoot)
 
       // then
       const raw = readFileSync(stubPath(), "utf8")
-      const parsed = OhMyOpenCodeConfigSchema.parse(JSON.parse(raw))
-      expect(parsed.cross_project_mailbox?.enabled).toBe(true)
-      expect(parsed.cross_project_mailbox?.default_sender_access).toBe("allow-none")
-      expect(parsed.cross_project_mailbox?.senders).toEqual({})
+      const parsed = parseJsonc(raw)
+      expect(parsed).toEqual({
+        $schema: expect.any(String),
+        cross_project_mailbox: { senders: {} },
+      })
+      expect(raw).toContain("/project-mailbox")
+      expect(raw).toContain('"<source-projectId>": { "access": "allow"|"deny", "intent_budget": "question"|"impl"|"plan" }')
+      expect(raw).not.toContain('"enabled"')
+      expect(raw).not.toContain('"default_sender_access"')
+    })
+
+    it("#then the written stub is schema-compliant and resolves mailbox defaults", () => {
+      // given / when
+      autoProvisionMailboxConfig(repoRoot)
+
+      // then
+      const raw = readFileSync(stubPath(), "utf8")
+      const result = OhMyOpenCodeConfigSchema.safeParse(parseJsonc(raw))
+      expect(result.success).toBe(true)
+      if (!result.success) throw result.error
+      expect(result.data.cross_project_mailbox?.enabled).toBe(true)
+      expect(result.data.cross_project_mailbox?.default_sender_access).toBe("allow-none")
+      expect(result.data.cross_project_mailbox?.senders).toEqual({})
+      expect(raw).toContain("/project-mailbox")
     })
 
     it("#then validatePluginConfig in the same process sees the new file (cache cleared)", async () => {

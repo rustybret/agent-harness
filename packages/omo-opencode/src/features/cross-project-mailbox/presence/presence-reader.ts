@@ -12,6 +12,11 @@ import {
 
 export type PresenceStatus = "live" | "stale" | "offline" | "internal"
 
+export interface PresenceDetail {
+  status: PresenceStatus | "missing"
+  heartbeatTs: number | null
+}
+
 const DEFAULT_PROBE_TIMEOUT_MS = 2_000
 
 export interface ReadPresenceStatusDeps {
@@ -94,20 +99,35 @@ async function raceProbe(
   }
 }
 
+export async function readPresenceDetail(
+  projectId: string,
+  homeDir: string = os.homedir(),
+  deps: ReadPresenceStatusDeps = { probeSession: defaultProbeSession },
+): Promise<PresenceDetail> {
+  const record = await readRecord(projectId, homeDir)
+  if (record === null) {
+    return { status: "missing", heartbeatTs: null }
+  }
+
+  const age = Date.now() - record.heartbeatTs
+  if (age > PRESENCE_TTL_MS) {
+    return { status: "offline", heartbeatTs: record.heartbeatTs }
+  }
+
+  if (record.mode === "internal") {
+    return { status: "internal", heartbeatTs: record.heartbeatTs }
+  }
+
+  const timeoutMs = deps.probeTimeoutMs ?? DEFAULT_PROBE_TIMEOUT_MS
+  const alive = await raceProbe(record, deps.probeSession, timeoutMs)
+  return { status: alive ? "live" : "stale", heartbeatTs: record.heartbeatTs }
+}
+
 export async function readPresenceStatus(
   projectId: string,
   homeDir: string = os.homedir(),
   deps: ReadPresenceStatusDeps = { probeSession: defaultProbeSession },
 ): Promise<PresenceStatus> {
-  const record = await readRecord(projectId, homeDir)
-  if (record === null) return "offline"
-
-  const age = Date.now() - record.heartbeatTs
-  if (age > PRESENCE_TTL_MS) return "offline"
-
-  if (record.mode === "internal") return "internal"
-
-  const timeoutMs = deps.probeTimeoutMs ?? DEFAULT_PROBE_TIMEOUT_MS
-  const alive = await raceProbe(record, deps.probeSession, timeoutMs)
-  return alive ? "live" : "stale"
+  const detail = await readPresenceDetail(projectId, homeDir, deps)
+  return detail.status === "missing" ? "offline" : detail.status
 }

@@ -6,20 +6,29 @@ import path from "node:path"
 import { log } from "../../../shared/logger"
 import type { CrossProjectMailboxConfig } from "../config"
 import { projectIdForRoot } from "../envelope/project-id"
+import type { PresenceCache } from "../presence"
+import type { ProjectEntry } from "../registry/types"
 import { outboxLogPath, parseOutboxLine } from "../send-tool"
+import { readProjectPresenceRows } from "./projects-presence"
 import type { OutboxEntry } from "../send-tool"
 
 const NOTE_SUFFIX = ".md"
 const RESERVED_PREFIX = ".delivering-"
 const RECENT_SENT_LIMIT = 3
 const OUTBOX_ACK_WINDOW = 50
-// Tail budget for the outbox log: large enough to comfortably hold more than
-// OUTBOX_ACK_WINDOW JSONL lines (body preview capped at 100 chars), bounded so a
-// huge log is never loaded in full.
 const OUTBOX_TAIL_BYTES = 64 * 1024
 
 export interface MailboxSidebarRegistryPort {
   getRepoRootForProjectId(id: string): string | undefined
+  listProjects?(): Promise<ProjectEntry[]>
+}
+
+export interface ProjectPresenceRow {
+  projectId: string
+  label: string
+  presence: "online" | "pending" | "lastSeen"
+  statusText: string
+  dotColor: "success" | "warning" | "muted"
 }
 
 export interface MailboxSidebarState {
@@ -30,12 +39,26 @@ export interface MailboxSidebarState {
   outboundUnresolved: number
   outboundRead: number
   outboundFailed: number
+  projects: ProjectPresenceRow[]
+}
+
+export interface MailboxSidebarDeps {
+  presenceCache?: PresenceCache
+  projectEntries?: readonly ProjectEntry[]
+}
+
+export function allowedSenderIds(config: CrossProjectMailboxConfig): string[] {
+  const senders = config.senders ?? {}
+  return Object.entries(senders)
+    .filter(([, sender]) => sender.access === "allow")
+    .map(([projectId]) => projectId)
 }
 
 export async function readMailboxSidebarState(
   repoRoot: string,
   config: CrossProjectMailboxConfig,
   registry: MailboxSidebarRegistryPort,
+  deps?: MailboxSidebarDeps,
 ): Promise<MailboxSidebarState | null> {
   if (!config.enabled) return null
 
@@ -50,6 +73,7 @@ export async function readMailboxSidebarState(
 
   const { recentSent, recentSentCount } = await readRecentSent(repoRoot)
   const ack = resolveOutboundAck(repoRoot, recentSent, registry)
+  const projects = await readProjectPresenceRows(config, registry.listProjects?.bind(registry), deps)
 
   return {
     inboundUnread,
@@ -59,6 +83,7 @@ export async function readMailboxSidebarState(
     outboundUnresolved: ack.outboundUnresolved,
     outboundRead: ack.outboundRead,
     outboundFailed: ack.outboundFailed,
+    projects,
   }
 }
 
@@ -84,16 +109,11 @@ async function readDirSafe(dir: string): Promise<Dirent[]> {
   try {
     return await readdir(dir, { withFileTypes: true })
   } catch (error) {
-    // A missing directory is expected (no notes yet); record it for diagnostics
-    // rather than swallowing silently.
     log("mailbox sidebar readdir failed", { error, dir })
     return []
   }
 }
 
-// Reads at most maxBytes from the END of a file without loading the whole file.
-// The outbox log is newline-separated JSONL, so a truncated leading line is
-// discarded by the caller's window slice + parse filter. Never throws.
 function readLastBytes(filePath: string, maxBytes: number): string {
   let fd: number | null = null
   try {

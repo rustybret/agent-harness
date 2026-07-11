@@ -1,0 +1,45 @@
+T13: End-to-end auto-registration + live grant integration
+Date: 2026-07-11
+Worktree: /Volumes/Topper2TB/Git/agent-harness/.local-ignore/worktrees/mailbox-ux
+
+WHAT WAS TESTED:
+- Full four-stage end-to-end flow: auto-registration (T5) + deep-merge allow-all (T1/T3) + applySelection (T8) + live resolver (T6) + readMailboxSidebarState (T9)
+- Test file: packages/omo-opencode/src/features/cross-project-mailbox/__tests__/two-repo-integration.test.ts
+- Test name: "T13: end-to-end auto-registration + live grant integration"
+
+WHAT WAS OBSERVED:
+- 13 tests pass, 0 fail, 37 expect() calls
+- Wall-clock time: well under 30s
+- All four stages assert independently
+
+Stage 1: Auto-registration
+- registerProject() returns { created: true } on first call for both repos
+- Second call returns { created: false }
+- Both assertions would fail independently if registration logic broke
+
+Stage 2: Deep-merge allow-all
+- Project config with empty senders merged with user-level default_sender_access: "allow-all"
+- question-tier inbound passes validateInbound
+- impl-tier inbound rejected as over-budget
+- Both assertions would fail independently if merge or validation broke
+
+Stage 3: Live permission grant
+- applySelection() grants "plan" tier to sender in config file
+- Live resolver re-reads config from disk (no restart/rebuild)
+- impl-tier inbound NOW passes validation
+- This proves live config effect without process restart
+
+Stage 4: Sidebar presence
+- readMailboxSidebarState() with presence cache returns sender as "online"
+- dotColor: "success", statusText: "online"
+- This proves sidebar correctly reports presence after the dead-code fix
+
+WHY IT IS ENOUGH:
+- All four stages test the A+B+D+C interlock from the mailbox-ux plan
+- Each stage has independent assertions
+- Runs in under 30s
+- Exercises real code paths (not mocks)
+
+WHAT WAS OMITTED:
+- No secrets or credentials involved
+- No production config files modified

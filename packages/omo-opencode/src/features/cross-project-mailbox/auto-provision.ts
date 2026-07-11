@@ -14,9 +14,12 @@ const LOCAL_SCHEMA_PATH =
 const stubContent = (schemaPath: string) =>
   `{
   "$schema": "${schemaPath}",
+  // The cross-project mailbox receives notes and requests from other registered projects.
+  // Use /project-mailbox to manage project connections interactively.
   "cross_project_mailbox": {
-    "enabled": true,
-    "default_sender_access": "allow-none",
+    // Sender entries use this shape:
+    // "<source-projectId>": { "access": "allow"|"deny", "intent_budget": "question"|"impl"|"plan" }
+    // The machine-global sender default comes from the user-level config.
     "senders": {}
   }
 }

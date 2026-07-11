@@ -9,7 +9,7 @@ import {
   createProjectNoteTool,
 } from "../tools"
 import { projectIdForRoot } from "../features/cross-project-mailbox/envelope"
-import { validatePluginConfig } from "../config/validate"
+import { createLiveMailboxConfigResolver } from "../features/cross-project-mailbox/config/live-config"
 import { BodyDigestStore, SamePairRateLimiter } from "../features/cross-project-mailbox/loop-guard"
 import { MailboxStore } from "../features/cross-project-mailbox/mailbox"
 import {
@@ -54,12 +54,15 @@ export function createMailboxToolsRecord(args: {
       repoRoot,
     })
 
+  const liveConfigResolver = createLiveMailboxConfigResolver(repoRoot, config)
+
   const sharedDeps = {
     config,
     thisProjectId: projectIdForRoot(repoRoot),
     thisRepoRoot: repoRoot,
     thisProjectDisplayName: path.basename(repoRoot),
     registry: { listProjects: () => registry.listProjects() },
+    liveConfigResolver,
   }
   const manualDeps = {
     config,
@@ -75,7 +78,7 @@ export function createMailboxToolsRecord(args: {
     makeRateLimiter: (root: string) =>
       new SamePairRateLimiter(root, config.bounds.same_pair_rate_limit_per_min),
     validateInbound,
-    validatePluginConfig,
+    liveConfigResolver,
   }
 
   return {

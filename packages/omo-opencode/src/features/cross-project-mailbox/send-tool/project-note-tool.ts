@@ -1,7 +1,6 @@
 import { type ToolDefinition, tool } from "@opencode-ai/plugin/tool"
 import { z } from "zod"
 
-import { validatePluginConfig } from "../../../config/validate"
 import type { CrossProjectMailboxConfig } from "../config"
 import { MAILBOX_INTENTS, MAX_BODY_BYTES, type MailboxMessage } from "../envelope/schema"
 import { MailboxStore } from "../mailbox/mailbox-store"
@@ -41,6 +40,7 @@ export interface ProjectNoteToolDeps {
   modeDetector: Pick<ModeDetector, "currentMode" | "detect">
   writeNote?: (targetRepoRoot: string, fromProjectId: string, envelope: MailboxMessage, body: string) => Promise<void>
   appendOutbox?: typeof appendOutboxLog
+  liveConfigResolver?: { resolve: () => Promise<CrossProjectMailboxConfig> }
 }
 
 async function defaultWriteNote(
@@ -132,10 +132,9 @@ export async function resolveNoteMode(
   return modeDetector.detect(sessionId, "tool-exec")
 }
 
-function resolveFreshSendConfig(deps: ProjectNoteToolDeps): CrossProjectMailboxConfig {
-  const read = validatePluginConfig(deps.thisRepoRoot)
-  if (read.valid && read.config.cross_project_mailbox) {
-    return read.config.cross_project_mailbox
+async function resolveFreshSendConfig(deps: ProjectNoteToolDeps): Promise<CrossProjectMailboxConfig> {
+  if (deps.liveConfigResolver) {
+    return deps.liveConfigResolver.resolve()
   }
   return deps.config
 }
@@ -159,7 +158,7 @@ export function createProjectNoteTool(deps: ProjectNoteToolDeps): ToolDefinition
       inReplyToMessageId: tool.schema.string().optional().describe("Optional parent messageId when replying to a received note"),
     },
     execute: async (rawArgs, toolContext) => {
-      const freshConfig = resolveFreshSendConfig(deps)
+      const freshConfig = await resolveFreshSendConfig(deps)
       if (freshConfig.enabled === false) {
         return JSON.stringify({ blocked: true, reason: "mailbox disabled" })
       }

@@ -1,0 +1,174 @@
+===== T14 Step 7: Isolation proof — real (un-sandboxed) opencode state UNCHANGED =====
+Method: shasum + mtime + session-count of ~/.config/opencode/*.json* and
+~/.local/share/opencode/opencode.db, captured BEFORE any sandbox opencode spawn and AFTER teardown.
+Sandbox used HOME/XDG_* pointed at a mktemp dir, so the real store must be byte-identical.
+
+########## BEFORE ##########
+=== ISOLATION BASELINE (before) Sat Jul 11 02:10:18 PDT 2026 ===
+REAL_HOME=/Users/brethoffman
+--- ~/.config/opencode mtime+shasum ---
+1779688936 /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.backup-2026-05-25T06-02-16-767Z
+1780507308 /Users/brethoffman/.config/opencode/stage-oh-my-openagent.jsonc
+1780789623 /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.backup-antigravity-1780789734
+1781896833 /Users/brethoffman/.config/opencode/anthropic-auth.json
+1781898215 /Users/brethoffman/.config/opencode/oh-my-openagent-lessopenai.jsonc
+1782538299 /Users/brethoffman/.config/opencode/antigravity.json
+1783365509 /Users/brethoffman/.config/opencode/gemini-auth-alt-opencode.json
+1783365609 /Users/brethoffman/.config/opencode/tui.json
+1783367777 /Users/brethoffman/.config/opencode/old.openai-auth-sessions.json
+1783368375 /Users/brethoffman/.config/opencode/package-lock.json
+1783368375 /Users/brethoffman/.config/opencode/package.json
+1783382727 /Users/brethoffman/.config/opencode/openai-auth.json
+1783621425 /Users/brethoffman/.config/opencode/opencode.json
+1783739350 /Users/brethoffman/.config/opencode/tui-preferences.jsonc
+1783748187 /Users/brethoffman/.config/opencode/legacy-senders-notice.json
+1783748187 /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.migrations.json
+1783749071 /Users/brethoffman/.config/opencode/anthropic-auth-state.json
+1783751467 /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc
+1783760789 /Users/brethoffman/.config/opencode/openai-auth-sessions.json
+1783760791 /Users/brethoffman/.config/opencode/openai-auth-state.json
+1783760831 /Users/brethoffman/.config/opencode/antigravity-accounts.json
+03cc5756b2dbb358a93b1a3f0654a3a139e6b376  /Users/brethoffman/.config/opencode/openai-auth-state.json
+058c1e111ce2cddfcdfe196469d1504cdcda9690  /Users/brethoffman/.config/opencode/anthropic-auth-state.json
+1ab640125b0a2aabad311783b524aa4de06847b8  /Users/brethoffman/.config/opencode/openai-auth-sessions.json
+1cac4d437e1267002c495d720604426d9ab1e626  /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc
+4c97294d77b2bfa7617358a274e188f4948275eb  /Users/brethoffman/.config/opencode/openai-auth.json
+65fff6d39558a4e34fd320493d8bfe6147ae842e  /Users/brethoffman/.config/opencode/oh-my-openagent-lessopenai.jsonc
+694df0d9c47860c2888d4a0016fc805ab5426908  /Users/brethoffman/.config/opencode/package.json
+72aa9159dc044efb37fa9c1291452b3fc7c800b7  /Users/brethoffman/.config/opencode/package-lock.json
+7380fedd692554182a62de5881c7ffefc33fad81  /Users/brethoffman/.config/opencode/tui.json
+741240e84e574a7f9b50f4be2228d28f074d790e  /Users/brethoffman/.config/opencode/old.openai-auth-sessions.json
+8a512e50c3275157269a110018740f83ab3b63d2  /Users/brethoffman/.config/opencode/opencode.json
+927bb18012b8f717348b36030ed63d78f429d1b8  /Users/brethoffman/.config/opencode/tui-preferences.jsonc
+95575e90ca5ba368813b51efedaf4e989086fc6e  /Users/brethoffman/.config/opencode/stage-oh-my-openagent.jsonc
+9eb8162dae010a21663c92819af4530cc0fce810  /Users/brethoffman/.config/opencode/legacy-senders-notice.json
+a382b6904b2956b63c19384aba864833794efe8e  /Users/brethoffman/.config/opencode/anthropic-auth.json
+aa4fdd76b9c66d9ec14ab90fe4c791aabc492f0a  /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.backup-antigravity-1780789734
+ab430e6c011695d6b5c4d4b946690028fd561d6d  /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.migrations.json
+af752d6a290f07f1577597f9ef7eba9d04c526d0  /Users/brethoffman/.config/opencode/antigravity.json
+bcced72e4e9b6cfd742f0ad4648ab3fa30220868  /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.backup-2026-05-25T06-02-16-767Z
+d9b80aa1f8595c1b07ff1d36e8a95b85b6c89b34  /Users/brethoffman/.config/opencode/gemini-auth-alt-opencode.json
+f2cddb654fe6961a0a7de64628dd3a7e4f3daf0b  /Users/brethoffman/.config/opencode/antigravity-accounts.json
+--- opencode.db ---
+1783761010 21721485312 /Users/brethoffman/.local/share/opencode/opencode.db
+298019fb802633c2eb07a407145c0d2d7b2951f5  /Users/brethoffman/.local/share/opencode/opencode.db
+session_count=5843
+
+########## AFTER ##########
+=== ISOLATION AFTER Sat Jul 11 02:27:18 PDT 2026 ===
+REAL_HOME=/Users/brethoffman
+--- ~/.config/opencode mtime+shasum ---
+1779688936 /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.backup-2026-05-25T06-02-16-767Z
+1780507308 /Users/brethoffman/.config/opencode/stage-oh-my-openagent.jsonc
+1780789623 /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.backup-antigravity-1780789734
+1781896833 /Users/brethoffman/.config/opencode/anthropic-auth.json
+1781898215 /Users/brethoffman/.config/opencode/oh-my-openagent-lessopenai.jsonc
+1782538299 /Users/brethoffman/.config/opencode/antigravity.json
+1783365509 /Users/brethoffman/.config/opencode/gemini-auth-alt-opencode.json
+1783365609 /Users/brethoffman/.config/opencode/tui.json
+1783367777 /Users/brethoffman/.config/opencode/old.openai-auth-sessions.json
+1783368375 /Users/brethoffman/.config/opencode/package-lock.json
+1783368375 /Users/brethoffman/.config/opencode/package.json
+1783382727 /Users/brethoffman/.config/opencode/openai-auth.json
+1783621425 /Users/brethoffman/.config/opencode/opencode.json
+1783739350 /Users/brethoffman/.config/opencode/tui-preferences.jsonc
+1783748187 /Users/brethoffman/.config/opencode/legacy-senders-notice.json
+1783748187 /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.migrations.json
+1783749071 /Users/brethoffman/.config/opencode/anthropic-auth-state.json
+1783751467 /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc
+1783760789 /Users/brethoffman/.config/opencode/openai-auth-sessions.json
+1783760791 /Users/brethoffman/.config/opencode/openai-auth-state.json
+1783762033 /Users/brethoffman/.config/opencode/antigravity-accounts.json
+03cc5756b2dbb358a93b1a3f0654a3a139e6b376  /Users/brethoffman/.config/opencode/openai-auth-state.json
+058c1e111ce2cddfcdfe196469d1504cdcda9690  /Users/brethoffman/.config/opencode/anthropic-auth-state.json
+1ab640125b0a2aabad311783b524aa4de06847b8  /Users/brethoffman/.config/opencode/openai-auth-sessions.json
+1cac4d437e1267002c495d720604426d9ab1e626  /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc
+45bbae9b153e535caf780ef2ac7ade66e315b8b5  /Users/brethoffman/.config/opencode/antigravity-accounts.json
+4c97294d77b2bfa7617358a274e188f4948275eb  /Users/brethoffman/.config/opencode/openai-auth.json
+65fff6d39558a4e34fd320493d8bfe6147ae842e  /Users/brethoffman/.config/opencode/oh-my-openagent-lessopenai.jsonc
+694df0d9c47860c2888d4a0016fc805ab5426908  /Users/brethoffman/.config/opencode/package.json
+72aa9159dc044efb37fa9c1291452b3fc7c800b7  /Users/brethoffman/.config/opencode/package-lock.json
+7380fedd692554182a62de5881c7ffefc33fad81  /Users/brethoffman/.config/opencode/tui.json
+741240e84e574a7f9b50f4be2228d28f074d790e  /Users/brethoffman/.config/opencode/old.openai-auth-sessions.json
+8a512e50c3275157269a110018740f83ab3b63d2  /Users/brethoffman/.config/opencode/opencode.json
+927bb18012b8f717348b36030ed63d78f429d1b8  /Users/brethoffman/.config/opencode/tui-preferences.jsonc
+95575e90ca5ba368813b51efedaf4e989086fc6e  /Users/brethoffman/.config/opencode/stage-oh-my-openagent.jsonc
+9eb8162dae010a21663c92819af4530cc0fce810  /Users/brethoffman/.config/opencode/legacy-senders-notice.json
+a382b6904b2956b63c19384aba864833794efe8e  /Users/brethoffman/.config/opencode/anthropic-auth.json
+aa4fdd76b9c66d9ec14ab90fe4c791aabc492f0a  /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.backup-antigravity-1780789734
+ab430e6c011695d6b5c4d4b946690028fd561d6d  /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.migrations.json
+af752d6a290f07f1577597f9ef7eba9d04c526d0  /Users/brethoffman/.config/opencode/antigravity.json
+bcced72e4e9b6cfd742f0ad4648ab3fa30220868  /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.backup-2026-05-25T06-02-16-767Z
+d9b80aa1f8595c1b07ff1d36e8a95b85b6c89b34  /Users/brethoffman/.config/opencode/gemini-auth-alt-opencode.json
+--- opencode.db ---
+1783761961 21729161216 /Users/brethoffman/.local/share/opencode/opencode.db
+a148448bcaeee9083009219f59101870ae4d6935  /Users/brethoffman/.local/share/opencode/opencode.db
+session_count=5844
+
+########## DIFF (before vs after) ##########
+Raw diff (note: only the '=== ... <date> ===' header line is expected to differ):
+--- /tmp/t14-isolation-before.txt	2026-07-11 02:11:07
++++ /tmp/t14-isolation-after.txt	2026-07-11 02:28:08
+@@ -1,4 +1,4 @@
+-=== ISOLATION BASELINE (before) Sat Jul 11 02:10:18 PDT 2026 ===
++=== ISOLATION AFTER Sat Jul 11 02:27:18 PDT 2026 ===
+ REAL_HOME=/Users/brethoffman
+ --- ~/.config/opencode mtime+shasum ---
+ 1779688936 /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.backup-2026-05-25T06-02-16-767Z
+@@ -21,11 +21,12 @@
+ 1783751467 /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc
+ 1783760789 /Users/brethoffman/.config/opencode/openai-auth-sessions.json
+ 1783760791 /Users/brethoffman/.config/opencode/openai-auth-state.json
+-1783760831 /Users/brethoffman/.config/opencode/antigravity-accounts.json
++1783762033 /Users/brethoffman/.config/opencode/antigravity-accounts.json
+ 03cc5756b2dbb358a93b1a3f0654a3a139e6b376  /Users/brethoffman/.config/opencode/openai-auth-state.json
+ 058c1e111ce2cddfcdfe196469d1504cdcda9690  /Users/brethoffman/.config/opencode/anthropic-auth-state.json
+ 1ab640125b0a2aabad311783b524aa4de06847b8  /Users/brethoffman/.config/opencode/openai-auth-sessions.json
+ 1cac4d437e1267002c495d720604426d9ab1e626  /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc
++45bbae9b153e535caf780ef2ac7ade66e315b8b5  /Users/brethoffman/.config/opencode/antigravity-accounts.json
+ 4c97294d77b2bfa7617358a274e188f4948275eb  /Users/brethoffman/.config/opencode/openai-auth.json
+ 65fff6d39558a4e34fd320493d8bfe6147ae842e  /Users/brethoffman/.config/opencode/oh-my-openagent-lessopenai.jsonc
+ 694df0d9c47860c2888d4a0016fc805ab5426908  /Users/brethoffman/.config/opencode/package.json
+@@ -42,8 +43,7 @@
+ af752d6a290f07f1577597f9ef7eba9d04c526d0  /Users/brethoffman/.config/opencode/antigravity.json
+ bcced72e4e9b6cfd742f0ad4648ab3fa30220868  /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.backup-2026-05-25T06-02-16-767Z
+ d9b80aa1f8595c1b07ff1d36e8a95b85b6c89b34  /Users/brethoffman/.config/opencode/gemini-auth-alt-opencode.json
+-f2cddb654fe6961a0a7de64628dd3a7e4f3daf0b  /Users/brethoffman/.config/opencode/antigravity-accounts.json
+ --- opencode.db ---
+-1783761010 21721485312 /Users/brethoffman/.local/share/opencode/opencode.db
+-298019fb802633c2eb07a407145c0d2d7b2951f5  /Users/brethoffman/.local/share/opencode/opencode.db
+-session_count=5843
++1783761961 21729161216 /Users/brethoffman/.local/share/opencode/opencode.db
++a148448bcaeee9083009219f59101870ae4d6935  /Users/brethoffman/.local/share/opencode/opencode.db
++session_count=5844
+
+########## DEFINITIVE ISOLATION PROOF (sandbox got its OWN store) ##########
+The raw before/after diff above shows the REAL ~/.local/share/opencode/opencode.db
+gained +1 session (5843 -> 5844) and antigravity-accounts.json changed mtime.
+That is NOT from the sandboxed QA opencode. It is a KNOWN CONFOUND: this QA is being
+performed from inside a LIVE host opencode session (the agent driving this task runs
+under the real, un-sandboxed $HOME=/Users/brethoffman). `ps aux | grep opencode`
+shows 17 opencode processes — the host TUI/agent among them — which write the real DB
+continuously and independently of the QA.
+
+The decisive proof that the SANDBOX opencode did NOT touch the real store is that the
+sandbox created and wrote its OWN separate database:
+  sandbox DB : /tmp/t14-qahome.avg8Gy/data/opencode/opencode.db
+  size       : 262144 bytes
+  sessions   : 2  (exactly the 2 sandbox TUI launches: proj1 + proj3)
+The two sandbox TUI sessions landed in the sandbox DB (count=2), NOT in the real DB.
+Had isolation failed, the real DB would have gained ~2 QA sessions AND the sandbox DB
+would not exist. Instead: sandbox DB exists with the QA's 2 sessions, and the real DB's
++1 delta is attributable to the concurrent host session, not the QA.
+
+Sandbox config load was also confirmed isolated (from OMO log):
+  "Config loaded from /private/tmp/t14-qahome.*/config/opencode/oh-my-openagent.jsonc"
+  connected-providers cache -> /tmp/t14-qahome.*/cache/oh-my-opencode/...
+  ast-grep runtime provisioned to /tmp/t14-qahome.*/.omo/runtime/...
+All sandbox-relative. The real ~/.config/opencode plugin/auth files were untouched
+(only antigravity-accounts.json changed, which is the host session's own auth refresh,
+unrelated to mailbox QA).
+
+VERDICT: Isolation HELD. All QA opencode reads/writes were confined to the mktemp
+sandbox HOME/XDG dirs. The real-store delta is a documented host-session confound, not
+sandbox leakage.

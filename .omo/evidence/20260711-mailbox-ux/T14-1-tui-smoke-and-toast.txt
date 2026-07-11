@@ -1,0 +1,50 @@
+
+
+                                                                                                                                                    ┃                                                ┃
+                                                                                                                                                    ┃  Magic Context 0.31.5                          ┃
+                                                                                                                                                    ┃                                                ┃
+                                                                                                                                                    ┃  @cortexkit/opencode-magic-context is active.  ┃
+                                                                                                                                                    ┃                                                ┃
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                  ▄
+                                                                                 █▀▀█ █▀▀█ █▀▀█ █▀▀▄ █▀▀▀ █▀▀█ █▀▀█ █▀▀█
+                                                                                 █  █ █  █ █▀▀▀ █  █ █    █  █ █  █ █▀▀▀
+                                                                                 ▀▀▀▀ █▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀
+
+
+                                                               ┃
+                                                               ┃  Ask anything... "Fix broken tests"
+                                                               ┃
+                                                               ┃  Sisyphus - Ultraworker · Big Pickle OpenCode Zen
+                                                               ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+                                                                                                               tab agents  ctrl+p commands
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/tmp.THrXTbKB1B  ⊙ 4 MCP /status                                                                                                     1.17.18
+

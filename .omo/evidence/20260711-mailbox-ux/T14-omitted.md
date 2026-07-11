@@ -1,0 +1,4 @@
+# T14 — What Was Omitted / Could Not Be Observed Live
+
+1. **Interactive `/project-mailbox` dialog rendering**: The current `opencode` version (1.17.18) does not expose the required TUI dialog APIs (`api.keymap.registerLayer`, `api.ui.DialogSelect`). The plugin correctly detects this and skips the registration of the slash command. Therefore, the dialog could not be observed live in the TUI. The exact onSelect write-path was driven programmatically instead (`T14-dialog-diff-new.txt`).
+2. **Registration toast + collapsed sidebar line visible paint**: The toast (`api.ui.toast`) and the `Projects (a/t active)` collapsed line could not be observed live due to the absence of the required TUI APIs. The underlying logic (project registration) was proven to work by inspecting the generated `project-registry.json`.

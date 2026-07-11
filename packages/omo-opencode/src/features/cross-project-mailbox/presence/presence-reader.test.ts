@@ -7,6 +7,7 @@ import { writePresenceRecord, type PresenceRecord } from "./presence-record"
 import {
   defaultProbeSession,
   isPresenceRecord,
+  readPresenceDetail,
   readPresenceStatus,
   type ReadPresenceStatusDeps,
 } from "./presence-reader"
@@ -363,6 +364,123 @@ describe("defaultProbeSession", () => {
       // then
       expect(live).toBe(false)
       expect(fetchMock).not.toHaveBeenCalled()
+    })
+  })
+})
+
+describe("readPresenceDetail", () => {
+  let homeDir: string
+
+  beforeEach(() => {
+    homeDir = mkdtempSync(path.join(os.tmpdir(), "presence-detail-"))
+  })
+
+  afterEach(() => {
+    rmSync(homeDir, { recursive: true, force: true })
+  })
+
+  describe("#given no presence file exists", () => {
+    it("#then it returns status 'missing' and heartbeatTs null", async () => {
+      // given
+      const probeSession = jest.fn(async () => true)
+      const deps: ReadPresenceStatusDeps = { probeSession }
+
+      // when
+      const detail = await readPresenceDetail("missing-id", homeDir, deps)
+
+      // then
+      expect(detail).toEqual({ status: "missing", heartbeatTs: null })
+      expect(probeSession).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("#given a malformed presence file", () => {
+    it("#then it returns status 'missing' and heartbeatTs null", async () => {
+      // given
+      const { mkdirSync, writeFileSync } = await import("node:fs")
+      const dir = path.join(homeDir, ".omo", "presence")
+      mkdirSync(dir, { recursive: true })
+      writeFileSync(path.join(dir, "broken-id.json"), "{ not json")
+      const probeSession = jest.fn(async () => true)
+      const deps: ReadPresenceStatusDeps = { probeSession }
+
+      // when
+      const detail = await readPresenceDetail("broken-id", homeDir, deps)
+
+      // then
+      expect(detail).toEqual({ status: "missing", heartbeatTs: null })
+      expect(probeSession).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("#given a fresh file and the session API responds OK", () => {
+    it("#then it returns status 'live' and the record's heartbeatTs", async () => {
+      // given
+      const now = Date.now()
+      const record = makeRecord({ heartbeatTs: now })
+      await writePresenceRecord(record, homeDir)
+      const probeSession = jest.fn(async () => true)
+      const deps: ReadPresenceStatusDeps = { probeSession }
+
+      // when
+      const detail = await readPresenceDetail(record.projectId, homeDir, deps)
+
+      // then
+      expect(detail).toEqual({ status: "live", heartbeatTs: now })
+      expect(probeSession).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("#given a fresh file but the session API is unreachable", () => {
+    it("#then it returns status 'stale' and the record's heartbeatTs", async () => {
+      // given
+      const now = Date.now()
+      const record = makeRecord({ heartbeatTs: now })
+      await writePresenceRecord(record, homeDir)
+      const probeSession = jest.fn(async () => false)
+      const deps: ReadPresenceStatusDeps = { probeSession }
+
+      // when
+      const detail = await readPresenceDetail(record.projectId, homeDir, deps)
+
+      // then
+      expect(detail).toEqual({ status: "stale", heartbeatTs: now })
+    })
+  })
+
+  describe("#given a file whose heartbeat is older than the TTL", () => {
+    it("#then it returns status 'offline' and the record's heartbeatTs without probing", async () => {
+      // given
+      const oldTs = Date.now() - 60_000
+      const record = makeRecord({ heartbeatTs: oldTs })
+      await writePresenceRecord(record, homeDir)
+      const probeSession = jest.fn(async () => true)
+      const deps: ReadPresenceStatusDeps = { probeSession }
+
+      // when
+      const detail = await readPresenceDetail(record.projectId, homeDir, deps)
+
+      // then
+      expect(detail).toEqual({ status: "offline", heartbeatTs: oldTs })
+      expect(probeSession).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("#given a fresh internal-mode record", () => {
+    it("#then it returns status 'internal' and the record's heartbeatTs without probing", async () => {
+      // given
+      const now = Date.now()
+      const record = makeRecord({ mode: "internal", serverUrl: null, heartbeatTs: now })
+      await writePresenceRecord(record, homeDir)
+      const probeSession = jest.fn(async () => true)
+      const deps: ReadPresenceStatusDeps = { probeSession }
+
+      // when
+      const detail = await readPresenceDetail(record.projectId, homeDir, deps)
+
+      // then
+      expect(detail).toEqual({ status: "internal", heartbeatTs: now })
+      expect(probeSession).not.toHaveBeenCalled()
     })
   })
 })

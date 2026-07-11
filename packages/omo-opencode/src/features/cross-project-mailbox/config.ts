@@ -48,7 +48,7 @@ export const CrossProjectMailboxConfigSchema = z.object({
   default_sender_access: z
     .enum(["allow-all", "allow-none"])
     .default("allow-none")
-    .describe("Default access for source projects not listed in senders"),
+    .describe("Default access for source projects not listed in senders. User-level config conventionally seeds 'allow-all'; the unlisted-sender ceiling is 'question'."),
   senders: z
     .record(z.string(), SenderConfigSchema)
     .default({})

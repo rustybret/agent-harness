@@ -3,10 +3,16 @@ import { tmpdir } from "node:os"
 import path from "node:path"
 import { afterEach, describe, expect, it } from "bun:test"
 
+import type { PresenceDetail } from "../presence"
+import type { ProjectEntry } from "../registry/types"
 import { CrossProjectMailboxConfigSchema } from "../config"
 import { projectIdForRoot } from "../envelope/project-id"
 import type { OutboxEntry } from "../send-tool"
-import { type MailboxSidebarRegistryPort, readMailboxSidebarState } from "./mailbox-sidebar"
+import {
+  allowedSenderIds,
+  type MailboxSidebarRegistryPort,
+  readMailboxSidebarState,
+} from "./mailbox-sidebar"
 
 const createdRoots: string[] = []
 
@@ -207,5 +213,330 @@ describe("readMailboxSidebarState", () => {
     // then
     expect(calls()).toBe(50)
     expect(result?.outboundUnresolved).toBe(50)
+  })
+
+  it("#given a config with deny and unlisted senders #when reading projects #then only allow entries appear", async () => {
+    // given
+    const senderRoot = await makeRepo()
+    const config = CrossProjectMailboxConfigSchema.parse({
+      enabled: true,
+      senders: {
+        "proj-allow": { access: "allow", intent_budget: "quick" },
+        "proj-deny": { access: "deny", intent_budget: "quick" },
+      },
+    })
+    const entries: ProjectEntry[] = [
+      { projectId: "proj-allow", displayName: "Allowed", registeredAt: 1000 },
+      { projectId: "proj-deny", displayName: "Denied", registeredAt: 1000 },
+      { projectId: "proj-unlisted", displayName: "Unlisted", registeredAt: 1000 },
+    ]
+
+    // when
+    const result = await readMailboxSidebarState(senderRoot, config, emptyRegistry(), {
+      projectEntries: entries,
+    })
+
+    // then
+    expect(result).not.toBeNull()
+    expect(result!.projects.length).toBe(1)
+    expect(result!.projects[0]!.projectId).toBe("proj-allow")
+  })
+
+  it("#given allow-all default config #when some projects have explicit deny #then deny entries are excluded", async () => {
+    // given
+    const senderRoot = await makeRepo()
+    const config = CrossProjectMailboxConfigSchema.parse({
+      enabled: true,
+      senders: {
+        "proj-explicit-deny": { access: "deny", intent_budget: "quick" },
+      },
+    })
+    const entries: ProjectEntry[] = [
+      { projectId: "proj-explicit-deny", displayName: "Denied", registeredAt: 1000 },
+    ]
+
+    // when
+    const result = await readMailboxSidebarState(senderRoot, config, emptyRegistry(), {
+      projectEntries: entries,
+    })
+
+    // then
+    expect(result!.projects.length).toBe(0)
+  })
+
+  it("#given an allow entry with missing registry #when reading projects #then shows projectId with long-ago label", async () => {
+    // given
+    const senderRoot = await makeRepo()
+    const config = CrossProjectMailboxConfigSchema.parse({
+      enabled: true,
+      senders: {
+        "proj-unknown": { access: "allow", intent_budget: "quick" },
+      },
+    })
+
+    // when
+    const result = await readMailboxSidebarState(senderRoot, config, emptyRegistry(), {
+      projectEntries: [],
+    })
+
+    // then
+    expect(result!.projects.length).toBe(1)
+    const row = result!.projects[0]!
+    expect(row.projectId).toBe("proj-unknown")
+    expect(row.label).toBe("proj-unknown")
+    expect(row.presence).toBe("lastSeen")
+    expect(row.statusText).toBe("Last seen a long time ago")
+    expect(row.dotColor).toBe("muted")
+  })
+
+  it("#given an allow entry with fake presence cache #when reading projects #then maps live to online/success", async () => {
+    // given
+    const senderRoot = await makeRepo()
+    const config = CrossProjectMailboxConfigSchema.parse({
+      enabled: true,
+      senders: {
+        "proj-live": { access: "allow", intent_budget: "quick" },
+      },
+    })
+    const entries: ProjectEntry[] = [
+      { projectId: "proj-live", displayName: "Live Project", registeredAt: 1000 },
+    ]
+    const liveDetail: PresenceDetail = {
+      projectId: "proj-live",
+      status: "live",
+      heartbeatTs: Date.now(),
+      repoRoot: "/tmp/test",
+      registeredAt: 1000,
+      lastSeenTs: Date.now(),
+    }
+    const fakeCache = {
+      get: async () => liveDetail,
+      getMany: async () => [liveDetail],
+    }
+
+    // when
+    const result = await readMailboxSidebarState(senderRoot, config, emptyRegistry(), {
+      projectEntries: entries,
+      presenceCache: fakeCache,
+    })
+
+    // then
+    expect(result!.projects.length).toBe(1)
+    const row = result!.projects[0]!
+    expect(row.presence).toBe("online")
+    expect(row.dotColor).toBe("success")
+    expect(row.statusText).toBe("online")
+  })
+
+  it("#given an allow entry with fake presence cache #when reading projects #then maps stale to pending/warning", async () => {
+    // given
+    const senderRoot = await makeRepo()
+    const config = CrossProjectMailboxConfigSchema.parse({
+      enabled: true,
+      senders: {
+        "proj-stale": { access: "allow", intent_budget: "quick" },
+      },
+    })
+    const entries: ProjectEntry[] = [
+      { projectId: "proj-stale", displayName: "Stale Project", registeredAt: 1000 },
+    ]
+    const staleDetail: PresenceDetail = {
+      projectId: "proj-stale",
+      status: "stale",
+      heartbeatTs: Date.now() - 300_000,
+      repoRoot: "/tmp/test",
+      registeredAt: 1000,
+      lastSeenTs: Date.now() - 300_000,
+    }
+    const fakeCache = {
+      get: async () => staleDetail,
+      getMany: async () => [staleDetail],
+    }
+
+    // when
+    const result = await readMailboxSidebarState(senderRoot, config, emptyRegistry(), {
+      projectEntries: entries,
+      presenceCache: fakeCache,
+    })
+
+    // then
+    expect(result!.projects.length).toBe(1)
+    const row = result!.projects[0]!
+    expect(row.presence).toBe("pending")
+    expect(row.dotColor).toBe("warning")
+    expect(row.statusText).toBe("~")
+  })
+
+  it("#given an allow entry with fake presence cache #when reading projects #then maps offline to lastSeen/muted with label", async () => {
+    // given
+    const senderRoot = await makeRepo()
+    const config = CrossProjectMailboxConfigSchema.parse({
+      enabled: true,
+      senders: {
+        "proj-offline": { access: "allow", intent_budget: "quick" },
+      },
+    })
+    const entries: ProjectEntry[] = [
+      { projectId: "proj-offline", displayName: "Offline Project", registeredAt: 1000 },
+    ]
+    const offlineDetail: PresenceDetail = {
+      projectId: "proj-offline",
+      status: "missing",
+      heartbeatTs: Date.now() - 3_600_000,
+      repoRoot: "/tmp/test",
+      registeredAt: 1000,
+      lastSeenTs: Date.now() - 3_600_000,
+    }
+    const fakeCache = {
+      get: async () => offlineDetail,
+      getMany: async () => [offlineDetail],
+    }
+
+    // when
+    const result = await readMailboxSidebarState(senderRoot, config, emptyRegistry(), {
+      projectEntries: entries,
+      presenceCache: fakeCache,
+    })
+
+    // then
+    expect(result!.projects.length).toBe(1)
+    const row = result!.projects[0]!
+    expect(row.presence).toBe("lastSeen")
+    expect(row.dotColor).toBe("muted")
+    expect(row.statusText).toContain("ago")
+  })
+
+  it("#given two projects with same displayName #when reading projects #then collision uses full projectId as label", async () => {
+    // given
+    const senderRoot = await makeRepo()
+    const config = CrossProjectMailboxConfigSchema.parse({
+      enabled: true,
+      senders: {
+        "proj-a-12345678": { access: "allow", intent_budget: "quick" },
+        "proj-a-abcdef01": { access: "allow", intent_budget: "quick" },
+      },
+    })
+    const entries: ProjectEntry[] = [
+      { projectId: "proj-a-12345678", displayName: "proj-a", registeredAt: 1000 },
+      { projectId: "proj-a-abcdef01", displayName: "proj-a", registeredAt: 1000 },
+    ]
+
+    // when
+    const result = await readMailboxSidebarState(senderRoot, config, emptyRegistry(), {
+      projectEntries: entries,
+    })
+
+    // then
+    expect(result!.projects.length).toBe(2)
+    expect(result!.projects[0]!.label).toBe("proj-a-12345678")
+    expect(result!.projects[1]!.label).toBe("proj-a-abcdef01")
+  })
+
+  it("#given a single project with bare name #when reading projects #then strips hash suffix for label", async () => {
+    // given
+    const senderRoot = await makeRepo()
+    const config = CrossProjectMailboxConfigSchema.parse({
+      enabled: true,
+      senders: {
+        "proj-x-12345678": { access: "allow", intent_budget: "quick" },
+      },
+    })
+    const entries: ProjectEntry[] = [
+      { projectId: "proj-x-12345678", displayName: "proj-x", registeredAt: 1000 },
+    ]
+
+    // when
+    const result = await readMailboxSidebarState(senderRoot, config, emptyRegistry(), {
+      projectEntries: entries,
+    })
+
+    // then
+    expect(result!.projects.length).toBe(1)
+    expect(result!.projects[0]!.label).toBe("proj-x")
+  })
+
+  it("#given no presence cache provided #when reading projects #then falls back to createPresenceCache and treats as missing", async () => {
+    // given
+    const senderRoot = await makeRepo()
+    const config = CrossProjectMailboxConfigSchema.parse({
+      enabled: true,
+      senders: {
+        "proj-fallback": { access: "allow", intent_budget: "quick" },
+      },
+    })
+
+    // when
+    const result = await readMailboxSidebarState(senderRoot, config, emptyRegistry(), {
+      projectEntries: [],
+    })
+
+    // then
+    expect(result!.projects.length).toBe(1)
+    const row = result!.projects[0]!
+    expect(row.presence).toBe("lastSeen")
+    expect(row.dotColor).toBe("muted")
+  })
+
+  it("#given mixed access senders #when calling allowedSenderIds #then only returns allow entries", () => {
+    // given
+    const config = CrossProjectMailboxConfigSchema.parse({
+      enabled: true,
+      senders: {
+        "proj-a": { access: "allow", intent_budget: "quick" },
+        "proj-b": { access: "deny", intent_budget: "quick" },
+        "proj-c": { access: "allow", intent_budget: "quick" },
+      },
+    })
+
+    // when
+    const ids = allowedSenderIds(config)
+
+    // then
+    expect(ids).toEqual(["proj-a", "proj-c"])
+  })
+
+
+  it("#given a project in senders but missing from registry #when reading state #then it is shown by projectId with Last seen a long time ago", async () => {
+    // given
+    const senderRoot = await makeRepo()
+    const config = CrossProjectMailboxConfigSchema.parse({
+      enabled: true,
+      senders: {
+        "proj-missing": { access: "allow", intent_budget: "quick" },
+      },
+    })
+
+    // when
+    const result = await readMailboxSidebarState(senderRoot, config, emptyRegistry(), {
+      readPresenceDetail: async () => ({ status: "unknown" }),
+    })
+
+    // then
+    expect(result!.projects.length).toBe(1)
+    const row = result!.projects[0]!
+    expect(row.projectId).toBe("proj-missing")
+    expect(row.presence).toBe("lastSeen")
+    expect(row.statusText).toBe("Last seen a long time ago")
+  })
+
+  it("#given mixed access senders #when reading state #then strict-set filtering applies (deny + unlisted excluded even under allow-all default)", async () => {
+    // given
+    const senderRoot = await makeRepo()
+    const config = CrossProjectMailboxConfigSchema.parse({
+      enabled: true,
+      senders: {
+        "proj-allow": { access: "allow", intent_budget: "quick" },
+        "proj-deny": { access: "deny", intent_budget: "quick" },
+      },
+    })
+
+    // when
+    const result = await readMailboxSidebarState(senderRoot, config, emptyRegistry(), {
+      readPresenceDetail: async () => ({ status: "unknown" }),
+    })
+
+    // then
+    expect(result!.projects.length).toBe(1)
+    expect(result!.projects[0]!.projectId).toBe("proj-allow")
   })
 })

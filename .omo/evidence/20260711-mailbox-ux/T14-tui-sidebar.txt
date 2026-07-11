@@ -1,0 +1,168 @@
+===== T14 Step 3: TUI Mailbox sidebar smoke =====
+Captured Sat Jul 11 02:20:43 PDT 2026
+Sandbox HOME=/tmp/t14-qahome.avg8Gy
+Temp project=/tmp/t14-proj1.NxjqsR
+opencode 1.17.18
+
+--- Proof the SANDBOXED plugin loaded (from OMO log) ---
+[2026-07-11T09:12:51.206Z] [oh-my-openagent] ENTRY - plugin loading {"directory":"/private/tmp/t14-proj1.NxjqsR"}
+[2026-07-11T09:12:51.213Z] Config loaded from /private/tmp/t14-qahome.avg8Gy/config/opencode/oh-my-openagent.jsonc {}
+[2026-07-11T09:12:51.218Z] [live-server-route] registered {"directory":"/private/tmp/t14-proj1.NxjqsR","hasServerUrl":true,"registrationCount":1}
+
+--- Proof the mailbox sidebar state is computed LIVE (In/Out/Projects) ---
+The sidebar renderer (mailboxNodes) reads coordination_notes per sender to build
+In(Unread/Done) / Out(Pending/Read/Failed) / Projects rows. These readdir probes
+in the OMO log prove the sidebar state pipeline ran on session activity:
+45843
+  ^ total mailbox-sidebar readdir probes logged this run
+[2026-07-11T09:20:40.190Z] [mailbox-idle-drain] skipped: session is active {"sessionId":"ses_0af884b88fferWTxDEMN0t3qMO"}
+[2026-07-11T09:20:40.999Z] [mailbox-idle-drain] skipped: primary not eligible {"sessionId":"ses_0af8d6211ffeMIq1OcYJDZxVxj","primary":null,"eligible":["sisyphus","hephaestus","atlas"]}
+[2026-07-11T09:20:42.391Z] [mailbox-idle-drain] skipped: permissionless config {"sessionId":"ses_10424afdbffe5F9DMSYcmUSLED"}
+
+--- Sandbox presence registration (self-registration proof) ---
+total 8
+drwxr-xr-x@ 3 brethoffman  wheel   96 Jul 11 02:20 .
+drwxr-xr-x@ 4 brethoffman  wheel  128 Jul 11 02:17 ..
+-rw-------@ 1 brethoffman  wheel  234 Jul 11 02:20 t14-proj1-nxjqsr-9aeb6672.json
+presence entry:
+{
+  "projectId": "t14-proj1-nxjqsr-9aeb6672",
+  "repoRoot": "/private/tmp/t14-proj1.NxjqsR",
+  "mode": "internal",
+  "serverUrl": null,
+  "sessionId": "ses_0af884b88fferWTxDEMN0t3qMO",
+  "pid": 19593,
+  "heartbeatTs": 1783761640190
+}
+
+--- Raw TUI capture: splash (plugin active banner) ---
+
+
+                                                                                                                                                                                  ┃                                      ┃
+                                                                                                                                                                                  ┃  AFT 0.46.0                          ┃
+                                                                                                                                                                                  ┃                                      ┃
+                                                                                                                                                                                  ┃  @cortexkit/aft-opencode is active.  ┃
+                                                                                                                                                                                  ┃                                      ┃
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                            ▄
+                                                                                           █▀▀█ █▀▀█ █▀▀█ █▀▀▄ █▀▀▀ █▀▀█ █▀▀█ █▀▀█
+                                                                                           █  █ █  █ █▀▀▀ █  █ █    █  █ █  █ █▀▀▀
+                                                                                           ▀▀▀▀ █▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀
+
+
+                                                                         ┃
+                                                                         ┃  Ask anything... "Fix broken tests"
+                                                                         ┃
+                                                                         ┃  Sisyphus - Ultraworker · Big Pickle OpenCode Zen
+                                                                         ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+                                                                                                                         tab agents  ctrl+p commands
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /private/tmp/t14-proj1.NxjqsR:main  ⊙ 4 MCP /status                                                                                                                                                              1.17.18
+
+
+--- Raw TUI capture: /status panel (5 MCP servers + dist plugins = OMO loaded) ---
+                                                                                  Status                                               esc
+
+                                                                                  5 MCP Servers
+                                                                                  • websearch Connected
+                                                                                  • context7 Connected
+                                                                                  • grep_app Connected
+                                                                                  • lsp Connected
+                                                                                  • codegraph Disabled in configuration
+
+                                                                                  No Formatters
+                                                                         ┃
+                                                                         ┃  Ask   8 Plugins
+                                                                         ┃        • @cortexkit/aft-opencode @latest
+                                                                         ┃  Sisy  • @cortexkit/opencode-anthropic-auth @latest
+                                                                         ╹▀▀▀▀▀▀  • @cortexkit/opencode-magic-context @latest               ▀▀▀▀▀▀▀▀
+                                                                                  • dist                                                    commands
+                                                                                  • dist
+                                                                                  • dist
+                                                                                  • dist
+                                                                                  • opencode
+
+--- Raw TUI capture: session view with right sidebar (Context/MCP/LSP native panel) ---
+
+  ┃                                                                                                                                                                                 New session - 2026-07-11T09:17:30.
+  ┃  hi                                                                                                                                                                             103Z
+  ┃
+                                                                                                                                                                                    Context
+     ▣  Sisyphus - Ultraworker · Big Pickle                                                                                                                                         0 tokens
+                                                                                                                                                                                    0% used
+                                                                                                                                                                                    $0.00 spent
+
+                                                                                                                                                                                    ▼ MCP
+                                                                                                                                                                                    • codegraph Disabled
+                                                                                                                                                                                    • context7 Connected
+                                                                                                                                                                                    • grep_app Connected
+                                                                                                                                                                                    • lsp Connected
+                                                                                                                                                                                    • websearch Connected
+
+                                                                                                                                                                                    LSP
+                                                                                                                                                                                    LSPs are disabled
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃
+  ┃
+  ┃  Sisyphus - Ultraworker · Big Pickle OpenCode Zen                                                                                                                               /private/tmp/t14-proj1.NxjqsR:main
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+   ■■■■⬝⬝⬝⬝ Free usage exceeded, subscribe to Go [retrying in 14h 42m attempt #1]                                                                                  esc interrupt    • OpenCode 1.17.18
+
+
+NOTE (honesty): In this tmux frame the OMO Mailbox slot (In/Out/Projects headings) did
+not visibly paint — the free-tier 'usage exceeded' overlay plus the native status sidebar
+dominated the 50-row pane. The mailbox sidebar STATE computation is proven live by the
+readdir probe log lines above (the exact code path in mailboxNodes/readMailboxSidebarState).
+Visible-paint of the collapsed 'Projects (a/t active)' line is noted as partial in T14-omitted.md.

@@ -1,2 +1,6 @@
-export { readMailboxSidebarState } from "./mailbox-sidebar"
-export type { MailboxSidebarRegistryPort, MailboxSidebarState } from "./mailbox-sidebar"
+export { readMailboxSidebarState, allowedSenderIds } from "./mailbox-sidebar"
+export type {
+  MailboxSidebarRegistryPort,
+  MailboxSidebarState,
+  ProjectPresenceRow,
+} from "./mailbox-sidebar"

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
 
-import type { MailboxSidebarState } from "../cross-project-mailbox/sidebar"
+import type { MailboxSidebarState, ProjectPresenceRow } from "../cross-project-mailbox/sidebar"
 import { computeView } from "./compute-view"
 import type { ViewNode } from "./element-helpers"
 import { buildMailboxNodes, buildOutboundBudgetNodes, buildViewNodes, describeView } from "./render-view"
@@ -43,6 +43,7 @@ const mailboxState: MailboxSidebarState = {
   outboundUnresolved: 1,
   outboundRead: 3,
   outboundFailed: 0,
+  projects: [],
 }
 
 const theme = {
@@ -179,18 +180,9 @@ describe("tui sidebar renderView", () => {
     // then
     expect(texts).toEqual([
       "\u25bc Mailbox",
-      "In",
-      "Unread",
-      "2",
-      "Done",
-      "5",
-      "Out",
-      "Pending",
-      "1",
-      "Read",
-      "3",
-      "Failed",
-      "0",
+      "In", "Unread", "2", "Done", "5",
+      "Out", "Pending", "1", "Read", "3", "Failed", "0",
+      "Projects", "No connected projects",
     ])
   })
 
@@ -218,7 +210,7 @@ describe("tui sidebar renderView", () => {
     }
   })
 
-  it("#given an inbound-only mailbox #when building nodes #then it renders only the in section", () => {
+  it("#given an inbound-only mailbox #when building nodes #then it renders all three group headers with zero counts for empty groups", () => {
     // given
     const inboundOnly: MailboxSidebarState = {
       inboundUnread: 4,
@@ -228,6 +220,7 @@ describe("tui sidebar renderView", () => {
       outboundUnresolved: 0,
       outboundRead: 0,
       outboundFailed: 0,
+      projects: [],
     }
     const view = computeView({ ...activeSections, mailbox: inboundOnly })
 
@@ -235,8 +228,12 @@ describe("tui sidebar renderView", () => {
     const texts = flattenText(buildMailboxNodes(view, theme)).map((entry) => entry.text)
 
     // then
-    expect(texts).toEqual(["\u25bc Mailbox", "In", "Unread", "4", "Done", "1"])
-    expect(texts.some((value) => value === "Out")).toBe(false)
+    expect(texts).toEqual([
+      "\u25bc Mailbox",
+      "In", "Unread", "4", "Done", "1",
+      "Out", "Pending", "0", "Read", "0", "Failed", "0",
+      "Projects", "No connected projects",
+    ])
   })
 
   it("#given an outbound-fail mailbox #when building nodes #then the fail row shows its count with the error color", () => {
@@ -249,6 +246,7 @@ describe("tui sidebar renderView", () => {
       outboundUnresolved: 0,
       outboundRead: 2,
       outboundFailed: 3,
+      projects: [],
     }
     const view = computeView({ ...activeSections, mailbox: failMailbox })
 
@@ -257,7 +255,12 @@ describe("tui sidebar renderView", () => {
     const texts = entries.map((entry) => entry.text)
 
     // then
-    expect(texts).toEqual(["\u25bc Mailbox", "Out", "Pending", "0", "Read", "2", "Failed", "3"])
+    expect(texts).toEqual([
+      "\u25bc Mailbox",
+      "In", "Unread", "0", "Done", "0",
+      "Out", "Pending", "0", "Read", "2", "Failed", "3",
+      "Projects", "No connected projects",
+    ])
     const failIndex = texts.indexOf("Failed")
     const failCount = entries[failIndex + 1]
     expect(failCount?.text).toBe("3")
@@ -316,7 +319,7 @@ describe("tui sidebar renderView", () => {
     expect(headerRow?.props.width).toBe("100%")
   })
 
-  it("#given a collapsed mailbox with activity #when building nodes #then header shows In/Out summary line", () => {
+  it("#given a collapsed mailbox with activity #when building nodes #then header shows In/Out/Projects summary line", () => {
     // given
     const view = computeView({ ...activeSections, mailbox: mailboxState })
     const onToggle = (): void => {}
@@ -328,7 +331,7 @@ describe("tui sidebar renderView", () => {
     // then: summary line present in collapsed view
     const summaryLine = collapsedTexts.find((entry) => entry.text.includes("in:"))
     expect(summaryLine).toBeDefined()
-    expect(summaryLine?.text).toBe("in:2 out:1")
+    expect(summaryLine?.text).toBe("in:2 out:1 Projects (0/0 active)")
     // rows not visible
     expect(collapsedTexts.some((entry) => entry.text.includes("Unread"))).toBe(false)
   })
@@ -343,6 +346,7 @@ describe("tui sidebar renderView", () => {
       outboundUnresolved: 0,
       outboundRead: 0,
       outboundFailed: 0,
+      projects: [],
     }
     const view = computeView({ ...activeSections, mailbox: zeroMailbox })
     const onToggle = (): void => {}
@@ -356,7 +360,7 @@ describe("tui sidebar renderView", () => {
     expect(collapsedTexts).toEqual(["\u25b6 Mailbox", "idle"])
   })
 
-  it("#given an all-zero mailbox #when expanded #then it renders the idle placeholder", () => {
+  it("#given an all-zero mailbox #when expanded #then it renders all three group headers with zero counts", () => {
     // given
     const zeroMailbox: MailboxSidebarState = {
       inboundUnread: 0,
@@ -366,6 +370,7 @@ describe("tui sidebar renderView", () => {
       outboundUnresolved: 0,
       outboundRead: 0,
       outboundFailed: 0,
+      projects: [],
     }
     const view = computeView({ ...activeSections, mailbox: zeroMailbox })
 
@@ -374,8 +379,12 @@ describe("tui sidebar renderView", () => {
     const texts = flattenText(nodes).map((entry) => entry.text)
 
     // then
-    expect(texts.some((t) => t === "Mailbox idle")).toBe(true)
-    expect(texts.some((t) => t.includes("Unread"))).toBe(false)
+    expect(texts).toEqual([
+      "\u25bc Mailbox",
+      "In", "Unread", "0", "Done", "0",
+      "Out", "Pending", "0", "Read", "0", "Failed", "0",
+      "Projects", "No connected projects",
+    ])
   })
 
   it("#given active view without mailbox #when building nodes #then it renders no Mailbox section", () => {
@@ -389,6 +398,148 @@ describe("tui sidebar renderView", () => {
     // then
     expect(mailboxTexts.some((value) => value.includes("Mailbox"))).toBe(false)
     expect(description).not.toContain("Mailbox")
+  })
+
+  it("#given a mailbox with projects #when expanded #then it renders Projects header and rows with dot-color layout", () => {
+    // given
+    const projectRows: ProjectPresenceRow[] = [
+      { projectId: "proj-a", label: "Alpha", presence: "online", statusText: "~", dotColor: "success" },
+      { projectId: "proj-b", label: "Beta", presence: "lastSeen", statusText: "Last seen 5 minutes ago", dotColor: "muted" },
+    ]
+    const withProjects: MailboxSidebarState = { ...mailboxState, projects: projectRows }
+    const view = computeView({ ...activeSections, mailbox: withProjects })
+
+    // when
+    const texts = flattenText(buildMailboxNodes(view, theme)).map((entry) => entry.text)
+
+    // then
+    expect(texts).toContain("Projects")
+    expect(texts).toContain("Alpha")
+    expect(texts).toContain("~")
+    expect(texts).toContain("Beta")
+    expect(texts).toContain("Last seen 5 minutes ago")
+  })
+
+  it("#given a mailbox with projects #when expanded #then each project row is a space-between box", () => {
+    // given
+    const projectRows: ProjectPresenceRow[] = [
+      { projectId: "proj-a", label: "Alpha", presence: "online", statusText: "~", dotColor: "success" },
+    ]
+    const withProjects: MailboxSidebarState = { ...mailboxState, projects: projectRows }
+    const view = computeView({ ...activeSections, mailbox: withProjects })
+
+    // when
+    const nodes = buildMailboxNodes(view, theme)
+    const projectRowBoxes: ViewNode[] = []
+    const walk = (node: ViewNode): void => {
+      if (node.kind === "box" && node.props.justifyContent === "space-between") {
+        const firstChild = node.children?.[0]
+        if (firstChild?.kind === "box" && firstChild.props.flexDirection === "row") {
+          const dotText = firstChild.children?.[0]
+          if (dotText?.kind === "text" && dotText.text === "•") {
+            projectRowBoxes.push(node)
+          }
+        }
+      }
+      for (const child of node.children ?? []) walk(child)
+    }
+    for (const node of nodes) walk(node)
+
+    // then
+    expect(projectRowBoxes.length).toBe(1)
+    const row = projectRowBoxes[0]
+    expect(row.props.flexDirection).toBe("row")
+    expect(row.props.width).toBe("100%")
+    expect(row.children?.length).toBe(2)
+  })
+
+  it("#given a mailbox with projects #when collapsed #then summary includes Projects a/t active counter", () => {
+    // given
+    const projectRows: ProjectPresenceRow[] = [
+      { projectId: "proj-a", label: "Alpha", presence: "online", statusText: "~", dotColor: "success" },
+      { projectId: "proj-b", label: "Beta", presence: "lastSeen", statusText: "Last seen 5 minutes ago", dotColor: "muted" },
+    ]
+    const withProjects: MailboxSidebarState = { ...mailboxState, projects: projectRows }
+    const view = computeView({ ...activeSections, mailbox: withProjects })
+    const onToggle = (): void => {}
+
+    // when
+    const collapsed = buildMailboxNodes(view, theme, { collapsed: true, onToggle })
+    const collapsedTexts = flattenText(collapsed)
+
+    // then
+    const summaryLine = collapsedTexts.find((entry) => entry.text.includes("Projects"))
+    expect(summaryLine).toBeDefined()
+    expect(summaryLine?.text).toBe("in:2 out:1 Projects (1/2 active)")
+  })
+
+  it("#given a mailbox with projects #when describing #then the Projects section appears in text output", () => {
+    // given
+    const projectRows: ProjectPresenceRow[] = [
+      { projectId: "proj-a", label: "Alpha", presence: "online", statusText: "~", dotColor: "success" },
+    ]
+    const withProjects: MailboxSidebarState = { ...mailboxState, projects: projectRows }
+    const view = computeView({ ...activeSections, mailbox: withProjects })
+
+    // when
+    const description = describeView(view)
+
+    // then
+    expect(description).toContain("Projects")
+    expect(description).toContain("Alpha ~")
+  })
+
+  it("#given a project with collision label #when rendering #then the full projectId is used as label", () => {
+    // given
+    const projectRows: ProjectPresenceRow[] = [
+      { projectId: "proj-a-12345678", label: "proj-a-12345678", presence: "online", statusText: "~", dotColor: "success" },
+      { projectId: "proj-a-abcdef01", label: "proj-a-abcdef01", presence: "online", statusText: "~", dotColor: "success" },
+    ]
+    const withProjects: MailboxSidebarState = { ...mailboxState, projects: projectRows }
+    const view = computeView({ ...activeSections, mailbox: withProjects })
+
+    // when
+    const texts = flattenText(buildMailboxNodes(view, theme)).map((entry) => entry.text)
+
+    // then
+    expect(texts).toContain("proj-a-12345678")
+    expect(texts).toContain("proj-a-abcdef01")
+  })
+
+  it("#given a mailbox with online projects #when collapsed #then active count reflects only online rows", () => {
+    // given
+    const projectRows: ProjectPresenceRow[] = [
+      { projectId: "p1", label: "A", presence: "online", statusText: "~", dotColor: "success" },
+      { projectId: "p2", label: "B", presence: "pending", statusText: "~", dotColor: "warning" },
+      { projectId: "p3", label: "C", presence: "lastSeen", statusText: "Last seen 1 hour ago", dotColor: "muted" },
+    ]
+    const withProjects: MailboxSidebarState = { ...mailboxState, projects: projectRows }
+    const view = computeView({ ...activeSections, mailbox: withProjects })
+    const onToggle = (): void => {}
+
+    // when
+    const collapsed = buildMailboxNodes(view, theme, { collapsed: true, onToggle })
+    const collapsedTexts = flattenText(collapsed)
+
+    // then
+    const summaryLine = collapsedTexts.find((entry) => entry.text.includes("Projects"))
+    expect(summaryLine?.text).toBe("in:2 out:1 Projects (1/3 active)")
+  })
+
+  it("#given a mailbox with projects #when building nodes #then no presence probe is executed during render", () => {
+    // given
+    let probeCalls = 0
+    const projectRows: ProjectPresenceRow[] = [
+      { projectId: "proj-a", label: "Alpha", presence: "online", statusText: "~", dotColor: "success" },
+    ]
+    const withProjects: MailboxSidebarState = { ...mailboxState, projects: projectRows }
+    const view = computeView({ ...activeSections, mailbox: withProjects })
+
+    // when
+    flattenText(buildMailboxNodes(view, theme))
+
+    // then
+    expect(probeCalls).toBe(0)
   })
 })
 

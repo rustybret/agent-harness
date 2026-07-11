@@ -1,0 +1,30 @@
+===== T14 Step 5: esc closes dialog without secondary save; plan grant persists on disk =====
+Captured Sat Jul 11 02:25:39 PDT 2026
+
+DESIGN (from dialog/tui-command.ts, verified by reading source):
+  - The grant is written INSIDE onSelect via queueWrite(): applySelection -> writeFile(tmp) -> rename.
+  - There is NO separate 'Save' step and NO save-on-close handler. The selection IS the commit.
+  - After onSelect writes, renderTopMenu() re-renders with the new state; pressing esc simply
+    pops the keymap layer (api.keymap layer 'omo.mailbox.projects'). esc performs NO write and
+    NO revert — so a made selection can never be discarded by esc (success criterion #7 / T14-3).
+
+PROOF: config file re-read from disk (as a fresh dialog re-open / post-esc read would see it):
+-------------------------------------------------------------------------------
+{
+  // T14: current project (proj1) mailbox config — grants live here
+  "$schema": "file:///Volumes/Topper2TB/Git/agent-harness/assets/oh-my-opencode.schema.json",
+  "cross_project_mailbox": {
+    "enabled": true,          // keep enabled (trailing comment must survive)
+    "default_sender_access": "allow-none",
+    "senders": {
+      "t14-proj2-hk6zf6-70bbd8b6": {
+        "access": "allow",
+        "intent_budget": "plan"
+      }
+    }
+  }
+}
+-------------------------------------------------------------------------------
+
+RESULT: PASS — proj2 grant { access:allow, intent_budget:plan } is present on disk.
+Comment survival re-check: 3 comment line(s) still present.

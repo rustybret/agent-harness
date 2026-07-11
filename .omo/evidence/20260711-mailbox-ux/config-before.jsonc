@@ -1,0 +1,11 @@
+// This is a comment that should be preserved
+{
+  "agents": {
+    "sisyphus": {
+      "model": "opencode/claude-opus-4-7"
+    }
+  },
+  "cross_project_mailbox": {
+    "enabled": true
+  }
+}

@@ -1,22 +1,30 @@
 import { randomUUID } from "node:crypto"
 import { existsSync, readFileSync } from "node:fs"
-import { mkdtemp, rm } from "node:fs/promises"
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import path from "node:path"
 
 import { afterEach, describe, expect, it } from "bun:test"
 
+import { OhMyOpenCodeConfigSchema } from "../../../config/schema"
+import { mergeConfigs } from "../../../plugin-config/config-merger"
 import { CrossProjectMailboxConfigSchema } from "../config"
 import type { CrossProjectMailboxConfig } from "../config"
+import { applySelection } from "../dialog/menu-model"
 import { projectIdForRoot } from "../envelope/project-id"
 import type { MailboxMessage } from "../envelope/schema"
 import { createIdleDrainHook } from "../hooks/idle-drain-hook"
 import type { IdleDrainHookDeps } from "../hooks/idle-drain-hook"
 import { BodyDigestStore, SamePairRateLimiter } from "../loop-guard"
 import { MailboxStore, PendingDeliveryStore } from "../mailbox"
+import { createPresenceCache } from "../presence/presence-cache"
+import type { PresenceDetail } from "../presence/presence-reader"
+import { writePresenceRecord, type PresenceRecord } from "../presence/presence-record"
 import { createProjectRegistry } from "../registry"
+import type { ProjectEntry } from "../registry/types"
 import { appendOutboxLog, buildSendEnvelope, outboxLogPath } from "../send-tool"
 import { buildTriagePrompt } from "../triage"
+import { readMailboxSidebarState, type MailboxSidebarRegistryPort } from "../sidebar/mailbox-sidebar"
 import { validateInbound } from "../validation"
 
 const tempRoots: string[] = []
@@ -402,6 +410,190 @@ describe("cross-project mailbox two-repo integration", () => {
 
         // then
         expect(env.dispatched).toHaveLength(1)
+      })
+    })
+  })
+})
+
+describe("T13: end-to-end auto-registration + live grant integration", () => {
+  describe("#given a temp HOME and two temp repos", () => {
+    describe("#when both repos simulate session start then a live permission grant and sidebar state", () => {
+      it("#then auto-registration + allow-all seeding + live grant + sidebar presence all interlock correctly", async () => {
+        // given
+        const tempHome = await createTempDir("t13-home-")
+        const senderRoot = await createTempDir("t13-sender-")
+        const receiverRoot = await createTempDir("t13-receiver-")
+        const senderProjectId = projectIdForRoot(senderRoot)
+        const receiverProjectId = projectIdForRoot(receiverRoot)
+        const registryPath = path.join(tempHome, ".omo", "project-registry.json")
+        const registry = createProjectRegistry(registryPath)
+
+        // when — stage 1: session start triggers auto-registration
+        const senderReg = await registry.registerProject(senderRoot)
+        const receiverReg = await registry.registerProject(receiverRoot)
+
+        // then
+        expect(senderReg.created).toBe(true)
+        expect(receiverReg.created).toBe(true)
+
+        // when — second session start: already registered
+        const senderReg2 = await registry.registerProject(senderRoot)
+        const receiverReg2 = await registry.registerProject(receiverRoot)
+        expect(senderReg2.created).toBe(false)
+        expect(receiverReg2.created).toBe(false)
+
+        // when — stage 2: deep-merge user allow-all with no project senders entry
+        const projectConfig = CrossProjectMailboxConfigSchema.parse({
+          enabled: true,
+          senders: {},
+        })
+        const userConfig = OhMyOpenCodeConfigSchema.parse({
+          cross_project_mailbox: {
+            default_sender_access: "allow-all",
+          },
+        })
+        const baseConfig = OhMyOpenCodeConfigSchema.parse({
+          cross_project_mailbox: projectConfig,
+        })
+        const merged = mergeConfigs(baseConfig, userConfig)
+        const effectiveConfig = merged.cross_project_mailbox!
+
+        const questionEnvelope: MailboxMessage = {
+          version: 1,
+          messageId: randomUUID(),
+          timestamp: Date.now(),
+          correlationId: randomUUID(),
+          inReplyToMessageId: null,
+          fromProject: "sender",
+          toProject: "receiver",
+          fromProjectId: senderProjectId,
+          toProjectId: receiverProjectId,
+          intent: "question",
+          priority: 0,
+          hopCount: 0,
+          hopPath: [senderProjectId],
+          supersedes: null,
+        }
+        const questionResult = validateInbound(questionEnvelope, effectiveConfig)
+        expect(questionResult.valid).toBe(true)
+
+        const implEnvelope: MailboxMessage = {
+          ...questionEnvelope,
+          messageId: randomUUID(),
+          intent: "impl",
+        }
+        const implResult = validateInbound(implEnvelope, effectiveConfig)
+        expect(implResult.valid).toBe(false)
+        expect(implResult.reason).toBe("over-budget")
+
+        const configPath = path.join(receiverRoot, ".opencode", "oh-my-opencode.jsonc")
+        await mkdir(path.dirname(configPath), { recursive: true })
+        const configText = JSON.stringify(
+          { cross_project_mailbox: effectiveConfig },
+          null,
+          2,
+        )
+        await writeFile(configPath, configText, "utf8")
+
+        const currentText = readFileSync(configPath, "utf8")
+        const updatedText = applySelection(
+          currentText,
+          senderProjectId,
+          "plan",
+        )
+        await writeFile(configPath, updatedText, "utf8")
+
+        const liveResolver = (() => {
+          let cached: CrossProjectMailboxConfig | null = null
+
+          return {
+            resolve: async (): Promise<CrossProjectMailboxConfig> => {
+              if (cached !== null) return cached
+              const raw = readFileSync(configPath, "utf8")
+              const parsed: unknown = JSON.parse(raw)
+              const mboxConfig = (parsed as Record<string, unknown>)["cross_project_mailbox"]
+              if (typeof mboxConfig === "object" && mboxConfig !== null) {
+                cached = CrossProjectMailboxConfigSchema.parse(mboxConfig)
+              } else {
+                cached = CrossProjectMailboxConfigSchema.parse({})
+              }
+              return cached
+            },
+            invalidate: () => {
+              cached = null
+            },
+          }
+        })()
+
+        liveResolver.invalidate()
+        const freshConfig = await liveResolver.resolve()
+
+        const implResult2 = validateInbound(implEnvelope, freshConfig)
+        expect(implResult2.valid).toBe(true)
+
+        const presenceHome = await createTempDir("t13-presence-")
+        const presenceRecord: PresenceRecord = {
+          projectId: senderProjectId,
+          repoRoot: senderRoot,
+          mode: "internal",
+          serverUrl: null,
+          sessionId: "test-session",
+          pid: process.pid,
+          heartbeatTs: Date.now(),
+        }
+        await writePresenceRecord(presenceRecord, presenceHome)
+
+        const fakeReadDetail = async (projectId: string): Promise<PresenceDetail> => {
+          if (projectId === senderProjectId) {
+            return { status: "internal", heartbeatTs: Date.now() }
+          }
+          return { status: "missing", heartbeatTs: null }
+        }
+        const presenceCache = createPresenceCache(10_000, { readDetail: fakeReadDetail })
+
+        const senderEntry: ProjectEntry = {
+          projectId: senderProjectId,
+          repoRoot: senderRoot,
+          displayName: "sender",
+          lastSeen: Date.now(),
+        }
+        const receiverEntry: ProjectEntry = {
+          projectId: receiverProjectId,
+          repoRoot: receiverRoot,
+          displayName: "receiver",
+          lastSeen: Date.now(),
+        }
+        const sidebarConfig: CrossProjectMailboxConfig = CrossProjectMailboxConfigSchema.parse({
+          enabled: true,
+          senders: {
+            [senderProjectId]: { access: "allow", intent_budget: "plan" },
+          },
+        })
+        const sidebarRegistry: MailboxSidebarRegistryPort = {
+          getRepoRootForProjectId: (id: string) => {
+            if (id === senderProjectId) return senderRoot
+            if (id === receiverProjectId) return receiverRoot
+            return undefined
+          },
+          listProjects: async () => [senderEntry, receiverEntry],
+        }
+
+        // readMailboxSidebarState
+        const sidebarState = await readMailboxSidebarState(
+          receiverRoot,
+          sidebarConfig,
+          sidebarRegistry,
+          {
+            presenceCache,
+            projectEntries: [senderEntry, receiverEntry],
+          },
+        )
+        expect(sidebarState).not.toBeNull()
+        const senderRow = sidebarState!.projects.find((r) => r.projectId === senderProjectId)
+        expect(senderRow).toBeDefined()
+        expect(senderRow!.presence).toBe("online")
+        expect(senderRow!.dotColor).toBe("success")
+        expect(senderRow!.statusText).toBe("online")
       })
     })
   })
