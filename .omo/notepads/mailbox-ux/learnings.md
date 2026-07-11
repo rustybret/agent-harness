@@ -174,3 +174,30 @@
 - `api.ui?.toast` takes `message` and `variant` (not `description` and `type` as used in `tui-command.ts`).
 - `tui.ts` poll tick is a good place to wire up periodic checks like `runRegistrationToastCheck` and `runLegacySendersNoticeCheck`.
 - `queueTuiPreferenceUpdate` is a safe, atomic way to write to `tui-preferences.jsonc`.
+n- T11 was successfully verified and the plan file was updated.
+
+## T12: Schema description + regeneration
+
+- Updated `default_sender_access` `.describe()` in `config.ts:48-51` from "Default access for source projects not listed in senders" to "Default access for source projects not listed in senders. User-level config conventionally seeds 'allow-all'; the unlisted-sender ceiling is 'question'."
+- Ran `bun run build:schema` to regenerate `assets/oh-my-opencode.schema.json`.
+- Verified via `git diff` that ONLY the description string changed in the schema JSON — no structural/type changes.
+- T2 stub-compliance test (auto-provision.test.ts line 60-73) passed 6/6.
+- Full mailbox suite passed 518/518.
+- Typecheck clean (exit 0).
+- Committed as `cd104e8c6` with message `chore(schema): document machine-global default_sender_access convention`.
+
+## T13: End-to-end auto-registration + live grant integration
+
+- `applySelection` takes exactly 3 params: `(configText, projectId, choice)` — NOT 6 params as originally attempted. It parses the JSONC config, sets `senders[projectId].access = "allow"` and `senders[projectId].intent_budget = choice` via `jsonc-parser`'s `modify`/`applyEdits`.
+- The `readMailboxSidebarState` 4th arg (`deps: MailboxSidebarDeps`) accepts `{ presenceCache, projectEntries }`. The `presenceCache` is a `PresenceCache` from `createPresenceCache()`. The `readDetail` override in `createPresenceCache` must match `typeof readPresenceDetail` which is `(projectId: string, homeDir: string, deps?: ReadPresenceStatusDeps) => Promise<PresenceDetail>`. TypeScript allows a 1-param callback for a 3-param function type (callback parameter bivariance).
+- `writePresenceRecord(record, homeDir)` writes a JSON file to `path.join(homeDir, ".omo", "presence", "<projectId>.json")`. For the sidebar test, we pass a fake `readDetail` that ignores `homeDir` entirely, so the presence-home temp dir is just for the `writePresenceRecord` call to succeed (it needs a valid dir to write to).
+- The `OhMyOpenCodeConfigSchema.parse({})` returns a valid config with `cross_project_mailbox` as `undefined` (not an empty object). This is fine for `mergeConfigs` — it merges the `cross_project_mailbox` key from both sides independently.
+- Dynamic `import("node:fs/promises")` is unnecessary when `mkdtemp`/`rm` are already statically imported from the same module. Use `{ mkdir, writeFile }` from the top-level import instead.
+- The test has 37 expect() calls across 4 stages + the original 12 tests, totaling 13 test cases and 0 failures. Wall-clock time is under 1 second for the full file.
+
+## T13: End-to-end auto-registration + live grant integration import fix
+
+### Findings & Changes
+- Fixed the broken import path in `packages/omo-opencode/src/features/cross-project-mailbox/__tests__/two-repo-integration.test.ts` from four levels (`../../../../`) to three levels (`../../../`) for both `OhMyOpenCodeConfigSchema` and `mergeConfigs`.
+- Verified that the test file and the full mailbox suite pass successfully (519 tests passed).
+- Verified that `lsp_diagnostics` is clean on the test file.
