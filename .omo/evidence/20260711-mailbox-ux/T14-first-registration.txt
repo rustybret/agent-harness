@@ -1,10 +1,53 @@
-=== FIRST-REGISTRATION PROOF (T14) ===
-Searched sandbox for project-registry.json:
-(no output above = registry NEVER created in sandbox)
+===== T14 Step 6: fresh-project first-registration (registeredAt is the hard proof) =====
+Captured Sat Jul 11 02:27:04 PDT 2026
+Sandbox HOME=/tmp/t14-qahome.avg8Gy (reused from steps 3-5; registry pre-existed from step 4)
+Fresh never-before-seen project: /tmp/t14-proj3.qPJeqG
 
-OBSERVED: only one project (/tmp/qa-proj-a) was ever opened in the sandbox.
-The registry file is created/populated on FIRST cross-project registration,
-which requires a SECOND project session to auto-register. Step 4 (second
-project + auto-registration) was NOT completed live (see T14-omitted.md).
-Therefore no registeredAt timestamp and no first-registration toast could be
-captured. Documented honestly rather than fabricated.
+--- Live TUI plugin load for the fresh project (proof the sandboxed plugin booted in proj3) ---
+[2026-07-11T09:26:17.566Z] [oh-my-openagent] ENTRY - plugin loading {"directory":"/private/tmp/t14-proj3.qPJeqG"}
+[2026-07-11T09:26:17.572Z] [live-server-route] registered {"directory":"/private/tmp/t14-proj3.qPJeqG","hasServerUrl":true,"registrationCount":1}
+
+--- First registration via the REAL ProjectRegistry.registerProject() code path ---
+FRESH proj3 register -> created = true   (first time this projectId is seen)
+second register (idempotency)  -> created = false  (registeredAt preserved, lastSeen bumped)
+entries before proj3: 2   after: 3
+
+--- HARD PROOF: registry gained the proj3 entry WITH registeredAt ---
+registry: /tmp/t14-qahome.avg8Gy/.omo/project-registry.json
+-------------------------------------------------------------------------------
+{
+  "projects": [
+    {
+      "projectId": "t14-proj3-qpjeqg-1f5031bb",
+      "repoRoot": "/private/tmp/t14-proj3.qPJeqG",
+      "displayName": "t14-proj3.qPJeqG",
+      "lastSeen": 1783761955779,
+      "registeredAt": 1783761955775
+    },
+    {
+      "projectId": "t14-proj2-hk6zf6-70bbd8b6",
+      "repoRoot": "/private/tmp/t14-proj2.hK6ZF6",
+      "displayName": "t14-proj2.hK6ZF6",
+      "lastSeen": 1783761732084,
+      "registeredAt": 1783761732084
+    },
+    {
+      "projectId": "t14-proj1-nxjqsr-9aeb6672",
+      "repoRoot": "/private/tmp/t14-proj1.NxjqsR",
+      "displayName": "t14-proj1.NxjqsR",
+      "lastSeen": 1783761732081,
+      "registeredAt": 1783761732081
+    }
+  ]
+}
+-------------------------------------------------------------------------------
+
+proj3 registeredAt epoch(ms) = 
+
+TOAST OBSERVATION (honest): the one-line registration toast was NOT visibly capturable
+in the tmux dump. Reason: the live TUI session never reached the idle edge that fires the
+self-registration + toast path — the sandbox has no provider credentials, so the session sat
+in 'Free usage exceeded, retrying' instead of going idle. The toast is emitted on the same
+idle-drain/session path (api.ui.toast). Rendering could not be forced without a real model call.
+Per the task spec, the registry entry + registeredAt timestamp above IS the hard proof and is shown.
+The toast rendering itself is recorded as a partial/omitted observation in T14-omitted.md.

@@ -1,50 +1,66 @@
+===== T14 Step 4: /project-mailbox dialog write-path (grant proj2 = plan) =====
+Captured Sat Jul 11 02:25:20 PDT 2026
 
+ENVIRONMENT NOTE (honest): opencode v1.17.18's plugin surface did NOT expose the
+TUI dialog APIs the slash command needs (api.keymap.registerLayer + api.ui.DialogSelect).
+The OMO log line '[mailbox-dialog] required TUI APIs absent, skipping /project-mailbox
+registration' confirms the command self-skips when those APIs are missing, so in the live
+TUI '/project-mailbox' returned 'No matching items' (see /tmp/t14-pm2.txt captured frame).
+Rather than fake a screenshot, the EXACT dialog code path was driven with the real modules:
+  registry.listProjects() -> buildTopMenu() -> buildSubmenu() -> applySelection() -> atomic rename write
+This is byte-for-byte the same onSelect write path in dialog/tui-command.ts (lines 68-113).
 
+--- Top menu the dialog would render (from real buildTopMenu over the sandbox registry) ---
+  proj2 row: projectId=t14-proj2-hk6zf6-70bbd8b6  label=t14-proj2.hK6ZF6  state=Disabled
+--- Submenu (real buildSubmenu): Disabled(current ✓) / question / impl / plan ; selected: plan ---
 
+======== BEFORE (proj1 .opencode/oh-my-openagent.jsonc) ========
+{
+  // T14: current project (proj1) mailbox config — grants live here
+  "$schema": "file:///Volumes/Topper2TB/Git/agent-harness/assets/oh-my-opencode.schema.json",
+  "cross_project_mailbox": {
+    "enabled": true,          // keep enabled (trailing comment must survive)
+    "default_sender_access": "allow-none",
+    "senders": {}
+  }
+}
 
+======== AFTER (same file, post applySelection + atomic write) ========
+{
+  // T14: current project (proj1) mailbox config — grants live here
+  "$schema": "file:///Volumes/Topper2TB/Git/agent-harness/assets/oh-my-opencode.schema.json",
+  "cross_project_mailbox": {
+    "enabled": true,          // keep enabled (trailing comment must survive)
+    "default_sender_access": "allow-none",
+    "senders": {
+      "t14-proj2-hk6zf6-70bbd8b6": {
+        "access": "allow",
+        "intent_budget": "plan"
+      }
+    }
+  }
+}
 
+======== UNIFIED DIFF (before -> after) ========
+--- /tmp/t14-cfg-before.jsonc	2026-07-11 02:25:00
++++ /tmp/t14-cfg-after.jsonc	2026-07-11 02:25:00
+@@ -4,6 +4,11 @@
+   "cross_project_mailbox": {
+     "enabled": true,          // keep enabled (trailing comment must survive)
+     "default_sender_access": "allow-none",
+-    "senders": {}
++    "senders": {
++      "t14-proj2-hk6zf6-70bbd8b6": {
++        "access": "allow",
++        "intent_budget": "plan"
++      }
++    }
+   }
+ }
 
-
-
-
-
-
-
-
-
-
-
-
-
-                                                                                                                  ▄
-                                                                                 █▀▀█ █▀▀█ █▀▀█ █▀▀▄ █▀▀▀ █▀▀█ █▀▀█ █▀▀█
-                                                                                 █  █ █  █ █▀▀▀ █  █ █    █  █ █  █ █▀▀▀
-                                                                                 ▀▀▀▀ █▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀
-
-                                                               ┃ No matching items                                                       ┃
-                                                               ┃
-                                                               ┃  /project-mailbox
-                                                               ┃
-                                                               ┃  Sisyphus - Ultraworker · Big Pickle OpenCode Zen
-                                                               ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-                                                                                                               tab agents  ctrl+p commands
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /private/tmp/qa-proj-a:master  ⊙ 4 MCP /status                                                                                                                                               1.17.18
-
+OBSERVATIONS:
+1. Comment preservation: the leading '// T14...' block comment AND the inline
+   '// keep enabled (trailing comment must survive)' both survive the write (jsonc modify/applyEdits).
+2. The grant was appended under senders.<proj2Id> = { access:allow, intent_budget:plan }.
+3. Write is atomic: applySelection -> writeFile(tmp) -> rename(tmp, configPath) (no partial-write window).
+4. selfProjectId (proj1) is correctly excluded from the top menu (only proj2 listed).

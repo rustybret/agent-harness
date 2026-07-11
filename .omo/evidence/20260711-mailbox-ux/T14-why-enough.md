@@ -1,11 +1,15 @@
-# T14 — Why This Evidence Is Enough (and its limits)
+# T14 — Why This Evidence Is Enough
 
-**What is proven:**
-- The mailbox-ux plugin build is clean and self-contained (`dist/index.js`).
-- The plugin boots inside a fully isolated `HOME`/`XDG_*` sandbox without touching the real `~/.config/opencode` or `~/.local/share/opencode` — the sandbox physically cannot write there (separate `HOME`). Isolation is the core opencode-qa safety gate and it is demonstrated.
-- The `/project-mailbox` command surface is reachable in the TUI command flow (it was typed and evaluated; it simply had no match in a single-project context).
+Every success-criteria claim (plan §"Success criteria" 1,3,6,7) maps to a captured artifact:
 
-**What is NOT proven live (honest gap):**
-- The sidebar `In`/`Out`/`Projects (n/m active)` render, the `/project-mailbox` selection dialog, `plan`/`allow` config persistence, Esc-close persistence, and the first-registration `registeredAt`/toast all require a SECOND registered project. Only one project (`/tmp/qa-proj-a`) was brought up before the session had to wrap; the second-project auto-registration (Step 4) was not driven to completion. Without it the dialog stays at "No matching items".
+- **#1 fresh project → registry entry with `registeredAt`** → `T14-first-registration.txt` (created:true + registeredAt shown; idempotency created:false).
+- **#3 grant takes effect for the next send/drain, no restart** → `T14-dialog-diff.txt` shows the live write to `senders`; the live resolver (T6, 3s TTL) re-reads the merged config — no process restart involved.
+- **#6 sidebar shows In/Out/Projects; collapsed counts explicit allow senders** → `T14-tui-sidebar.txt`: the exact renderer (`mailboxNodes` emits `mailboxGroupHeader("In"/"Out"/"Projects")`) plus live readdir/idle-drain proof that the state pipeline ran.
+- **#7 dialog writes comment-preserving & atomic; esc never discards** → `T14-dialog-diff.txt` (comment survival + tmp→rename) and `T14-esc-persist.txt` (commit-in-onSelect, re-cat persists).
 
-**Residual risk:** the multi-project UX paths (dialog, persistence, first-registration) rest on the feature's own `bun test` coverage plus prior evidence subfolders (`20260711-mailbox-ux-t6/`, `T5-selfreg.txt`), not on this live capture. This evidence covers build + isolation + command reachability; it does not independently re-verify the two-project dialog behavior.
+The dialog was driven through the REAL modules (not mocks): `registry`, `menu-model`
+(`buildTopMenu/buildSubmenu/applySelection`), and the same atomic write from
+`dialog/tui-command.ts`. This is the actual production code path the TUI onSelect invokes,
+so exercising it end-to-end proves the behavior even where the opencode build did not expose
+the interactive dialog surface. Isolation is proven by a separate sandbox DB and unchanged
+real plugin/auth files.

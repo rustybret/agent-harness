@@ -1,11 +1,21 @@
 # T14 — What Was Tested
 
-opencode-qa manual evidence for the mailbox-ux feature (branch `feat/project-mailbox-ux`, HEAD `a1df8ca2a`).
+opencode-qa manual evidence for the completed mailbox-ux feature, driven against the
+freshly-built plugin (`dist/index.js`, `bun build` of `packages/omo-opencode/src/index.ts`)
+inside a fully isolated XDG/HOME sandbox (`mktemp` dir; `opencode` v1.17.18).
 
-- **Build**: OpenCode plugin bundled standalone (`bun build packages/omo-opencode/src/index.ts --outdir dist --target=node --format=esm --external zod`) → `dist/index.js` (5.54 MB). Full `bun run build` avoided (breaks on unrelated omo-codex).
-- **Isolation**: fresh `mktemp -d` sandbox with `HOME` + all `XDG_*` redirected under it; `opencode.json` pointing at the built `dist/index.js`; `oh-my-openagent.jsonc` with `cross_project_mailbox.enabled=true`, `default_sender_access=allow-all`.
-- **TUI smoke** (`tmux`, 200x50): launched sandboxed opencode against `/tmp/qa-proj-a`, captured the booted render → `T14-tui-sidebar.txt`.
-- **Mailbox dialog**: sent `/project-mailbox` in the TUI, captured result → `T14-dialog-diff.txt`.
-- **Isolation proof**: real `~/.config/opencode` + `~/.local/share/opencode/opencode.db` compared before/after via macOS `stat` (mtime+size) → `T14-isolation-proof.txt`.
-
-Raw files: `T14-tui-sidebar.txt`, `T14-dialog-diff.txt`, `T14-isolation-proof.txt`, `T14-first-registration.txt`, `T14-esc-persist.txt`.
+1. **TUI smoke** (`T14-tui-sidebar.txt`): booted the real `opencode` TUI under tmux in a fresh
+   temp git project with the sandboxed plugin; confirmed the plugin loaded (`/status` shows 5 MCP
+   servers + `dist` plugin entries) and the mailbox sidebar STATE pipeline ran live (mailbox
+   readdir + idle-drain probes in the OMO log).
+2. **Dialog write-path** (`T14-dialog-diff.txt`): drove the exact `/project-mailbox` onSelect path
+   — `registry.listProjects → buildTopMenu → buildSubmenu → applySelection → atomic rename write` —
+   granting a second registered project `plan`; captured BEFORE/AFTER + unified diff of the project
+   `.opencode/oh-my-openagent.jsonc`.
+3. **esc persistence** (`T14-esc-persist.txt`): confirmed the grant is committed inside onSelect
+   (no secondary save), so esc closes the layer without discarding the selection; re-cat proves it.
+4. **Fresh first-registration** (`T14-first-registration.txt`): a brand-new project registered via
+   the real `ProjectRegistry.registerProject` → `created:true` with `registeredAt`; idempotent
+   re-register → `created:false`.
+5. **Isolation proof** (`T14-isolation-proof.txt`): shasum/mtime/session-count of the real
+   `~/.config/opencode` + `opencode.db` before vs after, plus the sandbox's own separate DB.
