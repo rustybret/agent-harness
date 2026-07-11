@@ -46,7 +46,7 @@ export interface PluginConfigReadResult {
   config: { cross_project_mailbox?: CrossProjectMailboxConfig }
 }
 
-export type ValidatePluginConfigPort = (directory: string) => PluginConfigReadResult
+export type ValidatePluginConfigPort = (directory: string) => import("../../../config/validate").PluginConfigValidation
 
 export interface IdleDrainHookDeps {
   config: CrossProjectMailboxConfig

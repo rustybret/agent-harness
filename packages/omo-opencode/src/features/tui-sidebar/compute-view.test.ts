@@ -57,7 +57,7 @@ const mailboxSection: MailboxSidebarState = {
   ],
   outboundUnresolved: 0,
   outboundRead: 0,
-  outboundFailed: 0,
+  outboundFailed: 0, projects: [],
 }
 
 describe("tui sidebar computeView", () => {

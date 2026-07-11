@@ -83,6 +83,7 @@ function stableMailboxKey(mailbox: MailboxSidebarState | null): readonly unknown
         mailbox.outboundUnresolved,
         mailbox.outboundRead,
         mailbox.outboundFailed,
+        mailbox.projects.map(p => [p.projectId, p.label, p.presence, p.statusText, p.dotColor]),
       ]
     : null
 }
