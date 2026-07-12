@@ -113,6 +113,18 @@ describe("queueTuiPreferenceUpdate", () => {
     expect(mailbox.collapsed).toBe(true)
   })
 
+  it("#given a collapsed=true write followed by collapsed=false #when re-read from disk #then the collapse state round-trips both ways", async () => {
+    // given a persisted collapsed=true flag
+    await queueTuiPreferenceUpdate(["mailbox", "collapsed"], true)
+    expect(resolveOmoCollapsed(readTuiPreferencesFileSync())).toBe(true)
+
+    // when overwriting with collapsed=false
+    await queueTuiPreferenceUpdate(["mailbox", "collapsed"], false)
+
+    // then a fresh read reports collapsed false
+    expect(resolveOmoCollapsed(readTuiPreferencesFileSync())).toBe(false)
+  })
+
   it("#given a pre-existing magic-context key with a comment #when queueing an update #then the sibling comment survives byte-for-byte", async () => {
     // given a prefs file with a sibling plugin key and an inline comment
     const file = process.env[TUI_PREFS_FILE_ENV] as string

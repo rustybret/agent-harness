@@ -1,20 +1,16 @@
 import type { TuiPluginModule } from "@opencode-ai/plugin/tui"
 
-import type {
-  MailboxSidebarRegistryPort,
-  MailboxSidebarState,
-} from "./features/cross-project-mailbox/sidebar"
-import { computeView, viewKey } from "./features/tui-sidebar/compute-view"
+import { viewKey } from "./features/tui-sidebar/compute-view"
 import { POLL_INTERVAL_MS } from "./features/tui-sidebar/constants"
-import { deriveAgents, deriveConfig, deriveJobBoard, deriveLoop, deriveRoster } from "./features/tui-sidebar/derivers"
-import type { ViewNode } from "./features/tui-sidebar/element-helpers"
 import { loadHostSolidRuntime } from "./features/tui-sidebar/host-runtime"
-import { readMirror } from "./features/tui-sidebar/mirror-io"
+import type { MailboxSidebarController } from "./features/tui-sidebar/mailbox-slot"
+import { loadCompiledMailboxModule } from "./features/tui-sidebar/mailbox-slot"
 import { buildMailboxNodes, buildViewNodes } from "./features/tui-sidebar/render-view"
 import type { MailboxToggleOpts } from "./features/tui-sidebar/render-view"
-import type { RosterRow } from "./features/tui-sidebar/state-types"
+import { createSignalPair } from "./features/tui-sidebar/signal-pair"
+import { materialize } from "./features/tui-sidebar/slot-materializer"
+import { MAILBOX_SLOT_ORDER, OMO_SLOT_ORDER } from "./features/tui-sidebar/slot-orders"
 import type { SidebarView } from "./features/tui-sidebar/state-types"
-import type { OmoTuiPrefs } from "./features/tui-sidebar/tui-preferences"
 import {
   computeEffectiveOrder,
   queueTuiPreferenceUpdate,
@@ -23,161 +19,15 @@ import {
   resolveOmoPrefs,
   watchTuiPreferences,
 } from "./features/tui-sidebar/tui-preferences"
+import { hasToast, isColor } from "./features/tui-sidebar/ui-guards"
+import { handleTuiPollError, loadPluginValidation, readView } from "./features/tui-sidebar/view-loader"
 import { log } from "./shared/logger"
 
 import packageJson from "../../../package.json" with { type: "json" }
 import { badgeTextColor } from "./features/tui-sidebar/badge-contrast"
 
-type Color = { r: number; g: number; b: number; a?: number }
-
-function isColor(c: unknown): c is Color {
-  return typeof c === "object" && c !== null && "r" in c && "g" in c && "b" in c
-}
-
-type MailboxSidebarController = {
-  readonly dispose: () => void
-}
-
-type CreateMailboxSidebarControllerFn = (deps: {
-  readonly getMailbox: () => MailboxSidebarState | null | undefined
-  readonly getPrefs: () => OmoTuiPrefs
-  readonly getVersion: () => string
-  readonly badgeTextColor: (accent: unknown, background: unknown) => unknown
-  readonly initialCollapsed: boolean
-  readonly onToggle: (collapsed: boolean) => void
-  readonly requestRender: () => void
-  readonly watchPrefs: (onChange: () => void) => () => void
-}) => MailboxSidebarController
-
-type MailboxSidebarComponent = (props: {
-  readonly controller: MailboxSidebarController
-  readonly theme: Record<string, unknown>
-}) => unknown
-
-type SolidRuntime<Node> = {
-  readonly createElement: (tag: string) => Node
-  readonly insert: (parent: Node, child: Node | string) => unknown
-  readonly setProp: (node: Node, name: string, value: unknown) => unknown
-}
-
-type SolidSignals = Pick<typeof import("solid-js"), "createSignal">
-
-// Signals must come from the HOST's solid-js instance (the OpenCode TUI rewrites
-// the "solid-js" specifier to its runtime module) so the slot's children() memo
-// tracks our reads and re-renders on writes. Without solid-js the sidebar still
-// renders, just statically (no live updates until remount).
-function createSignalPair<T>(runtime: SolidSignals | null, initial: T): readonly [() => T, (value: T) => void] {
-  if (runtime) {
-    const [get, set] = runtime.createSignal(initial)
-    return [
-      get,
-      (value: T): void => {
-        set(() => value)
-      },
-    ]
-  }
-  let current = initial
-  return [
-    () => current,
-    (value: T): void => {
-      current = value
-    },
-  ]
-}
-
-// Lower order renders higher: 150 sorts the mailbox above Magic Context (external DEFAULT_SLOT_ORDER 200).
-export const MAILBOX_SLOT_ORDER = 150
-export const OMO_SLOT_ORDER = 900
-
-
-function materialize<Node>(nodes: readonly ViewNode[], solid: SolidRuntime<Node>): Node {
-  const root = solid.createElement("box")
-  solid.setProp(root, "flexDirection", "column")
-  for (const node of nodes) {
-    solid.insert(root, materializeNode(node, solid))
-  }
-  return root
-}
-
-function materializeNode<Node>(node: ViewNode, solid: SolidRuntime<Node>): Node {
-  const element = solid.createElement(node.kind)
-  for (const [name, value] of Object.entries(node.props)) {
-    solid.setProp(element, name, value)
-  }
-  if (node.kind === "text") {
-    solid.insert(element, node.text ?? "")
-  }
-  for (const child of node.children ?? []) {
-    solid.insert(element, materializeNode(child, solid))
-  }
-  return element
-}
-
-type RosterResolver = (directory: string) => RosterRow[]
-type PluginValidation = {
-  readonly valid: boolean
-  readonly messages: readonly string[]
-  readonly config: {
-    readonly tui?: {
-      readonly sidebar?: {
-        readonly enabled?: boolean
-      }
-    }
-  }
-}
-
-async function loadPluginValidation(directory: string): Promise<PluginValidation> {
-  const { validatePluginConfig } = await import("./config/validate")
-  return validatePluginConfig(directory)
-}
-
-async function loadRosterRows(directory: string): Promise<readonly RosterRow[]> {
-  const { resolveRoster } = await import("./features/tui-sidebar/roster-resolver")
-  const resolver: RosterResolver = resolveRoster
-  return resolver(directory)
-}
-
-async function loadMailboxSection(directory: string): Promise<MailboxSidebarState | null> {
-  const { validatePluginConfig } = await import("./config/validate")
-  const { applyMailboxDefault } = await import("./features/cross-project-mailbox/config-defaults")
-  const mailboxConfig = applyMailboxDefault(validatePluginConfig(directory).config).cross_project_mailbox
-  if (!mailboxConfig || mailboxConfig.enabled === false) return null
-
-  const { createProjectRegistry } = await import("./features/cross-project-mailbox/registry")
-  const { readMailboxSidebarState } = await import("./features/cross-project-mailbox/sidebar")
-  const projects = await createProjectRegistry().listProjects()
-  const repoRootById = new Map(projects.map((entry) => [entry.projectId, entry.repoRoot]))
-  const registry: MailboxSidebarRegistryPort = {
-    getRepoRootForProjectId: (id) => repoRootById.get(id),
-  }
-  return readMailboxSidebarState(directory, mailboxConfig, registry)
-}
-
-async function readView(directory: string): Promise<SidebarView> {
-  const validation = await loadPluginValidation(directory)
-  const mirror = readMirror(directory)
-  const roster = await loadRosterRows(directory)
-  const mailbox = await loadMailboxSection(directory)
-  return computeView({
-    config: deriveConfig(validation),
-    roster: deriveRoster(roster),
-    agents: deriveAgents(mirror),
-    jobs: deriveJobBoard(mirror),
-    loop: deriveLoop(mirror),
-    mailbox,
-  })
-}
-
-export function handleTuiPollError(
-  error: unknown,
-  reportPollError: (error: Error) => void = (pollError) => log("[tui-sidebar] polling failed", { error: pollError }),
-): void {
-  if (error instanceof Error) {
-    reportPollError(error)
-    return
-  }
-  throw error
-}
+export { handleTuiPollError }
+export { MAILBOX_SLOT_ORDER, OMO_SLOT_ORDER }
 
 const module: TuiPluginModule = {
   id: "oh-my-openagent:tui",
@@ -208,16 +58,8 @@ const module: TuiPluginModule = {
       resolveOmoCollapsed(prefsRoot),
     )
 
-    let CompiledMailboxSidebar: MailboxSidebarComponent | null = null
-    let createMailboxSidebarController: CreateMailboxSidebarControllerFn | null = null
-    try {
-      const compiledUrl = new URL("./tui-compiled/mailbox-sidebar.js", import.meta.url).href
-      const mod = await import(compiledUrl)
-      CompiledMailboxSidebar = mod.MailboxSidebar
-      createMailboxSidebarController = mod.createMailboxSidebarController
-    } catch (error) {
-      // Fallback to materialize
-    }
+    const { MailboxSidebar: CompiledMailboxSidebar, createMailboxSidebarController } =
+      await loadCompiledMailboxModule()
 
     let mailboxController: MailboxSidebarController | null = null
     let renderMailboxSlot: () => unknown
@@ -246,12 +88,13 @@ const module: TuiPluginModule = {
       mailboxController = controller
 
       const order = computeEffectiveOrder(prefsRoot, "oh-my-openagent", MAILBOX_SLOT_ORDER)
-      
-      renderMailboxSlot = () => CompiledMailboxSidebar({
-        controller,
-        theme: api.theme.current,
-      })
-      
+
+      renderMailboxSlot = () =>
+        CompiledMailboxSidebar({
+          controller,
+          theme: api.theme.current,
+        })
+
       api.slots.register({
         order,
         slots: {
@@ -275,7 +118,7 @@ const module: TuiPluginModule = {
       }
 
       renderMailboxSlot = () => materialize(buildMailboxNodes(view(), api.theme.current, mailboxToggle), solid)
-      
+
       api.slots.register({
         order: MAILBOX_SLOT_ORDER,
         slots: {
@@ -317,8 +160,10 @@ const module: TuiPluginModule = {
           api.renderer.requestRender()
         }
 
-        if ((api.ui as any)?.toast) {
-          const { runRegistrationToastCheck, runLegacySendersNoticeCheck } = await import("./features/cross-project-mailbox/dialog/registration-notice")
+        if (hasToast(api.ui)) {
+          const { runRegistrationToastCheck, runLegacySendersNoticeCheck } = await import(
+            "./features/cross-project-mailbox/dialog/registration-notice"
+          )
           await runLegacySendersNoticeCheck(api, legacySendersState)
           await runRegistrationToastCheck(api, directory)
         }

@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test"
 
-import type { MailboxSidebarState } from "../features/cross-project-mailbox/sidebar"
-import type { ViewNode } from "../features/tui-sidebar/element-helpers"
-import { buildMailboxNodes } from "../features/tui-sidebar/render-view"
-import type { SidebarView } from "../features/tui-sidebar/state-types"
-import { createMailboxSidebarController, deriveMailboxContentModel } from "./mailbox-sidebar-model"
+import type { MailboxSidebarState } from "../cross-project-mailbox/sidebar"
+import type { ViewNode } from "./element-helpers"
+import { buildMailboxNodes } from "./render-view"
+import type { SidebarView } from "./state-types"
+import { createMailboxSidebarController, deriveMailboxContentModel } from "../../tui-solid/mailbox-sidebar-model"
 
 type TextToken = {
   readonly text: string
