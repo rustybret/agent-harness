@@ -1,0 +1,187 @@
+# mailbox-sidebar-aft - Work Plan
+
+## TL;DR (For humans)
+<!-- Fill this LAST, after the detailed plan below is written, so it summarizes the REAL plan. -->
+<!-- Plain English for a non-engineer: NO file paths, NO todo numbers, NO wave/agent/tool names. -->
+
+**What you'll get:** The Mailbox sidebar panel rebuilt to look and behave like AFT's polished panel - a colored badge header you can actually click to collapse/expand (the broken toggle gets fixed at its true root cause), tidy aligned rows, a compact summary when collapsed, and settings that remember your preferences. The recently found dialog-selection fix also gets locked in.
+
+**Why this approach:** The toggle was never broken by the terminal - our plugin was shipping its own private copy of the UI framework, so the screen never repainted after a click. The fix is to borrow the host's single copy, the exact pattern AFT and Magic Context already use successfully, and we adopt their battle-tested code directly (with credit) instead of reinventing it.
+
+**What it will NOT do:** No client/server plumbing gets added - data still comes from local files. The other status panel (loop/agents/jobs) keeps its current look. No mailbox numbers or meanings change - only presentation and interactivity.
+
+**Effort:** Large
+**Risk:** Medium - a UI-framework version bump plus a new build step; both are gated by real-runtime smoke tests and a full live-click QA before anything is pushed.
+**Decisions to sanity-check:** (1) The UI library version is raised to match the host's version. (2) Collapse preferences move to a richer settings shape but old saved values keep working. (3) Borrowed AFT/Magic Context code lands with attribution notices.
+
+Your next move: approve to start work, or ask for a high-accuracy review first. Full execution detail follows below.
+
+---
+
+> TL;DR (machine): Large effort, medium risk; deliverables = host-runtime-bound sidebar signals (frozen-toggle root-cause fix), AFT-style solid TSX mailbox panel w/ precompile pipeline, AFT-shaped prefs w/ back-compat, attribution, pack smoke + live click QA.
+
+## Scope
+### Must have
+- Root-cause fix for the frozen mailbox collapse toggle: sidebar signals must live on the HOST's solid-js runtime, not the private copy Bun currently inlines into dist/tui.js (proof: dist/tui.js:92458 `(init_server2(), exports_server)`; host memo: /Volumes/Topper2TB/Git/opencode/packages/tui/src/plugin/slots.tsx).
+- Mailbox sidebar panel (slot order 150) rewritten as a Solid TSX component adopting AFT's form/function/styling: single-border root box, accent badge header with triangle-inside-badge toggle ("▶ Mailbox" / "▼ Mailbox") and luminance-computed badge text color, StatRow/SectionHeader primitives, collapsed digest view, version right-aligned (pref-gated).
+- AFT two-runtime fix: TSX sources precompiled at build time with @opentui/solid's transformSolidSource, runtime imports rewritten to opentui:runtime-module:* virtual ids; runtime selection inside dist/tui.js (dynamically-constructed specifier probe -> compiled JSX slot; virtual registry absent -> existing materialize renderer as fallback).
+- Both slots (mailbox 150 + OMO status 900) get host-runtime-bound signals via ONE shared runtime loader created BEFORE any signal (Metis gap: shared loader, not per-slot).
+- Prefs: AFT-shaped schema under existing key "oh-my-openagent" (forceToTop/order/startCollapsed/rememberCollapsed/collapsed/header{label,showVersion}/sections{inbound,outbound,projects}) with BACK-COMPAT read of legacy mailbox.collapsed, fs.watch live-reload with echo guard; order/forceToTop documented restart-required.
+- Direct MIT adoption from CortexKit AFT (badge-contrast.ts, preferences patterns, build-tui.ts transform, sidebar skeleton) + magic-context (controller-in-factory-closure) with concise legal attribution headers and THIRD-PARTY-NOTICES.md entries; `node scripts/check-third-party-notices.mjs --ship` passes.
+- Land the already-implemented, live-verified bug-2a DialogSelect .value unwrap fix (tui-command.ts) as the first commit.
+- Semantic regression guard: mailbox counts, presence labels, dot colors, and collapsed summary text byte-identical across the port.
+- Live QA evidence: real OS click toggling the mailbox header via macos-cua (permission preflight first), in an isolated opencode-qa sandbox; /project-mailbox dialog regression re-run.
+
+### Must NOT have (guardrails, anti-slop, scope boundaries)
+- NO RPC server / WebSocket / port files / notification fan-out / rpc-client / notification-socket code (AFT doc SS5/SS8) - data is local disk; the existing 1s poll + viewKey dedupe stays.
+- NO JSX port of the OMO status slot (order 900) - its ViewNode materialize pipeline stays.
+- NO changes to mailbox data semantics (counts, presence derivation, registry IO, sidebar state reader).
+- NO removal of the legacy materialize mailbox renderer (older-host fallback path).
+- NO AFT-only prefs section names (searchIndex/semanticIndex/codeHealth/compression) - mailbox sections are inbound/outbound/projects.
+- NO raw /dev/ttys* escape writes presented as QA evidence (output-not-input; proven invalid).
+- NO cmux mouse-protocol workarounds; NO `as any` / @ts-ignore in new code; NO version field changes in package.json; NO upstream PR.
+- NO edits to packages/web or unrelated model registry files (utils/models*.json - known pre-commit-hook churn source).
+
+## Verification strategy
+> Zero human intervention - all verification is agent-executed.
+- Test decision: tests-after per todo (bun test, co-located *.test.ts, given/when/then #given/#when/#then style)
+- Typecheck gate: `bun run typecheck` clean after every todo that touches TS/TSX.
+- Real-runtime gates (not mocks): a post-bump @opentui/solid import smoke; a pack-install smoke proving the compiled TUI path loads and reactivity works (adapted from AFT scripts/smoke-tui-pack-install.ts).
+- Live-harness gate: opencode-qa skill conventions - isolated XDG sandbox (script/agent/qa-sandbox.sh), real TUI, real clicks (macos-cua; tmux `send-keys -H` hex SGR bytes into a tmux-hosted opencode pane as fallback).
+- Evidence: .omo/evidence/20260711-mailbox-sidebar-aft/task-<N>-<slug>.md (+ raw captures alongside)
+
+## Execution strategy
+### Parallel execution waves
+> SEQUENTIAL execution in the MAIN worktree (user directive: no worktrees; memory #1950 forbids parallel git ops in one tree). "Waves" are dependency tiers, not concurrency.
+- Wave 0: T1 (land pending fix)
+- Wave 1 (foundations): T2 deps bump, T3 build pipeline, T4 prefs schema, T5 badge-contrast + attribution
+- Wave 2 (component): T6 shared runtime loader, T7 mailbox TSX component, T8 slot wiring + fallback
+- Wave 3 (packaging + QA): T9 pack smoke, T10 live QA
+- Final verification wave: F1-F4
+
+### Dependency matrix
+| Todo | Depends on | Blocks | Can parallelize with |
+| --- | --- | --- | --- |
+| T1 | - | (commit baseline) | - |
+| T2 | T1 | T3, T6, T7 | - |
+| T3 | T2 | T7, T8, T9 | T4, T5 |
+| T4 | T1 | T7 | T3, T5 |
+| T5 | T1 | T7 | T3, T4 |
+| T6 | T2 | T7, T8 | T4, T5 |
+| T7 | T3, T4, T5, T6 | T8 | - |
+| T8 | T3, T6, T7 | T9, T10 | - |
+| T9 | T8 | F-wave | T10 |
+| T10 | T8 | F-wave | T9 |
+
+## Todos
+> Implementation + Test = ONE todo. Never separate.
+<!-- APPEND TASK BATCHES BELOW THIS LINE WITH edit/apply_patch - never rewrite the headers above. -->
+- [ ] 1. Land the pending bug-2a DialogSelect unwrap fix (already implemented + live-verified; commit it)
+  What to do: Verify the working-tree fix in packages/omo-opencode/src/features/cross-project-mailbox/dialog/tui-command.ts (onSelect receives TuiDialogSelectOption wrappers; code unwraps `.value` - lines ~74-118) and its updated tests; run the test file; commit ONLY tui-command.ts + tui-command.test.ts. Must NOT: include utils/models*.json or any other dirty file in the commit.
+  Parallelization: Wave 0 | Blocked by: none | Blocks: all
+  References: packages/omo-opencode/src/features/cross-project-mailbox/dialog/tui-command.ts:39-118 (registerLayer commands[] nesting already committed as 9de420a6d; the .value unwrap is the UNCOMMITTED delta); tui-command.test.ts (wrapper-shaped mocks + regression test); host contract /Volumes/Topper2TB/Git/opencode/packages/tui/src/plugin/adapters.tsx:82-96 (pickOption/mapOptionCb always deliver the option wrapper). NOTE: Metis flagged this fix as missing - that is STALE; grep confirms `selected.value` unwrapping is present. Verify by reading the file, not by trusting either claim.
+  Acceptance criteria: `bun test packages/omo-opencode/src/features/cross-project-mailbox/dialog/tui-command.test.ts` -> all pass (6 tests incl. "unwraps TuiDialogSelectOption wrappers"); `git show --stat HEAD` lists exactly the 2 files.
+  QA scenarios: happy = test run output captured; failure = if tests fail, the fix regressed - re-apply unwrap per adapters.tsx contract before committing. Evidence .omo/evidence/20260711-mailbox-sidebar-aft/task-1-land-unwrap-fix.md
+  Commit: Y | fix(mailbox-dialog): unwrap DialogSelect option wrappers in /project-mailbox submenu
+
+- [ ] 2. Bump @opentui/* production deps 0.2.16 -> 0.4.3 and prove the legacy materialize path still works
+  What to do: In root package.json DEPENDENCIES (not devDeps - they live at package.json:162-165): @opentui/core, @opentui/keymap, @opentui/solid -> 0.4.3 (match the opencode fork's pins, opencode/package.json:43-45); keep solid-js 1.9.12. `bun install`. Reconcile packages/omo-opencode/src/types/opentui-solid.d.ts: keep the ambient module shim ONLY if 0.4.3's real types don't cover createElement/insert/setProp as used by materialize; otherwise delete it and import real types. Add a REAL-RUNTIME smoke test (no mock.module) that imports @opentui/solid and asserts the materialize contract: createElement("box")/insert/setProp produce a node tree (Metis gap: existing tui.test.ts mocks @opentui/solid at tui.test.ts:62-70, so it cannot catch an API break). Verify @opentui/keymap 0.4.3 still exposes the Layer/commands[] registration shape used by tui-command.ts:39 and registerLayer tests still pass.
+  Must NOT: change solid-js version; touch package.json "version"; leave both an ambient shim AND real types conflicting.
+  Parallelization: Wave 1 | Blocked by: T1 | Blocks: T3, T6, T7
+  References: package.json:156-176; packages/omo-opencode/src/types/opentui-solid.d.ts; packages/omo-opencode/src/tui.ts:23-27,97-118 (SolidRuntime contract); packages/omo-opencode/src/tui.test.ts; aft/packages/opencode-plugin/package.json:38-41 (proves 0.4.3+solid 1.9.12 is the working combo against this host).
+  Acceptance criteria: `bun install` clean; `bun run typecheck` clean; `bun test packages/omo-opencode/src/tui.test.ts packages/omo-opencode/src/features/cross-project-mailbox/dialog/tui-command.test.ts` pass; new smoke test passes importing the REAL @opentui/solid.
+  QA scenarios: happy = smoke test green on 0.4.3; failure = if createElement/insert/setProp were renamed/removed in 0.4.3, adapt materialize() call sites in tui.ts and document the API delta in the evidence file. Evidence .omo/evidence/20260711-mailbox-sidebar-aft/task-2-opentui-bump.md
+  Commit: Y | chore(deps): bump @opentui/core+keymap+solid to 0.4.3 for host runtime parity
+
+- [ ] 3. Build pipeline: TSX precompile step with virtual runtime-module ids + bundle externals fix
+  What to do: (a) Create script/build-tui-solid.ts adapted from aft/packages/opencode-plugin/scripts/build-tui.ts (MIT attribution header): walk packages/omo-opencode/src/tui-solid/**, run @opentui/solid's transformSolidSource on .tsx (moduleName + resolvePath -> `opentui:runtime-module:<specifier>` for @opentui/core, @opentui/solid[, /components, /jsx-runtime, /jsx-dev-runtime], solid-js, solid-js/store), copy plain .ts, exclude *.test.*, emit to dist/tui-compiled/. (b) Add a `tui-solid` node to the script/build.ts graph (nodes array script/build.ts:55-71) with deps [] and make the `tui` node depend on it (Metis gap: no build node existed). (c) Add `--external solid-js` to the tui bundle args (script/build.ts:53,62) so dist/tui.js stops inlining a second solid runtime. (d) Scoped TSX typecheck: packages/omo-opencode/src/tui-solid/tsconfig.json with jsx=preserve, jsxImportSource=@opentui/solid (Metis gap: root tsconfigs define no jsx); ensure `bun run typecheck` covers or explicitly excludes-with-dedicated-check this dir. (e) Seed src/tui-solid/ with a trivial placeholder component so the pipeline is testable before T7.
+  Must NOT: bundle solid-js or @opentui/* INTO dist/tui-compiled output; emit test files; break the existing `tui` node output path dist/tui.js.
+  Parallelization: Wave 1 | Blocked by: T2 | Blocks: T7, T8, T9
+  References: aft/packages/opencode-plugin/scripts/build-tui.ts:1-151 (transform loader with dual resolve fallback, runtimeModuleId, isShippedSourceFile); script/build.ts:46-95 (BuildNode graph, OPENTUI_EXTERNALS); verify 0.4.3 ships scripts/solid-transform.js after T2's install (0.2.16 did NOT - confirmed absent).
+  Acceptance criteria: `bun run build` succeeds; dist/tui-compiled/ contains the transformed placeholder with `opentui:runtime-module:` ids and NO `from "solid-js"` literal imports; `grep -c 'init_server' dist/tui.js` shows the solid server-build inline is GONE (or at minimum `grep 'import("solid-js")'` remains as a bare dynamic import); test for the build script (given/when/then) covering .tsx transform + .ts copy + test-file exclusion.
+  QA scenarios: happy = build output inspection captured; failure = transformSolidSource missing in installed 0.4.3 -> resolve via package.json exports map or file path per AFT's resolveSolidTransformPath fallback; document. Evidence .omo/evidence/20260711-mailbox-sidebar-aft/task-3-build-pipeline.md
+  Commit: Y | feat(build): precompile TUI solid TSX with opentui virtual runtime-module binding
+
+- [ ] 4. Prefs: AFT-shaped schema under "oh-my-openagent" with mailbox back-compat + watcher
+  What to do: Extend packages/omo-opencode/src/features/tui-sidebar/tui-preferences.ts: OmoTuiPrefs = { forceToTop, order, startCollapsed, rememberCollapsed, collapsed, header:{label:"Mailbox",showVersion}, sections:{inbound,outbound,projects} } with resolveOmoPrefs() defaulting like aft preferences.ts resolveAftPrefs (bool/int/label coercers, structuredClone default); BACK-COMPAT: collapsed resolves `entry.collapsed ?? entry.mailbox.collapsed ?? startCollapsed` (legacy key written by tui.ts:221 today; do not delete legacy key on write - Metis gap). computeEffectiveOrder(root,"oh-my-openagent",150) incl. forceToTop -100000+keyIndex. Port watchTuiPreferences (fs.watch on dir, 150-200ms debounce, tmp-file filter, lastSeen echo guard) - keep jsonc-parser surgical writes (NOT comment-json; our write path already preserves sibling comments). Document order/forceToTop as restart-required. Tests: legacy-only file resolves collapsed; new schema wins over legacy; watcher echo guard rejects own write; malformed file -> defaults; write preserves sibling plugin keys+comments.
+  Must NOT: rename the "oh-my-openagent" key; introduce AFT-only section names; switch the write path to comment-json.
+  Parallelization: Wave 1 | Blocked by: T1 | Blocks: T7
+  References: packages/omo-opencode/src/features/tui-sidebar/tui-preferences.ts (current: OMO_KEY, writeChain, resolveOmoCollapsed:54-60); aft/packages/opencode-plugin/src/tui/preferences.ts:33-128,200-243 (schema/coercers/computeEffectiveOrder/watchTuiPreferences/persistCollapsedIfEnabled); magic-context sidebar-content.tsx:45-88 (echo-guard semantics: lastPersistedCollapsed advances only after own write lands).
+  Acceptance criteria: `bun test packages/omo-opencode/src/features/tui-sidebar/` pass incl. new cases; typecheck clean.
+  QA scenarios: happy = legacy {mailbox:{collapsed:true}} file yields collapsed=true under new resolver; failure = malformed jsonc file yields defaults and write is SKIPPED (no clobber - existing behavior preserved). Evidence .omo/evidence/20260711-mailbox-sidebar-aft/task-4-prefs-schema.md
+  Commit: Y | feat(tui-prefs): AFT-shaped preference schema with legacy mailbox.collapsed back-compat
+
+- [ ] 5. Adopt badge-contrast + write CortexKit attribution (notices checker green)
+  What to do: Copy aft/packages/opencode-plugin/src/tui/badge-contrast.ts to packages/omo-opencode/src/features/tui-sidebar/badge-contrast.ts with a concise legal attribution header (source repo, MIT, CortexKit) - keep the header short and factual so comment-checker passes (repo blocks decorative AI-slop comments; legal attribution is legitimate). Port/adapt its tests if AFT has them; else write given/when/then tests (accent hex -> readable fg; near-transparent + low-contrast guards). Add THIRD-PARTY-NOTICES.md entries for AFT (aft-opencode) and magic-context (CortexKit, MIT) covering the adapted files (badge-contrast, preferences patterns, build-tui transform, sidebar skeleton). Run `node scripts/check-third-party-notices.mjs --ship` (Metis: checker exists and gates dependency headings - scripts/check-third-party-notices.mjs:73-79,180-214) and fix whatever it demands (the @opentui/* dependency section may also need updating after T2's bump).
+  Must NOT: copy rpc-*.ts, notification-socket.ts, or any transport file; paste large unmodified AFT files that are not used.
+  Parallelization: Wave 1 | Blocked by: T1 | Blocks: T7
+  References: aft/packages/opencode-plugin/src/tui/badge-contrast.ts; THIRD-PARTY-NOTICES.md (headings: # Third Party Notices / ## Components); scripts/check-third-party-notices.mjs; AGENTS.md comment policy (+ `// @allow` escape if the checker false-positives on the header).
+  Acceptance criteria: `bun test` for new badge-contrast tests pass; `node scripts/check-third-party-notices.mjs --ship` exits 0.
+  QA scenarios: happy = checker green; failure = checker rejects heading shape -> match its expected format exactly and re-run. Evidence .omo/evidence/20260711-mailbox-sidebar-aft/task-5-attribution.md
+  Commit: Y | feat(tui-sidebar): adopt CortexKit badge-contrast with attribution and notices
+
+- [ ] 6. Shared host-runtime loader for BOTH sidebar slots
+  What to do: Create packages/omo-opencode/src/features/tui-sidebar/host-runtime.ts exporting loadHostSolidRuntime(): probes the host virtual registry via DYNAMICALLY CONSTRUCTED specifiers (`"opentui:runtime-module:" + encodeURIComponent("solid-js")`, same for "@opentui/solid") exactly like aft entry.mjs:5-14 - dynamic concatenation is REQUIRED so bun build cannot statically resolve/inline them; returns { solidJs, opentuiSolid, source: "host-virtual" | "bare-import" | "none" } falling back to bare import("solid-js")/import("@opentui/solid") (works because T3 made them externals), then to null. Rewire tui.ts to call this ONCE before creating ANY signal, and feed the result to createSignalPair for BOTH slots (Metis gap: a per-slot loader would leave the OMO slot on a different runtime). Log the chosen source via shared/logger for QA proof. Tests: registry-present path picks host-virtual (mock the virtual id via mock.module); registry-absent picks bare-import; both-absent degrades to static (current createSignalPair fallback).
+  Must NOT: import solid-js statically at module top level of tui.ts (would defeat externals/fallback); create signals before the loader resolves.
+  Parallelization: Wave 2 | Blocked by: T2 | Blocks: T7, T8
+  References: aft/packages/opencode-plugin/src/tui/entry.mjs:1-16; opencode/packages/opencode/src/plugin/tui/runtime.ts:47 (ensureRuntimePluginSupport registers the registry process-wide before plugins load, so the probe is safe at tui() time); packages/omo-opencode/src/tui.ts:29-52 (createSignalPair), 186-241 (tui entry + slot registration).
+  Acceptance criteria: `bun test packages/omo-opencode/src/features/tui-sidebar/host-runtime.test.ts` + tui.test.ts pass; typecheck clean.
+  QA scenarios: happy = mocked virtual registry -> source=host-virtual; failure = all imports throw -> sidebar still registers slots statically (registration test from tui.test.ts:56-107 stays green). Evidence .omo/evidence/20260711-mailbox-sidebar-aft/task-6-host-runtime.md
+  Commit: Y | fix(tui-sidebar): bind sidebar signals to the host solid runtime (frozen-toggle root cause)
+
+- [ ] 7. Mailbox TSX component in AFT form/function/styling + semantic regression guard
+  What to do: Create packages/omo-opencode/src/tui-solid/mailbox-sidebar.tsx (+ small pieces as needed, kebab-case, <=200 LOC/file): `/** @jsxImportSource @opentui/solid */`; createMailboxSidebarController in the slot-FACTORY closure (survives sidebar_content remounts - magic-context pattern sidebar-content.tsx:38-88) holding prefs/collapsed signals + watcher wiring from T4; SidebarContent: root box width=100% column border single borderColor=theme.borderActive padding 1; header row justifyContent=space-between alignItems=center with onMouseDown toggle + persist (aft sidebar.tsx:579-619); accent badge box with triangle INSIDE ("▶ "/"▼ " + prefs().header.label) fg=badgeTextColor(theme.accent, theme.background); version right-aligned when header.showVersion. Expanded: SectionHeader/StatRow rows for In (Unread warning-toned when >0, Done), Out (Pending, Read, Failed error-toned when >0), Projects (dot ● tone-colored + label left, statusText right; "No connected projects" muted) - sections gated by prefs().sections.{inbound,outbound,projects}. Collapsed: digest rows in the same space-between grid (in:N out:N + Projects (a/t active)) - reuse mailboxCollapsedSummary semantics. Tone mapping via theme only (success/warning/error/textMuted - render-view.ts presenceFg/projectDotColor semantics). Data in via props accessor to the SidebarView signal (from tui.ts poll). SEMANTIC REGRESSION TESTS (Metis gap): snapshot-level assertions that counts, presence labels, dot tones, and collapsed summary strings for fixture states are IDENTICAL to current mailboxNodes/describeView output (fixtures from render-view.test.ts).
+  Must NOT: alter any displayed value/derivation; import rpc/websocket anything; exceed sections beyond inbound/outbound/projects; use `as any`.
+  Parallelization: Wave 2 | Blocked by: T3, T4, T5, T6 | Blocks: T8
+  References: aft/packages/opencode-plugin/src/tui/sidebar.tsx:341-470 (component state/refresh discipline), 555-700 (JSX layout: header badge, collapsed rows, sections); magic-context sidebar-content.tsx:317-348 (StatRow/SectionHeader), 456-703 (controller usage + header onMouseDown), 897-921 (factory closure seeding); our data: render-view.ts:285-410 (mailboxNodes/mailboxCollapsedSummary/projectPresenceRow), state-types.ts SidebarView, cross-project-mailbox/sidebar MailboxSidebarState; theme fields available: ThemeLike render-view.ts:17-26 + borderActive/background/accent from host theme.
+  Acceptance criteria: `bun test packages/omo-opencode/src/tui-solid/` pass (component compiled via T3 pipeline in test or tested at the pure-function level with the transform applied); semantic-regression suite green; typecheck (scoped tsconfig) clean; `bun run build` emits dist/tui-compiled/mailbox-sidebar.* with runtime-module ids.
+  QA scenarios: happy = fixture with unread>0 renders warning tone + same count strings as legacy; failure = empty projects fixture renders "No connected projects" muted, all-zero mailbox renders "idle" digest. Evidence .omo/evidence/20260711-mailbox-sidebar-aft/task-7-mailbox-tsx.md
+  Commit: Y | feat(mailbox-sidebar): AFT-style solid TSX mailbox panel
+
+- [ ] 8. Wire the mailbox slot: compiled-JSX path with materialize fallback
+  What to do: In tui.ts: after loadHostSolidRuntime(), attempt the compiled component: dynamic import of dist/tui-compiled/mailbox-sidebar.js via `new URL("./tui-compiled/mailbox-sidebar.js", import.meta.url)` (dist/tui.js and dist/tui-compiled/ are siblings under dist/) guarded so bun build leaves it dynamic; on success register slot order = computeEffectiveOrder(prefsRoot,"oh-my-openagent",150) with sidebar_content mounting the TSX component bound to the shared view signal + controller; on ANY failure (registry absent, import fails, transform missing) register the EXISTING renderMailbox materialize thunk unchanged (fallback invariant). OMO slot (900) keeps materialize but now uses host-bound signals from T6. Keep the 1s poll -> setView -> requestRender loop and dispose cleanup (clear watcher from T4 controller on api.lifecycle.onDispose). Update tui.test.ts: both paths (compiled-present mock, compiled-absent fallback) assert two slot registrations + render; ensure legacy registration-order test (MAILBOX 150 before OMO 900) still passes when order comes from prefs.
+  Must NOT: drop the fallback; change POLL_INTERVAL_MS; leave the legacy toggle handler writing the OLD prefs path only (route writes through T4's schema, which still maintains legacy mailbox.collapsed for downgrade safety).
+  Parallelization: Wave 2 | Blocked by: T3, T6, T7 | Blocks: T9, T10
+  References: packages/omo-opencode/src/tui.ts:186-285 (current flow); T6 host-runtime.ts; T7 component; script/build.ts tui node output layout (dist/tui.js + dist/tui-compiled/).
+  Acceptance criteria: `bun test packages/omo-opencode/src/tui.test.ts` green for BOTH paths; `bun run build` then `node -e 'import("file:///.../dist/tui.js")'`-style import smoke does not throw; typecheck clean.
+  QA scenarios: happy = compiled path mounts (log line source=host-virtual + compiled=true); failure = simulate missing dist/tui-compiled -> fallback registers materialize slot, sidebar still renders. Evidence .omo/evidence/20260711-mailbox-sidebar-aft/task-8-slot-wiring.md
+  Commit: Y | feat(tui): mount compiled mailbox JSX slot with materialize fallback
+
+- [ ] 9. Pack-install smoke test (the AFT "frozen sidebar from npm install" gate)
+  What to do: Adapt aft/packages/opencode-plugin/scripts/smoke-tui-pack-install.ts: `bun pm pack` the root package into a temp dir, install/extract, import its ./tui export (dist/tui.js), assert (a) dist/tui-compiled/** is present in the tarball (Metis: files ships dist wholesale - verify, don't assume; package.json:44-47), (b) with a mocked virtual registry the compiled path is selected, (c) a signal write flips the rendered collapse marker (reactivity proof), (d) without the registry the fallback path loads. Wire as script/qa or test file runnable via bun; add to evidence.
+  Must NOT: publish anything; depend on network.
+  Parallelization: Wave 3 | Blocked by: T8 | Blocks: F-wave
+  References: AFT doc SS3 verify paragraph (building-a-tui-sidebar-plugin.md:134-136); aft/packages/opencode-plugin/scripts/smoke-tui-pack-install.ts; package.json files/exports:44-104.
+  Acceptance criteria: smoke script exits 0 with all four assertions logged; tarball listing captured.
+  QA scenarios: happy = full pass log; failure = tui-compiled missing from tarball -> fix files globs and re-run. Evidence .omo/evidence/20260711-mailbox-sidebar-aft/task-9-pack-smoke.md
+  Commit: Y | test(tui): pack-install smoke proving compiled TUI path + reactivity
+
+- [ ] 10. Live QA: real click toggles the mailbox panel (macos-cua primary, tmux fallback)
+  What to do: (a) `bun run build`; launch opencode TUI in an ISOLATED sandbox (source script/agent/qa-sandbox.sh conventions; never touch real ~/.local/share/opencode - prove via session-count diff) inside a cmux/tmux workspace with the local dist plugin. (b) PERMISSION PREFLIGHT for macos-cua: verify the MCP/CLI connects AND a test screenshot shows actual window content (earlier failure mode: wallpaper-only screenshot = Screen Recording not granted to the invoking terminal; MCP connection refused). If granted: locate the "▶/▼ Mailbox" badge row on screen, real-click it, capture before/after screenshots showing collapse<->expand and the prefs file gaining collapsed:true/false. (c) FALLBACK if permissions unavailable: run opencode inside tmux, `tmux send-keys -H` the SGR-encoded press+release bytes for the badge row coordinates into the PANE (input path - reaches the app's stdin; NEVER write escapes to /dev/ttys* and present it as evidence). (d) Regression: /project-mailbox dialog full loop (select project -> set impl -> verify jsonc write -> revert) still works post-refactor. (e) Also capture the collapsed digest + expanded sections visually for form/styling review vs AFT.
+  Must NOT: fabricate evidence; reuse the invalid raw-tty methodology; kill the user's live opencode sessions (memory #1873).
+  Parallelization: Wave 3 | Blocked by: T8 | Blocks: F-wave
+  References: .agents/skills/opencode-qa/ (isolation conventions); script/agent/qa-sandbox.sh; macos-cua skill (/Users/brethoffman/.config/opencode/skills/macos-cua/SKILL.md); prior evidence dirs .omo/evidence/20260702-mailbox-sidebar-live-toggle/ (what the old, pre-fix behavior looked like); memory #1747 (TUI sessions have mailboxes disabled without a port - launch with a port if mailbox data must populate, or assert the Projects section against a seeded registry fixture).
+  Acceptance criteria: evidence file with (1) isolation proof, (2) permission preflight result, (3) before/after captures proving a real click toggled collapse, (4) prefs file diff, (5) dialog regression pass; all commands + raw captures recorded.
+  QA scenarios: happy = macos-cua click path end-to-end; failure = permissions denied -> documented preflight failure + tmux send-keys -H path used instead, with the same before/after proof. Evidence .omo/evidence/20260711-mailbox-sidebar-aft/task-10-live-qa.md
+  Commit: Y | test(qa): live click-toggle + dialog regression evidence for mailbox sidebar
+
+## Final verification wave
+> Runs in parallel after ALL todos. ALL must APPROVE. Surface results and wait for the user's explicit okay before declaring complete.
+- [ ] F1. Plan compliance audit
+- [ ] F2. Code quality review
+- [ ] F3. Real manual QA
+- [ ] F4. Scope fidelity
+
+## Commit strategy
+- Fork policy (memory #1789): direct commits on `fork/local`, no PR. One atomic commit per todo (messages given per-todo above, conventional-commit style, present tense).
+- Pre-commit hook may churn utils/models*.json (known model-capabilities refresher); if it dirties them, exclude via `git commit --no-verify` after review, per established session practice - NEVER commit those files in this plan's commits.
+- PUSH to origin only after the Final verification wave passes AND the user gives the explicit okay.
+
+## Success criteria
+- Clicking the Mailbox header badge in a LIVE TUI (cmux) collapses/expands the panel, with real-click evidence recorded - the original bug 1 is dead.
+- dist/tui.js contains no inlined private solid-js runtime; sidebar signals verifiably live on the host runtime (source=host-virtual log + pack smoke reactivity proof).
+- Mailbox panel visually matches AFT's form: accent badge header w/ triangle, StatRow grid, collapsed digest, single-border container (screenshots in evidence).
+- All mailbox values render byte-identical to the legacy renderer (semantic regression suite green).
+- Legacy fallback intact: registry-absent host still renders the materialize mailbox panel.
+- `bun run typecheck` clean; `bun test` at baseline (32 known environmental failures, zero NEW failures); notices checker green; /project-mailbox dialog regression green.
+- All todo commits atomic on fork/local; push gated on user approval.
