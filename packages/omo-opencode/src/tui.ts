@@ -8,6 +8,7 @@ import { computeView, viewKey } from "./features/tui-sidebar/compute-view"
 import { POLL_INTERVAL_MS } from "./features/tui-sidebar/constants"
 import { deriveAgents, deriveConfig, deriveJobBoard, deriveLoop, deriveRoster } from "./features/tui-sidebar/derivers"
 import type { ViewNode } from "./features/tui-sidebar/element-helpers"
+import { loadHostSolidRuntime } from "./features/tui-sidebar/host-runtime"
 import { readMirror } from "./features/tui-sidebar/mirror-io"
 import { buildMailboxNodes, buildViewNodes } from "./features/tui-sidebar/render-view"
 import type { MailboxToggleOpts } from "./features/tui-sidebar/render-view"
@@ -186,17 +187,13 @@ export function handleTuiPollError(
 const module: TuiPluginModule = {
   id: "oh-my-openagent:tui",
   tui: async (api) => {
-    const solid = await import("@opentui/solid").catch((error) => {
-      log("[tui-sidebar] @opentui/solid unavailable; sidebar disabled", { error })
-      return null
-    })
+    const hostRuntime = await loadHostSolidRuntime()
+    const solid = hostRuntime.opentuiSolid
     if (!solid) {
+      log("[tui-sidebar] @opentui/solid unavailable; sidebar disabled")
       return
     }
-    const solidJs = await import("solid-js").catch((error) => {
-      log("[tui-sidebar] solid-js unavailable; sidebar renders statically", { error })
-      return null
-    })
+    const { solidJs } = hostRuntime
 
     const directory = api.state.path.directory
     if ((await loadPluginValidation(directory)).config.tui?.sidebar?.enabled === false) {
