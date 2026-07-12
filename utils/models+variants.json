@@ -1897,10 +1897,6 @@
       "variants": []
     },
     {
-      "key": "openrouter/meta-llama/llama-3-8b-instruct",
-      "variants": []
-    },
-    {
       "key": "openrouter/meta-llama/llama-3.1-70b-instruct",
       "variants": []
     },
