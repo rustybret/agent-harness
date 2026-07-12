@@ -84,6 +84,18 @@ Generator/checker note: update this file with the audited component list, then r
 - Upstream URL: https://www.npmjs.com/package/@opencode-ai/sdk
 - Where-bundled: root production dependency for OpenCode API access.
 
+### aft-opencode@source
+- License: MIT, from the CortexKit AFT source repository.
+- Copyright: CortexKit contributors.
+- Upstream URL: https://github.com/cortexkit/aft
+- Where-adapted: source patterns and code in `script/build-tui-solid.ts`, `packages/omo-opencode/src/features/tui-sidebar/tui-preferences.ts`, and `packages/omo-opencode/src/features/tui-sidebar/badge-contrast.ts`.
+
+### magic-context@source
+- License: MIT, from the CortexKit Magic Context source repository.
+- Copyright: CortexKit contributors.
+- Upstream URL: https://github.com/cortexkit/magic-context
+- Where-adapted: shared TUI preference and sidebar controller patterns for the mailbox sidebar plan, currently reflected in `packages/omo-opencode/src/features/tui-sidebar/tui-preferences.ts`; later plan todos will update this entry as additional adapted files land.
+
 ### CodeGraph bundled Node.js runtime
 - License: Node.js MIT license plus bundled third-party licenses for runtime components such as OpenSSL and V8. The inspected CodeGraph platform tarballs include the Node.js binary but no separate Node LICENSE or NOTICE files; the Codex CodeGraph component therefore ships Node.js v24.16.0 license text at `packages/omo-codex/plugin/components/codegraph/NODE-RUNTIME-LICENSES.md`.
 - Copyright: Node.js contributors, OpenSSL Software Foundation, V8 authors, and other Node.js third-party contributors.
