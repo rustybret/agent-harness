@@ -130,11 +130,12 @@ await rm(outputRoot, { recursive: true, force: true })
 
 for (const sourceFile of files) {
   const relativePath = relative(sourceRoot, sourceFile)
-  const outputFile = join(outputRoot, relativePath)
-
+  
   if (sourceFile.endsWith(".tsx")) {
+    const outputFile = join(outputRoot, relativePath.replace(/\.tsx$/, ".js"))
     await compileTsx(loadedTransform.transformSolidSource, sourceFile, outputFile)
   } else {
+    const outputFile = join(outputRoot, relativePath)
     await copyPlainTypeScript(sourceFile, outputFile)
   }
 }

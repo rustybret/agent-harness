@@ -71,10 +71,10 @@ describe("build-tui-solid precompile", () => {
 
     // #then
     expect(result.status, result.stderr).toBe(0)
-    expect(listRelativeFiles(outputRoot)).toEqual(["nested/plain.ts", "placeholder.tsx"])
+    expect(listRelativeFiles(outputRoot)).toEqual(["nested/plain.ts", "placeholder.js"])
     expect(readFileSync(join(outputRoot, "nested", "plain.ts"), "utf8")).toBe("export const copied = true\n")
 
-    const transformed = readFileSync(join(outputRoot, "placeholder.tsx"), "utf8")
+    const transformed = readFileSync(join(outputRoot, "placeholder.js"), "utf8")
     expect(transformed).toContain("opentui:runtime-module:%40opentui%2Fsolid")
     expect(transformed).toContain("opentui:runtime-module:solid-js")
     expect(transformed).toContain("opentui:runtime-module:solid-js%2Fstore")
