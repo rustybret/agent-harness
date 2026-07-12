@@ -35,7 +35,7 @@ function listRelativeFiles(root: string): string[] {
 }
 
 describe("build-tui-solid precompile", () => {
-  test("transforms TSX, copies TS, and excludes test files", async () => {
+  test("transforms TSX and TS sources, emits JS, and excludes test files", async () => {
     // #given
     const workspace = mkdtempSync(join(tmpdir(), "tui-solid-build-"))
     const sourceRoot = join(workspace, "src")
@@ -54,7 +54,14 @@ describe("build-tui-solid precompile", () => {
         "}",
       ].join("\n"),
     )
-    writeFileSync(join(sourceRoot, "nested", "plain.ts"), "export const copied = true\n")
+    writeFileSync(
+      join(sourceRoot, "nested", "plain.ts"),
+      [
+        'import { createSignal } from "solid-js"',
+        "",
+        "export const copied = createSignal(true)[0]",
+      ].join("\n"),
+    )
     writeFileSync(join(sourceRoot, "nested", "skip.test.ts"), "throw new Error('excluded')\n")
     writeFileSync(join(sourceRoot, "skip.test.tsx"), "throw new Error('excluded')\n")
 
@@ -71,8 +78,12 @@ describe("build-tui-solid precompile", () => {
 
     // #then
     expect(result.status, result.stderr).toBe(0)
-    expect(listRelativeFiles(outputRoot)).toEqual(["nested/plain.ts", "placeholder.js"])
-    expect(readFileSync(join(outputRoot, "nested", "plain.ts"), "utf8")).toBe("export const copied = true\n")
+    expect(listRelativeFiles(outputRoot)).toEqual(["nested/plain.js", "placeholder.js"])
+
+    const transformedPlain = readFileSync(join(outputRoot, "nested", "plain.js"), "utf8")
+    expect(transformedPlain).toContain("opentui:runtime-module:solid-js")
+    expect(transformedPlain).toContain("export const copied = createSignal(true)[0]")
+    expect(transformedPlain).not.toContain('from "solid-js"')
 
     const transformed = readFileSync(join(outputRoot, "placeholder.js"), "utf8")
     expect(transformed).toContain("opentui:runtime-module:%40opentui%2Fsolid")

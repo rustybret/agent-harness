@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // Adapted from AFT packages/opencode-plugin/scripts/build-tui.ts, MIT licensed.
 
-import { copyFile, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises"
+import { mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises"
 import { createRequire } from "node:module"
 import { basename, dirname, join, relative } from "node:path"
 import { fileURLToPath, pathToFileURL } from "node:url"
@@ -102,12 +102,7 @@ async function listSourceFiles(directory: string): Promise<string[]> {
   return files
 }
 
-async function copyPlainTypeScript(sourceFile: string, outputFile: string): Promise<void> {
-  await mkdir(dirname(outputFile), { recursive: true })
-  await copyFile(sourceFile, outputFile)
-}
-
-async function compileTsx(
+async function compileSolidSource(
   transformSolidSource: TransformSolidSource,
   sourceFile: string,
   outputFile: string,
@@ -130,14 +125,8 @@ await rm(outputRoot, { recursive: true, force: true })
 
 for (const sourceFile of files) {
   const relativePath = relative(sourceRoot, sourceFile)
-  
-  if (sourceFile.endsWith(".tsx")) {
-    const outputFile = join(outputRoot, relativePath.replace(/\.tsx$/, ".js"))
-    await compileTsx(loadedTransform.transformSolidSource, sourceFile, outputFile)
-  } else {
-    const outputFile = join(outputRoot, relativePath)
-    await copyPlainTypeScript(sourceFile, outputFile)
-  }
+  const outputFile = join(outputRoot, relativePath.replace(/\.tsx?$/, ".js"))
+  await compileSolidSource(loadedTransform.transformSolidSource, sourceFile, outputFile)
 }
 
 process.stdout.write(

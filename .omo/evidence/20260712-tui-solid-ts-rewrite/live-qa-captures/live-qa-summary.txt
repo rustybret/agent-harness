@@ -1,0 +1,16 @@
+real_db=/Users/brethoffman/.local/share/opencode/opencode.db
+host_session_count_before=5941
+host_session_count_after=5941
+tmux_socket=omofixqa
+tmux_session=mailbox
+[2026-07-12T09:53:44.823Z] [tui-sidebar] host runtime source {"source":"host-virtual"}
+[2026-07-12T09:53:44.884Z] [tui-sidebar] mounted compiled mailbox component {"compiled":true,"order":150}
+coordinate=row=11 col=164 glyph=▼ line=                                                                                                                                                                │  ▼ Mailbox                v4.17.0 │ 
+badge_before=row 11:                                                                                                                                                                 │  ▼ Mailbox                v4.17.0 │
+badge_after_click_1=row 11:                                                                                                                                                                 │  ▶ Mailbox                v4.17.0 │
+badge_after_click_2=row 11:                                                                                                                                                                 │  ▼ Mailbox                v4.17.0 │
+badge_after_click_3=row 11:                                                                                                                                                                 │  ▶ Mailbox                v4.17.0 │
+prefs_before=(missing) 
+prefs_after_click_1={   "oh-my-openagent": {     "mailbox": {       "collapsed": true,       "registrationNoticeShown": {         "agent-harness-0367cd71": true       }     }   } } 
+prefs_after_click_2={   "oh-my-openagent": {     "mailbox": {       "collapsed": false,       "registrationNoticeShown": {         "agent-harness-0367cd71": true       }     }   } } 
+prefs_after_click_3={   "oh-my-openagent": {     "mailbox": {       "collapsed": true,       "registrationNoticeShown": {         "agent-harness-0367cd71": true       }     }   } } 
