@@ -1,30 +1,131 @@
 {
-  "active_plan": null,
-  "started_at": "2026-07-04T07:03:06.688Z",
+  "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.omo/plans/mailbox-sidebar-aft.md",
+  "started_at": "2026-07-12T04:41:50.207Z",
   "session_ids": [
-    "opencode:ses_12859ccc7ffeqfp9uzpCKBsAwW"
+    "opencode:ses_0b660fb8fffeFaqSApnd8cKG4S"
   ],
   "session_origins": {
-    "opencode:ses_12859ccc7ffeqfp9uzpCKBsAwW": "direct"
+    "opencode:ses_0b660fb8fffeFaqSApnd8cKG4S": "direct"
   },
-  "plan_name": "mailbox-internal-external-mode",
+  "plan_name": "mailbox-sidebar-aft",
   "agent": "atlas",
   "task_sessions": {
+    "todo:2": {
+      "task_key": "todo:2",
+      "task_label": "2",
+      "task_title": "Bump @opentui/* production deps 0.2.16 -> 0.4.3 and prove the legacy materialize path still works",
+      "session_id": "opencode:ses_0ab5852f7ffe9QgRTucVz5QVpu",
+      "agent": "Sisyphus-Junior",
+      "category": "deep",
+      "updated_at": "2026-07-12T04:58:41.148Z",
+      "started_at": "2026-07-12T04:57:30.230Z",
+      "status": "completed",
+      "ended_at": "2026-07-12T04:58:41.148Z",
+      "elapsed_ms": 70918
+    },
+    "todo:3": {
+      "task_key": "todo:3",
+      "task_label": "3",
+      "task_title": "Build pipeline: TSX precompile step with virtual runtime-module ids + bundle externals fix",
+      "session_id": "opencode:ses_0ab4d74beffe4VyIV6Ke1mpaZC",
+      "agent": "Sisyphus-Junior",
+      "category": "deep",
+      "updated_at": "2026-07-12T05:15:29.106Z",
+      "started_at": "2026-07-12T05:12:31.740Z",
+      "status": "completed",
+      "ended_at": "2026-07-12T05:15:29.106Z",
+      "elapsed_ms": 177366
+    },
+    "todo:4": {
+      "task_key": "todo:4",
+      "task_label": "4",
+      "task_title": "Prefs: AFT-shaped schema under \"oh-my-openagent\" with mailbox back-compat + watcher",
+      "session_id": "opencode:ses_0ab3e43b0ffedLnE0E1fP2tega",
+      "agent": "Sisyphus-Junior",
+      "started_at": "2026-07-12T05:25:17.522Z",
+      "status": "completed",
+      "updated_at": "2026-07-12T05:34:38.056Z",
+      "ended_at": "2026-07-12T05:34:38.056Z",
+      "elapsed_ms": 560534
+    },
     "todo:1": {
       "task_key": "todo:1",
       "task_label": "1",
-      "task_title": "The shared `ModeDetector` instance IS correctly threaded from `create-plugin-module.ts` \u2192 `createTools`/`createHooks` \u2192 `createToolRegistry`/`createMailboxSessionHooks` \u2192 `createMailboxToolsRecord`/`createMailboxHooks` (verified by direct code read \u2014 this was fixed in a prior round).",
-      "session_id": "opencode:ses_0cdc935caffeBX5sWLLh8E6mtE",
+      "task_title": "Copy `/Volumes/Topper2TB/Git/aft/packages/opencode-plugin/src/tui/badge-contrast.ts` to `packages/omo-opencode/src/features/tui-sidebar/badge-contrast.ts` with a concise legal attribution header (source repo, MIT license, CortexKit) — keep the header SHORT and factual (2-4 lines) so `comment-checker` doesn't flag it as decorative AI-slop (legal attribution is a legitimate exception, but keep it terse).",
+      "session_id": "opencode:ses_0ab2c86cbffeeurobVZZfQsJXP",
+      "agent": "Sisyphus-Junior",
+      "category": "deep",
+      "updated_at": "2026-07-12T05:44:53.444Z",
+      "started_at": "2026-07-12T05:44:53.443Z",
+      "status": "completed",
+      "ended_at": "2026-07-12T05:44:53.444Z",
+      "elapsed_ms": 1
+    },
+    "todo:6": {
+      "task_key": "todo:6",
+      "task_label": "6",
+      "task_title": "Shared host-runtime loader for BOTH sidebar slots",
+      "session_id": "opencode:ses_0ab21fddeffedRBK6RTL3F7JVE",
       "agent": "Sisyphus-Junior",
       "category": "ultrabrain",
-      "updated_at": "2026-07-05T12:18:17.747Z",
-      "started_at": "2026-07-05T12:18:17.747Z",
+      "updated_at": "2026-07-12T06:03:14.701Z",
+      "started_at": "2026-07-12T06:01:30.667Z",
+      "status": "completed",
+      "ended_at": "2026-07-12T06:03:14.701Z",
+      "elapsed_ms": 104034
+    },
+    "todo:7": {
+      "task_key": "todo:7",
+      "task_label": "7",
+      "task_title": "Mailbox TSX component in AFT form/function/styling + semantic regression guard",
+      "session_id": "opencode:ses_0ab0fff7cffeAQuH91sad6h2Y2",
+      "agent": "Sisyphus-Junior",
+      "started_at": "2026-07-12T06:19:48.848Z",
+      "status": "completed",
+      "updated_at": "2026-07-12T06:27:55.647Z",
+      "ended_at": "2026-07-12T06:27:55.647Z",
+      "elapsed_ms": 486799
+    },
+    "todo:8": {
+      "task_key": "todo:8",
+      "task_label": "8",
+      "task_title": "Wire the mailbox slot: compiled-JSX path with materialize fallback",
+      "session_id": "opencode:ses_0aaf2c737fferwsX2QTz9k8xOa",
+      "agent": "Sisyphus-Junior",
+      "started_at": "2026-07-12T06:31:29.668Z",
+      "status": "completed",
+      "updated_at": "2026-07-12T06:48:06.028Z",
+      "ended_at": "2026-07-12T06:48:06.028Z",
+      "elapsed_ms": 996360
+    },
+    "todo:9": {
+      "task_key": "todo:9",
+      "task_label": "9",
+      "task_title": "Pack-install smoke test (the AFT \"frozen sidebar from npm install\" gate)",
+      "session_id": "opencode:ses_0aad4d22dffegxR9SMcG3NDwEx",
+      "agent": "Sisyphus-Junior",
+      "category": "deep",
+      "started_at": "2026-07-12T06:58:28.899Z",
+      "status": "completed",
+      "updated_at": "2026-07-12T07:31:30.927Z",
+      "ended_at": "2026-07-12T07:31:30.927Z",
+      "elapsed_ms": 1982028
+    },
+    "todo:10": {
+      "task_key": "todo:10",
+      "task_label": "10",
+      "task_title": "Live QA: real click toggles the mailbox panel (macos-cua primary, tmux fallback)",
+      "session_id": "opencode:ses_0aabc8112ffee8v2PfrnrZqcGW",
+      "agent": "Sisyphus-Junior",
+      "category": "deep",
+      "updated_at": "2026-07-12T07:39:26.250Z",
+      "started_at": "2026-07-12T07:39:26.250Z",
       "status": "running"
     }
   },
-  "active_work_id": null,
-  "status": "idle",
-  "updated_at": "2026-07-05T12:18:17.747Z",
+  "active_work_id": "mailbox-sidebar-aft-4dc5de92",
+  "status": "active",
+  "updated_at": "2026-07-12T07:39:26.250Z",
   "schema_version": 2,
   "works": {
     "provider-quirks-normalizer-legacy": {
@@ -69,7 +170,7 @@
         "final-wave:f1": {
           "task_key": "final-wave:f1",
           "task_label": "F1",
-          "task_title": "**Plan Compliance Audit** \u2014 `oracle`",
+          "task_title": "**Plan Compliance Audit** — `oracle`",
           "session_id": "ses_1ec0c9ce2ffezzZ5wTH46FWZLw",
           "agent": "oracle",
           "updated_at": "2026-05-10T22:12:58.387Z"
@@ -102,7 +203,7 @@
         "final-wave:f1": {
           "task_key": "final-wave:f1",
           "task_label": "F1",
-          "task_title": "**Plan Compliance Audit** \u2014 `oracle`",
+          "task_title": "**Plan Compliance Audit** — `oracle`",
           "session_id": "ses_1d69f1164ffeH2mEmdlKtNdCWb",
           "agent": "oracle",
           "updated_at": "2026-05-15T02:04:39.059Z"
@@ -214,7 +315,7 @@
         "final-wave:f1": {
           "task_key": "final-wave:f1",
           "task_label": "F1",
-          "task_title": "**Plan Compliance Audit** \u2014 `oracle`",
+          "task_title": "**Plan Compliance Audit** — `oracle`",
           "session_id": "opencode:ses_17671a21affeOBqy01SZ6wv4wk",
           "agent": "Sisyphus-Junior",
           "category": "deep",
@@ -305,7 +406,7 @@
         "todo:9": {
           "task_key": "todo:9",
           "task_label": "9",
-          "task_title": "C2/C3: render the mailbox section in buildViewNodes (counts + \u25b6/\u25bc + onMouseDown)",
+          "task_title": "C2/C3: render the mailbox section in buildViewNodes (counts + ▶/▼ + onMouseDown)",
           "session_id": "opencode:ses_0e5ded1b5ffeWTslAndA014QTj",
           "agent": "Sisyphus-Junior",
           "category": "unspecified-high",
@@ -331,7 +432,7 @@
         "final-wave:f1": {
           "task_key": "final-wave:f1",
           "task_label": "F1",
-          "task_title": "Plan compliance audit - every todo's acceptance criteria met; ROOT mailbox field STILL optional (NO per-layer `.default()`) with the populated default injected ONCE post-merge in both loaders; a layered user `enabled:false` + project-omitted survives the shallow merge as false; auto-provision trigger fires on an absent PROJECT-layer file (not on merged-config falsiness) AND uses `detectPluginConfigFile` (not hardcoded `.opencode/oh-my-openagent.jsonc`) to detect existing configs; tui-preferences uses jsonc-parser `modify`/`applyEdits` (NOT comment-json, NOT JSON round-trip) and preserves sibling comments (verify citation is `package.json:33` not `:31`); outbound 3-state ack over a tail-bounded read/parse/stat window; effective body cap = `min(config.bounds.max_body_bytes, 32768)`; T6 hot-reload uses `deps.thisRepoRoot` (NOT `deps.directory` which does not exist on `ProjectMessageToolDeps`); lazy reload via the READ-ONLY `validatePluginConfig` (NOT `loadPluginConfig`) on both send + drain with last-good fallback; permissionless early-out; collapse persisted to `\"oh-my-openagent\"` key via `queueTuiPreferenceUpdate([\"mailbox\",\"collapsed\"], ...)` (path arg MUST be `[\"mailbox\",\"collapsed\"]` \u2014 helper prepends the root prefix internally). Cite file:line for each.",
+          "task_title": "Plan compliance audit - every todo's acceptance criteria met; ROOT mailbox field STILL optional (NO per-layer `.default()`) with the populated default injected ONCE post-merge in both loaders; a layered user `enabled:false` + project-omitted survives the shallow merge as false; auto-provision trigger fires on an absent PROJECT-layer file (not on merged-config falsiness) AND uses `detectPluginConfigFile` (not hardcoded `.opencode/oh-my-openagent.jsonc`) to detect existing configs; tui-preferences uses jsonc-parser `modify`/`applyEdits` (NOT comment-json, NOT JSON round-trip) and preserves sibling comments (verify citation is `package.json:33` not `:31`); outbound 3-state ack over a tail-bounded read/parse/stat window; effective body cap = `min(config.bounds.max_body_bytes, 32768)`; T6 hot-reload uses `deps.thisRepoRoot` (NOT `deps.directory` which does not exist on `ProjectMessageToolDeps`); lazy reload via the READ-ONLY `validatePluginConfig` (NOT `loadPluginConfig`) on both send + drain with last-good fallback; permissionless early-out; collapse persisted to `\"oh-my-openagent\"` key via `queueTuiPreferenceUpdate([\"mailbox\",\"collapsed\"], ...)` (path arg MUST be `[\"mailbox\",\"collapsed\"]` — helper prepends the root prefix internally). Cite file:line for each.",
           "session_id": "opencode:ses_0e59b6e74ffeTf5MKeXNkWJPNR",
           "agent": "oracle",
           "started_at": "2026-06-30T20:29:25.040Z",
@@ -383,7 +484,135 @@
       "task_sessions": {},
       "ended_at": "2026-07-05T14:47:33.000Z",
       "merge_commit": "0f381309c"
+    },
+    "mailbox-sidebar-aft-4dc5de92": {
+      "work_id": "mailbox-sidebar-aft-4dc5de92",
+      "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.omo/plans/mailbox-sidebar-aft.md",
+      "plan_name": "mailbox-sidebar-aft",
+      "status": "active",
+      "started_at": "2026-07-12T04:41:50.207Z",
+      "updated_at": "2026-07-12T07:39:26.250Z",
+      "session_ids": [
+        "opencode:ses_0b660fb8fffeFaqSApnd8cKG4S"
+      ],
+      "session_origins": {
+        "opencode:ses_0b660fb8fffeFaqSApnd8cKG4S": "direct"
+      },
+      "agent": "atlas",
+      "task_sessions": {
+        "todo:2": {
+          "task_key": "todo:2",
+          "task_label": "2",
+          "task_title": "Bump @opentui/* production deps 0.2.16 -> 0.4.3 and prove the legacy materialize path still works",
+          "session_id": "opencode:ses_0ab5852f7ffe9QgRTucVz5QVpu",
+          "agent": "Sisyphus-Junior",
+          "category": "deep",
+          "updated_at": "2026-07-12T04:58:41.148Z",
+          "started_at": "2026-07-12T04:57:30.230Z",
+          "status": "completed",
+          "ended_at": "2026-07-12T04:58:41.148Z",
+          "elapsed_ms": 70918
+        },
+        "todo:3": {
+          "task_key": "todo:3",
+          "task_label": "3",
+          "task_title": "Build pipeline: TSX precompile step with virtual runtime-module ids + bundle externals fix",
+          "session_id": "opencode:ses_0ab4d74beffe4VyIV6Ke1mpaZC",
+          "agent": "Sisyphus-Junior",
+          "category": "deep",
+          "updated_at": "2026-07-12T05:15:29.106Z",
+          "started_at": "2026-07-12T05:12:31.740Z",
+          "status": "completed",
+          "ended_at": "2026-07-12T05:15:29.106Z",
+          "elapsed_ms": 177366
+        },
+        "todo:4": {
+          "task_key": "todo:4",
+          "task_label": "4",
+          "task_title": "Prefs: AFT-shaped schema under \"oh-my-openagent\" with mailbox back-compat + watcher",
+          "session_id": "opencode:ses_0ab3e43b0ffedLnE0E1fP2tega",
+          "agent": "Sisyphus-Junior",
+          "started_at": "2026-07-12T05:25:17.522Z",
+          "status": "completed",
+          "updated_at": "2026-07-12T05:34:38.056Z",
+          "ended_at": "2026-07-12T05:34:38.056Z",
+          "elapsed_ms": 560534
+        },
+        "todo:1": {
+          "task_key": "todo:1",
+          "task_label": "1",
+          "task_title": "Copy `/Volumes/Topper2TB/Git/aft/packages/opencode-plugin/src/tui/badge-contrast.ts` to `packages/omo-opencode/src/features/tui-sidebar/badge-contrast.ts` with a concise legal attribution header (source repo, MIT license, CortexKit) — keep the header SHORT and factual (2-4 lines) so `comment-checker` doesn't flag it as decorative AI-slop (legal attribution is a legitimate exception, but keep it terse).",
+          "session_id": "opencode:ses_0ab2c86cbffeeurobVZZfQsJXP",
+          "agent": "Sisyphus-Junior",
+          "category": "deep",
+          "updated_at": "2026-07-12T05:44:53.444Z",
+          "started_at": "2026-07-12T05:44:53.443Z",
+          "status": "completed",
+          "ended_at": "2026-07-12T05:44:53.444Z",
+          "elapsed_ms": 1
+        },
+        "todo:6": {
+          "task_key": "todo:6",
+          "task_label": "6",
+          "task_title": "Shared host-runtime loader for BOTH sidebar slots",
+          "session_id": "opencode:ses_0ab21fddeffedRBK6RTL3F7JVE",
+          "agent": "Sisyphus-Junior",
+          "category": "ultrabrain",
+          "updated_at": "2026-07-12T06:03:14.701Z",
+          "started_at": "2026-07-12T06:01:30.667Z",
+          "status": "completed",
+          "ended_at": "2026-07-12T06:03:14.701Z",
+          "elapsed_ms": 104034
+        },
+        "todo:7": {
+          "task_key": "todo:7",
+          "task_label": "7",
+          "task_title": "Mailbox TSX component in AFT form/function/styling + semantic regression guard",
+          "session_id": "opencode:ses_0ab0fff7cffeAQuH91sad6h2Y2",
+          "agent": "Sisyphus-Junior",
+          "started_at": "2026-07-12T06:19:48.848Z",
+          "status": "completed",
+          "updated_at": "2026-07-12T06:27:55.647Z",
+          "ended_at": "2026-07-12T06:27:55.647Z",
+          "elapsed_ms": 486799
+        },
+        "todo:8": {
+          "task_key": "todo:8",
+          "task_label": "8",
+          "task_title": "Wire the mailbox slot: compiled-JSX path with materialize fallback",
+          "session_id": "opencode:ses_0aaf2c737fferwsX2QTz9k8xOa",
+          "agent": "Sisyphus-Junior",
+          "started_at": "2026-07-12T06:31:29.668Z",
+          "status": "completed",
+          "updated_at": "2026-07-12T06:48:06.028Z",
+          "ended_at": "2026-07-12T06:48:06.028Z",
+          "elapsed_ms": 996360
+        },
+        "todo:9": {
+          "task_key": "todo:9",
+          "task_label": "9",
+          "task_title": "Pack-install smoke test (the AFT \"frozen sidebar from npm install\" gate)",
+          "session_id": "opencode:ses_0aad4d22dffegxR9SMcG3NDwEx",
+          "agent": "Sisyphus-Junior",
+          "category": "deep",
+          "started_at": "2026-07-12T06:58:28.899Z",
+          "status": "completed",
+          "updated_at": "2026-07-12T07:31:30.927Z",
+          "ended_at": "2026-07-12T07:31:30.927Z",
+          "elapsed_ms": 1982028
+        },
+        "todo:10": {
+          "task_key": "todo:10",
+          "task_label": "10",
+          "task_title": "Live QA: real click toggles the mailbox panel (macos-cua primary, tmux fallback)",
+          "session_id": "opencode:ses_0aabc8112ffee8v2PfrnrZqcGW",
+          "agent": "Sisyphus-Junior",
+          "category": "deep",
+          "updated_at": "2026-07-12T07:39:26.250Z",
+          "started_at": "2026-07-12T07:39:26.250Z",
+          "status": "running"
+        }
+      }
     }
-  },
-  "worktree_path": null
+  }
 }
