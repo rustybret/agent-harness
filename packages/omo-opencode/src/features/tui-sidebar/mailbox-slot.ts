@@ -28,7 +28,7 @@ export type CompiledMailboxModule = {
 
 export async function loadCompiledMailboxModule(): Promise<CompiledMailboxModule> {
   try {
-    const compiledUrl = new URL("../../tui-compiled/mailbox-sidebar.js", import.meta.url).href
+    const compiledUrl = new URL("./tui-compiled/mailbox-sidebar.js", import.meta.url).href
     const mod = await import(compiledUrl)
     return {
       MailboxSidebar: mod.MailboxSidebar ?? null,
