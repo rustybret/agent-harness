@@ -1,7 +1,14 @@
 import { log } from "../../../shared/logger"
 import { createLiveMailboxConfigResolver } from "../config/live-config"
 import { createProjectRegistry } from "../registry"
-import { buildTopMenu, buildSubmenu, applySelection, MalformedConfigError } from "./menu-model"
+import {
+  buildTopMenu,
+  buildSubmenu,
+  applySelection,
+  MalformedConfigError,
+  type TopMenuRow,
+  type SubmenuOption,
+} from "./menu-model"
 import { detectPluginConfigFile, clearPluginConfigFileDetectionCache } from "../../../shared/jsonc-parser"
 import { autoProvisionMailboxConfig } from "../auto-provision"
 import { readFile, writeFile, rename, mkdir } from "node:fs/promises"
@@ -61,7 +68,12 @@ export function registerProjectMailboxCommand(api: any, deps: { directory: strin
               api.ui.DialogSelect({
                 title: "Project Mailbox",
                 options,
-                onSelect: (selectedRow: any) => {
+                // The host's DialogSelect delivers the full option wrapper
+                // ({title, value, description, ...}) to onSelect, not the
+                // bare value — see mapOptionCb() in opencode's tui adapters.
+                // Unwrap .value to get the TopMenuRow we put there above.
+                onSelect: (selected: { value: TopMenuRow }) => {
+                  const selectedRow = selected.value
                   const submenu = buildSubmenu(selectedRow)
                   const subOptions = submenu.map((opt) => ({
                     title: opt.label,
@@ -72,7 +84,8 @@ export function registerProjectMailboxCommand(api: any, deps: { directory: strin
                     api.ui.DialogSelect({
                       title: `Project Mailbox > ${selectedRow.label}`,
                       options: subOptions,
-                      onSelect: (selectedOpt: any) => {
+                      onSelect: (selectedSubOpt: { value: SubmenuOption }) => {
+                        const selectedOpt = selectedSubOpt.value
                         queueWrite(async () => {
                           const opencodeDirPath = join(deps.directory, ".opencode")
                           let detected = detectPluginConfigFile(opencodeDirPath, {

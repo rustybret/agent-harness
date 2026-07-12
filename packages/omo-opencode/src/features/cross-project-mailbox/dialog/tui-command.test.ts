@@ -66,6 +66,32 @@ describe("registerProjectMailboxCommand", () => {
     expect(topMenuProps.title).toBe("Project Mailbox")
   })
 
+  it("#given onSelect fires with the host's wrapped-option shape #when a project and choice are selected #then the write targets the real projectId, not undefined", async () => {
+    const configPath = join(tempDir, ".opencode", "oh-my-openagent.jsonc")
+    await mkdir(join(tempDir, ".opencode"), { recursive: true })
+    await writeFile(configPath, "{}", "utf8")
+
+    registerProjectMailboxCommand(api, { directory: tempDir })
+    await api.keymap.registerLayer.mock.calls[0][0].commands[0].run()
+
+    const topMenuProps = api.ui.DialogSelect.mock.calls[0][0]
+    // Mirrors mapOptionCb() in opencode's tui/plugin/adapters.tsx: onSelect
+    // is invoked with { value, title, description, ... }, not the bare row.
+    topMenuProps.onSelect({ value: { projectId: "project-a", label: "project-a", state: "Disabled" }, title: "project-a" })
+
+    const subMenuProps = api.ui.DialogSelect.mock.calls[1][0]
+    subMenuProps.onSelect({ value: { choice: "impl", value: "impl", label: "impl" }, title: "impl" })
+
+    await new Promise((resolve) => setTimeout(resolve, 50))
+
+    const updatedConfig = JSON.parse(await readFile(configPath, "utf8"))
+    expect(updatedConfig.cross_project_mailbox.senders["project-a"]).toEqual({
+      access: "allow",
+      intent_budget: "impl",
+    })
+    expect(updatedConfig.cross_project_mailbox.senders.undefined).toBeUndefined()
+  })
+
   it("preserves JSONC comments byte-for-byte outside the edited span", async () => {
     const configPath = join(tempDir, ".opencode", "oh-my-openagent.jsonc")
     await mkdir(join(tempDir, ".opencode"), { recursive: true })
@@ -87,16 +113,18 @@ describe("registerProjectMailboxCommand", () => {
     registerProjectMailboxCommand(api, { directory: tempDir })
     await api.keymap.registerLayer.mock.calls[0][0].commands[0].run()
     
-    // Simulate selecting project-a and changing to "impl"
+    // Simulate selecting project-a and changing to "impl". The real host
+    // wraps the option in { value, title, ... } — see the onSelect comment
+    // in tui-command.ts.
     const topMenuProps = api.ui.DialogSelect.mock.calls[0][0]
     const onSelectTop = topMenuProps.onSelect
     
-    onSelectTop({ projectId: "project-a", label: "project-a", state: "Disabled" })
+    onSelectTop({ value: { projectId: "project-a", label: "project-a", state: "Disabled" } })
     
     const subMenuProps = api.ui.DialogSelect.mock.calls[1][0]
     const onSelectSub = subMenuProps.onSelect
     
-    onSelectSub({ choice: "impl", value: "impl", label: "impl" })
+    onSelectSub({ value: { choice: "impl", value: "impl", label: "impl" } })
     
     // Wait for the write chain to complete
     await new Promise((resolve) => setTimeout(resolve, 50))
@@ -118,10 +146,10 @@ describe("registerProjectMailboxCommand", () => {
     await api.keymap.registerLayer.mock.calls[0][0].commands[0].run()
 
     const topMenuProps = api.ui.DialogSelect.mock.calls[0][0]
-    topMenuProps.onSelect({ projectId: "project-a", label: "project-a", state: "Disabled" })
+    topMenuProps.onSelect({ value: { projectId: "project-a", label: "project-a", state: "Disabled" } })
 
     const subMenuProps = api.ui.DialogSelect.mock.calls[1][0]
-    subMenuProps.onSelect({ choice: "impl", value: "impl", label: "impl" })
+    subMenuProps.onSelect({ value: { choice: "impl", value: "impl", label: "impl" } })
 
     await new Promise((resolve) => setTimeout(resolve, 50))
 
