@@ -4,7 +4,7 @@ import type { MailboxSidebarState } from "../features/cross-project-mailbox/side
 import type { ViewNode } from "../features/tui-sidebar/element-helpers"
 import { buildMailboxNodes } from "../features/tui-sidebar/render-view"
 import type { SidebarView } from "../features/tui-sidebar/state-types"
-import { createMailboxSidebarController, deriveMailboxContentModel } from "./mailbox-sidebar"
+import { createMailboxSidebarController, deriveMailboxContentModel } from "./mailbox-sidebar-model"
 
 type TextToken = {
   readonly text: string
