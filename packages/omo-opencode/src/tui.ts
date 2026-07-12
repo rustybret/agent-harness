@@ -14,12 +14,45 @@ import { buildMailboxNodes, buildViewNodes } from "./features/tui-sidebar/render
 import type { MailboxToggleOpts } from "./features/tui-sidebar/render-view"
 import type { RosterRow } from "./features/tui-sidebar/state-types"
 import type { SidebarView } from "./features/tui-sidebar/state-types"
+import type { OmoTuiPrefs } from "./features/tui-sidebar/tui-preferences"
 import {
+  computeEffectiveOrder,
   queueTuiPreferenceUpdate,
   readTuiPreferencesFileSync,
   resolveOmoCollapsed,
+  resolveOmoPrefs,
+  watchTuiPreferences,
 } from "./features/tui-sidebar/tui-preferences"
 import { log } from "./shared/logger"
+
+import packageJson from "../../../package.json" with { type: "json" }
+import { badgeTextColor } from "./features/tui-sidebar/badge-contrast"
+
+type Color = { r: number; g: number; b: number; a?: number }
+
+function isColor(c: unknown): c is Color {
+  return typeof c === "object" && c !== null && "r" in c && "g" in c && "b" in c
+}
+
+type MailboxSidebarController = {
+  readonly dispose: () => void
+}
+
+type CreateMailboxSidebarControllerFn = (deps: {
+  readonly getMailbox: () => MailboxSidebarState | null | undefined
+  readonly getPrefs: () => OmoTuiPrefs
+  readonly getVersion: () => string
+  readonly badgeTextColor: (accent: unknown, background: unknown) => unknown
+  readonly initialCollapsed: boolean
+  readonly onToggle: (collapsed: boolean) => void
+  readonly requestRender: () => void
+  readonly watchPrefs: (onChange: () => void) => () => void
+}) => MailboxSidebarController
+
+type MailboxSidebarComponent = (props: {
+  readonly controller: MailboxSidebarController
+  readonly theme: Record<string, unknown>
+}) => unknown
 
 type SolidRuntime<Node> = {
   readonly createElement: (tag: string) => Node
@@ -56,44 +89,6 @@ function createSignalPair<T>(runtime: SolidSignals | null, initial: T): readonly
 export const MAILBOX_SLOT_ORDER = 150
 export const OMO_SLOT_ORDER = 900
 
-type SidebarSlotRegistration<Node> = {
-  readonly order: number
-  readonly slots: {
-    readonly sidebar_content: () => () => Node
-  }
-}
-
-type RegisterSidebarContentSlotInput<Node> = {
-  readonly registerSlot: (registration: SidebarSlotRegistration<Node>) => void
-  readonly requestRender: () => void
-  readonly renderSidebar: () => Node
-  readonly renderMailbox: () => Node
-}
-
-// The slot registry invokes each renderer ONCE and resolves the result through
-// solid's children() memo. Returning the render thunk (instead of a materialized
-// tree) lets that memo re-run whenever a signal read inside the thunk changes,
-// which is what makes live count updates and the collapse toggle repaint.
-function registerSidebarContentSlot<Node>({
-  registerSlot,
-  requestRender,
-  renderSidebar,
-  renderMailbox,
-}: RegisterSidebarContentSlotInput<Node>): void {
-  registerSlot({
-    order: MAILBOX_SLOT_ORDER,
-    slots: {
-      sidebar_content: () => renderMailbox,
-    },
-  })
-  registerSlot({
-    order: OMO_SLOT_ORDER,
-    slots: {
-      sidebar_content: () => renderSidebar,
-    },
-  })
-  requestRender()
-}
 
 function materialize<Node>(nodes: readonly ViewNode[], solid: SolidRuntime<Node>): Node {
   const root = solid.createElement("box")
@@ -207,35 +202,96 @@ const module: TuiPluginModule = {
     let timer: ReturnType<typeof setTimeout> | null = null
 
     const [view, setView] = createSignalPair<SidebarView>(solidJs, initialView)
+    const prefsRoot = readTuiPreferencesFileSync()
     const [collapsed, setCollapsed] = createSignalPair<boolean>(
       solidJs,
-      resolveOmoCollapsed(readTuiPreferencesFileSync()),
+      resolveOmoCollapsed(prefsRoot),
     )
 
-    const toggleMailbox = (): void => {
-      const next = !collapsed()
-      setCollapsed(next)
-      queueTuiPreferenceUpdate(["mailbox", "collapsed"], next)
-      api.renderer.requestRender()
+    let CompiledMailboxSidebar: MailboxSidebarComponent | null = null
+    let createMailboxSidebarController: CreateMailboxSidebarControllerFn | null = null
+    try {
+      const compiledUrl = new URL("./tui-compiled/mailbox-sidebar.js", import.meta.url).href
+      const mod = await import(compiledUrl)
+      CompiledMailboxSidebar = mod.MailboxSidebar
+      createMailboxSidebarController = mod.createMailboxSidebarController
+    } catch (error) {
+      // Fallback to materialize
     }
 
-    const mailboxToggle: MailboxToggleOpts = {
-      get collapsed() {
-        return collapsed()
-      },
-      onToggle: toggleMailbox,
-    }
+    let mailboxController: MailboxSidebarController | null = null
+    let renderMailboxSlot: () => unknown
 
-    registerSidebarContentSlot({
-      registerSlot: (registration) => {
-        api.slots.register(registration)
-      },
-      requestRender: () => {
+    if (CompiledMailboxSidebar && createMailboxSidebarController) {
+      const controller = createMailboxSidebarController({
+        getMailbox: () => {
+          const v = view()
+          return v.kind === "active" ? v.mailbox : null
+        },
+        getPrefs: () => resolveOmoPrefs(readTuiPreferencesFileSync()),
+        getVersion: () => packageJson.version,
+        badgeTextColor: (accent: unknown, background: unknown) => {
+          if (isColor(accent) && isColor(background)) {
+            return badgeTextColor(accent, background)
+          }
+          return undefined
+        },
+        initialCollapsed: resolveOmoCollapsed(prefsRoot),
+        onToggle: (nextCollapsed: boolean) => {
+          queueTuiPreferenceUpdate(["mailbox", "collapsed"], nextCollapsed)
+        },
+        requestRender: () => api.renderer.requestRender(),
+        watchPrefs: watchTuiPreferences,
+      })
+      mailboxController = controller
+
+      const order = computeEffectiveOrder(prefsRoot, "oh-my-openagent", MAILBOX_SLOT_ORDER)
+      
+      renderMailboxSlot = () => CompiledMailboxSidebar({
+        controller,
+        theme: api.theme.current,
+      })
+      
+      api.slots.register({
+        order,
+        slots: {
+          sidebar_content: () => renderMailboxSlot,
+        },
+      })
+      log("[tui-sidebar] mounted compiled mailbox component", { compiled: true, order })
+    } else {
+      const toggleMailbox = (): void => {
+        const next = !collapsed()
+        setCollapsed(next)
+        queueTuiPreferenceUpdate(["mailbox", "collapsed"], next)
         api.renderer.requestRender()
+      }
+
+      const mailboxToggle: MailboxToggleOpts = {
+        get collapsed() {
+          return collapsed()
+        },
+        onToggle: toggleMailbox,
+      }
+
+      renderMailboxSlot = () => materialize(buildMailboxNodes(view(), api.theme.current, mailboxToggle), solid)
+      
+      api.slots.register({
+        order: MAILBOX_SLOT_ORDER,
+        slots: {
+          sidebar_content: () => renderMailboxSlot,
+        },
+      })
+      log("[tui-sidebar] mounted materialized mailbox component", { compiled: false, order: MAILBOX_SLOT_ORDER })
+    }
+
+    api.slots.register({
+      order: OMO_SLOT_ORDER,
+      slots: {
+        sidebar_content: () => () => materialize(buildViewNodes(view(), api.theme.current), solid),
       },
-      renderSidebar: () => materialize(buildViewNodes(view(), api.theme.current), solid),
-      renderMailbox: () => materialize(buildMailboxNodes(view(), api.theme.current, mailboxToggle), solid),
     })
+    api.renderer.requestRender()
 
     const { registerProjectMailboxCommand } = await import("./features/cross-project-mailbox/dialog/tui-command")
     registerProjectMailboxCommand(api, { directory })
@@ -278,6 +334,7 @@ const module: TuiPluginModule = {
     api.lifecycle.onDispose(() => {
       disposed = true
       if (timer) clearTimeout(timer)
+      if (mailboxController) mailboxController.dispose()
     })
   },
 }

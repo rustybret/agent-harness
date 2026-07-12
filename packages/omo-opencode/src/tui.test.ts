@@ -53,7 +53,7 @@ describe("TUI sidebar polling", () => {
     rmSync(tempDir, { recursive: true, force: true })
   })
 
-  it("#given the TUI plugin starts #when it registers sidebar slots #then a mailbox slot and an omo slot are registered before the initial render", async () => {
+  it("#given the TUI plugin starts without compiled JSX #when it registers sidebar slots #then it falls back to materialize and registers both slots", async () => {
     // given
     const calls: string[] = []
     const disposers: (() => void)[] = []
@@ -67,6 +67,65 @@ describe("TUI sidebar polling", () => {
       setProp: (node: SolidNode, name: string, value: unknown): void => {
         node.props[name] = value
       },
+    }))
+
+    const api = {
+      state: { path: { directory: tempDir } },
+      theme: { current: {} },
+      slots: {
+        register: (nextRegistration: TuiSlotPlugin): string => {
+          calls.push("register")
+          registrations.push(nextRegistration)
+          return "omo-sidebar-slot"
+        },
+      },
+      renderer: {
+        requestRender: (): void => {
+          calls.push("render")
+        },
+      },
+      lifecycle: {
+        signal: new AbortController().signal,
+        onDispose: (dispose: () => void): (() => void) => {
+          disposers.push(dispose)
+          return () => undefined
+        },
+      },
+    } satisfies SidebarApiForTest
+
+    // when
+    await tuiModule.tui(api as unknown as TuiPluginApi, undefined, {} as TuiPluginMeta)
+
+    // then
+    expect(calls).toEqual(["register", "register", "render"])
+    expect(registrations.map((entry) => entry.order)).toEqual([MAILBOX_SLOT_ORDER, OMO_SLOT_ORDER])
+    for (const registration of registrations) {
+      expect(Object.keys(registration.slots)).toEqual(["sidebar_content"])
+      expect(registration.slots.sidebar_content).toBeFunction()
+    }
+    for (const dispose of disposers) dispose()
+  })
+
+  it("#given the TUI plugin starts with compiled JSX available #when it registers sidebar slots #then it mounts the compiled component and registers both slots", async () => {
+    // given
+    const calls: string[] = []
+    const disposers: (() => void)[] = []
+    const registrations: TuiSlotPlugin[] = []
+
+    mock.module("@opentui/solid", () => ({
+      createElement: (tag: string): SolidNode => ({ tag, props: {}, children: [] }),
+      insert: (parent: SolidNode, child: unknown): void => {
+        parent.children.push(child)
+      },
+      setProp: (node: SolidNode, name: string, value: unknown): void => {
+        node.props[name] = value
+      },
+    }))
+
+    const compiledUrl = new URL("./tui-compiled/mailbox-sidebar.js", import.meta.url).href
+    mock.module(compiledUrl, () => ({
+      MailboxSidebar: () => ({ tag: "compiled-mailbox" }),
+      createMailboxSidebarController: () => ({ dispose: () => {} })
     }))
 
     const api = {
