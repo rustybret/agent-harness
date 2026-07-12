@@ -1,7 +1,7 @@
-import { readFileSync } from "node:fs"
+import { readFileSync, watch } from "node:fs"
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises"
 import { homedir } from "node:os"
-import { dirname, join } from "node:path"
+import { basename, dirname, join } from "node:path"
 import { randomUUID } from "node:crypto"
 import { applyEdits, modify, parse } from "jsonc-parser"
 
@@ -19,6 +19,47 @@ import { log } from "../../shared/logger"
 const TUI_PREFS_FILE_ENV = "OPENCODE_TUI_PREFERENCES_FILE"
 const FILE_NAME = "tui-preferences.jsonc"
 const OMO_KEY = "oh-my-openagent"
+const DEFAULT_SLOT_ORDER = 150
+const FORCE_TOP_BASE = -100000
+const WATCH_DEBOUNCE_MS = 150
+
+export type OmoTuiPrefs = {
+  forceToTop: boolean
+  // order and forceToTop are read once during slot registration; changes require restart.
+  order: number
+  startCollapsed: boolean
+  rememberCollapsed: boolean
+  collapsed: boolean | null
+  header: {
+    label: string
+    showVersion: boolean
+  }
+  sections: {
+    inbound: boolean
+    outbound: boolean
+    projects: boolean
+  }
+}
+
+export const DEFAULT_PREFS: OmoTuiPrefs = {
+  forceToTop: false,
+  order: DEFAULT_SLOT_ORDER,
+  startCollapsed: false,
+  rememberCollapsed: true,
+  collapsed: null,
+  header: { label: "Mailbox", showVersion: true },
+  sections: {
+    inbound: true,
+    outbound: true,
+    projects: true,
+  },
+}
+
+type WatchState = {
+  lastSeen: string | null
+}
+
+const preferenceWatchStates = new Set<WatchState>()
 
 function getTuiPreferencesFile(): string {
   const override = process.env[TUI_PREFS_FILE_ENV]
@@ -31,6 +72,21 @@ function getTuiPreferencesFile(): string {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+// Adapted from CortexKit AFT's MIT-licensed TUI preference helpers.
+function bool(value: unknown, fallback: boolean): boolean {
+  return typeof value === "boolean" ? value : fallback
+}
+
+function int(value: unknown, fallback: number, min: number, max: number): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return fallback
+  return Math.min(Math.max(Math.round(value), min), max)
+}
+
+function label(value: unknown, fallback: string, maxLength: number): string {
+  if (typeof value !== "string" || value.length === 0) return fallback
+  return value.slice(0, maxLength)
 }
 
 // Synchronous tolerant read. A missing file, parse error, or non-object root all
@@ -49,14 +105,62 @@ export function readTuiPreferencesFileSync(): Record<string, unknown> {
   }
 }
 
-// Reads root["oh-my-openagent"].mailbox.collapsed, defaulting to false when any
-// segment is missing or not the expected shape.
-export function resolveOmoCollapsed(root: Record<string, unknown>): boolean {
+export function resolveOmoPrefs(root: Record<string, unknown>): OmoTuiPrefs {
   const entry = root[OMO_KEY]
-  if (!isRecord(entry)) return false
-  const mailbox = entry.mailbox
-  if (!isRecord(mailbox)) return false
-  return mailbox.collapsed === true
+  if (!isRecord(entry)) return structuredClone(DEFAULT_PREFS)
+
+  const d = DEFAULT_PREFS
+  const header = isRecord(entry.header) ? entry.header : {}
+  const sections = isRecord(entry.sections) ? entry.sections : {}
+  const startCollapsed = bool(entry.startCollapsed, d.startCollapsed)
+  const mailbox = isRecord(entry.mailbox) ? entry.mailbox : {}
+  const legacyCollapsed = mailbox.collapsed
+
+  return {
+    forceToTop: bool(entry.forceToTop, d.forceToTop),
+    order: int(entry.order, d.order, -10000, 10000),
+    startCollapsed,
+    rememberCollapsed: bool(entry.rememberCollapsed, d.rememberCollapsed),
+    collapsed:
+      typeof entry.collapsed === "boolean"
+        ? entry.collapsed
+        : typeof legacyCollapsed === "boolean"
+          ? legacyCollapsed
+          : startCollapsed,
+    header: {
+      label: label(header.label, d.header.label, 20),
+      showVersion: bool(header.showVersion, d.header.showVersion),
+    },
+    sections: {
+      inbound: bool(sections.inbound, d.sections.inbound),
+      outbound: bool(sections.outbound, d.sections.outbound),
+      projects: bool(sections.projects, d.sections.projects),
+    },
+  }
+}
+
+// Adapted from CortexKit AFT's MIT-licensed force-to-top ordering helper.
+export function computeEffectiveOrder(
+  root: Record<string, unknown>,
+  pluginKey: string,
+  defaultOrder: number,
+): number {
+  const entry = root[pluginKey]
+  if (!isRecord(entry)) return defaultOrder
+  if (entry.forceToTop === true) {
+    return FORCE_TOP_BASE + Object.keys(root).indexOf(pluginKey)
+  }
+  return int(entry.order, defaultOrder, -10000, 10000)
+}
+
+export function resolveOmoCollapsed(root: Record<string, unknown>): boolean {
+  return resolveOmoPrefs(root).collapsed ?? DEFAULT_PREFS.startCollapsed
+}
+
+function rememberWrittenPreferenceText(text: string): void {
+  for (const state of preferenceWatchStates) {
+    state.lastSeen = text
+  }
 }
 
 async function writePreference(path: string[], value: unknown): Promise<void> {
@@ -93,6 +197,7 @@ async function writePreference(path: string[], value: unknown): Promise<void> {
   const tmp = `${file}.${randomUUID()}.tmp`
   await writeFile(tmp, next, "utf8")
   await rename(tmp, file)
+  rememberWrittenPreferenceText(next)
 }
 
 let writeChain: Promise<void> = Promise.resolve()
@@ -109,4 +214,56 @@ export function queueTuiPreferenceUpdate(path: string[], value: unknown): Promis
       log("tui preferences queued update failed", { error })
     })
   return writeChain
+}
+
+// Adapted from CortexKit AFT's MIT-licensed fs.watch debounce pattern.
+export function watchTuiPreferences(onChange: () => void, onSettled?: (text: string | null) => void): () => void {
+  const file = getTuiPreferencesFile()
+  const name = basename(file)
+  const state: WatchState = { lastSeen: null }
+  preferenceWatchStates.add(state)
+  let timer: ReturnType<typeof setTimeout> | null = null
+
+  void readFile(file, "utf8")
+    .then((text) => {
+      if (state.lastSeen === null) state.lastSeen = text
+    })
+    .catch((error) => {
+      log("tui preferences watcher initial read failed", { error })
+    })
+
+  try {
+    const watcher = watch(dirname(file), (_event, filename) => {
+      const isOurs = filename == null || filename === name || (filename.startsWith(`${name}.`) && filename.endsWith(".tmp"))
+      if (filename != null && !isOurs) return
+      if (timer) clearTimeout(timer)
+      timer = setTimeout(() => {
+        timer = null
+        void readFile(file, "utf8")
+          .catch(() => null)
+          .then((text) => {
+            if (text === null) {
+              onSettled?.(text)
+              return
+            }
+            if (text === state.lastSeen) {
+              onSettled?.(text)
+              return
+            }
+            state.lastSeen = text
+            onChange()
+            onSettled?.(text)
+          })
+      }, WATCH_DEBOUNCE_MS)
+    })
+    return () => {
+      if (timer) clearTimeout(timer)
+      preferenceWatchStates.delete(state)
+      watcher.close()
+    }
+  } catch (error) {
+    log("tui preferences watcher unavailable", { error })
+    preferenceWatchStates.delete(state)
+    return () => {}
+  }
 }
