@@ -1,0 +1,8 @@
+### BEFORE click (expanded, triangle = down)
+     + Thought: 300ms                                                                                                                                                               │  ▼ Mailbox                v4.17.0 │
+### AFTER click #1 (collapsed, triangle = right)
+     + Thought: 300ms                                                                                                                                                               │  ▶ Mailbox                v4.17.0 │
+### AFTER click #2 (expanded again)
+     + Thought: 300ms                                                                                                                                                               │  ▼ Mailbox                v4.17.0 │
+### AFTER click #3 (collapsed again)
+     + Thought: 300ms                                                                                                                                                               │  ▶ Mailbox                v4.17.0 │

@@ -1,0 +1,2 @@
+[2026-07-12T08:21:07.246Z] [tui-sidebar] host runtime source {"source":"host-virtual"}
+[2026-07-12T08:21:07.303Z] [tui-sidebar] mounted compiled mailbox component {"compiled":true,"order":150}

@@ -33,3 +33,32 @@
 - `@opentui/solid`'s `fg` and `borderColor` props expect `string | RGBA | undefined`. Since `ThemeLike` uses `unknown` for colors, casting to `string | undefined` is necessary to satisfy the type checker without using `as any`.
 - The `createMailboxSidebarController` factory pattern effectively isolates the Solid state and allows it to survive remounts, matching the magic-context pattern.
 - The root `tsconfig.json` needed `"jsx": "preserve"` and `"jsxImportSource": "@opentui/solid"` to allow `tsc --emitDeclarationOnly` to process the new TSX files during the build pipeline.
+
+## T10 Live QA (tmux send-keys -H fallback path)
+
+- **TUI local-build wiring (memory #1533 resolved):** to point an isolated sandbox TUI at a local dev
+  build, `tui.json` must list the repo DIRECTORY (`file://<repo>`), NOT `dist/index.js`. OpenCode's
+  TUI resolver (`packages/opencode/src/plugin/shared.ts resolvePackageEntrypoint`) reads
+  `package.json` `exports["./tui"]` → `dist/tui.js` only when the spec resolves to a directory with a
+  package.json. A file spec pointing at `dist/index.js` loads the SERVER module (no `.tui`), so the
+  sidebar silently never mounts. `opencode.jsonc` server plugin still uses `file://<repo>/dist/index.js`.
+- **Proof the sandbox runs local code, not npm:** grep the isolated plugin log
+  (`$TMPDIR/oh-my-opencode.log`, since the logger uses `os.tmpdir()` which honors `TMPDIR`) for
+  `[tui-sidebar] mounted compiled mailbox component {"compiled":true}` + `host runtime source
+  {"source":"host-virtual"}`. Both strings are post-T8-only.
+- **Real SGR click via tmux:** set `tmux set -g mouse on`, measure the badge cell column with a
+  wcwidth-aware pass over `capture-pane` (box-drawing + triangle are wide chars, byte offset ≠ cell
+  col), then `send-keys -H` the SGR press `1b5b3c30 3b<col>3b<row>4d` + release `...6d`. The badge sat
+  at row 12 / cell col ~186 at 220x55. Click flips `▼`↔`▶` AND the `oh-my-openagent.mailbox.collapsed`
+  pref true↔false together — verified 3 clicks.
+- **Sidebar only renders in the session view**, not the home/splash screen — submit one prompt first.
+- **`/project-mailbox` dialog** filters out the self-project (`buildTopMenu` drops the entry whose
+  repoRoot == cwd), so a SECOND registry project is needed for the top menu to show any row. The
+  plugin rewrites `~/.omo/project-registry.json` on launch (self-registration), so seed the extra
+  project AFTER launch. Submenu order: Disabled/question/impl/plan. Typing into an open DialogSelect
+  goes to its Search filter — use arrow keys, and `ctrl-u` (send-keys -H `15`) to clear a stray filter.
+- **Isolation:** dedicated tmux socket `-L omot10qa` (never the user's default server); isolated
+  `HOME/XDG_*/TMPDIR`; host DB session count 5927 unchanged, sandbox DB count 0.
+- **Honest gap:** expanded In/Out/Projects rows render empty when `getMailbox()` is null (no seeded
+  inbox/outbox digest). Toggle mechanics (the bug) work regardless; body content is a fixture-data
+  condition, already locked by T7's semantic-regression suite.
