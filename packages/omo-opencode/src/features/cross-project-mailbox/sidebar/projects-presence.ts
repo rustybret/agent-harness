@@ -57,7 +57,7 @@ export async function readProjectPresenceRows(
       }
     } catch {
       presence = "lastSeen"
-      statusText = "Last seen a long time ago"
+      statusText = "a long time ago"
       dotColor = "muted"
     }
 

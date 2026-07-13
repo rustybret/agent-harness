@@ -285,7 +285,7 @@ describe("readMailboxSidebarState", () => {
     expect(row.projectId).toBe("proj-unknown")
     expect(row.label).toBe("proj-unknown")
     expect(row.presence).toBe("lastSeen")
-    expect(row.statusText).toBe("Last seen a long time ago")
+    expect(row.statusText).toBe("a long time ago")
     expect(row.dotColor).toBe("muted")
   })
 
@@ -403,7 +403,7 @@ describe("readMailboxSidebarState", () => {
     const row = result!.projects[0]!
     expect(row.presence).toBe("lastSeen")
     expect(row.dotColor).toBe("muted")
-    expect(row.statusText).toContain("ago")
+    expect(row.statusText).toBe("1 hour ago")
   })
 
   it("#given two projects with same displayName #when reading projects #then collision uses full projectId as label", async () => {
@@ -496,7 +496,7 @@ describe("readMailboxSidebarState", () => {
   })
 
 
-  it("#given a project in senders but missing from registry #when reading state #then it is shown by projectId with Last seen a long time ago", async () => {
+  it("#given a project in senders but missing from registry #when reading state #then it is shown by projectId with a long time ago", async () => {
     // given
     const senderRoot = await makeRepo()
     const config = CrossProjectMailboxConfigSchema.parse({
@@ -516,7 +516,7 @@ describe("readMailboxSidebarState", () => {
     const row = result!.projects[0]!
     expect(row.projectId).toBe("proj-missing")
     expect(row.presence).toBe("lastSeen")
-    expect(row.statusText).toBe("Last seen a long time ago")
+    expect(row.statusText).toBe("a long time ago")
   })
 
   it("#given mixed access senders #when reading state #then strict-set filtering applies (deny + unlisted excluded even under allow-all default)", async () => {

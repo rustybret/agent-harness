@@ -182,7 +182,7 @@ describe("tui sidebar renderView", () => {
       "\u25bc Mailbox",
       "In", "Unread", "2", "Done", "5",
       "Out", "Pending", "1", "Read", "3", "Failed", "0",
-      "Projects", "No connected projects",
+      "Projects", "(0/0)", "No connected projects",
     ])
   })
 
@@ -194,7 +194,11 @@ describe("tui sidebar renderView", () => {
     const nodes = buildMailboxNodes(view, theme)
     const rowBoxes: ViewNode[] = []
     const walk = (node: ViewNode): void => {
-      if (node.kind === "box" && node.props.justifyContent === "space-between") rowBoxes.push(node)
+      if (
+        node.kind === "box" &&
+        node.props.justifyContent === "space-between" &&
+        node.props.marginTop !== 1
+      ) rowBoxes.push(node)
       for (const child of node.children ?? []) walk(child)
     }
     for (const node of nodes) walk(node)
@@ -232,7 +236,7 @@ describe("tui sidebar renderView", () => {
       "\u25bc Mailbox",
       "In", "Unread", "4", "Done", "1",
       "Out", "Pending", "0", "Read", "0", "Failed", "0",
-      "Projects", "No connected projects",
+      "Projects", "(0/0)", "No connected projects",
     ])
   })
 
@@ -259,7 +263,7 @@ describe("tui sidebar renderView", () => {
       "\u25bc Mailbox",
       "In", "Unread", "0", "Done", "0",
       "Out", "Pending", "0", "Read", "2", "Failed", "3",
-      "Projects", "No connected projects",
+      "Projects", "(0/0)", "No connected projects",
     ])
     const failIndex = texts.indexOf("Failed")
     const failCount = entries[failIndex + 1]
@@ -383,7 +387,7 @@ describe("tui sidebar renderView", () => {
       "\u25bc Mailbox",
       "In", "Unread", "0", "Done", "0",
       "Out", "Pending", "0", "Read", "0", "Failed", "0",
-      "Projects", "No connected projects",
+      "Projects", "(0/0)", "No connected projects",
     ])
   })
 
@@ -404,7 +408,7 @@ describe("tui sidebar renderView", () => {
     // given
     const projectRows: ProjectPresenceRow[] = [
       { projectId: "proj-a", label: "Alpha", presence: "online", statusText: "~", dotColor: "success" },
-      { projectId: "proj-b", label: "Beta", presence: "lastSeen", statusText: "Last seen 5 minutes ago", dotColor: "muted" },
+      { projectId: "proj-b", label: "Beta", presence: "lastSeen", statusText: "5 minutes ago", dotColor: "muted" },
     ]
     const withProjects: MailboxSidebarState = { ...mailboxState, projects: projectRows }
     const view = computeView({ ...activeSections, mailbox: withProjects })
@@ -414,10 +418,27 @@ describe("tui sidebar renderView", () => {
 
     // then
     expect(texts).toContain("Projects")
+    expect(texts).toContain("(1/2)")
     expect(texts).toContain("Alpha")
     expect(texts).toContain("~")
     expect(texts).toContain("Beta")
-    expect(texts).toContain("Last seen 5 minutes ago")
+    expect(texts).toContain("5 minutes ago")
+  })
+
+  it("#given no active projects #when expanded #then the project count uses the muted tone", () => {
+    // given
+    const projectRows: ProjectPresenceRow[] = [
+      { projectId: "proj-a", label: "Alpha", presence: "pending", statusText: "pending", dotColor: "warning" },
+      { projectId: "proj-b", label: "Beta", presence: "lastSeen", statusText: "5 minutes ago", dotColor: "muted" },
+    ]
+    const view = computeView({ ...activeSections, mailbox: { ...mailboxState, projects: projectRows } })
+
+    // when
+    const entries = flattenText(buildMailboxNodes(view, theme))
+
+    // then
+    const count = entries.find((entry) => entry.text === "(0/2)")
+    expect(count?.props.fg).toBe("muted")
   })
 
   it("#given a mailbox with projects #when expanded #then each project row is a space-between box", () => {
@@ -450,14 +471,18 @@ describe("tui sidebar renderView", () => {
     const row = projectRowBoxes[0]
     expect(row.props.flexDirection).toBe("row")
     expect(row.props.width).toBe("100%")
+    expect(row.props.gap).toBe(1)
     expect(row.children?.length).toBe(2)
+    const label = row.children?.[0]?.children?.[1]
+    expect(label?.props.wrapMode).toBe("none")
+    expect(label?.props.truncate).toBe(true)
   })
 
   it("#given a mailbox with projects #when collapsed #then summary includes Projects a/t active counter", () => {
     // given
     const projectRows: ProjectPresenceRow[] = [
       { projectId: "proj-a", label: "Alpha", presence: "online", statusText: "~", dotColor: "success" },
-      { projectId: "proj-b", label: "Beta", presence: "lastSeen", statusText: "Last seen 5 minutes ago", dotColor: "muted" },
+      { projectId: "proj-b", label: "Beta", presence: "lastSeen", statusText: "5 minutes ago", dotColor: "muted" },
     ]
     const withProjects: MailboxSidebarState = { ...mailboxState, projects: projectRows }
     const view = computeView({ ...activeSections, mailbox: withProjects })
@@ -511,7 +536,7 @@ describe("tui sidebar renderView", () => {
     const projectRows: ProjectPresenceRow[] = [
       { projectId: "p1", label: "A", presence: "online", statusText: "~", dotColor: "success" },
       { projectId: "p2", label: "B", presence: "pending", statusText: "~", dotColor: "warning" },
-      { projectId: "p3", label: "C", presence: "lastSeen", statusText: "Last seen 1 hour ago", dotColor: "muted" },
+      { projectId: "p3", label: "C", presence: "lastSeen", statusText: "1 hour ago", dotColor: "muted" },
     ]
     const withProjects: MailboxSidebarState = { ...mailboxState, projects: projectRows }
     const view = computeView({ ...activeSections, mailbox: withProjects })

@@ -14,7 +14,7 @@ export function MailboxSidebar(props: { readonly controller: MailboxSidebarContr
   const model = createMemo(() => props.controller.contentModel(props.theme))
   return (
     <box width="100%" flexDirection="column" borderStyle="single" borderColor={props.theme.borderActive as string | undefined} padding={1}>
-      <box width="100%" flexDirection="row" justifyContent="space-between" alignItems="center" onMouseDown={props.controller.toggle}>
+      <box width="100%" flexDirection="row" alignItems="center" onMouseDown={props.controller.toggle}>
         <box flexDirection="row" alignItems="center">
           <box paddingLeft={1} paddingRight={1} backgroundColor={props.theme.accent as string | undefined}>
             <text fg={props.controller.badgeFg(props.theme) as string | undefined}>
@@ -22,7 +22,6 @@ export function MailboxSidebar(props: { readonly controller: MailboxSidebarContr
             </text>
           </box>
         </box>
-        {prefs().header.showVersion && <text fg={props.theme.textMuted as string | undefined}>v{props.controller.version()}</text>}
       </box>
       <MailboxRows model={model()} theme={props.theme} />
     </box>
@@ -30,13 +29,18 @@ export function MailboxSidebar(props: { readonly controller: MailboxSidebarContr
 }
 
 function MailboxRows(props: { readonly model: MailboxContentModel | null; readonly theme: MailboxSidebarTheme }) {
-  if (!props.model) return null
-  if (props.model.kind === "collapsed") return <text fg={props.model.tokens[0]?.fg as string | undefined}>{props.model.tokens[0]?.text ?? ""}</text>
-  return <ExpandedTokens tokens={props.model.tokens} theme={props.theme} />
+  return <>
+    {props.model?.kind === "collapsed" && <text fg={props.model.tokens[0]?.fg as string | undefined}>{props.model.tokens[0]?.text ?? ""}</text>}
+    {props.model?.kind === "expanded" && <ExpandedTokens tokens={props.model.tokens} theme={props.theme} />}
+  </>
 }
 
 function SectionHeader(props: { readonly token: MailboxTextToken }) {
   return <box width="100%" marginTop={1}><text fg={props.token.fg as string | undefined}><b>{props.token.text}</b></text></box>
+}
+
+function ProjectSectionHeader(props: { readonly label: MailboxTextToken; readonly count: MailboxTextToken }) {
+  return <box width="100%" marginTop={1} flexDirection="row" justifyContent="space-between"><text fg={props.label.fg as string | undefined}><b>{props.label.text}</b></text><text fg={props.count.fg as string | undefined}><b>{props.count.text}</b></text></box>
 }
 
 function StatRow(props: { readonly label: MailboxTextToken; readonly value: MailboxTextToken }) {
@@ -50,7 +54,7 @@ function ProjectRows(props: { readonly tokens: readonly MailboxTextToken[]; read
     for (let index = 0; index < props.tokens.length; index += 3) grouped.push(props.tokens.slice(index, index + 3))
     return grouped
   }
-  return <>{rows().map((row) => <box width="100%" flexDirection="row" justifyContent="space-between"><box flexDirection="row" gap={1}><text fg={row[0]?.fg as string | undefined}>{row[0]?.text ?? ""}</text><text fg={row[1]?.fg as string | undefined}>{row[1]?.text ?? ""}</text></box><text fg={row[2]?.fg as string | undefined}>{row[2]?.text ?? ""}</text></box>)}</>
+  return <>{rows().map((row) => <box width="100%" flexDirection="row" justifyContent="space-between" gap={1}><box flexDirection="row" gap={1} flexGrow={1} flexShrink={1}><text fg={row[0]?.fg as string | undefined}>{row[0]?.text ?? ""}</text><text fg={row[1]?.fg as string | undefined} flexShrink={1} wrapMode="none" truncate>{row[1]?.text ?? ""}</text></box><text fg={row[2]?.fg as string | undefined} flexShrink={0}>{row[2]?.text ?? ""}</text></box>)}</>
 }
 
 function tokenAt(tokens: readonly MailboxTextToken[], index: number): MailboxTextToken {
@@ -58,5 +62,5 @@ function tokenAt(tokens: readonly MailboxTextToken[], index: number): MailboxTex
 }
 
 function ExpandedTokens(props: { readonly tokens: readonly MailboxTextToken[]; readonly theme: MailboxSidebarTheme }) {
-  return <><SectionHeader token={tokenAt(props.tokens, 0)} /><StatRow label={tokenAt(props.tokens, 1)} value={tokenAt(props.tokens, 2)} /><StatRow label={tokenAt(props.tokens, 3)} value={tokenAt(props.tokens, 4)} /><SectionHeader token={tokenAt(props.tokens, 5)} /><StatRow label={tokenAt(props.tokens, 6)} value={tokenAt(props.tokens, 7)} /><StatRow label={tokenAt(props.tokens, 8)} value={tokenAt(props.tokens, 9)} /><StatRow label={tokenAt(props.tokens, 10)} value={tokenAt(props.tokens, 11)} /><SectionHeader token={tokenAt(props.tokens, 12)} /><ProjectRows tokens={props.tokens.slice(13)} theme={props.theme} /></>
+  return <><SectionHeader token={tokenAt(props.tokens, 0)} /><StatRow label={tokenAt(props.tokens, 1)} value={tokenAt(props.tokens, 2)} /><StatRow label={tokenAt(props.tokens, 3)} value={tokenAt(props.tokens, 4)} /><SectionHeader token={tokenAt(props.tokens, 5)} /><StatRow label={tokenAt(props.tokens, 6)} value={tokenAt(props.tokens, 7)} /><StatRow label={tokenAt(props.tokens, 8)} value={tokenAt(props.tokens, 9)} /><StatRow label={tokenAt(props.tokens, 10)} value={tokenAt(props.tokens, 11)} /><ProjectSectionHeader label={tokenAt(props.tokens, 12)} count={tokenAt(props.tokens, 13)} /><ProjectRows tokens={props.tokens.slice(14)} theme={props.theme} /></>
 }

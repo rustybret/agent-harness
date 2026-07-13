@@ -102,6 +102,7 @@ export function deriveMailboxContentModel(
   collapsed: boolean,
 ): MailboxContentModel {
   if (collapsed) return { kind: "collapsed", tokens: [collapsedSummaryToken(mailbox, theme)] }
+  const activeProjects = mailbox.projects.filter((project) => project.presence === "online").length
   return {
     kind: "expanded",
     tokens: [
@@ -118,6 +119,7 @@ export function deriveMailboxContentModel(
       { text: "Failed", fg: theme.textMuted },
       { text: String(mailbox.outboundFailed), fg: mailbox.outboundFailed > 0 ? theme.error : theme.textMuted },
       { text: "Projects", fg: theme.text },
+      { text: `(${activeProjects}/${mailbox.projects.length})`, fg: activeProjects > 0 ? theme.warning : theme.textMuted },
       ...projectTokens(mailbox.projects, theme),
     ],
   }

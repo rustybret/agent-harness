@@ -325,7 +325,13 @@ function mailboxNodes(
     mailboxCountRow("Failed", mailbox.outboundFailed, mailbox.outboundFailed > 0 ? theme.error : theme.textMuted, theme),
   )
 
-  rows.push(mailboxGroupHeader("Projects", theme))
+  const activeProjects = mailbox.projects.filter((project) => project.presence === "online").length
+  rows.push(
+    box({ width: "100%", flexDirection: "row", justifyContent: "space-between", marginTop: 1 }, [
+      text({ fg: theme.text }, "Projects"),
+      text({ fg: activeProjects > 0 ? theme.warning : theme.textMuted }, `(${activeProjects}/${mailbox.projects.length})`),
+    ]),
+  )
   if (mailbox.projects.length === 0) {
     rows.push(text({ fg: theme.textMuted }, "No connected projects"))
   } else {
@@ -338,12 +344,12 @@ function mailboxNodes(
 }
 
 function projectPresenceRow(label: string, statusText: string, dotFg: unknown, theme: ThemeLike): ViewNode {
-  return box({ width: "100%", flexDirection: "row", justifyContent: "space-between" }, [
-    box({ flexDirection: "row", gap: 1 }, [
+  return box({ width: "100%", flexDirection: "row", justifyContent: "space-between", gap: 1 }, [
+    box({ flexDirection: "row", gap: 1, flexGrow: 1, flexShrink: 1 }, [
       text({ fg: dotFg }, "•"),
-      text({ fg: theme.textMuted }, label),
+      text({ fg: theme.textMuted, flexShrink: 1, wrapMode: "none", truncate: true }, label),
     ]),
-    text({ fg: theme.textMuted }, statusText),
+    text({ fg: theme.textMuted, flexShrink: 0 }, statusText),
   ])
 }
 
