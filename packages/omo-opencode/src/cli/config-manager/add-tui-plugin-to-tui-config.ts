@@ -96,12 +96,23 @@ export function ensureTuiPluginEntry(opts: { configDir?: string } = {}): EnsureT
     return { changed: false, reason: "malformed" }
   }
 
-  const plugins = pluginEntries(config).filter((entry) => !isNamedTuiPluginEntry(entry))
-  if (plugins.includes(desiredEntry)) {
-    return { changed: false, reason: "already-present" }
+  const existingPlugins = pluginEntries(config)
+  const surviving = existingPlugins.filter(
+    (entry) =>
+      !isNamedTuiPluginEntry(entry) && (entry === desiredEntry || !isOurFilePluginEntry(entry)),
+  )
+  if (surviving.includes(desiredEntry)) {
+    if (surviving.length === existingPlugins.length) {
+      return { changed: false, reason: "already-present" }
+    }
+    mkdirSync(configDir, { recursive: true })
+    writeFileAtomically(tuiJsonPath, formatConfig({ ...config, plugin: surviving }))
+    return { changed: true, reason: "added" }
   }
 
+  const nextPlugins = [...surviving, desiredEntry]
+
   mkdirSync(configDir, { recursive: true })
-  writeFileAtomically(tuiJsonPath, formatConfig({ ...config, plugin: [...plugins, desiredEntry] }))
+  writeFileAtomically(tuiJsonPath, formatConfig({ ...config, plugin: nextPlugins }))
   return { changed: true, reason: "added" }
 }

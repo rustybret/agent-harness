@@ -5,7 +5,7 @@ import { POLL_INTERVAL_MS } from "./features/tui-sidebar/constants"
 import { loadHostSolidRuntime } from "./features/tui-sidebar/host-runtime"
 import type { MailboxSidebarController } from "./features/tui-sidebar/mailbox-slot"
 import { loadCompiledMailboxModule } from "./features/tui-sidebar/mailbox-slot"
-import { buildMailboxNodes, buildViewNodes } from "./features/tui-sidebar/render-view"
+import { buildMailboxNodes, buildViewNodes, selectMailbox } from "./features/tui-sidebar/render-view"
 import type { MailboxToggleOpts } from "./features/tui-sidebar/render-view"
 import { createSignalPair } from "./features/tui-sidebar/signal-pair"
 import { materialize } from "./features/tui-sidebar/slot-materializer"
@@ -66,10 +66,7 @@ const module: TuiPluginModule = {
 
     if (CompiledMailboxSidebar && createMailboxSidebarController) {
       const controller = createMailboxSidebarController({
-        getMailbox: () => {
-          const v = view()
-          return v.kind === "active" ? v.mailbox : null
-        },
+        getMailbox: () => selectMailbox(view()) ?? null,
         getPrefs: () => resolveOmoPrefs(readTuiPreferencesFileSync()),
         getVersion: () => packageJson.version,
         badgeTextColor: (accent: unknown, background: unknown) => {

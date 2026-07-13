@@ -83,6 +83,25 @@ describe("ensureTuiPluginEntry", () => {
     expect(readTuiPlugins(dir)).toEqual([fileEntry])
   })
 
+  it("#given a stale file entry in a different form #when ensuring #then it replaces the stale entry instead of duplicating", () => {
+    // given
+    const dir = tempConfigDir()
+    const packageDir = join(dir, "package")
+    mkdirSync(packageDir, { recursive: true })
+    writeConfig(packageDir, "package.json", { name: PLUGIN_NAME, exports: { ".": "./dist/index.js", "./tui": "./dist/tui.js" } })
+    const dirFormEntry = `file:${packageDir}`
+    const fileFormEntry = `file:${join(packageDir, "dist", "index.js")}`
+    writeConfig(dir, "opencode.json", { plugin: [fileFormEntry] })
+    writeConfig(dir, "tui.json", { plugin: [dirFormEntry, fileFormEntry] })
+
+    // when
+    const result = ensureTuiPluginEntry({ configDir: dir })
+
+    // then
+    expect(result).toEqual({ changed: true, reason: "added" })
+    expect(readTuiPlugins(dir)).toEqual([fileFormEntry])
+  })
+
   it("#given legacy server entry #when legacy TUI entry already exists #then it does not duplicate", () => {
     // given
     const dir = tempConfigDir()
