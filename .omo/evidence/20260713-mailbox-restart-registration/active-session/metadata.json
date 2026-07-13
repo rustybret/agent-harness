@@ -1,0 +1,27 @@
+{
+  "title": "Mailbox active session restart",
+  "connector": "xterm-node-pty",
+  "colorPath": "xterm.js (true color; not tmux)",
+  "browserCapture": "captured",
+  "source": {
+    "kind": "command",
+    "label": "strictly isolated fresh OpenCode TUI active session"
+  },
+  "interaction": [],
+  "redaction": {
+    "builtInRules": 7,
+    "literalRules": 0,
+    "regexRules": 0
+  },
+  "dimensions": {
+    "cols": 180,
+    "rows": 48
+  },
+  "cleanup": "pty pid 45487 killed",
+  "files": {
+    "png": "/Volumes/Topper2TB/Git/agent-harness/.omo/evidence/20260713-mailbox-restart-registration/active-session/terminal.png",
+    "text": "/Volumes/Topper2TB/Git/agent-harness/.omo/evidence/20260713-mailbox-restart-registration/active-session/terminal.txt",
+    "ansi": "/Volumes/Topper2TB/Git/agent-harness/.omo/evidence/20260713-mailbox-restart-registration/active-session/terminal-ansi.txt",
+    "metadata": "/Volumes/Topper2TB/Git/agent-harness/.omo/evidence/20260713-mailbox-restart-registration/active-session/metadata.json"
+  }
+}

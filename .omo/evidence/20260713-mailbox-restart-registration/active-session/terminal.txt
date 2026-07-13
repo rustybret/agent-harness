@@ -1,0 +1,48 @@
+                                                                                                                                                                                    
+  ┃                                                                                                                                         New session - 2026-07-13T07:55:02.   █  
+  ┃  Reply with OK                                                                                                                          393Z                                 █  
+  ┃                                                                                                                                         ses_0a5871286ffemnHqVpSzRiypji       █  
+                                                                                                                                                                                 █  
+     ⠇ Thinking                                                                                                                             Context                              █  
+                                                                                                                                            0 tokens                             █  
+     ▣  Sisyphus - Ultraworker · Big Pickle                                                                                                 0% used                              █  
+                                                                                                                                            $0.00 spent                          █  
+                                                                                                                                                                                 █  
+                                                                                                                                            ┌──────────────────────────────────┐ █  
+                                                                                                                                            │                                  │ █  
+                                                                                                                                            │  ▼ Mailbox               v4.17.0 │ █  
+                                                                                                                                            │                                  │ █  
+                                                                                                                                            │ In                               │ █  
+                                                                                                                                            │ Unread                         0 │ █  
+                                                                                                                                            │ Done                           0 │ █  
+                                                                                                                                            │                                  │ █  
+                                                                                                                                            │ Out                              │ █  
+                                                                                                                                            │ Pending                        0 │ █  
+                                                                                                                                            │ Read                           0 │ █  
+                                                                                                                                            │ Failed                         0 │ █  
+                                                                                                                                            │                                  │ █  
+                                                                                                                                            │ Projects                         │ █  
+                                                                                                                                            │ No connected projects            │ █  
+                                                                                                                                            │                                  │ █  
+                                                                                                                                            └──────────────────────────────────┘ █  
+                                                                                                                                                                                 █  
+                                                                                                                                            ▼ MCP                                █  
+                                                                                                                                            • codegraph Disabled                 █  
+                                                                                                                                            • context7 Connected                    
+                                                                                                                                            • grep_app Connected                    
+                                                                                                                                            • lsp Connected                         
+                                                                                                                                            • websearch Connected                   
+                                                                                                                                                                                    
+                                                                                                                                            LSP                                     
+                                                                                                                                            LSPs are disabled                       
+                                                                                                                                                                                    
+                                                                                                                                            ┌──────────────────────────────────┐    
+                                                                                                                                            │                                  │    
+                                                                                                                                            │ Agents                           │    
+  ┃                                                                                                                                                                                 
+  ┃                                                                                                                                         /Volumes/Topper2TB/Git/agent-harness/.  
+  ┃                                                                                                                                         local-ignore/qa/mailbox-restart-        
+  ┃  Sisyphus - Ultraworker · Big Pickle OpenCode Zen                                                                                       20260713/run3/project:fork/local        
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                            
+   ■⬝⬝⬝⬝⬝⬝⬝  esc interrupt                                                                                   tab agents  ctrl+p commands    • OpenCode 1.17.18+bec7f1c              
+                                                                                                                                                                                    

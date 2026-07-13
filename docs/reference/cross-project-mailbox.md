@@ -23,7 +23,7 @@ The Cross-Project Mailbox is an OmO feature that enables independent OpenCode re
 ```
 
 ### Key Subsystems
-1. **Registry (`~/.omo/project-registry.json`)**: A local registry tracking observed repositories, mapping unique 8-character `projectId` tags to absolute filesystem paths.
+1. **Registry (`~/.omo/project-registry.json`)**: A local registry of explicitly enrolled repositories, mapping unique 8-character `projectId` tags to absolute filesystem paths.
 2. **MailboxStore**: Manages message states (reservation, confirmation, quarantine, stale reclamation) via atomic filesystem locks to prevent race conditions.
 3. **Idle-Drain Hook**: Injected into `session.idle` events. It checks incoming notes in `coordination_notes/` when the session becomes idle, then sequentially drains eligible messages into the active prompt stream via `dispatchInternalPrompt`.
 4. **Manual Receive Tools (`project_mailbox_peek`, `project_mailbox_drain`)**: Let agents inspect or consume inbound notes on demand when work cannot wait for a `session.idle` edge.
@@ -73,20 +73,19 @@ Configure the mailbox by adding the `cross_project_mailbox` block to your user c
 
 Follow this runbook to enable cross-project coordination across your local workspace.
 
-### Step 1: Project Auto-Discovery
-Repositories must register themselves so other repositories can locate them.
+### Step 1: Explicit Project Registration
+Repositories must be registered deliberately so other repositories can locate them. Starting OpenCode in a repository does not add it to the global registry.
 
-#### Option A: Automatic via OpenClaw
-If running the OpenClaw reply listener daemon, register projects automatically by running:
+#### Option A: Import from OpenClaw
+If running the OpenClaw reply listener daemon, explicitly import its known projects:
 ```ts
-// The registry auto-syncs with your OpenClaw session directory:
 await registry.discoverFromOpenClaw("/path/to/openclaw/sessions.jsonl");
 ```
 
 #### Option B: Manual Registration
-A project registers itself with the central registry whenever its OpenCode plugin initializes. Launching an OpenCode session inside any repository registers it:
-```bash
-opencode run "check status"
+Register only the repository roots that should participate:
+```ts
+await registry.registerProject("/absolute/path/to/repository");
 ```
 Check the registered projects list by inspecting `~/.omo/project-registry.json`.
 

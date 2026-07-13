@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from "bun:test"
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
+import { pathToFileURL } from "node:url"
 
 import { LEGACY_PLUGIN_NAME, PLUGIN_NAME } from "../../shared"
 import { ensureTuiPluginEntry } from "./add-tui-plugin-to-tui-config"
@@ -26,7 +27,7 @@ function writeFilePackage(dir: string, name = PLUGIN_NAME): string {
   const packageDir = join(dir, "package")
   mkdirSync(packageDir, { recursive: true })
   writeConfig(packageDir, "package.json", { name, exports: { ".": "./dist/index.js", "./tui": "./dist/tui.js" } })
-  return `file:${packageDir}`
+  return pathToFileURL(packageDir).href
 }
 
 afterEach(() => {
@@ -83,14 +84,14 @@ describe("ensureTuiPluginEntry", () => {
     expect(readTuiPlugins(dir)).toEqual([fileEntry])
   })
 
-  it("#given a stale file entry in a different form #when ensuring #then it replaces the stale entry instead of duplicating", () => {
+  it("#given a server bundle file entry #when ensuring #then it keeps the package root for cold TUI export resolution", () => {
     // given
     const dir = tempConfigDir()
     const packageDir = join(dir, "package")
     mkdirSync(packageDir, { recursive: true })
     writeConfig(packageDir, "package.json", { name: PLUGIN_NAME, exports: { ".": "./dist/index.js", "./tui": "./dist/tui.js" } })
-    const dirFormEntry = `file:${packageDir}`
-    const fileFormEntry = `file:${join(packageDir, "dist", "index.js")}`
+    const dirFormEntry = pathToFileURL(packageDir).href
+    const fileFormEntry = pathToFileURL(join(packageDir, "dist", "index.js")).href
     writeConfig(dir, "opencode.json", { plugin: [fileFormEntry] })
     writeConfig(dir, "tui.json", { plugin: [dirFormEntry, fileFormEntry] })
 
@@ -99,7 +100,7 @@ describe("ensureTuiPluginEntry", () => {
 
     // then
     expect(result).toEqual({ changed: true, reason: "added" })
-    expect(readTuiPlugins(dir)).toEqual([fileFormEntry])
+    expect(readTuiPlugins(dir)).toEqual([dirFormEntry])
   })
 
   it("#given legacy server entry #when legacy TUI entry already exists #then it does not duplicate", () => {

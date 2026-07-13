@@ -20,8 +20,9 @@ export interface RegistrationToastDecision {
 }
 
 // Pure decision function: show the first-registration toast when the self entry
-// was auto-registered (registeredAt present — legacy projects never carry this
-// field, so they never toast) AND the prefs marker has not already been set true.
+// was registered through an explicit registry workflow (registeredAt present —
+// legacy projects never carry this field, so they never toast) AND the prefs
+// marker has not already been set true.
 // markerPath is always ["mailbox","registrationNoticeShown", selfEntry.projectId]
 // once an entry with registeredAt exists, regardless of show, so the caller can
 // write to it unconditionally on show:true.

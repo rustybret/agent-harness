@@ -1,0 +1,402 @@
+diff --git a/docs/reference/cross-project-mailbox.md b/docs/reference/cross-project-mailbox.md
+index d46e0b013..f655bb195 100644
+--- a/docs/reference/cross-project-mailbox.md
++++ b/docs/reference/cross-project-mailbox.md
+@@ -23,7 +23,7 @@ The Cross-Project Mailbox is an OmO feature that enables independent OpenCode re
+ ```
+ 
+ ### Key Subsystems
+-1. **Registry (`~/.omo/project-registry.json`)**: A local registry tracking observed repositories, mapping unique 8-character `projectId` tags to absolute filesystem paths.
++1. **Registry (`~/.omo/project-registry.json`)**: A local registry of explicitly enrolled repositories, mapping unique 8-character `projectId` tags to absolute filesystem paths.
+ 2. **MailboxStore**: Manages message states (reservation, confirmation, quarantine, stale reclamation) via atomic filesystem locks to prevent race conditions.
+ 3. **Idle-Drain Hook**: Injected into `session.idle` events. It checks incoming notes in `coordination_notes/` when the session becomes idle, then sequentially drains eligible messages into the active prompt stream via `dispatchInternalPrompt`.
+ 4. **Manual Receive Tools (`project_mailbox_peek`, `project_mailbox_drain`)**: Let agents inspect or consume inbound notes on demand when work cannot wait for a `session.idle` edge.
+@@ -73,20 +73,19 @@ Configure the mailbox by adding the `cross_project_mailbox` block to your user c
+ 
+ Follow this runbook to enable cross-project coordination across your local workspace.
+ 
+-### Step 1: Project Auto-Discovery
+-Repositories must register themselves so other repositories can locate them.
++### Step 1: Explicit Project Registration
++Repositories must be registered deliberately so other repositories can locate them. Starting OpenCode in a repository does not add it to the global registry.
+ 
+-#### Option A: Automatic via OpenClaw
+-If running the OpenClaw reply listener daemon, register projects automatically by running:
++#### Option A: Import from OpenClaw
++If running the OpenClaw reply listener daemon, explicitly import its known projects:
+ ```ts
+-// The registry auto-syncs with your OpenClaw session directory:
+ await registry.discoverFromOpenClaw("/path/to/openclaw/sessions.jsonl");
+ ```
+ 
+ #### Option B: Manual Registration
+-A project registers itself with the central registry whenever its OpenCode plugin initializes. Launching an OpenCode session inside any repository registers it:
+-```bash
+-opencode run "check status"
++Register only the repository roots that should participate:
++```ts
++await registry.registerProject("/absolute/path/to/repository");
+ ```
+ Check the registered projects list by inspecting `~/.omo/project-registry.json`.
+ 
+diff --git a/packages/omo-opencode/src/cli/config-manager/add-tui-plugin-to-tui-config.test.ts b/packages/omo-opencode/src/cli/config-manager/add-tui-plugin-to-tui-config.test.ts
+index ffe9053dc..5b2edfe73 100644
+--- a/packages/omo-opencode/src/cli/config-manager/add-tui-plugin-to-tui-config.test.ts
++++ b/packages/omo-opencode/src/cli/config-manager/add-tui-plugin-to-tui-config.test.ts
+@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from "bun:test"
+ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs"
+ import { tmpdir } from "node:os"
+ import { join } from "node:path"
++import { pathToFileURL } from "node:url"
+ 
+ import { LEGACY_PLUGIN_NAME, PLUGIN_NAME } from "../../shared"
+ import { ensureTuiPluginEntry } from "./add-tui-plugin-to-tui-config"
+@@ -26,7 +27,7 @@ function writeFilePackage(dir: string, name = PLUGIN_NAME): string {
+   const packageDir = join(dir, "package")
+   mkdirSync(packageDir, { recursive: true })
+   writeConfig(packageDir, "package.json", { name, exports: { ".": "./dist/index.js", "./tui": "./dist/tui.js" } })
+-  return `file:${packageDir}`
++  return pathToFileURL(packageDir).href
+ }
+ 
+ afterEach(() => {
+@@ -83,14 +84,14 @@ describe("ensureTuiPluginEntry", () => {
+     expect(readTuiPlugins(dir)).toEqual([fileEntry])
+   })
+ 
+-  it("#given a stale file entry in a different form #when ensuring #then it replaces the stale entry instead of duplicating", () => {
++  it("#given a server bundle file entry #when ensuring #then it keeps the package root for cold TUI export resolution", () => {
+     // given
+     const dir = tempConfigDir()
+     const packageDir = join(dir, "package")
+     mkdirSync(packageDir, { recursive: true })
+     writeConfig(packageDir, "package.json", { name: PLUGIN_NAME, exports: { ".": "./dist/index.js", "./tui": "./dist/tui.js" } })
+-    const dirFormEntry = `file:${packageDir}`
+-    const fileFormEntry = `file:${join(packageDir, "dist", "index.js")}`
++    const dirFormEntry = pathToFileURL(packageDir).href
++    const fileFormEntry = pathToFileURL(join(packageDir, "dist", "index.js")).href
+     writeConfig(dir, "opencode.json", { plugin: [fileFormEntry] })
+     writeConfig(dir, "tui.json", { plugin: [dirFormEntry, fileFormEntry] })
+ 
+@@ -99,7 +100,7 @@ describe("ensureTuiPluginEntry", () => {
+ 
+     // then
+     expect(result).toEqual({ changed: true, reason: "added" })
+-    expect(readTuiPlugins(dir)).toEqual([fileFormEntry])
++    expect(readTuiPlugins(dir)).toEqual([dirFormEntry])
+   })
+ 
+   it("#given legacy server entry #when legacy TUI entry already exists #then it does not duplicate", () => {
+diff --git a/packages/omo-opencode/src/cli/config-manager/add-tui-plugin-to-tui-config.ts b/packages/omo-opencode/src/cli/config-manager/add-tui-plugin-to-tui-config.ts
+index e5dd50c3f..47137358d 100644
+--- a/packages/omo-opencode/src/cli/config-manager/add-tui-plugin-to-tui-config.ts
++++ b/packages/omo-opencode/src/cli/config-manager/add-tui-plugin-to-tui-config.ts
+@@ -1,7 +1,9 @@
+ import { existsSync, mkdirSync, readFileSync } from "node:fs"
+ import { join } from "node:path"
++import { pathToFileURL } from "node:url"
+ 
+ import {
++  fileEntryPackageRoot,
+   isOurFilePluginEntry,
+   isNamedTuiPluginEntry,
+   isServerPluginEntry,
+@@ -60,7 +62,8 @@ function desiredTuiEntry(serverEntry: string): string | null {
+     return serverEntry
+   }
+   if (serverEntry.startsWith("file:") && isOurFilePluginEntry(serverEntry)) {
+-    return serverEntry
++    const packageRoot = fileEntryPackageRoot(serverEntry)
++    return packageRoot ? pathToFileURL(packageRoot).href : null
+   }
+   return null
+ }
+diff --git a/packages/omo-opencode/src/cli/doctor/checks/tui-plugin-config.ts b/packages/omo-opencode/src/cli/doctor/checks/tui-plugin-config.ts
+index 56f97831c..a0699af81 100644
+--- a/packages/omo-opencode/src/cli/doctor/checks/tui-plugin-config.ts
++++ b/packages/omo-opencode/src/cli/doctor/checks/tui-plugin-config.ts
+@@ -59,6 +59,11 @@ function fileEntryPackageJsonPath(entry: string): string {
+   return join(path, "package.json")
+ }
+ 
++export function fileEntryPackageRoot(entry: string): string | null {
++  const pkgJsonPath = fileEntryPackageJsonPath(entry)
++  return existsSync(pkgJsonPath) ? dirname(pkgJsonPath) : null
++}
++
+ function packageJsonExportsTui(pkgJsonPath: string): boolean | null {
+   if (!existsSync(pkgJsonPath)) return null
+ 
+diff --git a/packages/omo-opencode/src/features/cross-project-mailbox/__tests__/two-repo-integration.test.ts b/packages/omo-opencode/src/features/cross-project-mailbox/__tests__/two-repo-integration.test.ts
+index 2abe3ae49..1b378a16d 100644
+--- a/packages/omo-opencode/src/features/cross-project-mailbox/__tests__/two-repo-integration.test.ts
++++ b/packages/omo-opencode/src/features/cross-project-mailbox/__tests__/two-repo-integration.test.ts
+@@ -415,10 +415,10 @@ describe("cross-project mailbox two-repo integration", () => {
+   })
+ })
+ 
+-describe("T13: end-to-end auto-registration + live grant integration", () => {
++describe("T13: end-to-end explicit registration + live grant integration", () => {
+   describe("#given a temp HOME and two temp repos", () => {
+-    describe("#when both repos simulate session start then a live permission grant and sidebar state", () => {
+-      it("#then auto-registration + allow-all seeding + live grant + sidebar presence all interlock correctly", async () => {
++    describe("#when both repos are registered then receive a live permission grant and sidebar state", () => {
++      it("#then explicit registration + allow-all seeding + live grant + sidebar presence all interlock correctly", async () => {
+         // given
+         const tempHome = await createTempDir("t13-home-")
+         const senderRoot = await createTempDir("t13-sender-")
+@@ -428,7 +428,7 @@ describe("T13: end-to-end auto-registration + live grant integration", () => {
+         const registryPath = path.join(tempHome, ".omo", "project-registry.json")
+         const registry = createProjectRegistry(registryPath)
+ 
+-        // when — stage 1: session start triggers auto-registration
++        // when: stage 1 explicitly registers both repositories
+         const senderReg = await registry.registerProject(senderRoot)
+         const receiverReg = await registry.registerProject(receiverRoot)
+ 
+@@ -436,7 +436,7 @@ describe("T13: end-to-end auto-registration + live grant integration", () => {
+         expect(senderReg.created).toBe(true)
+         expect(receiverReg.created).toBe(true)
+ 
+-        // when — second session start: already registered
++        // when: repeated explicit registration is idempotent
+         const senderReg2 = await registry.registerProject(senderRoot)
+         const receiverReg2 = await registry.registerProject(receiverRoot)
+         expect(senderReg2.created).toBe(false)
+diff --git a/packages/omo-opencode/src/features/cross-project-mailbox/dialog/registration-notice.test.ts b/packages/omo-opencode/src/features/cross-project-mailbox/dialog/registration-notice.test.ts
+index a46312cca..40e19448d 100644
+--- a/packages/omo-opencode/src/features/cross-project-mailbox/dialog/registration-notice.test.ts
++++ b/packages/omo-opencode/src/features/cross-project-mailbox/dialog/registration-notice.test.ts
+@@ -28,7 +28,7 @@ describe("decideRegistrationToast", () => {
+   })
+ 
+   it("#given a self entry without registeredAt #when deciding #then does not show (legacy project)", () => {
+-    // given a legacy entry never auto-registered
++    // given a legacy entry without a recorded explicit registration time
+     const entry = makeEntry({ registeredAt: undefined })
+ 
+     // when deciding
+diff --git a/packages/omo-opencode/src/features/cross-project-mailbox/dialog/registration-notice.ts b/packages/omo-opencode/src/features/cross-project-mailbox/dialog/registration-notice.ts
+index 046775cb6..5f17f622a 100644
+--- a/packages/omo-opencode/src/features/cross-project-mailbox/dialog/registration-notice.ts
++++ b/packages/omo-opencode/src/features/cross-project-mailbox/dialog/registration-notice.ts
+@@ -20,8 +20,9 @@ export interface RegistrationToastDecision {
+ }
+ 
+ // Pure decision function: show the first-registration toast when the self entry
+-// was auto-registered (registeredAt present — legacy projects never carry this
+-// field, so they never toast) AND the prefs marker has not already been set true.
++// was registered through an explicit registry workflow (registeredAt present —
++// legacy projects never carry this field, so they never toast) AND the prefs
++// marker has not already been set true.
+ // markerPath is always ["mailbox","registrationNoticeShown", selfEntry.projectId]
+ // once an entry with registeredAt exists, regardless of show, so the caller can
+ // write to it unconditionally on show:true.
+diff --git a/packages/omo-opencode/src/features/cross-project-mailbox/hooks/create-mailbox-hooks.test.ts b/packages/omo-opencode/src/features/cross-project-mailbox/hooks/create-mailbox-hooks.test.ts
+index 99e49d3c2..d6ebddf99 100644
+--- a/packages/omo-opencode/src/features/cross-project-mailbox/hooks/create-mailbox-hooks.test.ts
++++ b/packages/omo-opencode/src/features/cross-project-mailbox/hooks/create-mailbox-hooks.test.ts
+@@ -4,8 +4,9 @@ import os from "node:os"
+ import path from "node:path"
+ 
+ import type { PluginContext } from "../../../plugin/types"
++import { CrossProjectMailboxConfigSchema } from "../config"
+ import type { PresenceRecord } from "../presence"
+-import { buildPresenceHeartbeatHook, loadSessionMessageIds } from "./create-mailbox-hooks"
++import { buildIdleDrainDeps, buildPresenceHeartbeatHook, loadSessionMessageIds } from "./create-mailbox-hooks"
+ 
+ function makeCtx(sessionApi: Record<string, unknown>): PluginContext {
+   return {
+@@ -14,6 +15,26 @@ function makeCtx(sessionApi: Record<string, unknown>): PluginContext {
+   } as unknown as PluginContext
+ }
+ 
++describe("buildIdleDrainDeps", () => {
++  it("#given an enabled mailbox #when hooks initialize #then it reads peers without registering the current project", () => {
++    // given
++    let registerCalls = 0
++    const registry = {
++      listProjects: async () => [],
++      registerProject: async () => {
++        registerCalls += 1
++        return { created: true }
++      },
++    }
++
++    // when
++    buildIdleDrainDeps(makeCtx({}), CrossProjectMailboxConfigSchema.parse({}), registry)
++
++    // then
++    expect(registerCalls).toBe(0)
++  })
++})
++
+ describe("buildPresenceHeartbeatHook", () => {
+   let server: ReturnType<typeof Bun.serve> | undefined
+   const tmpDirs: string[] = []
+diff --git a/packages/omo-opencode/src/features/cross-project-mailbox/hooks/create-mailbox-hooks.ts b/packages/omo-opencode/src/features/cross-project-mailbox/hooks/create-mailbox-hooks.ts
+index 0ba70f413..82eddf305 100644
+--- a/packages/omo-opencode/src/features/cross-project-mailbox/hooks/create-mailbox-hooks.ts
++++ b/packages/omo-opencode/src/features/cross-project-mailbox/hooks/create-mailbox-hooks.ts
+@@ -11,8 +11,7 @@ import { BodyDigestStore, SamePairRateLimiter } from "../loop-guard"
+ import { MailboxStore, PendingDeliveryStore } from "../mailbox"
+ import { resolveSessionAgent } from "../../../plugin/session-agent-resolver"
+ import { normalizePrimaryAgent, resolveActivePrimaryAgent } from "../primary-resolver"
+-import { createProjectRegistry } from "../registry"
+-import { ensureSelfRegistered } from "../registry/self-registration"
++import { createProjectRegistry, type ProjectRegistry } from "../registry"
+ import type { ProjectEntry } from "../registry/types"
+ import { buildTriagePrompt } from "../triage"
+ import { validateInbound } from "../validation"
+@@ -83,13 +82,13 @@ export async function loadSessionMessageIds(
+   }
+ }
+ 
+-function buildIdleDrainDeps(
++export function buildIdleDrainDeps(
+   ctx: PluginContext,
+   config: CrossProjectMailboxConfig,
++  registry: Pick<ProjectRegistry, "listProjects"> = createProjectRegistry(),
+ ): IdleDrainHookDeps {
+   const repoRoot = ctx.directory
+   const liveConfigResolver = createLiveMailboxConfigResolver(repoRoot, config)
+-  const registry = createProjectRegistry()
+   let projectsSnapshot: ProjectEntry[] = []
+   const refreshSnapshot = (): void => {
+     registry
+@@ -103,11 +102,6 @@ function buildIdleDrainDeps(
+   }
+   refreshSnapshot()
+ 
+-  // Fire-and-forget: register this project in the global registry so other
+-  // projects can discover it.  Errors are logged inside ensureSelfRegistered
+-  // and never propagate — session start must never break.
+-  void ensureSelfRegistered({ registry, repoRoot })
+-
+   return {
+     config,
+     validatePluginConfig,
+diff --git a/packages/omo-opencode/src/features/cross-project-mailbox/registry/self-registration.test.ts b/packages/omo-opencode/src/features/cross-project-mailbox/registry/self-registration.test.ts
+deleted file mode 100644
+index 130e78576..000000000
+--- a/packages/omo-opencode/src/features/cross-project-mailbox/registry/self-registration.test.ts
++++ /dev/null
+@@ -1,89 +0,0 @@
+-import { describe, expect, it } from "bun:test"
+-import { mkdtemp, mkdir, chmod } from "node:fs/promises"
+-import { realpathSync } from "node:fs"
+-import os from "node:os"
+-import path from "node:path"
+-
+-import { createProjectRegistry } from "./project-registry"
+-import { ensureSelfRegistered } from "./self-registration"
+-
+-describe("ensureSelfRegistered", () => {
+-  describe("#given a valid repo root and enabled mailbox", () => {
+-    it("#then registers the project with a fresh lastSeen", async () => {
+-      // given
+-      const tmpHome = await mkdtemp(path.join(os.tmpdir(), "omo-selfreg-"))
+-      const registryPath = path.join(tmpHome, "project-registry.json")
+-      const registry = createProjectRegistry(registryPath)
+-      const repoRoot = await mkdtemp(path.join(tmpHome, "repo-"))
+-
+-      // when
+-      const result = await ensureSelfRegistered({ registry, repoRoot })
+-
+-      // then
+-      expect(result).not.toBeNull()
+-      expect(result!.created).toBe(true)
+-      const projects = await registry.listProjects()
+-      expect(projects).toHaveLength(1)
+-      expect(projects[0]!.repoRoot).toBe(realpathSync(repoRoot))
+-      expect(projects[0]!.lastSeen).toBeGreaterThan(0)
+-    })
+-  })
+-
+-  describe("#given a disabled mailbox (registry untouched)", () => {
+-    it("#then does not write to the registry", async () => {
+-      // given
+-      const tmpHome = await mkdtemp(path.join(os.tmpdir(), "omo-selfreg-disabled-"))
+-      const registryPath = path.join(tmpHome, "project-registry.json")
+-      const registry = createProjectRegistry(registryPath)
+-      const repoRoot = await mkdtemp(path.join(tmpHome, "repo-"))
+-
+-      // when — simulate "disabled" by not calling ensureSelfRegistered
+-      // (in production, hooks aren't created at all when disabled)
+-
+-      // then
+-      const projects = await registry.listProjects()
+-      expect(projects).toHaveLength(0)
+-    })
+-  })
+-
+-  describe("#given a registry write failure (read-only dir)", () => {
+-    it("#then returns null without throwing", async () => {
+-      // given
+-      const tmpHome = await mkdtemp(path.join(os.tmpdir(), "omo-selfreg-readonly-"))
+-      const readOnlyDir = path.join(tmpHome, "readonly")
+-      await mkdir(readOnlyDir)
+-      const registryPath = path.join(readOnlyDir, "project-registry.json")
+-      const registry = createProjectRegistry(registryPath)
+-      const repoRoot = await mkdtemp(path.join(tmpHome, "repo-"))
+-
+-      // make the parent dir read-only so mkdir/open will fail
+-      await chmod(readOnlyDir, 0o555)
+-
+-      // when
+-      const result = await ensureSelfRegistered({ registry, repoRoot })
+-
+-      // then — should return null, not throw
+-      expect(result).toBeNull()
+-    })
+-  })
+-
+-  describe("#given a second session for the same project", () => {
+-    it("#then returns created:false with no duplicate entry", async () => {
+-      // given
+-      const tmpHome = await mkdtemp(path.join(os.tmpdir(), "omo-selfreg-dup-"))
+-      const registryPath = path.join(tmpHome, "project-registry.json")
+-      const registry = createProjectRegistry(registryPath)
+-      const repoRoot = await mkdtemp(path.join(tmpHome, "repo-"))
+-
+-      // when
+-      const first = await ensureSelfRegistered({ registry, repoRoot })
+-      const second = await ensureSelfRegistered({ registry, repoRoot })
+-
+-      // then
+-      expect(first!.created).toBe(true)
+-      expect(second!.created).toBe(false)
+-      const projects = await registry.listProjects()
+-      expect(projects).toHaveLength(1)
+-    })
+-  })
+-})
+diff --git a/packages/omo-opencode/src/features/cross-project-mailbox/registry/self-registration.ts b/packages/omo-opencode/src/features/cross-project-mailbox/registry/self-registration.ts
+deleted file mode 100644
+index a15e044d1..000000000
+--- a/packages/omo-opencode/src/features/cross-project-mailbox/registry/self-registration.ts
++++ /dev/null
+@@ -1,23 +0,0 @@
+-import { log } from "../../../shared/logger"
+-
+-import type { ProjectRegistry } from "./project-registry"
+-
+-export async function ensureSelfRegistered(args: {
+-  registry: ProjectRegistry
+-  repoRoot: string
+-}): Promise<{ created: boolean } | null> {
+-  try {
+-    const result = await args.registry.registerProject(args.repoRoot)
+-    log("[cross-project-mailbox] self-registration", {
+-      repoRoot: args.repoRoot,
+-      created: result.created,
+-    })
+-    return result
+-  } catch (error) {
+-    log("[cross-project-mailbox] self-registration failed", {
+-      repoRoot: args.repoRoot,
+-      error: error instanceof Error ? `${error.name}: ${error.message}` : String(error),
+-    })
+-    return null
+-  }
+-}

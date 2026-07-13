@@ -148,7 +148,8 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "medium",
+        "none"
       ]
     },
     {
@@ -161,7 +162,9 @@
     },
     {
       "key": "cerebras/zai-glm-4.7",
-      "variants": []
+      "variants": [
+        "none"
+      ]
     },
     {
       "key": "google/antigravity-claude-opus-4-6-thinking",
@@ -233,8 +236,7 @@
       "variants": [
         "high",
         "low",
-        "medium",
-        "none"
+        "medium"
       ]
     },
     {
@@ -242,8 +244,7 @@
       "variants": [
         "high",
         "low",
-        "medium",
-        "none"
+        "medium"
       ]
     },
     {
@@ -251,13 +252,15 @@
       "variants": [
         "high",
         "low",
-        "medium",
-        "none"
+        "medium"
       ]
     },
     {
       "key": "groq/qwen/qwen3-32b",
-      "variants": []
+      "variants": [
+        "default",
+        "none"
+      ]
     },
     {
       "key": "groq/whisper-large-v3",
@@ -351,18 +354,16 @@
       "key": "nvidia/deepseek-ai/deepseek-v4-flash",
       "variants": [
         "high",
-        "low",
         "max",
-        "medium"
+        "none"
       ]
     },
     {
       "key": "nvidia/deepseek-ai/deepseek-v4-pro",
       "variants": [
         "high",
-        "low",
         "max",
-        "medium"
+        "none"
       ]
     },
     {
@@ -476,8 +477,7 @@
       "key": "nvidia/mistralai/mistral-small-4-119b-2603",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "none"
       ]
     },
     {
@@ -570,11 +570,7 @@
     },
     {
       "key": "nvidia/nvidia/nemotron-content-safety-reasoning-4b",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "nvidia/nvidia/nemotron-mini-4b-instruct",
@@ -697,7 +693,10 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "max",
+        "medium",
+        "minimal",
+        "xhigh"
       ]
     },
     {
@@ -786,6 +785,7 @@
       "variants": [
         "high",
         "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -796,16 +796,7 @@
       "variants": [
         "high",
         "low",
-        "medium",
-        "none",
-        "xhigh"
-      ]
-    },
-    {
-      "key": "openai/gpt-5.6-luna-pro",
-      "variants": [
-        "high",
-        "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -816,6 +807,7 @@
       "variants": [
         "high",
         "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -826,16 +818,7 @@
       "variants": [
         "high",
         "low",
-        "medium",
-        "none",
-        "xhigh"
-      ]
-    },
-    {
-      "key": "openai/gpt-5.6-sol-pro",
-      "variants": [
-        "high",
-        "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -846,6 +829,7 @@
       "variants": [
         "high",
         "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -856,16 +840,7 @@
       "variants": [
         "high",
         "low",
-        "medium",
-        "none",
-        "xhigh"
-      ]
-    },
-    {
-      "key": "openai/gpt-5.6-terra-pro",
-      "variants": [
-        "high",
-        "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -973,27 +948,21 @@
       "key": "opencode/deepseek-v4-flash",
       "variants": [
         "high",
-        "low",
-        "max",
-        "medium"
+        "max"
       ]
     },
     {
       "key": "opencode/deepseek-v4-flash-free",
       "variants": [
         "high",
-        "low",
-        "max",
-        "medium"
+        "max"
       ]
     },
     {
       "key": "opencode/deepseek-v4-pro",
       "variants": [
         "high",
-        "low",
-        "max",
-        "medium"
+        "max"
       ]
     },
     {
@@ -1132,7 +1101,6 @@
         "high",
         "low",
         "medium",
-        "none",
         "xhigh"
       ]
     },
@@ -1197,6 +1165,7 @@
       "variants": [
         "high",
         "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -1207,6 +1176,7 @@
       "variants": [
         "high",
         "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -1217,6 +1187,7 @@
       "variants": [
         "high",
         "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -1232,19 +1203,11 @@
     },
     {
       "key": "opencode/grok-build-0.1",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "opencode/hy3-free",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "opencode/kimi-k2.5",
@@ -1260,11 +1223,7 @@
     },
     {
       "key": "opencode/mimo-v2.5-free",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "opencode/minimax-m2.5",
@@ -1276,18 +1235,11 @@
     },
     {
       "key": "opencode/minimax-m3",
-      "variants": [
-        "none",
-        "thinking"
-      ]
+      "variants": []
     },
     {
       "key": "opencode/nemotron-3-ultra-free",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "opencode/north-mini-code-free",
@@ -1298,11 +1250,17 @@
     },
     {
       "key": "opencode/qwen3.5-plus",
-      "variants": []
+      "variants": [
+        "high",
+        "max"
+      ]
     },
     {
       "key": "opencode/qwen3.6-plus",
-      "variants": []
+      "variants": [
+        "high",
+        "max"
+      ]
     },
     {
       "key": "openrouter/ai21/jamba-large-1.7",
@@ -1310,27 +1268,15 @@
     },
     {
       "key": "openrouter/aion-labs/aion-2.0",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/aion-labs/aion-3.0",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/aion-labs/aion-3.0-mini",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/aion-labs/aion-rp-llama-3.1-8b",
@@ -1338,19 +1284,11 @@
     },
     {
       "key": "openrouter/allenai/olmo-3-32b-think",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/amazon/nova-2-lite-v1",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/amazon/nova-lite-v1",
@@ -1381,31 +1319,30 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "max",
+        "medium",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/anthropic/claude-haiku-4.5",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "max"
       ]
     },
     {
       "key": "openrouter/anthropic/claude-opus-4",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "max"
       ]
     },
     {
       "key": "openrouter/anthropic/claude-opus-4.1",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "max"
       ]
     },
     {
@@ -1421,6 +1358,7 @@
       "variants": [
         "high",
         "low",
+        "max",
         "medium"
       ]
     },
@@ -1429,7 +1367,9 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "max",
+        "medium",
+        "xhigh"
       ]
     },
     {
@@ -1437,7 +1377,9 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "max",
+        "medium",
+        "xhigh"
       ]
     },
     {
@@ -1445,7 +1387,9 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "max",
+        "medium",
+        "xhigh"
       ]
     },
     {
@@ -1453,23 +1397,23 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "max",
+        "medium",
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/anthropic/claude-sonnet-4",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "max"
       ]
     },
     {
       "key": "openrouter/anthropic/claude-sonnet-4.5",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "max"
       ]
     },
     {
@@ -1477,6 +1421,7 @@
       "variants": [
         "high",
         "low",
+        "max",
         "medium"
       ]
     },
@@ -1485,7 +1430,9 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "max",
+        "medium",
+        "xhigh"
       ]
     },
     {
@@ -1494,11 +1441,7 @@
     },
     {
       "key": "openrouter/arcee-ai/trinity-large-thinking",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/arcee-ai/virtuoso-large",
@@ -1506,34 +1449,23 @@
     },
     {
       "key": "openrouter/baidu/ernie-4.5-vl-424b-a47b",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/bytedance-seed/seed-1.6",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/bytedance-seed/seed-1.6-flash",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/bytedance-seed/seed-2.0-lite",
       "variants": [
         "high",
         "low",
-        "medium"
+        "medium",
+        "minimal"
       ]
     },
     {
@@ -1541,7 +1473,8 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "medium",
+        "minimal"
       ]
     },
     {
@@ -1574,19 +1507,11 @@
     },
     {
       "key": "openrouter/cohere/north-mini-code:free",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/deepcogito/cogito-v2.1-671b",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/deepseek/deepseek-chat",
@@ -1628,24 +1553,21 @@
       "key": "openrouter/deepseek/deepseek-v4-flash",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/deepseek/deepseek-v4-pro",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "xhigh"
       ]
     },
     {
       "key": "openrouter/google/gemini-2.5-flash",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "max"
       ]
     },
     {
@@ -1656,32 +1578,28 @@
       "key": "openrouter/google/gemini-2.5-flash-lite",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "max"
       ]
     },
     {
       "key": "openrouter/google/gemini-2.5-pro",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "max"
       ]
     },
     {
       "key": "openrouter/google/gemini-2.5-pro-preview",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "max"
       ]
     },
     {
       "key": "openrouter/google/gemini-2.5-pro-preview-05-06",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "max"
       ]
     },
     {
@@ -1689,39 +1607,30 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "medium",
+        "minimal"
       ]
     },
     {
       "key": "openrouter/google/gemini-3-pro-image",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/google/gemini-3-pro-image-preview",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/google/gemini-3.1-flash-image",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "minimal"
       ]
     },
     {
       "key": "openrouter/google/gemini-3.1-flash-image-preview",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "minimal"
       ]
     },
     {
@@ -1729,15 +1638,15 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "medium",
+        "minimal"
       ]
     },
     {
       "key": "openrouter/google/gemini-3.1-flash-lite-image",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "minimal"
       ]
     },
     {
@@ -1745,7 +1654,8 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "medium",
+        "minimal"
       ]
     },
     {
@@ -1769,7 +1679,8 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "medium",
+        "minimal"
       ]
     },
     {
@@ -1849,7 +1760,8 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "medium",
+        "none"
       ]
     },
     {
@@ -1864,8 +1776,7 @@
       "key": "openrouter/inclusionai/ring-2.6-1t",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "xhigh"
       ]
     },
     {
@@ -1886,11 +1797,7 @@
     },
     {
       "key": "openrouter/liquid/lfm-2.5-1.2b-thinking:free",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/mancer/weaver",
@@ -2016,8 +1923,7 @@
       "key": "openrouter/mistralai/mistral-medium-3-5",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "none"
       ]
     },
     {
@@ -2040,8 +1946,7 @@
       "key": "openrouter/mistralai/mistral-small-2603",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "none"
       ]
     },
     {
@@ -2094,19 +1999,11 @@
     },
     {
       "key": "openrouter/nex-agi/nex-n2-mini",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/nex-agi/nex-n2-pro",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/nousresearch/hermes-3-llama-3.1-405b",
@@ -2138,40 +2035,26 @@
     },
     {
       "key": "openrouter/nvidia/llama-3.3-nemotron-super-49b-v1.5",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/nvidia/nemotron-3-nano-30b-a3b",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/nvidia/nemotron-3-nano-30b-a3b:free",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "max"
       ]
     },
     {
       "key": "openrouter/nvidia/nemotron-3-super-120b-a12b",
       "variants": [
-        "high",
         "low",
         "medium"
       ]
@@ -2179,7 +2062,6 @@
     {
       "key": "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
       "variants": [
-        "high",
         "low",
         "medium"
       ]
@@ -2188,7 +2070,6 @@
       "key": "openrouter/nvidia/nemotron-3-ultra-550b-a55b",
       "variants": [
         "high",
-        "low",
         "medium"
       ]
     },
@@ -2196,33 +2077,20 @@
       "key": "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
       "variants": [
         "high",
-        "low",
         "medium"
       ]
     },
     {
       "key": "openrouter/nvidia/nemotron-3.5-content-safety:free",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/nvidia/nemotron-nano-12b-v2-vl:free",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/nvidia/nemotron-nano-9b-v2:free",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/openai/gpt-3.5-turbo",
@@ -2302,9 +2170,7 @@
         "high",
         "low",
         "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "minimal"
       ]
     },
     {
@@ -2317,25 +2183,11 @@
     },
     {
       "key": "openrouter/openai/gpt-5-image",
-      "variants": [
-        "high",
-        "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/openai/gpt-5-image-mini",
-      "variants": [
-        "high",
-        "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/openai/gpt-5-mini",
@@ -2343,9 +2195,7 @@
         "high",
         "low",
         "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "minimal"
       ]
     },
     {
@@ -2354,9 +2204,7 @@
         "high",
         "low",
         "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "minimal"
       ]
     },
     {
@@ -2444,7 +2292,6 @@
         "high",
         "low",
         "medium",
-        "none",
         "xhigh"
       ]
     },
@@ -2519,6 +2366,7 @@
       "variants": [
         "high",
         "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -2529,6 +2377,7 @@
       "variants": [
         "high",
         "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -2539,6 +2388,7 @@
       "variants": [
         "high",
         "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -2549,6 +2399,7 @@
       "variants": [
         "high",
         "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -2559,6 +2410,7 @@
       "variants": [
         "high",
         "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -2569,6 +2421,7 @@
       "variants": [
         "high",
         "low",
+        "max",
         "medium",
         "none",
         "xhigh"
@@ -2591,10 +2444,7 @@
       "variants": [
         "high",
         "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "medium"
       ]
     },
     {
@@ -2602,10 +2452,7 @@
       "variants": [
         "high",
         "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "medium"
       ]
     },
     {
@@ -2613,10 +2460,7 @@
       "variants": [
         "high",
         "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "medium"
       ]
     },
     {
@@ -2624,10 +2468,7 @@
       "variants": [
         "high",
         "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "medium"
       ]
     },
     {
@@ -2635,10 +2476,7 @@
       "variants": [
         "high",
         "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "medium"
       ]
     },
     {
@@ -2646,65 +2484,37 @@
       "variants": [
         "high",
         "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "medium"
       ]
     },
     {
       "key": "openrouter/openai/o1-pro",
-      "variants": [
-        "high",
-        "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/openai/o3",
       "variants": [
         "high",
         "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "medium"
       ]
     },
     {
       "key": "openrouter/openai/o3-deep-research",
-      "variants": [
-        "high",
-        "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/openai/o3-mini",
       "variants": [
         "high",
         "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "medium"
       ]
     },
     {
       "key": "openrouter/openai/o3-mini-high",
       "variants": [
-        "high",
-        "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "high"
       ]
     },
     {
@@ -2712,10 +2522,7 @@
       "variants": [
         "high",
         "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "medium"
       ]
     },
     {
@@ -2723,41 +2530,22 @@
       "variants": [
         "high",
         "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "medium"
       ]
     },
     {
       "key": "openrouter/openai/o4-mini-deep-research",
-      "variants": [
-        "high",
-        "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/openai/o4-mini-high",
       "variants": [
-        "high",
-        "low",
-        "medium",
-        "minimal",
-        "none",
-        "xhigh"
+        "high"
       ]
     },
     {
       "key": "openrouter/openrouter/auto",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/openrouter/bodybuilder",
@@ -2765,11 +2553,7 @@
     },
     {
       "key": "openrouter/openrouter/free",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/openrouter/fusion",
@@ -2781,11 +2565,7 @@
     },
     {
       "key": "openrouter/perceptron/perceptron-mk1",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/perplexity/sonar",
@@ -2793,11 +2573,7 @@
     },
     {
       "key": "openrouter/perplexity/sonar-deep-research",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/perplexity/sonar-pro",
@@ -2805,51 +2581,27 @@
     },
     {
       "key": "openrouter/perplexity/sonar-pro-search",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/perplexity/sonar-reasoning-pro",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/poolside/laguna-m.1",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/poolside/laguna-m.1:free",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/poolside/laguna-xs-2.1",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/poolside/laguna-xs-2.1:free",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/qwen/qwen-2.5-72b-instruct",
@@ -2873,7 +2625,10 @@
     },
     {
       "key": "openrouter/qwen/qwen-plus-2025-07-28:thinking",
-      "variants": []
+      "variants": [
+        "high",
+        "max"
+      ]
     },
     {
       "key": "openrouter/qwen/qwen2.5-vl-72b-instruct",
@@ -2885,7 +2640,10 @@
     },
     {
       "key": "openrouter/qwen/qwen3-235b-a22b",
-      "variants": []
+      "variants": [
+        "high",
+        "max"
+      ]
     },
     {
       "key": "openrouter/qwen/qwen3-235b-a22b-2507",
@@ -2945,7 +2703,10 @@
     },
     {
       "key": "openrouter/qwen/qwen3-max-thinking",
-      "variants": []
+      "variants": [
+        "high",
+        "max"
+      ]
     },
     {
       "key": "openrouter/qwen/qwen3-next-80b-a3b-instruct",
@@ -3009,15 +2770,24 @@
     },
     {
       "key": "openrouter/qwen/qwen3.5-flash-02-23",
-      "variants": []
+      "variants": [
+        "high",
+        "max"
+      ]
     },
     {
       "key": "openrouter/qwen/qwen3.5-plus-02-15",
-      "variants": []
+      "variants": [
+        "high",
+        "max"
+      ]
     },
     {
       "key": "openrouter/qwen/qwen3.5-plus-20260420",
-      "variants": []
+      "variants": [
+        "high",
+        "max"
+      ]
     },
     {
       "key": "openrouter/qwen/qwen3.6-27b",
@@ -3029,23 +2799,38 @@
     },
     {
       "key": "openrouter/qwen/qwen3.6-flash",
-      "variants": []
+      "variants": [
+        "high",
+        "max"
+      ]
     },
     {
       "key": "openrouter/qwen/qwen3.6-max-preview",
-      "variants": []
+      "variants": [
+        "high",
+        "max"
+      ]
     },
     {
       "key": "openrouter/qwen/qwen3.6-plus",
-      "variants": []
+      "variants": [
+        "high",
+        "max"
+      ]
     },
     {
       "key": "openrouter/qwen/qwen3.7-max",
-      "variants": []
+      "variants": [
+        "high",
+        "max"
+      ]
     },
     {
       "key": "openrouter/qwen/qwen3.7-plus",
-      "variants": []
+      "variants": [
+        "high",
+        "max"
+      ]
     },
     {
       "key": "openrouter/rekaai/reka-edge",
@@ -3053,11 +2838,7 @@
     },
     {
       "key": "openrouter/rekaai/reka-flash-3",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/relace/relace-apply-3",
@@ -3071,8 +2852,8 @@
       "key": "openrouter/sakana/fugu-ultra",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "max",
+        "xhigh"
       ]
     },
     {
@@ -3093,11 +2874,7 @@
     },
     {
       "key": "openrouter/stepfun/step-3.5-flash",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/stepfun/step-3.7-flash",
@@ -3109,18 +2886,14 @@
     },
     {
       "key": "openrouter/tencent/hunyuan-a13b-instruct",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/tencent/hy3",
       "variants": [
         "high",
         "low",
-        "medium"
+        "none"
       ]
     },
     {
@@ -3128,7 +2901,7 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "none"
       ]
     },
     {
@@ -3136,7 +2909,7 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "none"
       ]
     },
     {
@@ -3161,11 +2934,7 @@
     },
     {
       "key": "openrouter/upstage/solar-pro-3",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/writer/palmyra-x5",
@@ -3173,18 +2942,13 @@
     },
     {
       "key": "openrouter/x-ai/grok-4.20",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/x-ai/grok-4.20-multi-agent",
       "variants": [
         "high",
-        "low",
-        "medium"
+        "low"
       ]
     },
     {
@@ -3192,7 +2956,8 @@
       "variants": [
         "high",
         "low",
-        "medium"
+        "medium",
+        "none"
       ]
     },
     {
@@ -3205,11 +2970,7 @@
     },
     {
       "key": "openrouter/x-ai/grok-build-0.1",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
+      "variants": []
     },
     {
       "key": "openrouter/xiaomi/mimo-v2.5",

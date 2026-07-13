@@ -11,8 +11,7 @@ import { BodyDigestStore, SamePairRateLimiter } from "../loop-guard"
 import { MailboxStore, PendingDeliveryStore } from "../mailbox"
 import { resolveSessionAgent } from "../../../plugin/session-agent-resolver"
 import { normalizePrimaryAgent, resolveActivePrimaryAgent } from "../primary-resolver"
-import { createProjectRegistry } from "../registry"
-import { ensureSelfRegistered } from "../registry/self-registration"
+import { createProjectRegistry, type ProjectRegistry } from "../registry"
 import type { ProjectEntry } from "../registry/types"
 import { buildTriagePrompt } from "../triage"
 import { validateInbound } from "../validation"
@@ -83,13 +82,13 @@ export async function loadSessionMessageIds(
   }
 }
 
-function buildIdleDrainDeps(
+export function buildIdleDrainDeps(
   ctx: PluginContext,
   config: CrossProjectMailboxConfig,
+  registry: Pick<ProjectRegistry, "listProjects"> = createProjectRegistry(),
 ): IdleDrainHookDeps {
   const repoRoot = ctx.directory
   const liveConfigResolver = createLiveMailboxConfigResolver(repoRoot, config)
-  const registry = createProjectRegistry()
   let projectsSnapshot: ProjectEntry[] = []
   const refreshSnapshot = (): void => {
     registry
@@ -102,11 +101,6 @@ function buildIdleDrainDeps(
       })
   }
   refreshSnapshot()
-
-  // Fire-and-forget: register this project in the global registry so other
-  // projects can discover it.  Errors are logged inside ensureSelfRegistered
-  // and never propagate — session start must never break.
-  void ensureSelfRegistered({ registry, repoRoot })
 
   return {
     config,

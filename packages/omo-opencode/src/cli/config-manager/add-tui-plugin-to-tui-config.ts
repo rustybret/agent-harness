@@ -1,7 +1,9 @@
 import { existsSync, mkdirSync, readFileSync } from "node:fs"
 import { join } from "node:path"
+import { pathToFileURL } from "node:url"
 
 import {
+  fileEntryPackageRoot,
   isOurFilePluginEntry,
   isNamedTuiPluginEntry,
   isServerPluginEntry,
@@ -60,7 +62,8 @@ function desiredTuiEntry(serverEntry: string): string | null {
     return serverEntry
   }
   if (serverEntry.startsWith("file:") && isOurFilePluginEntry(serverEntry)) {
-    return serverEntry
+    const packageRoot = fileEntryPackageRoot(serverEntry)
+    return packageRoot ? pathToFileURL(packageRoot).href : null
   }
   return null
 }

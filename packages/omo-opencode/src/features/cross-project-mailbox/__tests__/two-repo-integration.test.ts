@@ -415,10 +415,10 @@ describe("cross-project mailbox two-repo integration", () => {
   })
 })
 
-describe("T13: end-to-end auto-registration + live grant integration", () => {
+describe("T13: end-to-end explicit registration + live grant integration", () => {
   describe("#given a temp HOME and two temp repos", () => {
-    describe("#when both repos simulate session start then a live permission grant and sidebar state", () => {
-      it("#then auto-registration + allow-all seeding + live grant + sidebar presence all interlock correctly", async () => {
+    describe("#when both repos are registered then receive a live permission grant and sidebar state", () => {
+      it("#then explicit registration + allow-all seeding + live grant + sidebar presence all interlock correctly", async () => {
         // given
         const tempHome = await createTempDir("t13-home-")
         const senderRoot = await createTempDir("t13-sender-")
@@ -428,7 +428,7 @@ describe("T13: end-to-end auto-registration + live grant integration", () => {
         const registryPath = path.join(tempHome, ".omo", "project-registry.json")
         const registry = createProjectRegistry(registryPath)
 
-        // when — stage 1: session start triggers auto-registration
+        // when: stage 1 explicitly registers both repositories
         const senderReg = await registry.registerProject(senderRoot)
         const receiverReg = await registry.registerProject(receiverRoot)
 
@@ -436,7 +436,7 @@ describe("T13: end-to-end auto-registration + live grant integration", () => {
         expect(senderReg.created).toBe(true)
         expect(receiverReg.created).toBe(true)
 
-        // when — second session start: already registered
+        // when: repeated explicit registration is idempotent
         const senderReg2 = await registry.registerProject(senderRoot)
         const receiverReg2 = await registry.registerProject(receiverRoot)
         expect(senderReg2.created).toBe(false)

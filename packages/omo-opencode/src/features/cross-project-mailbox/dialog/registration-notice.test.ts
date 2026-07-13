@@ -28,7 +28,7 @@ describe("decideRegistrationToast", () => {
   })
 
   it("#given a self entry without registeredAt #when deciding #then does not show (legacy project)", () => {
-    // given a legacy entry never auto-registered
+    // given a legacy entry without a recorded explicit registration time
     const entry = makeEntry({ registeredAt: undefined })
 
     // when deciding

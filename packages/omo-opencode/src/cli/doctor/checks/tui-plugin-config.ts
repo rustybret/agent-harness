@@ -59,6 +59,11 @@ function fileEntryPackageJsonPath(entry: string): string {
   return join(path, "package.json")
 }
 
+export function fileEntryPackageRoot(entry: string): string | null {
+  const pkgJsonPath = fileEntryPackageJsonPath(entry)
+  return existsSync(pkgJsonPath) ? dirname(pkgJsonPath) : null
+}
+
 function packageJsonExportsTui(pkgJsonPath: string): boolean | null {
   if (!existsSync(pkgJsonPath)) return null
 

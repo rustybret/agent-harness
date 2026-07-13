@@ -4,8 +4,9 @@ import os from "node:os"
 import path from "node:path"
 
 import type { PluginContext } from "../../../plugin/types"
+import { CrossProjectMailboxConfigSchema } from "../config"
 import type { PresenceRecord } from "../presence"
-import { buildPresenceHeartbeatHook, loadSessionMessageIds } from "./create-mailbox-hooks"
+import { buildIdleDrainDeps, buildPresenceHeartbeatHook, loadSessionMessageIds } from "./create-mailbox-hooks"
 
 function makeCtx(sessionApi: Record<string, unknown>): PluginContext {
   return {
@@ -13,6 +14,26 @@ function makeCtx(sessionApi: Record<string, unknown>): PluginContext {
     directory: "/tmp/mailbox-hooks-test",
   } as unknown as PluginContext
 }
+
+describe("buildIdleDrainDeps", () => {
+  it("#given an enabled mailbox #when hooks initialize #then it reads peers without registering the current project", () => {
+    // given
+    let registerCalls = 0
+    const registry = {
+      listProjects: async () => [],
+      registerProject: async () => {
+        registerCalls += 1
+        return { created: true }
+      },
+    }
+
+    // when
+    buildIdleDrainDeps(makeCtx({}), CrossProjectMailboxConfigSchema.parse({}), registry)
+
+    // then
+    expect(registerCalls).toBe(0)
+  })
+})
 
 describe("buildPresenceHeartbeatHook", () => {
   let server: ReturnType<typeof Bun.serve> | undefined

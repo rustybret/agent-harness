@@ -429,25 +429,16 @@
       "key": "openai/gpt-5.6-luna-fast"
     },
     {
-      "key": "openai/gpt-5.6-luna-pro"
-    },
-    {
       "key": "openai/gpt-5.6-sol"
     },
     {
       "key": "openai/gpt-5.6-sol-fast"
     },
     {
-      "key": "openai/gpt-5.6-sol-pro"
-    },
-    {
       "key": "openai/gpt-5.6-terra"
     },
     {
       "key": "openai/gpt-5.6-terra-fast"
-    },
-    {
-      "key": "openai/gpt-5.6-terra-pro"
     },
     {
       "key": "opencode/big-pickle"
