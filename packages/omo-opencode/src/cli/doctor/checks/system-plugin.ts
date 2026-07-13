@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs"
 
 import { LEGACY_PLUGIN_NAME, PLUGIN_NAME, getOpenCodeConfigPaths, parseJsonc } from "../../../shared"
+import { isOurFilePluginEntry } from "./tui-plugin-config"
 
 export interface PluginInfo {
   registered: boolean
@@ -44,7 +45,7 @@ function findPluginEntry(entries: string[]): { entry: string; isLocalDev: boolea
     if (entry === LEGACY_PLUGIN_NAME || entry.startsWith(`${LEGACY_PLUGIN_NAME}@`)) {
       return { entry, isLocalDev: false }
     }
-    if (entry.startsWith("file://") && (entry.includes(PLUGIN_NAME) || entry.includes(LEGACY_PLUGIN_NAME))) {
+    if (entry.startsWith("file:") && isOurFilePluginEntry(entry)) {
       return { entry, isLocalDev: true }
     }
   }
