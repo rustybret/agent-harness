@@ -139,8 +139,46 @@ export function applyToolConfig(params: {
       "task_*": "allow",
       teammate: "allow",
       ...denyTodoTools,
-      bash: "deny",
+      // Granular ruleset, NOT flat "deny": OpenCode's Permission.disabled hides a tool only
+      // when the LAST rule for its key is pattern "*"+deny, and its bash tool matches the WHOLE
+      // raw command string (no shell parsing). An executable CANNOT be safely prefix-allowed —
+      // its own flags are an unbounded surface (git --output / -c core.pager=cmd, node --eval).
+      // So the ONLY allow is the mandated scaffold-plan.mjs, anchored with `"/` right after
+      // node so an option can never be the effective first arg. Layered denies after it:
+      // shell metacharacters, then node code-exec long-options — findLast makes any bypass hit
+      // a deny, while the last non-"*" rule keeps bash VISIBLE.
+      bash: {
+        "*": "deny",
+        "node \"/*/scaffold-plan.mjs\"*": "allow",
+        "*;*": "deny",
+        "*&*": "deny",
+        "*|*": "deny",
+        "*>*": "deny",
+        "*<*": "deny",
+        "*`*": "deny",
+        "*$(*": "deny",
+        "*\n*": "deny",
+        "*--eval*": "deny",
+        "*--print*": "deny",
+        "*--require*": "deny",
+        "*--import*": "deny",
+        "*--loader*": "deny",
+        "*--experimental*": "deny",
+      },
       interactive_bash: "deny",
+      // Flat deny hides these mutators entirely (their own permission keys, not remapped).
+      // aft_* / ast_grep_replace / aft_safety use non-filePath arg shapes; lsp_rename applies
+      // a workspace edit and lsp_install_decision writes state. apply_patch is NOT here: it
+      // asserts the "edit" permission (which Prometheus needs for .omo/*.md), so it is gated
+      // by path in the prometheus-md-only hook instead.
+      aft_delete: "deny",
+      aft_move: "deny",
+      aft_refactor: "deny",
+      aft_import: "deny",
+      ast_grep_replace: "deny",
+      aft_safety: "deny",
+      lsp_rename: "deny",
+      lsp_install_decision: "deny",
     };
   }
   const junior = agentByKey(params.agentResult, "sisyphus-junior", params.pluginConfig);

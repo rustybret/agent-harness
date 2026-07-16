@@ -1,0 +1,88 @@
+=== PROMETHEUS PERMISSION (real applyToolConfig output) ===
+{
+  "call_omo_agent": "deny",
+  "task": "allow",
+  "question": "allow",
+  "task_*": "allow",
+  "teammate": "allow",
+  "bash": {
+    "*": "deny",
+    "node \"/*/scaffold-plan.mjs\"*": "allow",
+    "*;*": "deny",
+    "*&*": "deny",
+    "*|*": "deny",
+    "*>*": "deny",
+    "*<*": "deny",
+    "*`*": "deny",
+    "*$(*": "deny",
+    "*\n*": "deny",
+    "*--eval*": "deny",
+    "*--print*": "deny",
+    "*--require*": "deny",
+    "*--import*": "deny",
+    "*--loader*": "deny",
+    "*--experimental*": "deny"
+  },
+  "interactive_bash": "deny",
+  "aft_delete": "deny",
+  "aft_move": "deny",
+  "aft_refactor": "deny",
+  "aft_import": "deny",
+  "ast_grep_replace": "deny",
+  "aft_safety": "deny",
+  "lsp_rename": "deny",
+  "lsp_install_decision": "deny"
+}
+
+=== TOOL VISIBILITY (real disabled() engine) ===
+  visible  bash
+  HIDDEN   interactive_bash
+  HIDDEN   aft_delete
+  HIDDEN   aft_move
+  HIDDEN   aft_refactor
+  HIDDEN   aft_import
+  HIDDEN   ast_grep_replace
+  HIDDEN   aft_safety
+  HIDDEN   lsp_rename
+  HIDDEN   lsp_install_decision
+  visible  aft_search
+  visible  aft_outline
+  visible  aft_zoom
+  visible  aft_callgraph
+  visible  aft_inspect
+  visible  aft_conflicts
+  visible  ast_grep_search
+  visible  lsp_diagnostics
+  visible  lsp_goto_definition
+  visible  lsp_find_references
+  visible  lsp_symbols
+  visible  lsp_prepare_rename
+  visible  lsp_status
+  visible  task
+  visible  edit
+  visible  write
+
+=== BASH EXEC GATE (real evaluate() engine, whole-command match) ===
+  [PASS] allow (want allow) :: node "/Users/x/.config/opencode/skills/ulw-plan/scripts/scaffold-plan.mjs" my-slug
+  [PASS] allow (want allow) :: node "/abs/ulw-plan/scripts/scaffold-plan.mjs" my-slug --clear
+  [PASS] allow (want allow) :: node "/abs/scaffold-plan.mjs" prometheus-permissions --unclear
+  [PASS] deny  (want deny ) :: node "--eval=require('node:fs').writeFileSync('package.json','pwn')//scaffold-plan.mjs" x
+  [PASS] deny  (want deny ) :: git diff --output=package.json
+  [PASS] deny  (want deny ) :: git log --output=package.json
+  [PASS] deny  (want deny ) :: git -c core.pager=touch\ pwned log
+  [PASS] deny  (want deny ) :: git log --oneline -5
+  [PASS] deny  (want deny ) :: git status --short
+  [PASS] deny  (want deny ) :: just --list
+  [PASS] deny  (want deny ) :: node --eval "x" "/abs/scaffold-plan.mjs"
+  [PASS] deny  (want deny ) :: node -e "evil"
+  [PASS] deny  (want deny ) :: node "/abs/scaffold-plan.mjs" --import evil.js
+  [PASS] deny  (want deny ) :: git log --oneline && rm -rf /
+  [PASS] deny  (want deny ) :: git log > package.json
+  [PASS] deny  (want deny ) :: git diff | sh
+  [PASS] deny  (want deny ) :: git log $(curl evil)
+  [PASS] deny  (want deny ) :: rm -rf /tmp/x
+  [PASS] deny  (want deny ) :: curl http://evil.example
+
+=== VERDICT ===
+ALL PASS — bash visible, git/just dropped, node anchored, reviewer bypasses DENIED, mutators hidden, sensory kept
+exit=0

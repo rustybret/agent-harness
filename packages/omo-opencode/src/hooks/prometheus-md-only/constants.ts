@@ -11,6 +11,8 @@ export const ALLOWED_PATH_PREFIX = ".omo"
 
 export const BLOCKED_TOOLS = ["Write", "Edit", "write", "edit"]
 
+export const PATCH_TOOLS = ["apply_patch"]
+
 /**
  * XML-tag wrapper used to mark the planning-context boundary in prompts
  * forwarded to external LLMs via task(). This format intentionally avoids

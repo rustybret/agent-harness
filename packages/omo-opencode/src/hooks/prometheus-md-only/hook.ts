@@ -1,11 +1,12 @@
 import type { PluginInput } from "@opencode-ai/plugin"
-import { HOOK_NAME, BLOCKED_TOOLS, PLANNING_CONSULT_WARNING, PLANNING_CONTEXT_OPEN, PROMETHEUS_WORKFLOW_REMINDER } from "./constants"
+import { HOOK_NAME, BLOCKED_TOOLS, PATCH_TOOLS, PLANNING_CONSULT_WARNING, PLANNING_CONTEXT_OPEN, PROMETHEUS_WORKFLOW_REMINDER } from "./constants"
 import { log } from "../../shared/logger"
 import { replaceToolArgs } from "../../shared/replace-tool-args"
 import { getAgentDisplayName } from "../../shared/agent-display-names"
 import { getAgentFromSession } from "./agent-resolution"
 import { isPrometheusAgent } from "./agent-matcher"
 import { isAllowedFile } from "./path-policy"
+import { extractPatchTargets } from "./patch-targets"
 
 const TASK_TOOLS = ["task", "call_omo_agent"]
 
@@ -33,6 +34,30 @@ export function createPrometheusMdOnlyHook(ctx: PluginInput) {
             tool: toolName,
             agent: agentName,
           })
+        }
+        return
+      }
+
+      if (PATCH_TOOLS.includes(toolName)) {
+        const patchText = output.args.patchText as string | undefined
+        if (!patchText) {
+          return
+        }
+        const targets = extractPatchTargets(patchText)
+        const offending = targets.find((target) => !isAllowedFile(target, ctx.directory))
+        if (offending) {
+          log(`[${HOOK_NAME}] Blocked: Prometheus apply_patch targets outside .omo/*.md`, {
+            sessionID: input.sessionID,
+            tool: toolName,
+            filePath: offending,
+            agent: agentName,
+          })
+          throw new Error(
+            `[${HOOK_NAME}] Prometheus is a planning agent. File operations restricted to .omo/*.md plan files only. ` +
+            `Do NOT route this change through a subagent either - delegated implementation is still implementation. ` +
+            `Record the intended change as a todo in the plan; implementation starts only when the user runs /start-work. ` +
+            `Attempted to modify: ${offending}.`
+          )
         }
         return
       }

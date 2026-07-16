@@ -212,6 +212,88 @@ describe("prometheus-md-only", () => {
       ).rejects.toThrow("File operations restricted to .omo/*.md plan files only")
     })
 
+    test("should block Prometheus apply_patch that targets a non-.md file", async () => {
+      // given — apply_patch asserts the "edit" permission, so a permission deny is inert;
+      // the hook must parse patchText targets and enforce the same .omo/*.md policy
+      const hook = createPrometheusMdOnlyHook(createMockPluginInput())
+      const input = {
+        tool: "apply_patch",
+        sessionID: TEST_SESSION_ID,
+        callID: "call-1",
+      }
+      const output = {
+        args: {
+          patchText: "*** Begin Patch\n*** Update File: src/app.ts\n@@\n-a\n+b\n*** End Patch",
+        },
+      }
+
+      // when / #then
+      await expect(
+        hook["tool.execute.before"](input, output)
+      ).rejects.toThrow("File operations restricted to .omo/*.md plan files only")
+    })
+
+    test("should block Prometheus apply_patch that adds a file outside .omo/", async () => {
+      // given
+      const hook = createPrometheusMdOnlyHook(createMockPluginInput())
+      const input = {
+        tool: "apply_patch",
+        sessionID: TEST_SESSION_ID,
+        callID: "call-1",
+      }
+      const output = {
+        args: {
+          patchText: "*** Begin Patch\n*** Add File: package.json\n+{}\n*** End Patch",
+        },
+      }
+
+      // when / #then
+      await expect(
+        hook["tool.execute.before"](input, output)
+      ).rejects.toThrow("File operations restricted to .omo/*.md plan files only")
+    })
+
+    test("should block Prometheus apply_patch when ANY target escapes .omo/*.md (mixed hunks)", async () => {
+      // given — one legal .omo/*.md target plus one illegal target must still be rejected
+      const hook = createPrometheusMdOnlyHook(createMockPluginInput())
+      const input = {
+        tool: "apply_patch",
+        sessionID: TEST_SESSION_ID,
+        callID: "call-1",
+      }
+      const output = {
+        args: {
+          patchText:
+            "*** Begin Patch\n*** Update File: .omo/plans/x.md\n@@\n-a\n+b\n*** Update File: src/evil.ts\n@@\n-c\n+d\n*** End Patch",
+        },
+      }
+
+      // when / #then
+      await expect(
+        hook["tool.execute.before"](input, output)
+      ).rejects.toThrow("File operations restricted to .omo/*.md plan files only")
+    })
+
+    test("should allow Prometheus apply_patch that only touches .omo/*.md files", async () => {
+      // given
+      const hook = createPrometheusMdOnlyHook(createMockPluginInput())
+      const input = {
+        tool: "apply_patch",
+        sessionID: TEST_SESSION_ID,
+        callID: "call-1",
+      }
+      const output = {
+        args: {
+          patchText: "*** Begin Patch\n*** Update File: .omo/plans/work-plan.md\n@@\n-a\n+b\n*** End Patch",
+        },
+      }
+
+      // when / #then
+      await expect(
+        hook["tool.execute.before"](input, output)
+      ).resolves.toBeUndefined()
+    })
+
     test("should allow Prometheus to write .md files inside .omo/", async () => {
       // given
       const hook = createPrometheusMdOnlyHook(createMockPluginInput())
