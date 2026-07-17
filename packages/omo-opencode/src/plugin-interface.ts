@@ -29,8 +29,9 @@ export function createPluginInterface(args: {
   managers: Managers
   hooks: CreatedHooks
   tools: ToolsRecord
+  externalInjectTracker?: { recordActivity: (sessionID: string) => void; remove: (sessionID: string) => void }
 }): PluginInterface {
-  const { ctx, pluginConfig, firstMessageVariantGate, managers, hooks, tools } =
+  const { ctx, pluginConfig, firstMessageVariantGate, managers, hooks, tools, externalInjectTracker } =
     args
 
   return {
@@ -85,6 +86,7 @@ export function createPluginInterface(args: {
       firstMessageVariantGate,
       managers,
       hooks,
+      externalInjectTracker,
     }),
 
     "tool.definition": createToolDefinitionHandler({

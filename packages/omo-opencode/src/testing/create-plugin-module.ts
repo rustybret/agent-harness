@@ -41,6 +41,8 @@ import {
 import { startBackgroundCheck as startTmuxCheck } from "../tools/interactive-bash"
 import { getOrCreateModeDetector, type ModeDetector } from "../features/cross-project-mailbox/presence"
 import { getServerBaseUrl } from "../shared/opencode-http-api"
+import { startExternalInjectBridge } from "../features/external-inject"
+import { dispatchInternalPrompt } from "../shared/prompt-async-gate"
 
 type HooksWithRuntimeLifecycle = Hooks & {
   "experimental.compaction.autocontinue"?: CompactionAutocontinueHook
@@ -225,6 +227,18 @@ export function createPluginModule(overrides: Partial<PluginModuleDeps> = {}): P
       })
     }
 
+    const externalInjectBridge = pluginConfig.external_inject?.enabled
+      ? await startExternalInjectBridge({
+        client: input.client as Parameters<typeof startExternalInjectBridge>[0]["client"],
+        directory: input.directory,
+        config: pluginConfig.external_inject,
+        dispatchInternalPrompt,
+      }).catch((error: unknown) => {
+        log("[external-inject] bridge failed to start:", error)
+        return undefined
+      })
+      : undefined
+
     const toolsResult = await deps.createTools({
       ctx: input,
       pluginConfig,
@@ -253,6 +267,7 @@ export function createPluginModule(overrides: Partial<PluginModuleDeps> = {}): P
       managers,
       hooks,
       tools: toolsResult.filteredTools,
+      externalInjectTracker: externalInjectBridge?.tracker,
     })
 
     const dispose = createPluginDispose({
@@ -270,6 +285,7 @@ export function createPluginModule(overrides: Partial<PluginModuleDeps> = {}): P
 
       dispose: async (): Promise<void> => {
         runtimeSkillSource?.stop()
+        externalInjectBridge?.stop()
         await dispose()
       },
     }

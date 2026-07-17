@@ -32,8 +32,9 @@ export function createEventHandler(args: {
   firstMessageVariantGate: FirstMessageVariantGate;
   managers: Managers;
   hooks: CreatedHooks;
+  externalInjectTracker?: { recordActivity: (sessionID: string) => void; remove: (sessionID: string) => void };
 }): (input: EventInput) => Promise<void> {
-  const { ctx, pluginConfig, firstMessageVariantGate, managers, hooks } = args;
+  const { ctx, pluginConfig, firstMessageVariantGate, managers, hooks, externalInjectTracker } = args;
   const tmuxIntegrationEnabled = pluginConfig.tmux?.enabled ?? false;
   const pluginContext = ctx as PluginEventContext;
   const isRuntimeFallbackEnabled =
@@ -152,6 +153,7 @@ export function createEventHandler(args: {
 
     if (event.type === "session.created") {
       const createdSessionID = resolveSessionEventID(props);
+      if (createdSessionID) externalInjectTracker?.recordActivity(createdSessionID);
       if (createdSessionID && hooks.mailboxPresenceHeartbeat) {
         hooks.mailboxPresenceHeartbeat.onSessionActive(createdSessionID, "start");
       }
@@ -167,6 +169,8 @@ export function createEventHandler(args: {
     }
 
     if (event.type === "session.deleted") {
+      const deletedSessionID = resolveSessionEventID(props);
+      if (deletedSessionID) externalInjectTracker?.remove(deletedSessionID);
       await handleSessionDeletedEvent({
         props,
         tmuxIntegrationEnabled,
@@ -184,6 +188,7 @@ export function createEventHandler(args: {
 
     if (event.type === "session.idle") {
       const sessionID = resolveSessionEventID(props);
+      if (sessionID) externalInjectTracker?.recordActivity(sessionID);
       if (sessionID) {
         await dispatchOpenClawSessionEvent({ pluginConfig, pluginContext, managers, rawEvent: event.type, sessionID });
       }
@@ -199,6 +204,7 @@ export function createEventHandler(args: {
         props,
         noteSessionModel: modelFallbackHandler.setLastKnownModel,
       });
+      if (state.sessionID) externalInjectTracker?.recordActivity(state.sessionID);
       if (state.sessionID && ((typeof state.info?.finish === "string" && state.info.finish.length > 0) || state.info?.finish === true)) {
         invalidateContextWindowUsageCache(pluginContext as PluginInput, state.sessionID);
       }
