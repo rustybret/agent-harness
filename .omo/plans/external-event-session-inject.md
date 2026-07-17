@@ -149,4 +149,31 @@ The spec doc will specify, concretely:
 
 - **Sync-first-then-build:** deliver the §9 integration spec to unitySuperMCP FIRST (this session, now), so their Elixir watcher work proceeds in parallel with the agent-harness build.
 - **Arbiter of "done" + e2e owner: unitySuperMCP.** The harness side (this fork) is responsible for its own unit + opencode-qa gates (T6/T7) proving the bridge works in isolation. The **end-to-end** acceptance (real Unity event → real injection into a live session) is owned and run by unitySuperMCP; the feature is declared complete when unitySuperMCP's e2e passes against a built agent-harness bridge. Coordinate closure via the mailbox thread.
+
+## 12. Implementation status — COMPLETE (harness side) 2026-07-16
+
+All tasks landed on `fork/local`, TDD RED→GREEN per task.
+
+| Task | What | Status |
+| --- | --- | --- |
+| T0 | Config schema `external_inject` (off by default) + JSON schema regen | DONE |
+| T1 | Loopback listener: port-file (0600, XDG) + transport (Bun/Node, 127.0.0.1:0) + handler (auth/inject/describe) | DONE |
+| T2 | Session-addressing resolver (active-for-project / explicit sessionID) | DONE |
+| T3 | Injection adapter routing through `dispatchInternalPrompt` (defer + coalesce key; #584 route audit passes) | DONE |
+| T4 | Rate limiter (token bucket) + coalescer | DONE |
+| T5 | Plugin-init mount + live-session tracker fed by event hook + stop() on dispose | DONE |
+| T6 | Full-suite gate: workspace typecheck clean, feature suite green | DONE |
+| T7 | Live QA vs real `opencode serve` in isolated XDG sandbox | DONE |
+
+**F-wave (all PASS):**
+- F1 goal/scope: matches plan + unitySuperMCP's 3 asks; integration spec delivered (mailbox msg `58ba70c4`).
+- F2 code quality: every source file < 200 LOC (max transport.ts 143); zero `as any`/`@ts-ignore`.
+- F3 security: loopback-only bind (`127.0.0.1`), `timingSafeEqual` token check on EVERY method, fail-closed, port-file `0o600`, no secret in evidence.
+- F4 regression: workspace typecheck 0 errors; 148 pass / 0 fail across feature + touched files + #584 audit.
+
+**Live QA proof** (`.omo/evidence/20260716-external-inject/`): 9/9 HTTP contract assertions + injected marker LANDED in a real session's messages + isolation proven (real DB 6195→6195 unchanged).
+
+**Key discovery:** plugin `server()` hook (which starts the bridge) fires lazily on first project bootstrap (`GET /agent?directory=<dir>`), not on `Server.listen`.
+
+**Remaining:** unitySuperMCP owns the true end-to-end (real Unity event → their Elixir watcher → POST → injection). Feature declared complete on their e2e pass against the built bridge.
 ```
