@@ -33,7 +33,7 @@ export interface PortFileRecord {
  */
 export function portFileDir(repoRoot: string): string {
   const dataDir = resolveXdgDataDir("oh-my-opencode")
-  return path.join(dataDir, "rpc", projectIdForRoot(repoRoot), "ports")
+  return path.join(dataDir, "oh-my-opencode", "external-inject", "rpc", projectIdForRoot(repoRoot), "ports")
 }
 
 export function newInstanceId(): string {
