@@ -1,0 +1,38 @@
+sandbox: /var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T//ext-inject-qa.Z68Ivi
+starting opencode serve ...
+FAIL: no external-inject port file appeared under /var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T//ext-inject-qa.Z68Ivi/data/oh-my-opencode/external-inject/rpc after 30s
+--- serve.log tail ---
+Warning: OPENCODE_SERVER_PASSWORD is not set; server is unsecured.
+opencode server listening on http://127.0.0.1:53886
+
+RESULT: 0 passed, 1 failed
+sandbox: /var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T//ext-inject-qa.qbJr1I
+starting opencode serve ...
+FAIL: no external-inject port file appeared under /var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T//ext-inject-qa.qbJr1I/data/oh-my-opencode/external-inject/rpc after 30s
+--- serve.log tail ---
+Warning: OPENCODE_SERVER_PASSWORD is not set; server is unsecured.
+opencode server listening on http://127.0.0.1:54935
+
+RESULT: 0 passed, 1 failed
+sandbox: /var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T//ext-inject-qa.J9aiNo
+starting opencode serve ...
+opencode server url: http://127.0.0.1:56053
+triggering project bootstrap via GET /agent (fires plugin.init) ...
+PASS: port file discovered at /var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T//ext-inject-qa.J9aiNo/data/oh-my-opencode/external-inject/rpc/proj-9d176f74/ports/2f9fc05cd7776483.json
+port=56210 pid=26651 token=<64 chars>
+PASS: port file is 0600 (=600)
+PASS: GET /health -> 200 (=200)
+health body: {"ok":true,"pid":26651}
+PASS: POST /rpc/describe -> 200 (=200)
+describe body: {"version":1,"methods":["inject","describe"],"addressing_modes":["active-session","explicit-session-id"],"max_text_bytes":64,"rate_limit":{"max":3,"window_ms":60000}}
+PASS: describe reports configured max_text_bytes=64 (=64)
+PASS: describe reports configured rate_limit.max=3 (=3)
+PASS: inject with bad token -> 403 (=403)
+PASS: inject oversize text -> 413 (=413)
+inject (no active session yet) -> 409 : {"status":"no-active-session"}
+PASS: inject with no active session -> 409 (=409)
+opencode server url: http://127.0.0.1:56053
+created session: ses_091dd640cffeuNSxfzym5zKAtl
+inject explicit session -> 202 : {"status":"accepted"}
+
+RESULT: 9 passed, 0 failed

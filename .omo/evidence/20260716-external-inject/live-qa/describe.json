@@ -1,0 +1,1 @@
+{"version":1,"methods":["inject","describe"],"addressing_modes":["active-session","explicit-session-id"],"max_text_bytes":64,"rate_limit":{"max":3,"window_ms":60000}}
