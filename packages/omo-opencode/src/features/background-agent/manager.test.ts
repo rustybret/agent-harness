@@ -8,6 +8,8 @@ import {
 } from "../../shared/delegated-child-session-bootstrap"
 import { dispatchInternalPrompt, releaseAllPromptAsyncReservationsForTesting } from "../../shared/prompt-async-gate"
 import { clearSessionPromptParams, getSessionPromptParams } from "../../shared/session-prompt-params-state"
+import { createAbortSessionRequest } from "../../hooks/runtime-fallback/auto-retry-abort"
+import type { HookDeps, RuntimeFallbackPluginInput } from "../../hooks/runtime-fallback/types"
 import {
   getSessionAgent,
   registerAgentName,
@@ -230,6 +232,29 @@ function createPluginInput(client: unknown, directory = tmpdir()): PluginInput {
   return cast<PluginInput>({ client, directory })
 }
 
+function createRuntimeFallbackAbortDeps(client: unknown): HookDeps {
+  return {
+    ctx: cast<RuntimeFallbackPluginInput>({ client, directory: tmpdir() }),
+    config: {
+      enabled: true,
+      retry_on_errors: [429, 503, 529],
+      max_fallback_attempts: 3,
+      cooldown_seconds: 60,
+      timeout_seconds: 0,
+      notify_on_fallback: false,
+    },
+    options: undefined,
+    pluginConfig: undefined,
+    sessionStates: new Map(),
+    sessionLastAccess: new Map(),
+    sessionRetryInFlight: new Set(),
+    sessionAwaitingFallbackResult: new Set(),
+    sessionFallbackTimeouts: new Map(),
+    sessionStatusRetryKeys: new Map(),
+    internallyAbortedSessions: new Set(),
+  }
+}
+
 function createBackgroundManager(): BackgroundManager {
   const client = {
     session: {
@@ -320,6 +345,60 @@ async function tryCompleteTaskForTest(manager: BackgroundManager, task: Backgrou
 function stubNotifyParentSession(manager: BackgroundManager): void {
   ;(cast<{ notifyParentSession: () => Promise<void> }>(manager)).notifyParentSession = async () => {}
 }
+
+describe("BackgroundManager internal abort source routing", () => {
+  test("#given runtime-fallback tracking is active #when a background task completes #then background teardown marks internal abort", async () => {
+    // given
+    const client = {
+      session: {
+        prompt: async () => ({}),
+        promptAsync: async () => ({}),
+        abort: mock(() => Promise.resolve({})),
+      },
+    }
+    const deps = createRuntimeFallbackAbortDeps(client)
+    createAbortSessionRequest(deps)
+    const manager = new BackgroundManager({ pluginContext: createPluginInput(client) })
+    stubNotifyParentSession(manager)
+    const task = createMockTask({
+      id: "task-completion-internal-abort",
+      parentSessionId: "parent-session",
+      sessionId: "child-session-complete",
+    })
+
+    // when
+    await tryCompleteTaskForTest(manager, task)
+
+    // then
+    expect(deps.internallyAbortedSessions.has("child-session-complete")).toBe(true)
+  })
+
+  test("#given runtime-fallback tracking is active #when background_cancel aborts a running task #then it remains an external abort", async () => {
+    // given
+    const client = {
+      session: {
+        prompt: async () => ({}),
+        promptAsync: async () => ({}),
+        abort: mock(() => Promise.resolve({})),
+      },
+    }
+    const deps = createRuntimeFallbackAbortDeps(client)
+    createAbortSessionRequest(deps)
+    const manager = new BackgroundManager({ pluginContext: createPluginInput(client) })
+    const task = createMockTask({
+      id: "task-background-cancel-external-abort",
+      parentSessionId: "parent-session",
+      sessionId: "child-session-cancel",
+    })
+    getTaskMap(manager).set(task.id, task)
+
+    // when
+    await manager.cancelTask(task.id, { source: "background_cancel", abortSession: true })
+
+    // then
+    expect(deps.internallyAbortedSessions.has("child-session-cancel")).toBe(false)
+  })
+})
 
 async function flushBackgroundNotifications(): Promise<void> {
   for (let i = 0; i < 12; i++) {

@@ -6,6 +6,10 @@ import {
   dispatchInternalPrompt,
   type PromptAsyncGateResult,
 } from "../../hooks/shared/prompt-async-gate"
+import {
+  BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE,
+  markInternalAbortSession,
+} from "../../hooks/runtime-fallback/auto-retry-abort"
 import { isSessionActive as isOpenCodeSessionActive } from "../../hooks/shared/session-idle-settle"
 import { resolveDispatchClient } from "../../shared/live-server-route"
 import {
@@ -2581,6 +2585,7 @@ The task was re-queued on a fallback model after a retryable failure.
         SessionCategoryRegistry.remove(task.sessionId)
 
         // Awaited to prevent dangling promise during subagent teardown (Bun/WebKit SIGABRT)
+        markInternalAbortSession(task.sessionId, BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE)
         await this.abortSessionWithLogging(task.sessionId, `task completion (${source})`)
 
         // @allow Notify tmux to close the pane immediately. client.session.abort() does not
