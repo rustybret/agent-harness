@@ -2,7 +2,7 @@ import { afterEach, describe, expect, test } from "bun:test"
 
 import { releaseAllPromptAsyncReservationsForTesting } from "../../shared/prompt-async-gate"
 import { getPromptReservation, setPromptReservation } from "../../shared/prompt-async-gate/reservations"
-import { createAbortSessionRequest } from "./auto-retry-abort"
+import { createAbortSessionRequest, markInternalAbortSession } from "./auto-retry-abort"
 import type { HookDeps, RuntimeFallbackPluginInput } from "./types"
 
 function createContext(): RuntimeFallbackPluginInput {
@@ -113,5 +113,56 @@ describe("createAbortSessionRequest reservation release", () => {
 
     // then
     expect(getPromptReservation(sessionID)?.source).toBe("user-prompt")
+  })
+})
+
+describe("createAbortSessionRequest internal abort source tracking", () => {
+  test("#given runtime-fallback tracking is active #when background teardown marks internal abort #then the shared internal abort registry records the session", async () => {
+    // given
+    const deps = createDeps()
+    const sessionID = "session-background-teardown"
+    const abortSessionRequest = createAbortSessionRequest(deps)
+
+    // when
+    await abortSessionRequest(sessionID, "background-agent.completion-teardown")
+
+    // then
+    expect(deps.internallyAbortedSessions.has(sessionID)).toBe(true)
+    expect(deps.sessionLastAccess.has(sessionID)).toBe(true)
+  })
+
+  test("#given runtime-fallback tracking is active #when quota watchdog marks internal abort #then the shared internal abort registry records the session", () => {
+    // given
+    const deps = createDeps()
+    const sessionID = "session-quota-watchdog"
+    createAbortSessionRequest(deps)
+
+    // when
+    const marked = markInternalAbortSession(sessionID, "background-agent.quota-watchdog")
+
+    // then
+    expect(marked).toBe(true)
+    expect(deps.internallyAbortedSessions.has(sessionID)).toBe(true)
+  })
+
+  test("#given runtime-fallback tracking is active #when background_cancel or cleanup abort sources fire #then they remain external aborts", () => {
+    // given
+    const deps = createDeps()
+    createAbortSessionRequest(deps)
+    const externalSources = [
+      "background_cancel",
+      "cancelled pre-start cleanup",
+      "cancelled during launch setup",
+      "stale attempt binding cleanup",
+      "task cancellation (background_cancel)",
+      "shutdown",
+    ]
+
+    // when
+    const marked = externalSources.map((source) => markInternalAbortSession(`session-${source}`, source))
+
+    // then
+    expect(marked).toEqual(externalSources.map(() => false))
+    expect(deps.internallyAbortedSessions.size).toBe(0)
   })
 })
