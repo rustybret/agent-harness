@@ -358,7 +358,10 @@ describe("BackgroundManager internal abort source routing", () => {
     }
     const deps = createRuntimeFallbackAbortDeps(client)
     createAbortSessionRequest(deps)
-    const manager = new BackgroundManager({ pluginContext: createPluginInput(client) })
+    const manager = new BackgroundManager({
+      pluginContext: createPluginInput(client),
+      runtimeFallbackAbortRegistry: deps,
+    })
     stubNotifyParentSession(manager)
     const task = createMockTask({
       id: "task-completion-internal-abort",
@@ -384,7 +387,10 @@ describe("BackgroundManager internal abort source routing", () => {
     }
     const deps = createRuntimeFallbackAbortDeps(client)
     createAbortSessionRequest(deps)
-    const manager = new BackgroundManager({ pluginContext: createPluginInput(client) })
+    const manager = new BackgroundManager({
+      pluginContext: createPluginInput(client),
+      runtimeFallbackAbortRegistry: deps,
+    })
     const task = createMockTask({
       id: "task-background-cancel-external-abort",
       parentSessionId: "parent-session",

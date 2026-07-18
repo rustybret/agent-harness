@@ -233,6 +233,7 @@ export function createSessionHooks(args: {
         createRuntimeFallbackHook(ctx, {
           config: runtimeFallbackConfig,
           pluginConfig,
+          internalAbortRegistry: backgroundManager.getRuntimeFallbackAbortRegistry(),
         }))
     : null
 

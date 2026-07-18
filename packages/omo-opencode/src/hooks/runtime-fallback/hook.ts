@@ -51,12 +51,12 @@ export function createRuntimeFallbackHook(
     options,
     pluginConfig: options?.pluginConfig,
     sessionStates: new Map(),
-    sessionLastAccess: new Map(),
+    sessionLastAccess: options?.internalAbortRegistry?.sessionLastAccess ?? new Map(),
     sessionRetryInFlight: new Set(),
     sessionAwaitingFallbackResult: new Set(),
     sessionFallbackTimeouts: new Map(),
     sessionStatusRetryKeys: new Map(),
-    internallyAbortedSessions: new Set(),
+    internallyAbortedSessions: options?.internalAbortRegistry?.internallyAbortedSessions ?? new Set(),
   }
 
   const helpers = factories.createAutoRetryHelpers(deps)

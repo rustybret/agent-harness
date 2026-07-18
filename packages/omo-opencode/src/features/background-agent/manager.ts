@@ -10,6 +10,7 @@ import {
   BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE,
   markInternalAbortSession,
 } from "../../hooks/runtime-fallback/auto-retry-abort"
+import type { InternalAbortSessionRegistry } from "../../hooks/runtime-fallback/types"
 import { isSessionActive as isOpenCodeSessionActive } from "../../hooks/shared/session-idle-settle"
 import { resolveDispatchClient } from "../../shared/live-server-route"
 import {
@@ -243,6 +244,7 @@ export interface BackgroundManagerConfig {
   onShutdown?: () => void | Promise<void>
   enableParentSessionNotifications?: boolean
   modelFallbackControllerAccessor?: ModelFallbackControllerAccessor
+  runtimeFallbackAbortRegistry?: InternalAbortSessionRegistry
   log?: typeof log
 }
 
@@ -281,6 +283,7 @@ export class BackgroundManager {
   private preStartDescendantReservations: Set<string>
   private enableParentSessionNotifications: boolean
   private modelFallbackControllerAccessor?: ModelFallbackControllerAccessor
+  private readonly runtimeFallbackAbortRegistry: InternalAbortSessionRegistry
   private logger: typeof log
   private loggedSessionStatusUnavailable = false
   readonly taskHistory = new TaskHistory()
@@ -307,6 +310,10 @@ export class BackgroundManager {
     this.preStartDescendantReservations = new Set()
     this.enableParentSessionNotifications = options?.enableParentSessionNotifications ?? true
     this.modelFallbackControllerAccessor = options?.modelFallbackControllerAccessor
+    this.runtimeFallbackAbortRegistry = options?.runtimeFallbackAbortRegistry ?? {
+      internallyAbortedSessions: new Set(),
+      sessionLastAccess: new Map(),
+    }
     this.logger = options?.log ?? log
     this.parentWakeNotifier = new ParentWakeNotifier(
       {
@@ -344,6 +351,10 @@ export class BackgroundManager {
       })
       return false
     }
+  }
+
+  getRuntimeFallbackAbortRegistry(): InternalAbortSessionRegistry {
+    return this.runtimeFallbackAbortRegistry
   }
 
   async assertCanSpawn(parentSessionID: string): Promise<SubagentSpawnContext> {
@@ -2585,7 +2596,11 @@ The task was re-queued on a fallback model after a retryable failure.
         SessionCategoryRegistry.remove(task.sessionId)
 
         // Awaited to prevent dangling promise during subagent teardown (Bun/WebKit SIGABRT)
-        markInternalAbortSession(task.sessionId, BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE)
+        markInternalAbortSession(
+          this.runtimeFallbackAbortRegistry,
+          task.sessionId,
+          BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE,
+        )
         await this.abortSessionWithLogging(task.sessionId, `task completion (${source})`)
 
         // @allow Notify tmux to close the pane immediately. client.session.abort() does not
@@ -2945,6 +2960,7 @@ The task was re-queued on a fallback model after a retryable failure.
       concurrencyManager: this.concurrencyManager,
       notifyParentSession: (task) => this.enqueueNotificationForParent(task.parentSessionId, () => this.notifyParentSession(task)),
       sessionStatuses: allStatuses,
+      internalAbortRegistry: this.runtimeFallbackAbortRegistry,
     })
   }
 

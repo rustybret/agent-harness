@@ -68,6 +68,7 @@ export type AutoRetryDispatchOutcome =
 export interface RuntimeFallbackOptions {
   config?: RuntimeFallbackConfig
   pluginConfig?: OhMyOpenCodeConfig
+  internalAbortRegistry?: InternalAbortSessionRegistry
   session_timeout_ms?: number
 }
 
@@ -77,13 +78,17 @@ export interface RuntimeFallbackHook {
   dispose?: () => void
 }
 
-export interface HookDeps {
+export interface InternalAbortSessionRegistry {
+  internallyAbortedSessions: Set<string>
+  sessionLastAccess: Map<string, number>
+}
+
+export interface HookDeps extends InternalAbortSessionRegistry {
   ctx: RuntimeFallbackPluginInput
   config: Required<RuntimeFallbackConfig>
   options: RuntimeFallbackOptions | undefined
   pluginConfig: OhMyOpenCodeConfig | undefined
   sessionStates: Map<string, FallbackState>
-  sessionLastAccess: Map<string, number>
   sessionRetryInFlight: Set<string>
   sessionAwaitingFallbackResult: Set<string>
   sessionFallbackTimeouts: Map<string, RuntimeFallbackTimeout>
@@ -95,5 +100,4 @@ export interface HookDeps {
    * reset attemptCount — that reset is what was driving the infinite retry
    * loop (every cycle started over at attempt:1). See issue #4006.
    */
-  internallyAbortedSessions: Set<string>
 }
