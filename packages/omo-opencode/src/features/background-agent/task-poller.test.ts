@@ -129,6 +129,7 @@ describe("checkAndInterruptStaleTasks", () => {
       concurrencyManager: mockConcurrencyManager as never,
       notifyParentSession: mockNotify,
       sessionStatuses: { "ses-1": { type: "retry" } },
+      internalAbortRegistry: deps,
     })
 
     //#then
@@ -154,6 +155,7 @@ describe("checkAndInterruptStaleTasks", () => {
       config: { staleTimeoutMs: 180_000 },
       concurrencyManager: mockConcurrencyManager as never,
       notifyParentSession: mockNotify,
+      internalAbortRegistry: deps,
     })
 
     //#then
