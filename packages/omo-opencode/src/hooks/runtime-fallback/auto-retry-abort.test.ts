@@ -138,11 +138,28 @@ describe("createAbortSessionRequest internal abort source tracking", () => {
     createAbortSessionRequest(deps)
 
     // when
-    const marked = markInternalAbortSession(sessionID, "background-agent.quota-watchdog")
+    const marked = markInternalAbortSession(deps, sessionID, "background-agent.quota-watchdog")
 
     // then
     expect(marked).toBe(true)
     expect(deps.internallyAbortedSessions.has(sessionID)).toBe(true)
+  })
+
+  test("#given two runtime-fallback dependency sets #when marking with the first set after the second initializes #then the second set is not polluted", () => {
+    // given
+    const firstDeps = createDeps()
+    const secondDeps = createDeps()
+    const sessionID = "session-explicit-registry"
+    createAbortSessionRequest(firstDeps)
+    createAbortSessionRequest(secondDeps)
+
+    // when
+    const marked = markInternalAbortSession(firstDeps, sessionID, "background-agent.quota-watchdog")
+
+    // then
+    expect(marked).toBe(true)
+    expect(firstDeps.internallyAbortedSessions.has(sessionID)).toBe(true)
+    expect(secondDeps.internallyAbortedSessions.has(sessionID)).toBe(false)
   })
 
   test("#given runtime-fallback tracking is active #when background_cancel or cleanup abort sources fire #then they remain external aborts", () => {
@@ -159,7 +176,7 @@ describe("createAbortSessionRequest internal abort source tracking", () => {
     ]
 
     // when
-    const marked = externalSources.map((source) => markInternalAbortSession(`session-${source}`, source))
+    const marked = externalSources.map((source) => markInternalAbortSession(deps, `session-${source}`, source))
 
     // then
     expect(marked).toEqual(externalSources.map(() => false))

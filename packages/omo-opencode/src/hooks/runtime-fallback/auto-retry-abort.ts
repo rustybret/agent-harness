@@ -1,4 +1,4 @@
-import type { HookDeps } from "./types"
+import type { HookDeps, InternalAbortSessionRegistry } from "./types"
 import { HOOK_NAME } from "./constants"
 import { log } from "../../shared/logger"
 import { releasePromptAsyncReservation } from "../shared/prompt-async-gate"
@@ -15,25 +15,23 @@ const INTERNAL_ABORT_SOURCES: ReadonlySet<string> = new Set([
   BACKGROUND_QUOTA_WATCHDOG_ABORT_SOURCE,
 ])
 
-let activeInternallyAbortedSessions: Set<string> | undefined
-let activeSessionLastAccess: Map<string, number> | undefined
-
-export function markInternalAbortSession(sessionID: string, source: string): boolean {
+export function markInternalAbortSession(
+  registry: InternalAbortSessionRegistry,
+  sessionID: string,
+  source: string,
+): boolean {
   if (!INTERNAL_ABORT_SOURCES.has(source)) return false
-  if (!activeInternallyAbortedSessions || !activeSessionLastAccess) return false
 
-  activeInternallyAbortedSessions.add(sessionID)
-  activeSessionLastAccess.set(sessionID, Date.now())
+  registry.internallyAbortedSessions.add(sessionID)
+  registry.sessionLastAccess.set(sessionID, Date.now())
   return true
 }
 
 export function createAbortSessionRequest(deps: HookDeps) {
   const { ctx } = deps
-  activeInternallyAbortedSessions = deps.internallyAbortedSessions
-  activeSessionLastAccess = deps.sessionLastAccess
 
   return async (sessionID: string, source: string): Promise<void> => {
-    markInternalAbortSession(sessionID, source)
+    markInternalAbortSession(deps, sessionID, source)
     try {
       await ctx.client.session.abort({ path: { id: sessionID } })
       releasePromptAsyncReservation(sessionID, `runtime-fallback-abort:${source}`, {
