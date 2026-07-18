@@ -1,6 +1,6 @@
 # Plan: External-Event → Active-Session Injection Bridge (Option B)
 
-**Status:** DRAFT — awaiting review
+**Status:** COMPLETE — harness-side built + verified (2026-07-16), independent third-party e2e GREEN (2026-07-17, see §13)
 **Owner:** agent-harness fork (`fork/local`)
 **Requested by:** unitySuperMCP (Unity Editor MCP bridge) via cross-project mailbox note `39c8f0d2`
 **Author:** Sisyphus
@@ -176,4 +176,18 @@ All tasks landed on `fork/local`, TDD RED→GREEN per task.
 **Key discovery:** plugin `server()` hook (which starts the bridge) fires lazily on first project bootstrap (`GET /agent?directory=<dir>`), not on `Server.listen`.
 
 **Remaining:** unitySuperMCP owns the true end-to-end (real Unity event → their Elixir watcher → POST → injection). Feature declared complete on their e2e pass against the built bridge.
+
+## 13. Independent third-party e2e — GREEN (2026-07-17)
+
+unitySuperMCP built the Elixir-side `SuperMCP.ExternalInject.Client` and ran the true end-to-end against our live opencode session on this repo, reported via cross-project mailbox (msg `07487fe5`):
+
+- Real HTTP round trip: no mocks, no stub servers. Port/token read live from `~/.local/share/oh-my-opencode/external-inject/rpc/unitysupermcp-7b6c0482/ports/*.json` — confirmed namespace segment (`oh-my-opencode`) and `started_at` snake_case field matched our corrected spec exactly.
+- Two independent marker texts landed verbatim as real user-turn messages in the live session under test (`ses_10fb4f0acffeJ5HNp2ODJe51Sh`), read directly from the conversation transcript.
+- **Contended-session path proven, not just the happy path**: first proof hit `503 {"status":"active"}` on 5 attempts while the session was actively processing (matches `queueBehavior: defer`), then `202` accepted + landed once the session went idle (matches `dispatchAfterSessionIdle`). This is the trickiest part of the contract and it held under real contention.
+- `console_watch_start`/`status` verified graceful no-crash behavior with no Unity editor attached (harness_available: true, independent of Unity connection state).
+- Two bugs found and fixed on unitySuperMCP's side (not harness-side, no action taken here): (1) a 2s discovery timeout too short for real 4-10s `/rpc/describe` round trips under dispatch-gate latency, fixed with a 15s timeout at the one-shot discovery call site; (2) a Map passed where their GenServer expected a Keyword list, crashing the watcher through the tool boundary (missed by unit tests that bypassed the tool module).
+
+Their evidence: `.omo/evidence/task-7-external-event-session-inject.md` in the unitySuperMCP repo. We acknowledged and closed the thread (mailbox msg `6bba4ac9`).
+
+**Final status: feature complete, both parties confirmed green. No follow-up work identified.**
 ```

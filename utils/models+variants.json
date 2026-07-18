@@ -323,6 +323,14 @@
       "variants": []
     },
     {
+      "key": "moonshotai/kimi-k3",
+      "variants": [
+        "high",
+        "low",
+        "max"
+      ]
+    },
+    {
       "key": "nvidia/abacusai/dracarys-llama-3_1-70b-instruct",
       "variants": []
     },
@@ -1436,10 +1444,6 @@
       ]
     },
     {
-      "key": "openrouter/arcee-ai/coder-large",
-      "variants": []
-    },
-    {
       "key": "openrouter/arcee-ai/trinity-large-thinking",
       "variants": []
     },
@@ -1788,15 +1792,15 @@
       "variants": []
     },
     {
+      "key": "openrouter/kwaipilot/kat-coder-air-v2.5",
+      "variants": []
+    },
+    {
       "key": "openrouter/kwaipilot/kat-coder-pro-v2",
       "variants": []
     },
     {
-      "key": "openrouter/liquid/lfm-2.5-1.2b-instruct:free",
-      "variants": []
-    },
-    {
-      "key": "openrouter/liquid/lfm-2.5-1.2b-thinking:free",
+      "key": "openrouter/kwaipilot/kat-coder-pro-v2.5",
       "variants": []
     },
     {
@@ -1809,10 +1813,6 @@
     },
     {
       "key": "openrouter/meta-llama/llama-3.1-8b-instruct",
-      "variants": []
-    },
-    {
-      "key": "openrouter/meta-llama/llama-3.2-11b-vision-instruct",
       "variants": []
     },
     {
@@ -1846,6 +1846,16 @@
     {
       "key": "openrouter/meta-llama/llama-guard-4-12b",
       "variants": []
+    },
+    {
+      "key": "openrouter/meta/muse-spark-1.1",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "xhigh"
+      ]
     },
     {
       "key": "openrouter/microsoft/phi-4",
@@ -1990,6 +2000,12 @@
       "variants": []
     },
     {
+      "key": "openrouter/moonshotai/kimi-k3",
+      "variants": [
+        "max"
+      ]
+    },
+    {
       "key": "openrouter/morph/morph-v3-fast",
       "variants": []
     },
@@ -2032,10 +2048,6 @@
         "low",
         "medium"
       ]
-    },
-    {
-      "key": "openrouter/nvidia/llama-3.3-nemotron-super-49b-v1.5",
-      "variants": []
     },
     {
       "key": "openrouter/nvidia/nemotron-3-nano-30b-a3b",
@@ -2292,6 +2304,7 @@
         "high",
         "low",
         "medium",
+        "none",
         "xhigh"
       ]
     },
@@ -2441,14 +2454,6 @@
     },
     {
       "key": "openrouter/openai/gpt-oss-120b",
-      "variants": [
-        "high",
-        "low",
-        "medium"
-      ]
-    },
-    {
-      "key": "openrouter/openai/gpt-oss-120b:free",
       "variants": [
         "high",
         "low",
@@ -2861,10 +2866,6 @@
       "variants": []
     },
     {
-      "key": "openrouter/sao10k/l3.1-70b-hanami-x1",
-      "variants": []
-    },
-    {
       "key": "openrouter/sao10k/l3.1-euryale-70b",
       "variants": []
     },
@@ -2929,6 +2930,17 @@
       "variants": []
     },
     {
+      "key": "openrouter/thinkingmachines/inkling",
+      "variants": [
+        "high",
+        "low",
+        "max",
+        "medium",
+        "minimal",
+        "none"
+      ]
+    },
+    {
       "key": "openrouter/undi95/remm-slerp-l2-13b",
       "variants": []
     },
@@ -2948,7 +2960,9 @@
       "key": "openrouter/x-ai/grok-4.20-multi-agent",
       "variants": [
         "high",
-        "low"
+        "low",
+        "medium",
+        "xhigh"
       ]
     },
     {

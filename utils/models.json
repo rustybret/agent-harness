@@ -156,6 +156,9 @@
       "key": "moonshotai/kimi-k2.7-code-highspeed"
     },
     {
+      "key": "moonshotai/kimi-k3"
+    },
+    {
       "key": "nvidia/abacusai/dracarys-llama-3_1-70b-instruct"
     },
     {
@@ -687,9 +690,6 @@
       "key": "openrouter/anthropic/claude-sonnet-5"
     },
     {
-      "key": "openrouter/arcee-ai/coder-large"
-    },
-    {
       "key": "openrouter/arcee-ai/trinity-large-thinking"
     },
     {
@@ -882,13 +882,13 @@
       "key": "openrouter/inflection/inflection-3-productivity"
     },
     {
+      "key": "openrouter/kwaipilot/kat-coder-air-v2.5"
+    },
+    {
       "key": "openrouter/kwaipilot/kat-coder-pro-v2"
     },
     {
-      "key": "openrouter/liquid/lfm-2.5-1.2b-instruct:free"
-    },
-    {
-      "key": "openrouter/liquid/lfm-2.5-1.2b-thinking:free"
+      "key": "openrouter/kwaipilot/kat-coder-pro-v2.5"
     },
     {
       "key": "openrouter/mancer/weaver"
@@ -898,9 +898,6 @@
     },
     {
       "key": "openrouter/meta-llama/llama-3.1-8b-instruct"
-    },
-    {
-      "key": "openrouter/meta-llama/llama-3.2-11b-vision-instruct"
     },
     {
       "key": "openrouter/meta-llama/llama-3.2-1b-instruct"
@@ -925,6 +922,9 @@
     },
     {
       "key": "openrouter/meta-llama/llama-guard-4-12b"
+    },
+    {
+      "key": "openrouter/meta/muse-spark-1.1"
     },
     {
       "key": "openrouter/microsoft/phi-4"
@@ -1029,6 +1029,9 @@
       "key": "openrouter/moonshotai/kimi-k2.7-code"
     },
     {
+      "key": "openrouter/moonshotai/kimi-k3"
+    },
+    {
       "key": "openrouter/morph/morph-v3-fast"
     },
     {
@@ -1054,9 +1057,6 @@
     },
     {
       "key": "openrouter/nousresearch/hermes-4-70b"
-    },
-    {
-      "key": "openrouter/nvidia/llama-3.3-nemotron-super-49b-v1.5"
     },
     {
       "key": "openrouter/nvidia/nemotron-3-nano-30b-a3b"
@@ -1246,9 +1246,6 @@
     },
     {
       "key": "openrouter/openai/gpt-oss-120b"
-    },
-    {
-      "key": "openrouter/openai/gpt-oss-120b:free"
     },
     {
       "key": "openrouter/openai/gpt-oss-20b"
@@ -1500,9 +1497,6 @@
       "key": "openrouter/sao10k/l3-lunaris-8b"
     },
     {
-      "key": "openrouter/sao10k/l3.1-70b-hanami-x1"
-    },
-    {
       "key": "openrouter/sao10k/l3.1-euryale-70b"
     },
     {
@@ -1537,6 +1531,9 @@
     },
     {
       "key": "openrouter/thedrummer/unslopnemo-12b"
+    },
+    {
+      "key": "openrouter/thinkingmachines/inkling"
     },
     {
       "key": "openrouter/undi95/remm-slerp-l2-13b"
