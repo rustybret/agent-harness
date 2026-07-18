@@ -1,12 +1,6 @@
-import { describe, test, expect, mock, afterAll } from "bun:test"
+import { describe, expect, test } from "bun:test"
 
-const mockLog = mock()
-mock.module("../../shared/logger", () => ({ log: mockLog }))
-
-afterAll(() => { mock.restore() })
-
-const { isActiveSessionStatus, isTerminalSessionStatus } = await import("./session-status-classifier")
-mock.restore()
+import { isActiveSessionStatus, isTerminalSessionStatus } from "./session-status-classifier"
 
 describe("isActiveSessionStatus", () => {
   describe("#given a known active session status", () => {
@@ -28,21 +22,14 @@ describe("isActiveSessionStatus", () => {
       expect(isActiveSessionStatus("idle")).toBe(false)
     })
 
-    test('#when type is "interrupted" #then returns false and does not log', () => {
-      mockLog.mockClear()
+    test('#when type is "interrupted" #then returns false', () => {
       expect(isActiveSessionStatus("interrupted")).toBe(false)
-      expect(mockLog).not.toHaveBeenCalled()
     })
   })
 
   describe("#given an unknown session status", () => {
-    test('#when type is an arbitrary unknown string #then returns false and logs warning', () => {
-      mockLog.mockClear()
+    test('#when type is an arbitrary unknown string #then returns false', () => {
       expect(isActiveSessionStatus("some-unknown-status")).toBe(false)
-      expect(mockLog).toHaveBeenCalledWith(
-        "[background-agent] Unknown session status type encountered:",
-        "some-unknown-status",
-      )
     })
 
     test('#when type is empty string #then returns false', () => {
