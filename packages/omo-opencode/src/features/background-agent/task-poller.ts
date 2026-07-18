@@ -1,5 +1,9 @@
 import { log } from "../../shared"
 import { CONFIG_BASENAME } from "../../shared/plugin-identity"
+import {
+  BACKGROUND_QUOTA_WATCHDOG_ABORT_SOURCE,
+  markInternalAbortSession,
+} from "../../hooks/runtime-fallback/auto-retry-abort"
 
 import type { BackgroundTaskConfig } from "../../config/schema"
 import type { BackgroundTask } from "./types"
@@ -209,6 +213,7 @@ export async function checkAndInterruptStaleTasks(args: {
     if (!startedAt || !sessionID) continue
 
     const sessionStatus = sessionStatuses?.[sessionID]?.type
+    const shouldMarkQuotaWatchdogAbort = sessionStatus === "retry"
     const sessionMissing = sessionStatuses !== undefined && sessionStatus === undefined
     const runtime = now - startedAt.getTime()
 
@@ -247,6 +252,9 @@ export async function checkAndInterruptStaleTasks(args: {
 
       const staleMinutes = Math.round(runtime / 60000)
       const reason = sessionGone ? "session gone from status registry" : "no activity"
+      if (shouldMarkQuotaWatchdogAbort) {
+        markInternalAbortSession(sessionID, BACKGROUND_QUOTA_WATCHDOG_ABORT_SOURCE)
+      }
       staleInterruptions.push(
         interruptStaleTask({
           task,
@@ -297,6 +305,9 @@ export async function checkAndInterruptStaleTasks(args: {
 
     const staleMinutes = Math.round(timeSinceLastUpdate / 60000)
     const reason = sessionGone ? "session gone from status registry" : "no activity"
+    if (shouldMarkQuotaWatchdogAbort) {
+      markInternalAbortSession(sessionID, BACKGROUND_QUOTA_WATCHDOG_ABORT_SOURCE)
+    }
     staleInterruptions.push(
       interruptStaleTask({
         task,

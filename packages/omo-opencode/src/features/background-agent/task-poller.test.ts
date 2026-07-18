@@ -3,6 +3,8 @@ const { describe, it, expect, mock, spyOn, beforeEach, afterEach } = require("bu
 
 import { checkAndInterruptStaleTasks, pruneStaleTasksAndNotifications } from "./task-poller"
 import type { BackgroundTask } from "./types"
+import { createAbortSessionRequest } from "../../hooks/runtime-fallback/auto-retry-abort"
+import type { HookDeps, RuntimeFallbackPluginInput } from "../../hooks/runtime-fallback/types"
 
 describe("checkAndInterruptStaleTasks", () => {
   const mockClient = {
@@ -15,6 +17,29 @@ describe("checkAndInterruptStaleTasks", () => {
     release: mock(() => {}),
   }
   const mockNotify = mock(() => Promise.resolve())
+
+  function createRuntimeFallbackAbortDeps(client: unknown): HookDeps {
+    return {
+      ctx: { client, directory: "/test/dir" } as RuntimeFallbackPluginInput,
+      config: {
+        enabled: true,
+        retry_on_errors: [429, 503, 529],
+        max_fallback_attempts: 3,
+        cooldown_seconds: 60,
+        timeout_seconds: 0,
+        notify_on_fallback: false,
+      },
+      options: undefined,
+      pluginConfig: undefined,
+      sessionStates: new Map(),
+      sessionLastAccess: new Map(),
+      sessionRetryInFlight: new Set(),
+      sessionAwaitingFallbackResult: new Set(),
+      sessionFallbackTimeouts: new Map(),
+      sessionStatusRetryKeys: new Map(),
+      internallyAbortedSessions: new Set(),
+    }
+  }
 
   function createDeferredPromise(): {
     promise: Promise<void>
@@ -83,6 +108,57 @@ describe("checkAndInterruptStaleTasks", () => {
     //#then
     expect(task.status).toBe("cancelled")
     expect(task.error).toContain("Stale timeout")
+  })
+
+  it("#given a retrying session with stale progress #when watchdog aborts it #then quota watchdog marks internal abort", async () => {
+    //#given
+    const deps = createRuntimeFallbackAbortDeps(mockClient)
+    createAbortSessionRequest(deps)
+    const task = createRunningTask({
+      progress: {
+        toolCalls: 1,
+        lastUpdate: new Date(Date.now() - 200_000),
+      },
+    })
+
+    //#when
+    await checkAndInterruptStaleTasks({
+      tasks: [task],
+      client: mockClient as never,
+      config: { staleTimeoutMs: 180_000 },
+      concurrencyManager: mockConcurrencyManager as never,
+      notifyParentSession: mockNotify,
+      sessionStatuses: { "ses-1": { type: "retry" } },
+    })
+
+    //#then
+    expect(task.status).toBe("cancelled")
+    expect(deps.internallyAbortedSessions.has("ses-1")).toBe(true)
+  })
+
+  it("#given a stale session without retry status #when watchdog aborts it #then bare no-progress reap remains external", async () => {
+    //#given
+    const deps = createRuntimeFallbackAbortDeps(mockClient)
+    createAbortSessionRequest(deps)
+    const task = createRunningTask({
+      progress: {
+        toolCalls: 1,
+        lastUpdate: new Date(Date.now() - 200_000),
+      },
+    })
+
+    //#when
+    await checkAndInterruptStaleTasks({
+      tasks: [task],
+      client: mockClient as never,
+      config: { staleTimeoutMs: 180_000 },
+      concurrencyManager: mockConcurrencyManager as never,
+      notifyParentSession: mockNotify,
+    })
+
+    //#then
+    expect(task.status).toBe("cancelled")
+    expect(deps.internallyAbortedSessions.has("ses-1")).toBe(false)
   })
 
   it("should NOT interrupt tasks with recent lastUpdate", async () => {
