@@ -1,6 +1,6 @@
 import { describe, expect, it, mock, beforeEach, afterEach } from "bun:test"
 import { registerProjectMailboxCommand } from "./tui-command"
-import { rm, mkdir, writeFile, readFile } from "node:fs/promises"
+import { rm, mkdir, writeFile, readFile, realpath } from "node:fs/promises"
 import { join } from "node:path"
 import { tmpdir } from "node:os"
 import { randomUUID } from "node:crypto"
@@ -8,11 +8,16 @@ import { clearPluginConfigFileDetectionCache } from "../../../shared/jsonc-parse
 
 describe("registerProjectMailboxCommand", () => {
   let tempDir: string
+  let registryPath: string
   let api: any
 
   beforeEach(async () => {
     tempDir = join(tmpdir(), `omo-mailbox-test-${randomUUID()}`)
     await mkdir(tempDir, { recursive: true })
+    // A dedicated per-test registry file keeps writes off the real
+    // ~/.omo/project-registry.json (registerProjectMailboxCommand defaults
+    // there when no override is given).
+    registryPath = join(tempDir, "test-project-registry.json")
     clearPluginConfigFileDetectionCache()
 
     api = {
@@ -34,12 +39,12 @@ describe("registerProjectMailboxCommand", () => {
   })
 
   it("skips registration if TUI APIs are absent", () => {
-    registerProjectMailboxCommand({}, { directory: tempDir })
+    registerProjectMailboxCommand({}, { directory: tempDir, registryPath })
     // No throw, just returns
   })
 
   it("registers the command nested under Layer.commands with a palette namespace", async () => {
-    registerProjectMailboxCommand(api, { directory: tempDir })
+    registerProjectMailboxCommand(api, { directory: tempDir, registryPath })
     expect(api.keymap.registerLayer).toHaveBeenCalled()
 
     const layer = api.keymap.registerLayer.mock.calls[0][0]
@@ -52,7 +57,7 @@ describe("registerProjectMailboxCommand", () => {
   })
 
   it("handles the write path when the registered command runs", async () => {
-    registerProjectMailboxCommand(api, { directory: tempDir })
+    registerProjectMailboxCommand(api, { directory: tempDir, registryPath })
     const command = api.keymap.registerLayer.mock.calls[0][0].commands[0]
 
     // Run the command
@@ -71,13 +76,18 @@ describe("registerProjectMailboxCommand", () => {
     await mkdir(join(tempDir, ".opencode"), { recursive: true })
     await writeFile(configPath, "{}", "utf8")
 
-    registerProjectMailboxCommand(api, { directory: tempDir })
+    registerProjectMailboxCommand(api, { directory: tempDir, registryPath })
     await api.keymap.registerLayer.mock.calls[0][0].commands[0].run()
 
     const topMenuProps = api.ui.DialogSelect.mock.calls[0][0]
     // Mirrors mapOptionCb() in opencode's tui/plugin/adapters.tsx: onSelect
     // is invoked with { value, title, description, ... }, not the bare row.
-    topMenuProps.onSelect({ value: { projectId: "project-a", label: "project-a", state: "Disabled" }, title: "project-a" })
+    // The top-menu value is itself tagged ({ action, row }) so the handler
+    // can distinguish the "register this project" action from a project pick.
+    topMenuProps.onSelect({
+      value: { action: "project", row: { projectId: "project-a", label: "project-a", state: "Disabled" } },
+      title: "project-a",
+    })
 
     const subMenuProps = api.ui.DialogSelect.mock.calls[1][0]
     subMenuProps.onSelect({ value: { choice: "impl", value: "impl", label: "impl" }, title: "impl" })
@@ -110,7 +120,7 @@ describe("registerProjectMailboxCommand", () => {
 `
     await writeFile(configPath, initialConfig, "utf8")
 
-    registerProjectMailboxCommand(api, { directory: tempDir })
+    registerProjectMailboxCommand(api, { directory: tempDir, registryPath })
     await api.keymap.registerLayer.mock.calls[0][0].commands[0].run()
     
     // Simulate selecting project-a and changing to "impl". The real host
@@ -119,7 +129,7 @@ describe("registerProjectMailboxCommand", () => {
     const topMenuProps = api.ui.DialogSelect.mock.calls[0][0]
     const onSelectTop = topMenuProps.onSelect
     
-    onSelectTop({ value: { projectId: "project-a", label: "project-a", state: "Disabled" } })
+    onSelectTop({ value: { action: "project", row: { projectId: "project-a", label: "project-a", state: "Disabled" } } })
     
     const subMenuProps = api.ui.DialogSelect.mock.calls[1][0]
     const onSelectSub = subMenuProps.onSelect
@@ -142,11 +152,11 @@ describe("registerProjectMailboxCommand", () => {
     await mkdir(join(tempDir, ".opencode"), { recursive: true })
     await writeFile(configPath, "{", "utf8")
 
-    registerProjectMailboxCommand(api, { directory: tempDir })
+    registerProjectMailboxCommand(api, { directory: tempDir, registryPath })
     await api.keymap.registerLayer.mock.calls[0][0].commands[0].run()
 
     const topMenuProps = api.ui.DialogSelect.mock.calls[0][0]
-    topMenuProps.onSelect({ value: { projectId: "project-a", label: "project-a", state: "Disabled" } })
+    topMenuProps.onSelect({ value: { action: "project", row: { projectId: "project-a", label: "project-a", state: "Disabled" } } })
 
     const subMenuProps = api.ui.DialogSelect.mock.calls[1][0]
     subMenuProps.onSelect({ value: { choice: "impl", value: "impl", label: "impl" } })
@@ -158,5 +168,32 @@ describe("registerProjectMailboxCommand", () => {
       message: expect.stringContaining("Malformed JSONC configuration text"),
       variant: "error",
     })
+  })
+
+  it("#given the top menu is rendered #when the register-self action is selected #then registry.registerProject is invoked and a success toast confirms the projectId", async () => {
+    registerProjectMailboxCommand(api, { directory: tempDir, registryPath })
+    await api.keymap.registerLayer.mock.calls[0][0].commands[0].run()
+
+    const topMenuProps = api.ui.DialogSelect.mock.calls[0][0]
+    const registerOption = topMenuProps.options[0]
+    expect(registerOption.title).toBe("Register this project")
+    expect(registerOption.value).toEqual({ action: "register-self" })
+
+    topMenuProps.onSelect({ value: { action: "register-self" } })
+
+    await new Promise((resolve) => setTimeout(resolve, 50))
+
+    expect(api.ui.toast).toHaveBeenCalledWith(
+      expect.objectContaining({ title: "Mailbox", variant: "success" }),
+    )
+    const toastCall = api.ui.toast.mock.calls.find((call: any[]) => call[0].title === "Mailbox")
+    expect(toastCall[0].message).toStartWith("Registered as")
+
+    const registryData = JSON.parse(await readFile(registryPath, "utf8"))
+    expect(registryData.projects).toHaveLength(1)
+    expect(registryData.projects[0].repoRoot).toBe(await realpath(tempDir))
+
+    const rerenderedTopMenuProps = api.ui.DialogSelect.mock.calls.at(-1)![0]
+    expect(rerenderedTopMenuProps.options[0].title).toStartWith("Re-register this project")
   })
 })
