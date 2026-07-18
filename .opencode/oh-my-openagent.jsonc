@@ -18,8 +18,7 @@
         "enabled": true,
         "intake_eligible_agents": [
             "sisyphus",
-            "hephaestus",
-            "atlas"
+            "hephaestus"
         ],
         "interrupt_policy": "allow-interrupt",
         "launch_policy": "auto",
@@ -55,7 +54,26 @@
             "umeairt-installer-fork-77e989dd": {
                 "access": "allow",
                 "intent_budget": "plan"
+            },
+            "aft-5fc3f7ed": {
+              "access": "allow",
+              "intent_budget": "plan"
+            },
+            "atlas-5ac6b1c6": {
+              "access": "allow",
+              "intent_budget": "question"
+            },
+            "magic-context-6deb493e": {
+              "access": "allow",
+              "intent_budget": "question"
+            },
+            "opencode-gemini-ec2cac67": {
+                "access": "allow",
+                "intent_budget": "plan"
             }
         }
+    },
+    "external_inject": {
+        "enabled": true
     }
 }
