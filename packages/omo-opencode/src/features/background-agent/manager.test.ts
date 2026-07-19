@@ -8,7 +8,11 @@ import {
 } from "../../shared/delegated-child-session-bootstrap"
 import { dispatchInternalPrompt, releaseAllPromptAsyncReservationsForTesting } from "../../shared/prompt-async-gate"
 import { clearSessionPromptParams, getSessionPromptParams } from "../../shared/session-prompt-params-state"
-import { createAbortSessionRequest } from "../../hooks/runtime-fallback/auto-retry-abort"
+import {
+  BACKGROUND_QUOTA_WATCHDOG_ABORT_SOURCE,
+  createAbortSessionRequest,
+  markInternalAbortSession,
+} from "../../hooks/runtime-fallback/auto-retry-abort"
 import type { HookDeps, RuntimeFallbackPluginInput } from "../../hooks/runtime-fallback/types"
 import {
   getSessionAgent,
@@ -6062,6 +6066,65 @@ describe("BackgroundManager.handleEvent - session.error", () => {
     getTaskMap(manager).set(task.id, task)
     return task
   }
+
+  test("internal abort does not finalize internally-aborted running task", async () => {
+    //#given
+    const client = {
+      session: {
+        prompt: async () => ({}),
+        promptAsync: async () => ({}),
+        abort: async () => ({}),
+      },
+    }
+    const deps = createRuntimeFallbackAbortDeps(client)
+    const manager = new BackgroundManager({
+      pluginContext: createPluginInput(client),
+      runtimeFallbackAbortRegistry: deps,
+    })
+    mockVerifySessionExists(manager, false)
+    const concurrencyManager = getConcurrencyManager(manager)
+    const concurrencyKey = "internal-abort/provider"
+    await concurrencyManager.acquire(concurrencyKey)
+
+    const task = createMockTask({
+      id: "task-internal-abort-running",
+      sessionId: "ses-internal-abort-running",
+      parentSessionId: "parent-session",
+      parentMessageId: "msg-internal-abort",
+      description: "task waiting for runtime fallback retry",
+      agent: "explore",
+      status: "running",
+      concurrencyKey,
+    })
+    getTaskMap(manager).set(task.id, task)
+    getPendingByParent(manager).set(task.parentSessionId, new Set([task.id]))
+    markInternalAbortSession(deps, task.sessionId, BACKGROUND_QUOTA_WATCHDOG_ABORT_SOURCE)
+
+    //#when
+    manager.handleEvent({
+      type: "session.error",
+      properties: {
+        sessionID: task.sessionId,
+        error: {
+          name: "MessageAbortedError",
+          message: "Request aborted by runtime fallback",
+        },
+      },
+    })
+
+    await flushBackgroundNotifications()
+
+    //#then
+    expect(task.status).toBe("running")
+    expect(task.error).toBeUndefined()
+    expect(task.completedAt).toBeUndefined()
+    expect(task.concurrencyKey).toBe(concurrencyKey)
+    expect(concurrencyManager.getCount(concurrencyKey)).toBe(1)
+    expect(getPendingByParent(manager).get(task.parentSessionId)?.has(task.id)).toBe(true)
+    expect(getCompletionTimers(manager).has(task.id)).toBe(false)
+
+    manager.shutdown()
+  })
 
   test("sets task to error, releases concurrency, and keeps it until delayed cleanup", async () => {
     //#given

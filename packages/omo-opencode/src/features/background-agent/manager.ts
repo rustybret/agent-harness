@@ -30,6 +30,7 @@ import {
   registerDelegatedChildSessionBootstrap,
 } from "../../shared/delegated-child-session-bootstrap"
 import { resolveMessageEventSessionID, resolveSessionEventID } from "../../shared/event-session-id"
+import { isAbortError } from "../../shared/is-abort-error"
 import {
   hasMoreFallbacks,
   shouldRetryError,
@@ -2074,6 +2075,20 @@ The fallback retry session is now created and can be inspected directly.
         `Agent "${task.agent}" not found. Make sure the agent is registered in your opencode.json or provided by a plugin.`,
         "agent-not-found session.error",
       )
+      return
+    }
+
+    if (
+      task.sessionId &&
+      isAbortError(errorInfo) &&
+      this.runtimeFallbackAbortRegistry.internallyAbortedSessions.has(task.sessionId)
+    ) {
+      this.logger("[background-agent] session.error matched internal abort; deferring to runtime-fallback retry", {
+        taskId: task.id,
+        sessionId: task.sessionId,
+        errorName,
+        errorMessage: errorMessage?.slice(0, 200),
+      })
       return
     }
 
