@@ -81,12 +81,12 @@ function wrap(proc: ChildProcess): SpawnedProcess {
 		},
 		exited: exitedPromise,
 		kill(signal?: NodeJS.Signals) {
-			killProcessTree(proc, signal ?? "SIGTERM");
+			terminateProcessTree(proc, signal ?? "SIGTERM");
 		},
 	};
 }
 
-function killProcessTree(proc: ChildProcess, signal: NodeJS.Signals): void {
+export function terminateProcessTree(proc: ChildProcess, signal: NodeJS.Signals): void {
 	if (process.platform === "win32" && proc.pid) {
 		const result = spawnSync("taskkill", ["/pid", String(proc.pid), "/f", "/t"], {
 			stdio: "ignore",

@@ -22,30 +22,33 @@ function tempRoot(prefix: string): string {
 }
 
 describe("LSP client path confinement", () => {
-	it("#given a relative file inside context cwd #when resolving workspace #then marker search stays inside cwd", () => {
+	it("#given a relative file inside context cwd #when resolving workspace #then marker search stays inside cwd", async () => {
 		const root = tempRoot("lsp-client-wrapper-root-");
 		mkdirSync(join(root, ".git"), { recursive: true });
 		mkdirSync(join(root, "src"), { recursive: true });
 		writeFileSync(join(root, "src", "file.ts"), "export const value = 1;\n");
 
-		const workspace = runWithRequestContext(createStandaloneMcpRequestContext({ cwd: root }), () =>
+		const workspace = await runWithRequestContext(createStandaloneMcpRequestContext({ cwd: root }), () =>
 			findWorkspaceRoot("src/file.ts"),
 		);
 
 		expect(workspace).toBe(realpathSync(root));
 	});
 
-	it("#given an absolute file outside context cwd #when resolving #then rejects before workspace inference", () => {
+	it("#given an absolute file outside context cwd #when resolving #then rejects before workspace inference", async () => {
 		const root = tempRoot("lsp-client-wrapper-cwd-");
 		const outside = tempRoot("lsp-client-wrapper-outside-");
 		mkdirSync(join(outside, ".git"), { recursive: true });
 		writeFileSync(join(outside, "file.ts"), "export const outside = true;\n");
 
-		expect(() =>
-			runWithRequestContext(createStandaloneMcpRequestContext({ cwd: root }), () =>
+		try {
+			await runWithRequestContext(createStandaloneMcpRequestContext({ cwd: root }), () =>
 				findWorkspaceRoot(join(outside, "file.ts")),
-			),
-		).toThrow(LspInvalidPathError);
+			);
+			throw new Error("expected outside path to be rejected");
+		} catch (error) {
+			expect(error).toBeInstanceOf(LspInvalidPathError);
+		}
 	});
 
 	it("#given a symlink inside cwd that points outside #when resolving #then rejects the escape", () => {

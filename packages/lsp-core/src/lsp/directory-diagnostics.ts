@@ -117,7 +117,9 @@ export async function aggregateDiagnosticsForDirectory(
 		return { output, totalDiagnostics: 0, fileFailures: [] };
 	}
 
-	const root = options.workspaceRoot ?? findWorkspaceRoot(absDir);
+	const root =
+		options.workspaceRoot ??
+		(await findWorkspaceRoot(absDir, server, options.signal === undefined ? {} : { signal: options.signal }));
 	const manager = options.manager ?? getLspManager();
 	const allDiagnostics: FileDiagnostic[] = [];
 	const fileErrors: DirectoryDiagnosticsFileFailure[] = [];

@@ -15,14 +15,14 @@ afterEach(() => {
 });
 
 describe("path resolution honors request context cwd", () => {
-	it("#given a relative path and a context cwd with a workspace marker #when findWorkspaceRoot #then resolves against the context cwd", () => {
+	it("#given a relative path and a context cwd with a workspace marker #when findWorkspaceRoot #then resolves against the context cwd", async () => {
 		const root = mkdtempSync(join(tmpdir(), "lsp-ctx-root-"));
 		tempDirectories.push(root);
 		mkdirSync(join(root, ".git"), { recursive: true });
 		mkdirSync(join(root, "sub"), { recursive: true });
 		writeFileSync(join(root, "sub", "file.ts"), "export const value = 1;\n");
 
-		const resolved = runWithRequestContext(createStandaloneMcpRequestContext({ cwd: root }), () =>
+		const resolved = await runWithRequestContext(createStandaloneMcpRequestContext({ cwd: root }), () =>
 			findWorkspaceRoot("sub/file.ts"),
 		);
 

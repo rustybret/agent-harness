@@ -6,6 +6,7 @@ import {
 	isPathInside,
 	lspRequestContext,
 } from "../request-context.js";
+import { type CargoWorkspaceRootOptions, resolveCargoWorkspaceRoot } from "./cargo-workspace-root.js";
 import type { LspClient } from "./client.js";
 import { effectiveExtension } from "./effective-extension.js";
 import {
@@ -18,7 +19,7 @@ import {
 import { getLspManager, type LspManager } from "./manager.js";
 import { loadInstallDecision } from "./server-install-state.js";
 import { findServerForExtension } from "./server-resolution.js";
-import type { ServerLookupResult } from "./types.js";
+import type { ResolvedServer, ServerLookupResult } from "./types.js";
 
 const WORKSPACE_MARKERS = [".git", "package.json", "pyproject.toml", "Cargo.toml", "go.mod", "pom.xml", "build.gradle"];
 
@@ -30,12 +31,25 @@ export function isDirectoryPath(filePath: string): boolean {
 	}
 }
 
-export function findWorkspaceRoot(filePath: string): string {
+export interface FindWorkspaceRootOptions extends CargoWorkspaceRootOptions {}
+
+export type { CargoMetadataLoader } from "./cargo-workspace-root.js";
+
+export async function findWorkspaceRoot(
+	filePath: string,
+	server?: ResolvedServer,
+	options: FindWorkspaceRootOptions = {},
+): Promise<string> {
 	const abs = resolvePathInsideContext(filePath);
 	let dir = abs;
 
 	if (!isDirectoryPath(dir)) {
 		dir = dirname(dir);
+	}
+
+	if (server?.id === "rust") {
+		const cargoRoot = await resolveCargoWorkspaceRoot(dir, options);
+		if (cargoRoot !== undefined) return cargoRoot;
 	}
 
 	let prevDir = "";
@@ -174,7 +188,11 @@ export async function withLspClient<T>(
 	}
 
 	const server = result.server;
-	const root = findWorkspaceRoot(absPath);
+	const root = await findWorkspaceRoot(
+		absPath,
+		server,
+		options.signal === undefined ? {} : { signal: options.signal },
+	);
 	const manager = options.manager ?? getLspManager();
 
 	const acquireAndCall = async (allowRetry: boolean): Promise<T> => {

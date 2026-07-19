@@ -1,6 +1,7 @@
 export * from "./lsp/cleanup-errors.js";
 export * from "./lsp/client-wrapper.js";
 export * from "./lsp/client.js";
+export * from "./lsp/cargo-workspace-root.js";
 export * from "./lsp/config-loader.js";
 export * from "./lsp/connection.js";
 export * from "./lsp/constants.js";

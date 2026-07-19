@@ -40,6 +40,7 @@
     "test": "bun test src/*.test.ts src/**/*.test.ts"
   },
   "dependencies": {
-    "@oh-my-opencode/mcp-stdio-core": "workspace:*"
+    "@oh-my-opencode/mcp-stdio-core": "workspace:*",
+    "smol-toml": "^1.7.0"
   }
 }

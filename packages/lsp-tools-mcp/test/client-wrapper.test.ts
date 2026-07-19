@@ -168,7 +168,9 @@ describe("withLspClient", () => {
 			);
 
 			// then
-			expect(runWithRequestContext(context, () => findWorkspaceRoot(filePath))).toBe(canonicalNestedWorkspace);
+			await expect(runWithRequestContext(context, () => findWorkspaceRoot(filePath))).resolves.toBe(
+				canonicalNestedWorkspace,
+			);
 			expect(result).toBe(canonicalNestedWorkspace);
 			expect(rootsSeen).toEqual([canonicalNestedWorkspace]);
 			expect(clients[0]?.stopCallCount).toBe(0);
