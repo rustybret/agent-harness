@@ -1,0 +1,49 @@
+real DB session count BEFORE: 6418
+sandbox: /var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T//postmerge-qa.WYSSte
+running: opencode run --format json --print-logs (trivial prompt)
+opencode run exit code: 0 (waited 16s)
+run output line count:        3
+--- run-stderr.log tail ---
+timestamp=2026-07-19T10:37:13.146Z level=INFO run=7e3d5efd message="creating instance" directory=/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/postmerge-qa.WYSSte/proj
+timestamp=2026-07-19T10:37:13.147Z level=INFO run=7e3d5efd message=fromDirectory directory=/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/postmerge-qa.WYSSte/proj
+timestamp=2026-07-19T10:37:13.158Z level=INFO run=7e3d5efd message=bootstrapping directory=/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/postmerge-qa.WYSSte/proj
+timestamp=2026-07-19T10:37:13.162Z level=INFO run=7e3d5efd message=loading path=/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/postmerge-qa.WYSSte/config/opencode/config.json
+timestamp=2026-07-19T10:37:13.162Z level=INFO run=7e3d5efd message=loading path=/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/postmerge-qa.WYSSte/config/opencode/opencode.json
+timestamp=2026-07-19T10:37:13.164Z level=INFO run=7e3d5efd message=loading path=/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/postmerge-qa.WYSSte/config/opencode/opencode.jsonc
+timestamp=2026-07-19T10:37:13.165Z level=INFO run=7e3d5efd message=loading path=/Users/brethoffman/.config/opencode/opencode.json
+timestamp=2026-07-19T10:37:13.183Z level=INFO run=7e3d5efd message=loading path=/Users/brethoffman/.opencode/opencode.json
+timestamp=2026-07-19T10:37:13.270Z level=INFO run=7e3d5efd message=loading path=/Users/brethoffman/.opencode/opencode.jsonc
+timestamp=2026-07-19T10:37:22.567Z level=INFO run=7e3d5efd message="all LSPs are disabled"
+timestamp=2026-07-19T10:37:22.568Z level=INFO run=7e3d5efd message="all formatters are disabled"
+timestamp=2026-07-19T10:37:22.568Z level=INFO run=7e3d5efd message=init
+timestamp=2026-07-19T10:37:22.747Z level=INFO run=7e3d5efd message=created id=ses_0860c4a45ffeKsC5ZT73KzS50I slug=sunny-tiger version=1.18.2 projectID=global directory=/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/postmerge-qa.WYSSte/proj path=private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/postmerge-qa.WYSSte/proj workspaceID=undefined parentID=undefined title="New session - 2026-07-19T10:37:22.747Z" agent=undefined model=undefined metadata=undefined permission="[{\"permission\":\"question\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"plan_enter\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"plan_exit\",\"pattern\":\"*\",\"action\":\"deny\"}]" cost=0 tokens.input=0 tokens.output=0 tokens.reasoning=0 tokens.cache.read=0 tokens.cache.write=0 time.created=1784457442747 time.updated=1784457442747
+timestamp=2026-07-19T10:37:22.761Z level=INFO run=7e3d5efd message="event connected"
+timestamp=2026-07-19T10:37:22.854Z level=INFO run=7e3d5efd message="fetching index" url=http://127.0.0.1:63169/index.json
+timestamp=2026-07-19T10:37:22.879Z level=INFO run=7e3d5efd message="fetching index" url=http://127.0.0.1:63172/index.json
+timestamp=2026-07-19T10:37:22.940Z level=INFO run=7e3d5efd message=loop session.id=ses_0860c4a45ffeKsC5ZT73KzS50I step=0
+timestamp=2026-07-19T10:37:22.958Z level=INFO run=7e3d5efd message="shell tool using shell" shell=/bin/zsh
+timestamp=2026-07-19T10:37:22.982Z level=INFO run=7e3d5efd message=init count=4
+timestamp=2026-07-19T10:37:22.998Z level=INFO run=7e3d5efd message=stream providerID=anthropic modelID=claude-haiku-4-5-20251001 session.id=ses_0860c4a45ffeKsC5ZT73KzS50I small=true agent=title mode=primary
+timestamp=2026-07-19T10:37:23.005Z level=INFO run=7e3d5efd message="llm runtime selected" llm.runtime=ai-sdk llm.provider=anthropic llm.model=claude-haiku-4-5-20251001
+timestamp=2026-07-19T10:37:23.813Z level=INFO run=7e3d5efd message="booting location services" directory=/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/postmerge-qa.WYSSte/proj workspaceID=undefined
+timestamp=2026-07-19T10:37:23.817Z level=INFO run=7e3d5efd message="project copy refresh started" projectID=global
+timestamp=2026-07-19T10:37:23.817Z level=INFO run=7e3d5efd message="project copy refresh done" projectID=global updated=[] removed=[]
+timestamp=2026-07-19T10:37:26.985Z level=INFO run=7e3d5efd message=process session.id=ses_0860c4a45ffeKsC5ZT73KzS50I messageID=msg_f79f3b67e001paJe6dSRuY1gdB
+timestamp=2026-07-19T10:37:26.986Z level=INFO run=7e3d5efd message=stream providerID=anthropic modelID=claude-haiku-4-5-20251001 session.id=ses_0860c4a45ffeKsC5ZT73KzS50I small=false agent="Sisyphus - ultraworker" mode=primary
+timestamp=2026-07-19T10:37:26.988Z level=INFO run=7e3d5efd message="llm runtime selected" llm.runtime=ai-sdk llm.provider=anthropic llm.model=claude-haiku-4-5-20251001
+timestamp=2026-07-19T10:37:28.645Z level=INFO run=7e3d5efd message=loop session.id=ses_0860c4a45ffeKsC5ZT73KzS50I step=1
+timestamp=2026-07-19T10:37:28.645Z level=INFO run=7e3d5efd message="exiting loop" session.id=ses_0860c4a45ffeKsC5ZT73KzS50I
+timestamp=2026-07-19T10:37:28.715Z level=INFO run=7e3d5efd message="disposing instance" directory=/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/postmerge-qa.WYSSte/proj
+timestamp=2026-07-19T10:37:28.744Z level=INFO run=7e3d5efd message=loading path=/Users/brethoffman/.config/opencode/opencode.json
+--- run-output.jsonl (first 40 lines) ---
+{"type":"step_start","timestamp":1784457448548,"sessionID":"ses_0860c4a45ffeKsC5ZT73KzS50I","part":{"id":"prt_f79f3cc610015I1NJ83b2KXGpU","messageID":"msg_f79f3b67e001paJe6dSRuY1gdB","sessionID":"ses_0860c4a45ffeKsC5ZT73KzS50I","type":"step-start"}}
+{"type":"text","timestamp":1784457448594,"sessionID":"ses_0860c4a45ffeKsC5ZT73KzS50I","part":{"id":"prt_f79f3cc62001oMQi6znth0k4U6","messageID":"msg_f79f3b67e001paJe6dSRuY1gdB","sessionID":"ses_0860c4a45ffeKsC5ZT73KzS50I","type":"text","text":"pong","time":{"start":1784457448546,"end":1784457448593}}}
+{"type":"step_finish","timestamp":1784457448715,"sessionID":"ses_0860c4a45ffeKsC5ZT73KzS50I","part":{"id":"prt_f79f3ccaf001WeEUuxOPxmcOkf","reason":"stop","messageID":"msg_f79f3b67e001paJe6dSRuY1gdB","sessionID":"ses_0860c4a45ffeKsC5ZT73KzS50I","type":"step-finish","tokens":{"total":40063,"input":3,"output":5,"reasoning":0,"cache":{"write":40055,"read":0}},"cost":0}}
+PASS: no plugin-load error strings detected
+PASS: opencode run exited 0
+PASS: JSON stream contains model response event(s)
+real DB session count AFTER: 6418
+PASS: real DB session count unchanged (=6418)
+
+RESULT: 4 passed, 0 failed
+sandbox cleaned up: /var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T//postmerge-qa.WYSSte
