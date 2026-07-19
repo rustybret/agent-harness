@@ -226,6 +226,27 @@ export function __getProcessCleanupSignalListenerForTesting(
   return cleanupSignalHandlers.get(signal)
 }
 
+/**
+ * @internal test-only seam: exposes the captured uncaughtException /
+ * unhandledRejection listener registered by `registerManagerForCleanup`.
+ *
+ * Tests MUST invoke this listener directly instead of calling
+ * `process.emit('uncaughtException', err)` or
+ * `process.emit('unhandledRejection', err, promise)`. Bun 1.3.14's test
+ * runner treats emitted fatal events as harness errors: a throw inside the
+ * listener (e.g. `log()` failing with EPIPE during shutdown) propagates back
+ * through `process.emit` and fails the enclosing test, and even a clean
+ * emit can be recorded as an unhandled error between tests. Invoking the
+ * captured listener directly is the deterministic test seam — it exercises
+ * the same handler the production runtime would call, without the harness
+ * treating the synthetic event as a real fatal.
+ */
+export function __getProcessCleanupErrorListenerForTesting(
+  signal: ProcessCleanupErrorEvent,
+): ((error: unknown) => void) | undefined {
+  return cleanupErrorHandlers.get(signal)
+}
+
 export function registerManagerForCleanup(manager: CleanupTarget): void {
   cleanupManagers.add(manager)
 

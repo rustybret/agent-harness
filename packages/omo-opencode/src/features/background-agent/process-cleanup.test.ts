@@ -17,7 +17,7 @@ import {
   __isShutdownInProgressForTesting,
   __setShutdownInProgressForTesting,
 } from "./process-cleanup"
-import { flushMicrotasks, getRegisteredProcessCleanupSignalListener } from "./process-cleanup.test-helpers"
+import { flushMicrotasks, getRegisteredProcessCleanupErrorListener, getRegisteredProcessCleanupSignalListener } from "./process-cleanup.test-helpers"
 
 type CleanupManager = {
   shutdown: () => void | Promise<void>
@@ -174,7 +174,7 @@ describe("#given process cleanup registration", () => {
         registerManagerForCleanup(managerOne)
         registerManagerForCleanup(managerTwo)
 
-        process.emit("uncaughtException", new Error("boom"))
+        getRegisteredProcessCleanupErrorListener("uncaughtException")(new Error("boom"))
         await flushMicrotasks()
 
         expect(shutdownOne).not.toHaveBeenCalled()
@@ -240,6 +240,9 @@ describe("#given process cleanup registration", () => {
         uncaughtExceptionListenersBefore.length,
       )
 
+      // After unregistration our listener is gone, so we use process.emit
+      // (safe when no listener is registered) to verify emits no longer
+      // reach this plugin's handler.
       process.emit("uncaughtException", new Error("boom"))
       expect(shutdown).not.toHaveBeenCalled()
     })
@@ -329,8 +332,8 @@ describe("#given process cleanup registration", () => {
       try {
         registerManagerForCleanup(manager)
 
-        // Other listeners on uncaughtException may exist (e.g. node default).
-        // We assert that OUR handler did not run cleanup.
+        // When OMO_DISABLE_PROCESS_CLEANUP is set, the listener is not registered,
+        // so we use process.emit to verify that emits do not trigger cleanup.
         process.emit("uncaughtException", new Error("boom"))
         await flushMicrotasks()
 
@@ -351,7 +354,7 @@ describe("#given process cleanup registration", () => {
       try {
         registerManagerForCleanup(manager)
 
-        process.emit("uncaughtException", new Error("boom"))
+        getRegisteredProcessCleanupErrorListener("uncaughtException")(new Error("boom"))
         await flushMicrotasks()
 
         expect(shutdown).not.toHaveBeenCalled()
@@ -369,7 +372,7 @@ describe("#given process cleanup registration", () => {
       try {
         registerManagerForCleanup(manager)
 
-        process.emit("unhandledRejection", new Error("boom"), Promise.resolve())
+        getRegisteredProcessCleanupErrorListener("unhandledRejection")(new Error("boom"))
         await flushMicrotasks()
 
         expect(shutdown).not.toHaveBeenCalled()
@@ -395,7 +398,7 @@ describe("#given process cleanup registration", () => {
       try {
         registerManagerForCleanup(manager)
 
-        process.emit("unhandledRejection", new Error("transient streaming rejection"), Promise.resolve())
+        getRegisteredProcessCleanupErrorListener("unhandledRejection")(new Error("transient streaming rejection"))
         await flushMicrotasks()
 
         expect(shutdown).not.toHaveBeenCalled()
@@ -421,7 +424,7 @@ describe("#given process cleanup registration", () => {
       try {
         registerManagerForCleanup(manager)
 
-        process.emit("uncaughtException", new Error("transient stream error"))
+        getRegisteredProcessCleanupErrorListener("uncaughtException")(new Error("transient stream error"))
         await flushMicrotasks()
 
         expect(shutdown).not.toHaveBeenCalled()
@@ -447,8 +450,8 @@ describe("#given process cleanup registration", () => {
       try {
         registerManagerForCleanup(manager)
 
-        process.emit("uncaughtException", new Error("first transient MCP failure"))
-        process.emit("uncaughtException", new Error("second transient MCP failure"))
+        getRegisteredProcessCleanupErrorListener("uncaughtException")(new Error("first transient MCP failure"))
+        getRegisteredProcessCleanupErrorListener("uncaughtException")(new Error("second transient MCP failure"))
         await flushMicrotasks()
 
         expect(process.listeners("uncaughtException")).toHaveLength(
@@ -487,6 +490,8 @@ describe("#given process cleanup registration", () => {
       )
 
       _resetForTesting()
+      // After _resetForTesting() our listener is unregistered, so we use process.emit
+      // to verify that emits no longer trigger cleanup.
       process.emit("uncaughtException", new Error("boom"))
 
       expect(shutdown).not.toHaveBeenCalled()
@@ -501,14 +506,14 @@ describe("#given process cleanup registration", () => {
       // closing a broken pipe). Before the fix, every re-entry logged another
       // line and re-ran cleanup, producing an unbounded loop that filled disk.
       const reentrantShutdown = mock(() => {
-        process.emit("uncaughtException", new Error("EPIPE re-entry"))
+        getRegisteredProcessCleanupErrorListener("uncaughtException")(new Error("EPIPE re-entry"))
       })
       const manager = { shutdown: reentrantShutdown }
       registeredManagers.push(manager)
 
       registerManagerForCleanup(manager)
 
-      process.emit("uncaughtException", new Error("boom"))
+      getRegisteredProcessCleanupErrorListener("uncaughtException")(new Error("boom"))
       await flushMicrotasks()
 
       // Primary listener body must run exactly once. Re-entry MUST be short-
@@ -519,14 +524,14 @@ describe("#given process cleanup registration", () => {
 
     test("#given cleanup emits unhandledRejection re-entrantly #when event fires #then listener body runs only once", async () => {
       const reentrantShutdown = mock(() => {
-        process.emit("unhandledRejection", new Error("re-entry"), Promise.resolve())
+        getRegisteredProcessCleanupErrorListener("unhandledRejection")(new Error("re-entry"))
       })
       const manager = { shutdown: reentrantShutdown }
       registeredManagers.push(manager)
 
       registerManagerForCleanup(manager)
 
-      process.emit("unhandledRejection", new Error("boom"), Promise.resolve())
+      getRegisteredProcessCleanupErrorListener("unhandledRejection")(new Error("boom"))
       await flushMicrotasks()
 
       expect(reentrantShutdown.mock.calls.length).toBeLessThanOrEqual(1)
@@ -718,7 +723,7 @@ describe("#given process cleanup registration", () => {
         const burst = Object.assign(new Error("connection reset"), { code: "ECONNRESET" })
         expect(isHarmlessShutdownError(burst)).toBe(true)
 
-        process.emit("uncaughtException", burst)
+        getRegisteredProcessCleanupErrorListener("uncaughtException")(burst)
         await flushMicrotasks()
       } finally {
         exitSpy.mockRestore()
