@@ -18,8 +18,12 @@ function sliceWorkflowSection(workflow: string, startMarker: string, endMarker: 
 }
 
 describe("release and platform publish workflows", () => {
-  test("publishes platform packages before installable wrappers", () => {
+  test("computes release metadata once and does not wire platform-binary publishing into the main release", () => {
     // #given
+    // AGENTS.md FORK SCOPE: release workflows do not generate or publish platform
+    // binaries. The main publish flow therefore has no publish-platform job, no
+    // codex-compatibility gate, and no platform-package verification step; it still
+    // resolves release metadata once and feeds it to the wrapper/release jobs.
     const workflow = readFileSync(publishWorkflowPath, "utf8")
 
     // #when
@@ -28,23 +32,23 @@ describe("release and platform publish workflows", () => {
       workflow.includes("version: ${{ steps.version.outputs.version }}") &&
       workflow.includes("dist_tag: ${{ steps.version.outputs.dist_tag }}")
     const computesVersionOnce = (workflow.match(/id: version/g) ?? []).length === 1
-    const platformUsesMetadata = workflow.includes("version: ${{ needs.release-metadata.outputs.version }}") &&
-      workflow.includes("dist_tag: ${{ needs.release-metadata.outputs.dist_tag }}")
-    const mainWaitsForPlatform = workflow.includes(
-      "needs: [test, typecheck, codex-compatibility, preflight-trust, release-metadata, prepare-release-state, publish-platform]",
-    ) &&
-      workflow.includes("inputs.skip_platform == true || needs.publish-platform.result == 'success'")
+    const publishMainNeedsWithoutPlatform = workflow.includes(
+      "needs: [test, typecheck, preflight-trust, release-metadata, prepare-release-state]",
+    )
+    const wiresPublishPlatformJob = workflow.includes("publish-platform:") ||
+      workflow.includes("uses: ./.github/workflows/publish-platform.yml")
+    const gatesOnCodexCompatibility = workflow.includes("codex-compatibility")
+    const verifiesPlatformPackages = workflow.includes("name: Verify platform packages are published")
     const releaseUsesMetadata = workflow.includes("VERSION: ${{ needs.release-metadata.outputs.version }}")
-    const wrappersVerifyPlatformPackages = workflow.includes("name: Verify platform packages are published") &&
-      workflow.includes("Missing platform package(s); refusing to publish wrappers.")
 
     // #then
     expect(computesReleaseMetadata, "release metadata must be a first-class job output").toBe(true)
     expect(computesVersionOnce, "version and dist tag must be computed exactly once").toBe(true)
-    expect(platformUsesMetadata, "platform workflow must consume the shared release metadata").toBe(true)
-    expect(mainWaitsForPlatform, "wrapper publish must wait for platform success unless pre-published platforms are explicitly verified").toBe(true)
+    expect(publishMainNeedsWithoutPlatform, "publish-main must gate on the fork's maintained jobs only").toBe(true)
+    expect(wiresPublishPlatformJob, "fork release must not wire platform-binary publishing into the main flow").toBe(false)
+    expect(gatesOnCodexCompatibility, "fork release must not gate on the omitted Codex compatibility job").toBe(false)
+    expect(verifiesPlatformPackages, "fork release must not verify platform binaries it never publishes").toBe(false)
     expect(releaseUsesMetadata, "release tail must use the shared release metadata").toBe(true)
-    expect(wrappersVerifyPlatformPackages, "wrappers must verify matching platform binaries exist before npm publish").toBe(true)
   })
 
   test("fails when a required platform artifact is missing", () => {
@@ -124,43 +128,52 @@ describe("release and platform publish workflows", () => {
     expect(darwinVerifyStep).not.toContain("codesign")
   })
 
-  test("regenerates and commits release lockfiles only in the prepared source state", () => {
+  test("regenerates the release lockfile and commits the release-state source before publishing", () => {
     // #given
+    // The fork keeps the release-state PR gate: the prepare job stamps versions,
+    // regenerates the bun lockfile, and commits `release: v${VERSION}` so npm
+    // publish only runs from a merged source-state commit.
     const workflow = readFileSync(publishWorkflowPath, "utf8")
-    const prepareStep = sliceWorkflowSection(workflow, "      - name: Prepare and merge release state before publishing", "      - name: Write job summary")
-    const releaseJob = workflow.slice(workflow.indexOf("  release:"))
-    const codexLockfileCommand = "npm --prefix packages/omo-codex/plugin install --package-lock-only --ignore-scripts --no-audit --fund=false"
-    const codexLockfilePath = "packages/omo-codex/plugin/package-lock.json"
-
-    // #then
-    expect(prepareStep).toContain(codexLockfileCommand)
-    expect(prepareStep.indexOf(codexLockfileCommand)).toBeGreaterThan(prepareStep.indexOf("node packages/omo-codex/plugin/scripts/sync-version.mjs"))
-    expect(prepareStep.indexOf("bun install --lockfile-only")).toBeGreaterThan(prepareStep.indexOf(codexLockfileCommand))
-    expect(prepareStep).toContain(codexLockfilePath)
-    expect(prepareStep).toContain("git commit -m \"release: v${VERSION}\"")
-    expect(releaseJob).not.toContain("name: Apply release version to source tree")
-    expect(releaseJob).not.toContain("name: Commit version bump")
-  })
-
-  test("validates an existing release tag before redispatching its prepared source", () => {
-    // #given
-    const workflow = readFileSync(publishWorkflowPath, "utf8")
-    const dispatchJob = sliceWorkflowSection(workflow, "  dispatch-provenance-safe-publish:", "  publish-main:")
+    const prepareStep = sliceWorkflowSection(
+      workflow,
+      "      - name: Prepare and merge release state before publishing",
+      "      - name: Write job summary",
+    )
 
     // #when
-    const checksExistingTagTarget =
-      dispatchJob.includes('if git rev-parse -q --verify "refs/tags/v${VERSION}" >/dev/null; then') &&
-      dispatchJob.includes('TAG_SHA="$(git rev-list --max-count=1 "v${VERSION}")"') &&
-      dispatchJob.includes('"$TAG_SHA" != "$RELEASE_SHA"')
-    const createsMissingTagAtPreparedSource = dispatchJob.includes('git tag "v${VERSION}" "$RELEASE_SHA"')
-    const redispatchesTag = dispatchJob.includes('gh workflow run publish.yml --ref "v${VERSION}"')
-    const marketplacePushSkipsWhenClean = workflow.includes("LazyCodex marketplace already up to date")
+    const syncVersionIndex = prepareStep.indexOf("node packages/omo-codex/plugin/scripts/sync-version.mjs")
+    const lockfileIndex = prepareStep.indexOf("bun install --lockfile-only")
 
     // #then
-    expect(checksExistingTagTarget, "reruns must reject a release tag that points away from the prepared source").toBe(true)
-    expect(createsMissingTagAtPreparedSource, "the first publish run must create its tag at the prepared source").toBe(true)
-    expect(redispatchesTag, "the provenance-bearing publish run must be dispatched from the verified release tag").toBe(true)
-    expect(marketplacePushSkipsWhenClean, "marketplace sync must skip push when rerun has no changes").toBe(true)
+    expect(syncVersionIndex, "prepare must stamp the Codex plugin version before regenerating the lockfile").toBeGreaterThanOrEqual(0)
+    expect(lockfileIndex, "prepare must regenerate the bun lockfile from the stamped source").toBeGreaterThan(syncVersionIndex)
+    expect(prepareStep).toContain("git add package.json packages/oh-my-opencode-*/package.json")
+    expect(prepareStep).toContain("bun.lock")
+    expect(prepareStep).toContain("git commit -m \"release: v${VERSION}\"")
+  })
+
+  test("keeps release finalization in a single job without a separate provenance dispatch", () => {
+    // #given
+    // AGENTS.md FORK SCOPE / Direct Deployment: this fork publishes directly from
+    // the maintained jobs and does not run the upstream two-phase
+    // dispatch-provenance-safe-publish redispatch model. The release job stamps,
+    // tags, and finalizes in place.
+    const workflow = readFileSync(publishWorkflowPath, "utf8")
+    const releaseJob = workflow.slice(workflow.indexOf("  release:"))
+
+    // #when
+    const hasDispatchJob = workflow.includes("dispatch-provenance-safe-publish:")
+    const redispatchesTagRun = workflow.includes('gh workflow run publish.yml --ref "v${VERSION}"')
+    const releaseCreatesTag = releaseJob.includes("name: Create release tag") &&
+      releaseJob.includes('git tag "v${VERSION}"')
+    const releaseCreatesGithubRelease = releaseJob.includes("name: Create GitHub release") &&
+      releaseJob.includes('gh release create "v${VERSION}"')
+
+    // #then
+    expect(hasDispatchJob, "fork release must not run a separate provenance-dispatch job").toBe(false)
+    expect(redispatchesTagRun, "fork release must not redispatch publish.yml from a pinned tag").toBe(false)
+    expect(releaseCreatesTag, "the release job must create the version tag in place").toBe(true)
+    expect(releaseCreatesGithubRelease, "the release job must create the GitHub release in place").toBe(true)
   })
 
   test("enumerates windows-arm64 consistently across every platform-list surface", () => {
@@ -202,7 +215,7 @@ describe("release and platform publish workflows", () => {
     expect(publishIds, "PLATFORM_PACKAGE_IDS must match build-binaries PLATFORMS exactly").toEqual(
       buildBinariesPlatforms,
     )
-    expect(publishYmlLists.length, "publish.yml must enumerate platforms in 2 PLATFORMS arrays + 2 prepared-source version-bump loops").toBe(4)
+    expect(publishYmlLists.length, "publish.yml must enumerate platforms in its 2 source-state version-bump loops (prepare + release), staying consistent with build-binaries").toBe(2)
     for (const publishYmlList of publishYmlLists) {
       expect(publishYmlList, "every publish.yml platform list must match build-binaries PLATFORMS exactly").toEqual(
         buildBinariesPlatforms,

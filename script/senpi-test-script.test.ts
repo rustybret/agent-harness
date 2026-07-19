@@ -29,15 +29,6 @@ function readRootManifest(): {
   }
 }
 
-function sliceWorkflowSection(workflow: string, startMarker: string, endMarker: string): string {
-  const start = workflow.indexOf(startMarker)
-  const end = workflow.indexOf(endMarker, start)
-  if (start < 0 || end < 0 || end <= start) {
-    throw new Error(`missing workflow section between ${startMarker} and ${endMarker}`)
-  }
-  return workflow.slice(start, end)
-}
-
 describe("Senpi compatibility test script", () => {
   test("#given published root package #when payload contract is inspected #then senpi payload is contained while local build stays available", () => {
     // #given
@@ -168,24 +159,20 @@ describe("Senpi compatibility test script", () => {
     expect(script, "test:senpi must stay hermetic and not run a live senpi install").not.toContain("senpi install")
   })
 
-  test("#given CI workflow #when inspected #then senpi compatibility is a merge-blocking matrix job", () => {
+  test("#given fork CI workflow #when inspected #then senpi compatibility is not a wired CI job", () => {
     // #given
+    // This private fork scopes CI to the OpenCode Ultimate edition (AGENTS.md FORK
+    // SCOPE): the Senpi adapter is unmaintained and omitted from CI pipelines. The
+    // hermetic Senpi gate stays available as the `test:senpi` script (asserted
+    // above) but is not restored as a merge-blocking CI matrix job here.
     const workflow = readFileSync(ciWorkflowPath, "utf8")
 
     // #when
-    const senpiJob = sliceWorkflowSection(workflow, "  senpi-compatibility:", "  lazycodex-published-smoke:")
+    const hasSenpiCompatibilityJob = workflow.includes("senpi-compatibility:")
     const needsReferences = workflow.match(/needs: \[[^\]]*senpi-compatibility[^\]]*\]/g) ?? []
 
     // #then
-    expect(senpiJob).toContain("os: [ubuntu-latest, macos-latest, windows-latest]")
-    expect(senpiJob).toContain('node-version: "24"')
-    expect(senpiJob).toContain('bun-version: "1.3.12"')
-    expect(senpiJob).toContain("bun run build:senpi-plugin")
-    expect(senpiJob).toContain("npm pack --pack-destination")
-    expect(senpiJob).toContain("npm --prefix packages/lsp-daemon test -- test/daemon-roundtrip.test.ts")
-    expect(senpiJob).toContain("tsgo --noEmit -p packages/omo-senpi/tsconfig.json")
-    expect(senpiJob).toContain("bun test packages/omo-senpi")
-    expect(senpiJob).not.toContain("senpi install")
-    expect(needsReferences.length, "senpi-compatibility must be included in both downstream needs lists").toBeGreaterThanOrEqual(2)
+    expect(hasSenpiCompatibilityJob, "fork CI must not restore the upstream senpi-compatibility matrix job").toBe(false)
+    expect(needsReferences.length, "no fork CI job may depend on senpi-compatibility").toBe(0)
   })
 })

@@ -5,45 +5,36 @@ import { readFileSync } from "node:fs"
 
 const publishWorkflowPath = new URL("../.github/workflows/publish.yml", import.meta.url)
 
-function sliceWorkflowSection(workflow: string, startMarker: string, endMarker: string): string {
-  const start = workflow.indexOf(startMarker)
-  const end = workflow.indexOf(endMarker, start)
-  if (start < 0 || end < 0 || end <= start) {
-    throw new Error(`missing workflow section between ${startMarker} and ${endMarker}`)
-  }
-  return workflow.slice(start, end)
-}
-
-describe("LazyCodex release version stamping workflow", () => {
-  test("stamps hook status messages with the release version before publishing lazycodex-ai", () => {
+describe("LazyCodex release version stamping workflow (fork policy)", () => {
+  test("fork publish workflow omits the lazycodex hook-status build and publish steps", () => {
     // #given
+    // Upstream stamped Codex hook status messages with the release version inside a
+    // "Build Codex plugin components" step feeding a lazycodex-ai publish. This fork
+    // does not build or publish the Codex plugin (AGENTS.md FORK SCOPE), so those
+    // steps are absent rather than restored just to keep an old assertion alive.
     const workflow = readFileSync(publishWorkflowPath, "utf8")
-    const buildStep = sliceWorkflowSection(
-      workflow,
-      "      - name: Build Codex plugin components",
-      "      - name: Publish lazycodex-ai",
-    )
 
     // #when
-    const exportsReleaseVersionForHookBuild = buildStep.includes("LAZYCODEX_RELEASE_VERSION: ${{ needs.release-metadata.outputs.version }}")
+    const buildsCodexPluginComponents = workflow.includes("name: Build Codex plugin components")
+    const publishesLazycodexAlias = workflow.includes("name: Publish lazycodex-ai")
+    const exportsHookBuildReleaseVersion = workflow.includes("LAZYCODEX_RELEASE_VERSION:")
 
     // #then
-    expect(exportsReleaseVersionForHookBuild, "lazycodex npm build must pass the release version into hook status message generation").toBe(true)
+    expect(buildsCodexPluginComponents, "fork publish workflow must not build Codex plugin components").toBe(false)
+    expect(publishesLazycodexAlias, "fork publish workflow must not publish the lazycodex-ai alias").toBe(false)
+    expect(exportsHookBuildReleaseVersion, "fork publish workflow must not stamp lazycodex hook status messages").toBe(false)
   })
 
-  test("stamps hook status messages with the release version before syncing the LazyCodex repository", () => {
+  test("fork publish workflow omits the LazyCodex marketplace sync step", () => {
     // #given
     const workflow = readFileSync(publishWorkflowPath, "utf8")
-    const syncStep = sliceWorkflowSection(
-      workflow,
-      "      - name: Sync LazyCodex Codex marketplace",
-      "      - name: Resolve LazyCodex release payload",
-    )
 
     // #when
-    const exportsReleaseVersionForRepoSync = syncStep.includes("LAZYCODEX_RELEASE_VERSION: ${{ needs.release-metadata.outputs.version }}")
+    const syncsLazycodexMarketplace = workflow.includes("name: Sync LazyCodex Codex marketplace")
+    const targetsLazycodexRepository = workflow.includes("code-yeongyu/lazycodex")
 
     // #then
-    expect(exportsReleaseVersionForRepoSync, "lazycodex repository sync must pass the release version into copied plugin metadata").toBe(true)
+    expect(syncsLazycodexMarketplace, "fork publish workflow must not sync the LazyCodex Codex marketplace").toBe(false)
+    expect(targetsLazycodexRepository, "fork publish workflow must not push to the upstream lazycodex repository").toBe(false)
   })
 })

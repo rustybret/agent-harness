@@ -43,28 +43,34 @@ describe("root npm payload containment", () => {
   })
 })
 
-describe("lazycodex-ai publish payload containment", () => {
-  test("#given publish workflow files override #when hygiene negations are checked #then the rewritten files list carries the same exclusions", () => {
+describe("fork publish payload containment", () => {
+  test("#given fork publish workflow #when a lazycodex files override is checked #then none is present", () => {
     // given
+    // The upstream publish workflow rewrote package.json .files into a lazycodex-ai
+    // payload. This fork does not publish the lazycodex-ai alias (AGENTS.md FORK
+    // SCOPE), so the root files allowlist is the single source of truth and no
+    // per-publish override line exists to drift from it.
     const workflow = readFileSync(publishWorkflowUrl, "utf8")
-    const overrideLine = workflow.split("\n").find((line) => line.includes('.files = ['))
 
-    // when / then
-    expect(overrideLine).toBeDefined()
-    expect(overrideLine).toContain('"!packages/omo-codex/plugin/node_modules"')
-    expect(overrideLine).toContain('"!packages/omo-codex/plugin/**/node_modules"')
-    expect(overrideLine).toContain('"!packages/omo-codex/plugin/components/workflow-selector"')
-    expect(overrideLine).not.toContain("packages/omo-senpi")
+    // when
+    const overrideLine = workflow.split("\n").find((line) => line.includes(".files = ["))
+
+    // then
+    expect(overrideLine, "fork publish workflow must not rewrite package.json .files for a lazycodex payload").toBeUndefined()
   })
 
-  test("#given publish workflow #when payload guards are checked #then verify-npm-payload runs before both npm publish paths", () => {
+  test("#given fork publish workflow #when npm publish paths are checked #then only the wrapper packages publish", () => {
     // given
     const workflow = readFileSync(publishWorkflowUrl, "utf8")
 
     // when
-    const guardCount = workflow.split("script/verify-npm-payload.mjs").length - 1
+    const publishesOpencodeWrapper = workflow.includes("name: Publish oh-my-opencode")
+    const publishesOpenagentWrapper = workflow.includes("name: Publish oh-my-openagent")
+    const publishesLazycodexAlias = workflow.includes("name: Publish lazycodex-ai")
 
     // then
-    expect(guardCount).toBeGreaterThanOrEqual(2)
+    expect(publishesOpencodeWrapper, "fork publish workflow must still publish oh-my-opencode").toBe(true)
+    expect(publishesOpenagentWrapper, "fork publish workflow must still publish oh-my-openagent").toBe(true)
+    expect(publishesLazycodexAlias, "fork publish workflow must not publish the lazycodex-ai npm alias").toBe(false)
   })
 })

@@ -69,13 +69,16 @@ describe("node-target CLI build (lazycodex#47)", () => {
     expect(report.summary?.total).toBeGreaterThan(0)
   }, 120_000)
 
-  test("the main build chain and the lazycodex-ai payload carry the node CLI", () => {
+  test("the main build chain carries the node CLI and the fork publish workflow ships no lazycodex payload", () => {
     // #given
     const buildOrchestrator = readFileSync(new URL("./build.ts", import.meta.url), "utf8")
     const workflow = readFileSync(publishWorkflowPath, "utf8")
 
     // #then
     expect(buildOrchestrator, "the build orchestrator must produce dist/cli-node").toContain("build:cli-node")
-    expect(workflow, "lazycodex-ai files list must ship dist/cli-node").toContain('"dist/cli-node"')
+    expect(
+      workflow.includes('.name = "lazycodex-ai"'),
+      "this fork's publish workflow must not carry a lazycodex-ai payload rewrite (AGENTS.md FORK SCOPE)",
+    ).toBe(false)
   })
 })

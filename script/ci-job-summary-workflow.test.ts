@@ -34,7 +34,6 @@ const workflowExpectations = [
       "preflight-trust",
       "release-metadata",
       "prepare-release-state",
-      "dispatch-provenance-safe-publish",
       "publish-main",
       "release",
     ],

@@ -18,7 +18,7 @@ describe("CI typecheck workflow", () => {
   test("#given root typecheck includes script tooling #when CI typecheck job is inspected #then script tooling is not rerun as a duplicate step", () => {
     // given
     const workflow = readFileSync(ciWorkflowPath, "utf8")
-    const typecheckJob = sliceWorkflowSection(workflow, "  typecheck:", "  codex-compatibility:")
+    const typecheckJob = sliceWorkflowSection(workflow, "  typecheck:", "  build:")
 
     // when
     const rootTypecheckStepCount = (typecheckJob.match(/run: bun run typecheck$/gm) ?? []).length

@@ -14,80 +14,36 @@ function sliceWorkflowSection(workflow: string, startMarker: string, endMarker: 
   return workflow.slice(start, end)
 }
 
-describe("LazyCodex marketplace sync workflow", () => {
-  test("builds bundled MCP dists before the release marketplace sync builds the Codex plugin", () => {
+describe("LazyCodex marketplace sync workflow (fork policy)", () => {
+  test("fork publish workflow does not sync the Codex marketplace or build the Codex plugin", () => {
     // #given
+    // AGENTS.md FORK SCOPE drops Codex marketplace sync entirely: no lazycodex
+    // repository push, no aggregate Codex plugin build. The sync script and the
+    // Codex plugin build must not appear in the maintained release path.
     const workflow = readFileSync(publishWorkflowPath, "utf8")
-    const syncStep = sliceWorkflowSection(
-      workflow,
-      "      - name: Sync LazyCodex Codex marketplace",
-      "      - name: Resolve LazyCodex release payload",
-    )
 
     // #when
-    const gitBashBuildIndex = syncStep.indexOf("bun run build:git-bash-mcp")
-    const lspBuildIndex = syncStep.indexOf("bun run build:lsp-tools-mcp")
-    const lspDaemonBuildIndex = syncStep.indexOf("bun run build:lsp-daemon")
-    const rootCliBuildIndex = syncStep.indexOf("bun build packages/omo-opencode/src/cli/index.ts --outdir dist/cli --target bun --format esm")
-    const nodeCliBuildIndex = syncStep.indexOf("bun run build:cli-node")
-    const codexPluginBuildIndex = syncStep.indexOf("bun run --cwd packages/omo-codex/plugin build")
-    const syncScriptIndex = syncStep.indexOf("bun run script/sync-lazycodex-marketplace.ts")
-    const buildsMcpDistsBeforeCodexPlugin =
-      gitBashBuildIndex >= 0 &&
-      lspBuildIndex >= 0 &&
-      lspDaemonBuildIndex >= 0 &&
-      codexPluginBuildIndex >= 0 &&
-      gitBashBuildIndex < codexPluginBuildIndex &&
-      lspBuildIndex < codexPluginBuildIndex &&
-      lspDaemonBuildIndex < codexPluginBuildIndex
-    const buildsCodexPluginBeforeMarketplaceSync =
-      codexPluginBuildIndex >= 0 && syncScriptIndex > codexPluginBuildIndex
-    const buildsRootCliBeforeMarketplaceSync =
-      rootCliBuildIndex >= 0 && nodeCliBuildIndex > rootCliBuildIndex && syncScriptIndex > nodeCliBuildIndex
+    const syncsMarketplace = workflow.includes("bun run script/sync-lazycodex-marketplace.ts")
+    const buildsCodexPlugin = workflow.includes("bun run --cwd packages/omo-codex/plugin build")
+    const hasSyncStep = workflow.includes("name: Sync LazyCodex Codex marketplace")
 
     // #then
-    expect(
-      buildsMcpDistsBeforeCodexPlugin,
-      "release marketplace sync must build bundled MCP dists before the Codex plugin build consumes them",
-    ).toBe(true)
-    expect(buildsCodexPluginBeforeMarketplaceSync, "release marketplace sync must build the Codex plugin before copying it").toBe(true)
-    expect(buildsRootCliBeforeMarketplaceSync, "release marketplace sync must build root omo CLI dists before copying it").toBe(true)
+    expect(syncsMarketplace, "fork release must not run the LazyCodex marketplace sync script").toBe(false)
+    expect(buildsCodexPlugin, "fork release must not build the aggregate Codex plugin for marketplace sync").toBe(false)
+    expect(hasSyncStep, "fork release must not expose a LazyCodex marketplace sync step").toBe(false)
   })
 
-  test("uses the vendored LSP tools package directly during release marketplace sync", () => {
+  test("fork publish-main still builds the vendored LSP dists it actually ships", () => {
     // #given
     const workflow = readFileSync(publishWorkflowPath, "utf8")
-    const syncStep = sliceWorkflowSection(
-      workflow,
-      "      - name: Sync LazyCodex Codex marketplace",
-      "      - name: Resolve LazyCodex release payload",
-    )
+    const publishMainJob = sliceWorkflowSection(workflow, "  publish-main:", "  release:")
 
     // #when
-    const gitBashBuildIndex = syncStep.indexOf("bun run build:git-bash-mcp")
-    const lspBuildIndex = syncStep.indexOf("bun run build:lsp-tools-mcp")
-    const lspDaemonBuildIndex = syncStep.indexOf("bun run build:lsp-daemon")
+    const buildsLspToolsMcp = publishMainJob.includes("bun run build:lsp-tools-mcp")
+    const buildsLspDaemon = publishMainJob.includes("bun run build:lsp-daemon")
 
     // #then
-    expect(syncStep).not.toContain("git submodule")
-    expect(gitBashBuildIndex, "release marketplace sync must build the vendored Git Bash MCP package").toBeGreaterThanOrEqual(0)
-    expect(lspBuildIndex, "release marketplace sync must build the vendored LSP package").toBeGreaterThanOrEqual(0)
-    expect(lspDaemonBuildIndex, "release marketplace sync must build the vendored LSP daemon package").toBeGreaterThanOrEqual(0)
-  })
-
-  test("stages generated LazyCodex repository workflow changes", () => {
-    // #given
-    const workflow = readFileSync(publishWorkflowPath, "utf8")
-    const syncStep = sliceWorkflowSection(
-      workflow,
-      "      - name: Sync LazyCodex Codex marketplace",
-      "      - name: Resolve LazyCodex release payload",
-    )
-
-    // #when
-    const stagesWorkflow = syncStep.includes("git add .agents/plugins/marketplace.json .github/workflows/pr-source-guidance.yml plugins/omo")
-
-    // #then
-    expect(stagesWorkflow, "release marketplace sync must stage generated LazyCodex repository workflow changes").toBe(true)
+    expect(buildsLspToolsMcp, "publish-main must build the vendored LSP tools MCP dist it ships").toBe(true)
+    expect(buildsLspDaemon, "publish-main must build the vendored LSP daemon dist it ships").toBe(true)
   })
 })
