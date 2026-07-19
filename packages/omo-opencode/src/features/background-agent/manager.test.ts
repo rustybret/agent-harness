@@ -256,6 +256,9 @@ function createRuntimeFallbackAbortDeps(client: unknown): HookDeps {
     sessionFallbackTimeouts: new Map(),
     sessionStatusRetryKeys: new Map(),
     internallyAbortedSessions: new Set(),
+    internalAbortSources: new Map(),
+    internalAbortResumeAttempts: new Map(),
+    internalAbortBudgetExhaustedMessages: new Map(),
   }
 }
 
@@ -6122,6 +6125,55 @@ describe("BackgroundManager.handleEvent - session.error", () => {
     expect(concurrencyManager.getCount(concurrencyKey)).toBe(1)
     expect(getPendingByParent(manager).get(task.parentSessionId)?.has(task.id)).toBe(true)
     expect(getCompletionTimers(manager).has(task.id)).toBe(false)
+
+    manager.shutdown()
+  })
+
+  test("internal abort resume budget exhausted finalizes internally-aborted running task with budget message", async () => {
+    //#given
+    const client = {
+      session: {
+        prompt: async () => ({}),
+        promptAsync: async () => ({}),
+        abort: async () => ({}),
+      },
+    }
+    const deps = createRuntimeFallbackAbortDeps(client)
+    const manager = new BackgroundManager({
+      pluginContext: createPluginInput(client),
+      runtimeFallbackAbortRegistry: deps,
+    })
+    mockVerifySessionExists(manager, false)
+    const task = createMockTask({
+      id: "task-internal-abort-budget-exhausted",
+      sessionId: "ses-internal-abort-budget-exhausted",
+      parentSessionId: "parent-session",
+      parentMessageId: "msg-internal-abort-budget",
+      description: "task exhausting runtime fallback retry budget",
+      agent: "explore",
+      status: "running",
+    })
+    getTaskMap(manager).set(task.id, task)
+    deps.internalAbortResumeAttempts.set(task.sessionId, 2)
+    markInternalAbortSession(deps, task.sessionId, BACKGROUND_QUOTA_WATCHDOG_ABORT_SOURCE)
+
+    //#when
+    manager.handleEvent({
+      type: "session.error",
+      properties: {
+        sessionID: task.sessionId,
+        error: {
+          name: "MessageAbortedError",
+          message: "Request aborted by runtime fallback",
+        },
+      },
+    })
+
+    await flushBackgroundNotifications()
+
+    //#then
+    expect(task.status).toBe("error")
+    expect(task.error).toContain("resume budget exhausted (2)")
 
     manager.shutdown()
   })

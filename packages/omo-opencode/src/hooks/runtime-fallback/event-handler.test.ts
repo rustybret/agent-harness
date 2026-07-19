@@ -1,6 +1,7 @@
 import { describe, expect, it } from "bun:test"
 import type { HookDeps, RuntimeFallbackPluginInput } from "./types"
 import type { AutoRetryHelpers } from "./auto-retry"
+import { BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE } from "./auto-retry-abort"
 import { createFallbackState } from "./fallback-state"
 import { createEventHandler } from "./event-handler"
 
@@ -41,6 +42,9 @@ function createDeps(): HookDeps {
     sessionFallbackTimeouts: new Map(),
     sessionStatusRetryKeys: new Map(),
     internallyAbortedSessions: new Set(),
+    internalAbortSources: new Map(),
+    internalAbortResumeAttempts: new Map(),
+    internalAbortBudgetExhaustedMessages: new Map(),
   }
 }
 
@@ -105,6 +109,24 @@ describe("createEventHandler", () => {
     expect(clearCalls).toEqual([sessionID])
     expect(abortCalls).toEqual([])
     expect(state.pendingFallbackModel).toBe(undefined)
+  })
+
+  it("#given internal abort resume budget state #when a genuine session.idle completion fires #then the internal abort resume budget is reset", async () => {
+    const sessionID = "session-idle-resets-internal-abort-resume-budget"
+    const deps = createDeps()
+    const abortCalls: string[] = []
+    const clearCalls: string[] = []
+    deps.internalAbortResumeAttempts.set(sessionID, 2)
+    deps.internalAbortSources.set(sessionID, BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE)
+    deps.internalAbortBudgetExhaustedMessages.set(sessionID, "resume budget exhausted (2) — internal interruptions kept recurring")
+    const handler = createEventHandler(deps, createHelpers(deps, abortCalls, clearCalls))
+
+    await handler({ event: { type: "session.idle", properties: { sessionID } } })
+
+    expect(deps.internalAbortResumeAttempts.has(sessionID)).toBe(false)
+    expect(deps.internalAbortSources.has(sessionID)).toBe(false)
+    expect(deps.internalAbortBudgetExhaustedMessages.has(sessionID)).toBe(false)
+    expect(abortCalls).toEqual([])
   })
 
   it("#given a cancelled session #when session.error receives an abort error #then fallback retry state is reset", async () => {

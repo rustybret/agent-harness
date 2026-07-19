@@ -8,6 +8,7 @@ import {
 } from "../../hooks/shared/prompt-async-gate"
 import {
   BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE,
+  getInternalAbortResumeBudgetExhaustedMessage,
   markInternalAbortSession,
 } from "../../hooks/runtime-fallback/auto-retry-abort"
 import type { InternalAbortSessionRegistry } from "../../hooks/runtime-fallback/types"
@@ -314,6 +315,9 @@ export class BackgroundManager {
     this.runtimeFallbackAbortRegistry = options?.runtimeFallbackAbortRegistry ?? {
       internallyAbortedSessions: new Set(),
       sessionLastAccess: new Map(),
+      internalAbortSources: new Map(),
+      internalAbortResumeAttempts: new Map(),
+      internalAbortBudgetExhaustedMessages: new Map(),
     }
     this.logger = options?.log ?? log
     this.parentWakeNotifier = new ParentWakeNotifier(
@@ -2092,11 +2096,15 @@ The fallback retry session is now created and can be inspected directly.
       return
     }
 
-    if (await this.tryFallbackRetry(task, errorInfo, "session.error")) {
+    const budgetExhaustedMessage = task.sessionId && isAbortError(errorInfo)
+      ? getInternalAbortResumeBudgetExhaustedMessage(this.runtimeFallbackAbortRegistry, task.sessionId)
+      : undefined
+
+    if (!budgetExhaustedMessage && await this.tryFallbackRetry(task, errorInfo, "session.error")) {
       return
     }
 
-    const errorMsg = errorMessage ?? "Session error"
+    const errorMsg = budgetExhaustedMessage ?? errorMessage ?? "Session error"
     const canRetry =
       shouldRetryError(errorInfo) &&
       !!task.fallbackChain &&

@@ -57,6 +57,9 @@ export function createRuntimeFallbackHook(
     sessionFallbackTimeouts: new Map(),
     sessionStatusRetryKeys: new Map(),
     internallyAbortedSessions: options?.internalAbortRegistry?.internallyAbortedSessions ?? new Set(),
+    internalAbortSources: options?.internalAbortRegistry?.internalAbortSources ?? new Map(),
+    internalAbortResumeAttempts: options?.internalAbortRegistry?.internalAbortResumeAttempts ?? new Map(),
+    internalAbortBudgetExhaustedMessages: options?.internalAbortRegistry?.internalAbortBudgetExhaustedMessages ?? new Map(),
   }
 
   const helpers = factories.createAutoRetryHelpers(deps)
@@ -113,6 +116,9 @@ export function createRuntimeFallbackHook(
     deps.sessionFallbackTimeouts.clear()
     deps.sessionStatusRetryKeys.clear()
     deps.internallyAbortedSessions.clear()
+    deps.internalAbortSources.clear()
+    deps.internalAbortResumeAttempts.clear()
+    deps.internalAbortBudgetExhaustedMessages.clear()
   }
 
   return {

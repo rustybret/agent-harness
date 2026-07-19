@@ -12,6 +12,7 @@ import { dispatchFallbackRetry } from "./fallback-retry-dispatcher"
 import { createSessionStatusHandler } from "./session-status-handler"
 import { resolveMessageEventSessionID, resolveSessionEventID } from "../../shared/event-session-id"
 import { normalizeModelToCanonicalString } from "./normalize-model"
+import { resetInternalAbortResumeBudget } from "./auto-retry-abort"
 
 function isRuntimeFallbackRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null
@@ -63,6 +64,7 @@ export function createEventHandler(deps: HookDeps, helpers: AutoRetryHelpers) {
     sessionRetryInFlight.delete(sessionID)
     sessionAwaitingFallbackResult.delete(sessionID)
     deps.internallyAbortedSessions.delete(sessionID)
+    resetInternalAbortResumeBudget(deps, sessionID)
     sessionStatusRetryKeys.delete(sessionID)
     helpers.clearSessionFallbackTimeout(sessionID)
   }
@@ -107,6 +109,7 @@ export function createEventHandler(deps: HookDeps, helpers: AutoRetryHelpers) {
       sessionRetryInFlight.delete(sessionID)
       sessionAwaitingFallbackResult.delete(sessionID)
       deps.internallyAbortedSessions.delete(sessionID)
+      resetInternalAbortResumeBudget(deps, sessionID)
       helpers.clearSessionFallbackTimeout(sessionID)
       sessionStatusRetryKeys.delete(sessionID)
       SessionCategoryRegistry.remove(sessionID)
@@ -155,6 +158,7 @@ export function createEventHandler(deps: HookDeps, helpers: AutoRetryHelpers) {
     helpers.clearSessionFallbackTimeout(sessionID)
     sessionRetryInFlight.delete(sessionID)
     sessionStatusRetryKeys.delete(sessionID)
+    resetInternalAbortResumeBudget(deps, sessionID)
 
     const state = sessionStates.get(sessionID)
     if (state?.pendingFallbackModel) {

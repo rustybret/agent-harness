@@ -81,6 +81,9 @@ export interface RuntimeFallbackHook {
 export interface InternalAbortSessionRegistry {
   internallyAbortedSessions: Set<string>
   sessionLastAccess: Map<string, number>
+  internalAbortSources: Map<string, string>
+  internalAbortResumeAttempts: Map<string, number>
+  internalAbortBudgetExhaustedMessages: Map<string, string>
 }
 
 export interface HookDeps extends InternalAbortSessionRegistry {

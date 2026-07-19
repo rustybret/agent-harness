@@ -112,6 +112,9 @@ function createDeps(pluginConfig: HookDeps["pluginConfig"] = undefined): HookDep
     sessionFallbackTimeouts: new Map(),
     sessionStatusRetryKeys: new Map(),
     internallyAbortedSessions: new Set(),
+    internalAbortSources: new Map(),
+    internalAbortResumeAttempts: new Map(),
+    internalAbortBudgetExhaustedMessages: new Map(),
   }
 }
 

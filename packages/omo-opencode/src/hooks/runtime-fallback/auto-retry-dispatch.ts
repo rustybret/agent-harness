@@ -12,6 +12,7 @@ import {
 } from "../shared/prompt-async-gate"
 import { isAmbiguousPostDispatchPromptFailure } from "../../shared/prompt-failure-classifier"
 import { resolveOriginalUserRetryMetadata } from "./auto-retry-metadata"
+import { recordInternalAbortRedispatch } from "./auto-retry-abort"
 
 export function createAutoRetryDispatcher(
   deps: HookDeps,
@@ -201,6 +202,9 @@ export function createAutoRetryDispatcher(
       const state = sessionStates.get(sessionID)
       if (state) {
         state.pendingFallbackPromptMayHaveBeenAccepted = false
+      }
+      if (wasInternallyAborted) {
+        recordInternalAbortRedispatch(deps, sessionID)
       }
       retryDispatched = true
       return { accepted: true, status: acceptedStatus }

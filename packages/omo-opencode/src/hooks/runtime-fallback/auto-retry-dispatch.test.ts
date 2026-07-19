@@ -2,6 +2,11 @@ import { afterEach, describe, expect, test } from "bun:test"
 
 import { DEFAULT_PROMPT_QUEUE_RETRY_MS, releaseAllPromptAsyncReservationsForTesting } from "../../shared/prompt-async-gate"
 import { setPromptReservation } from "../../shared/prompt-async-gate/reservations"
+import {
+  BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE,
+  getInternalAbortResumeBudgetExhaustedMessage,
+  markInternalAbortSession,
+} from "./auto-retry-abort"
 import { createAutoRetryHelpers } from "./auto-retry"
 import { createFallbackState } from "./fallback-state"
 import { installRuntimeFallbackTestClock, restoreRuntimeFallbackTestClock } from "./test-timeout-clock.test-support"
@@ -56,6 +61,9 @@ function createDeps(promptCalls: { count: number }): HookDeps {
     sessionFallbackTimeouts: new Map(),
     sessionStatusRetryKeys: new Map(),
     internallyAbortedSessions: new Set(),
+    internalAbortSources: new Map(),
+    internalAbortResumeAttempts: new Map(),
+    internalAbortBudgetExhaustedMessages: new Map(),
   }
 }
 
@@ -244,5 +252,54 @@ describe("createAutoRetryDispatcher reserved-session retry (#5109)", () => {
 
     // then
     expect(promptCalls.count).toBe(0)
+  })
+})
+
+describe("createAutoRetryDispatcher internal abort resume budget", () => {
+  afterEach(() => {
+    releaseAllPromptAsyncReservationsForTesting()
+    restoreRuntimeFallbackTestClock()
+  })
+
+  test("#given repeated background internal aborts for one session #when two internal abort re-dispatches have already run #then the third background abort is left terminal with a budget message", async () => {
+    // given
+    const promptCalls = { count: 0 }
+    const deps = createDeps(promptCalls)
+    const helpers = createAutoRetryHelpers(deps)
+    const sessionID = "session-internal-abort-resume-budget"
+    const state = createFallbackState("openai/gpt-5.5")
+    state.pendingFallbackModel = "anthropic/claude-opus-4-8"
+    deps.sessionStates.set(sessionID, state)
+
+    expect(markInternalAbortSession(deps, sessionID, BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE)).toBe(true)
+    await helpers.autoRetryWithFallback(sessionID, "anthropic/claude-opus-4-8", undefined, "session.status")
+    releaseAllPromptAsyncReservationsForTesting()
+
+    expect(markInternalAbortSession(deps, sessionID, BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE)).toBe(true)
+    await helpers.autoRetryWithFallback(sessionID, "anthropic/claude-opus-4-8", undefined, "session.status")
+    releaseAllPromptAsyncReservationsForTesting()
+
+    const thirdMark = markInternalAbortSession(deps, sessionID, BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE)
+
+    // then
+    expect(promptCalls.count).toBe(2)
+    expect(thirdMark).toBe(false)
+    expect(deps.internallyAbortedSessions.has(sessionID)).toBe(false)
+    expect(getInternalAbortResumeBudgetExhaustedMessage(deps, sessionID)).toContain("resume budget exhausted (2)")
+  })
+
+  test("#given a model-fallback internal abort source #when background internal abort resume budget is exhausted #then model fallback marking is still allowed", () => {
+    // given
+    const promptCalls = { count: 0 }
+    const deps = createDeps(promptCalls)
+    const sessionID = "session-model-fallback-not-budgeted"
+    deps.internalAbortResumeAttempts.set(sessionID, 2)
+
+    // when
+    const marked = markInternalAbortSession(deps, sessionID, "session.status.retry-signal")
+
+    // then
+    expect(marked).toBe(true)
+    expect(deps.internallyAbortedSessions.has(sessionID)).toBe(true)
   })
 })

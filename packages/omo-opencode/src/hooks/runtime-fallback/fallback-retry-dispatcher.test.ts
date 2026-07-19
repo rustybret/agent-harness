@@ -45,6 +45,9 @@ function createDeps(toastMessages: string[]): HookDeps {
     sessionFallbackTimeouts: new Map(),
     sessionStatusRetryKeys: new Map(),
     internallyAbortedSessions: new Set(),
+    internalAbortSources: new Map(),
+    internalAbortResumeAttempts: new Map(),
+    internalAbortBudgetExhaustedMessages: new Map(),
   }
 }
 
