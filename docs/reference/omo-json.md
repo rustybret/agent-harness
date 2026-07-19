@@ -1,6 +1,6 @@
 # omo.json Configuration Reference
 
-`omo.json` (or `omo.jsonc`) is the harness-neutral configuration surface owned by [`@oh-my-opencode/omo-config-core`](../../packages/omo-config-core/AGENTS.md). Today it is read by the Senpi adapter's `task` component only; the schema, loader, and writer are shared code so other harnesses can adopt it later (see [Coexistence](#coexistence-omojson-vs-oh-my-openagentjson) and [`ROADMAP.md`](../../ROADMAP.md)).
+`omo.json` (or `omo.jsonc`) is the harness-neutral configuration surface owned by [`@oh-my-opencode/omo-config-core`](../../packages/omo-config-core/AGENTS.md). Today it is read by the Senpi adapter's `task` component only; the schema, loader, and writer are shared code so other harnesses can adopt it later (see [Coexistence](#coexistence-omojson-vs-oh-my-openagentjson)).
 
 Files may be JSONC: `//` comments and trailing commas are allowed. Every schema object is `.strict()`, so unknown keys are rejected and reported as a diagnostic rather than silently ignored.
 
@@ -215,7 +215,7 @@ Each member shares a base (`name` matching `^[a-z0-9-]+$`, optional `cwd`, `work
 
 There is no automatic migration or field bridging between the two. When a project contains BOTH an OpenCode-family config and an `omo.json` that contributed `categories`/`agents`, the Senpi task component emits a one-time warning on first session start noting that senpi reads `omo.json` only and ignores the OpenCode config for tasks (`packages/omo-senpi/src/components/task/coexistence.ts`).
 
-This is deliberate: `omo.json` landed **senpi-first**. Adopting it in the OpenCode edition, and any migration path from `oh-my-openagent.json`, is a later phase tracked in [`ROADMAP.md`](../../ROADMAP.md).
+This is deliberate: `omo.json` landed **senpi-first**. Adopting it in the OpenCode edition, and any migration path from `oh-my-openagent.json`, is a later phase.
 
 ## Follow-ups
 

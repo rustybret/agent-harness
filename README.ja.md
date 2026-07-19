@@ -11,7 +11,7 @@
 > [!NOTE]
 > **マルチハーネスエージェントOSへのリファクタリング進行中**
 >
-> OpenCode、Codex、Piなどの複数エージェントハーネスをサポートするため、コードベースを再構成しています。貢献に興味がある方は、まず[ROADMAP](./ROADMAP.md)をご確認ください。ROADMAP関連のPRには`ROADMAP`ラベルを付けてください。
+> OpenCode、Codex、Piなどの複数エージェントハーネスをサポートするため、コードベースを再構成しています。
 
 > [!TIP]
 > **Building in Public**

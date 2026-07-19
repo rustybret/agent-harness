@@ -4,7 +4,7 @@
 
 ## OVERVIEW
 
-Harness-neutral primitives for the `omo.json` config surface: a Zod v4 schema tree, a walked multi-layer loader, and a comment-preserving atomic writer. Pure logic with all IO injected through a filesystem port. No OpenCode, Codex, Senpi, Pi, or adapter imports (guarded by `script/shared-core-extraction-guard.test.ts`). Package: `@oh-my-opencode/omo-config-core` (private, `sideEffects: false`). Consumed first by the Senpi adapter (`packages/omo-senpi`); the OpenCode migration onto this core is a later phase (see [`ROADMAP.md`](../../ROADMAP.md)).
+Harness-neutral primitives for the `omo.json` config surface: a Zod v4 schema tree, a walked multi-layer loader, and a comment-preserving atomic writer. Pure logic with all IO injected through a filesystem port. No OpenCode, Codex, Senpi, Pi, or adapter imports (guarded by `script/shared-core-extraction-guard.test.ts`). Package: `@oh-my-opencode/omo-config-core` (private, `sideEffects: false`). Consumed first by the Senpi adapter (`packages/omo-senpi`); the OpenCode migration onto this core is a later phase.
 
 ## ANATOMY
 

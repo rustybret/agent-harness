@@ -11,7 +11,7 @@
 > [!NOTE]
 > **正在进行多 Harness 代理操作系统重构**
 >
-> 我们正在重构代码库以支持多个代理 harness（OpenCode、Codex、Pi 等）。如果您有兴趣贡献，请先阅读 [ROADMAP](./ROADMAP.md)。与 ROADMAP 相关的 PR 请使用 `ROADMAP` 标签。
+> 我们正在重构代码库以支持多个代理 harness（OpenCode、Codex、Pi 等）。
 
 > [!TIP]
 > **Building in Public**
@@ -148,8 +148,6 @@ Read this and tell me why it's not just another boilerplate: https://raw.githubu
 ## 路线图
 
 我们正在重构代码库以支持多个代理 harness（OpenCode、Codex、Pi、Claude Code 等）。当前最紧迫的任务是包分层重构：将纯 TypeScript 核心逻辑、MCP 服务器、技能和适配器 shim 分离到不同的层，以便跨 harness 复用而不产生重复。
-
-如果你有兴趣贡献，请先阅读 [ROADMAP](./ROADMAP.md)。与此重构相关的 PR 请使用 `ROADMAP` 标签，以便我们追踪。
 
 
 ## 核心亮点

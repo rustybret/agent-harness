@@ -8823,10 +8823,17 @@ function shouldCopyPluginPath(path, root) {
   const parts = relative4.split(sep5);
   if (parts.some((part) => part === ".git" || part === "node_modules"))
     return false;
-  return !isNestedComponentMcpManifest(parts);
+  if (isNestedComponentMcpManifest(parts))
+    return false;
+  return !isNestedReferenceSkillManifest(parts);
 }
 function isNestedComponentMcpManifest(parts) {
   return parts.length > 1 && parts.at(-1) === ".mcp.json";
+}
+function isNestedReferenceSkillManifest(parts) {
+  if (parts.at(-1) !== "SKILL.md")
+    return false;
+  return parts.includes("references");
 }
 var removedSparkshellReferencePattern = /\b(?:sparkshell|spark[-_\s]+shell)\b/i;
 var removedSparkshellPromptSurfaceDirs = new Set([".codex-plugin", "agents", "bundled-rules", "hooks", "skills"]);
