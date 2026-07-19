@@ -410,6 +410,37 @@ describe("BackgroundManager internal abort source routing", () => {
 
     // then
     expect(deps.internallyAbortedSessions.has("child-session-cancel")).toBe(false)
+    expect(deps.internalAbortSources.has("child-session-cancel")).toBe(false)
+  })
+
+  test("#given runtime-fallback tracking is active #when manager shutdown aborts running tasks #then shutdown remains an external abort", async () => {
+    // given
+    const client = {
+      session: {
+        prompt: async () => ({}),
+        promptAsync: async () => ({}),
+        abort: mock(() => Promise.resolve({})),
+      },
+    }
+    const deps = createRuntimeFallbackAbortDeps(client)
+    const manager = new BackgroundManager({
+      pluginContext: createPluginInput(client),
+      runtimeFallbackAbortRegistry: deps,
+    })
+    const task = createMockTask({
+      id: "task-shutdown-external-abort",
+      parentSessionId: "parent-session",
+      sessionId: "child-session-shutdown",
+    })
+    getTaskMap(manager).set(task.id, task)
+
+    // when
+    await manager.shutdown()
+
+    // then
+    expect(client.session.abort).toHaveBeenCalled()
+    expect(deps.internallyAbortedSessions.has("child-session-shutdown")).toBe(false)
+    expect(deps.internalAbortSources.has("child-session-shutdown")).toBe(false)
   })
 })
 

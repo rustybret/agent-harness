@@ -175,6 +175,7 @@ describe("createAbortSessionRequest internal abort source tracking", () => {
       "cancelled during launch setup",
       "stale attempt binding cleanup",
       "task cancellation (background_cancel)",
+      "session.stop",
       "shutdown",
     ]
 

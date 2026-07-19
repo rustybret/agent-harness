@@ -187,7 +187,7 @@ export function createEventHandler(deps: HookDeps, helpers: AutoRetryHelpers) {
       // If we triggered this abort to swap in a fallback model, consume the
       // flag and preserve state — wiping attemptCount here is what causes
       // the infinite retry loop (issue #4006).
-      if (deps.internallyAbortedSessions.has(sessionID)) {
+      if (deps.internallyAbortedSessions.has(sessionID) && deps.internalAbortSources.has(sessionID)) {
         deps.internallyAbortedSessions.delete(sessionID)
         log(`[${HOOK_NAME}] session.error matched internal abort; preserving retry state`, { sessionID, resolvedAgent })
         return

@@ -199,7 +199,7 @@ describe("createAutoRetryDispatcher reserved-session retry (#5109)", () => {
     const promptCalls = { count: 0 }
     const deps = createDeps(promptCalls)
     const sessionID = "session-internally-aborted-dangling-assistant"
-    deps.internallyAbortedSessions.add(sessionID)
+    expect(markInternalAbortSession(deps, sessionID, "session.status.retry-signal")).toBe(true)
     deps.ctx.client.session.messages = async () => ({
       data: [
         {
@@ -252,6 +252,37 @@ describe("createAutoRetryDispatcher reserved-session retry (#5109)", () => {
 
     // then
     expect(promptCalls.count).toBe(0)
+  })
+
+  test("#given a stale internal-abort marker without an allowlisted source #when auto retry sees an active assistant #then it does not bypass the active-turn dispatch guard", async () => {
+    // given
+    const promptCalls = { count: 0 }
+    const deps = createDeps(promptCalls)
+    const sessionID = "session-stale-internal-marker-no-source"
+    deps.internallyAbortedSessions.add(sessionID)
+    deps.ctx.client.session.messages = async () => ({
+      data: [
+        {
+          info: { role: "user" },
+          parts: [{ type: "text", text: "retry this" }],
+        },
+        {
+          info: { role: "assistant" },
+          parts: [{ type: "reasoning", text: "cancelled stream is still active" }],
+        },
+      ],
+    })
+    const helpers = createAutoRetryHelpers(deps)
+    const state = createFallbackState("openai/gpt-5.5")
+    state.pendingFallbackModel = "anthropic/claude-opus-4-8"
+    deps.sessionStates.set(sessionID, state)
+
+    // when
+    await helpers.autoRetryWithFallback(sessionID, "anthropic/claude-opus-4-8", undefined, "session.status")
+
+    // then
+    expect(promptCalls.count).toBe(0)
+    expect(deps.internalAbortResumeAttempts.has(sessionID)).toBe(false)
   })
 })
 
