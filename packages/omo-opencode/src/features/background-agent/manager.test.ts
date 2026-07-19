@@ -2519,6 +2519,101 @@ describe("BackgroundManager.tryCompleteTask", () => {
     expect(concurrencyManager.getCount(concurrencyKey)).toBe(0)
   })
 
+  test("tryCompleteTask active guard returns false without aborting active sessions", async () => {
+    // #given
+    const abort = mock(async () => ({}))
+    const client = {
+      session: {
+        prompt: async () => ({}),
+        promptAsync: async () => ({}),
+        abort,
+        messages: async () => ({ data: [] }),
+        status: async () => ({ data: { "session-active-guard": { type: "running" } } }),
+      },
+    }
+    const logSpy = spyOn(sharedModule, "log").mockImplementation(() => {})
+    manager.shutdown()
+    manager = new BackgroundManager({ pluginContext: createPluginInput(client) })
+    stubNotifyParentSession(manager)
+
+    const task: BackgroundTask = {
+      id: "task-active-guard",
+      sessionId: "session-active-guard",
+      parentSessionId: "session-parent",
+      parentMessageId: "msg-1",
+      description: "active task must not be completed",
+      prompt: "test",
+      agent: "explore",
+      status: "running",
+      startedAt: new Date(),
+    }
+
+    try {
+      // #when
+      const completed = await tryCompleteTaskForTest(manager, task)
+
+      // #then
+      expect(completed).toBe(false)
+      expect(task.status).toBe("running")
+      expect(abort).toHaveBeenCalledTimes(0)
+      expect(logSpy).toHaveBeenCalledWith(
+        "tryCompleteTask called on active session, skipping",
+        { taskId: "task-active-guard", sessionID: "session-active-guard", source: "test" },
+      )
+    } finally {
+      logSpy.mockRestore()
+    }
+  })
+
+  test("tryCompleteTask active guard still completes idle sessions and logs teardown abort", async () => {
+    // #given
+    const abortedSessionIDs: string[] = []
+    const client = {
+      session: {
+        prompt: async () => ({}),
+        promptAsync: async () => ({}),
+        abort: mock(async (args: { path: { id: string } }) => {
+          abortedSessionIDs.push(args.path.id)
+          return {}
+        }),
+        messages: async () => ({ data: [] }),
+        status: async () => ({ data: { "session-idle-guard": { type: "idle" } } }),
+      },
+    }
+    const logSpy = spyOn(sharedModule, "log").mockImplementation(() => {})
+    manager.shutdown()
+    manager = new BackgroundManager({ pluginContext: createPluginInput(client) })
+    stubNotifyParentSession(manager)
+
+    const task: BackgroundTask = {
+      id: "task-idle-guard",
+      sessionId: "session-idle-guard",
+      parentSessionId: "session-parent",
+      parentMessageId: "msg-1",
+      description: "idle task should complete",
+      prompt: "test",
+      agent: "explore",
+      status: "running",
+      startedAt: new Date(),
+    }
+
+    try {
+      // #when
+      const completed = await tryCompleteTaskForTest(manager, task)
+
+      // #then
+      expect(completed).toBe(true)
+      expect(task.status).toBe("completed")
+      expect(abortedSessionIDs).toEqual(["session-idle-guard"])
+      expect(logSpy).toHaveBeenCalledWith(
+        "[background-agent] teardown abort",
+        { sessionID: "session-idle-guard", source: "test" },
+      )
+    } finally {
+      logSpy.mockRestore()
+    }
+  })
+
    test("should abort session on completion", async () => {
      // #given
      const abortedSessionIDs: string[] = []

@@ -9,6 +9,7 @@ export function handleSessionIdleBackgroundEvent(args: {
   idleDeferralTimers: Map<string, ReturnType<typeof setTimeout>>
   validateSessionHasOutput: (sessionID: string) => Promise<boolean>
   checkSessionTodos: (sessionID: string) => Promise<boolean>
+  isOpenCodeSessionActive: (sessionID: string) => Promise<boolean>
   tryCompleteTask: (task: BackgroundTask, source: string) => Promise<boolean>
   emitIdleEvent: (sessionID: string) => void
 }): void {
@@ -18,6 +19,7 @@ export function handleSessionIdleBackgroundEvent(args: {
     idleDeferralTimers,
     validateSessionHasOutput,
     checkSessionTodos,
+    isOpenCodeSessionActive,
     tryCompleteTask,
     emitIdleEvent,
   } = args
@@ -85,6 +87,15 @@ export function handleSessionIdleBackgroundEvent(args: {
         log("[background-agent] Team member session went idle; skipping background auto-complete:", {
           taskId: task.id,
           teamRunId: task.teamRunId,
+        })
+        return
+      }
+
+      const sessionActive = await isOpenCodeSessionActive(sessionID)
+      if (sessionActive) {
+        log("[background-agent] session.idle but session still active, deferring", {
+          sessionID,
+          taskId: task.id,
         })
         return
       }

@@ -175,10 +175,6 @@
       "variants": []
     },
     {
-      "key": "google/antigravity-gemini-3.1-flash-image",
-      "variants": []
-    },
-    {
       "key": "google/antigravity-gemini-3.1-pro",
       "variants": [
         "high",

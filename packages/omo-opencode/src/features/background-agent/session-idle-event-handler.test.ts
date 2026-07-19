@@ -32,6 +32,7 @@ describe("handleSessionIdleBackgroundEvent", () => {
         idleDeferralTimers: new Map(),
         validateSessionHasOutput: () => Promise.resolve(true),
         checkSessionTodos: () => Promise.resolve(false),
+        isOpenCodeSessionActive: () => Promise.resolve(false),
         tryCompleteTask,
         emitIdleEvent: () => {},
       })
@@ -53,6 +54,7 @@ describe("handleSessionIdleBackgroundEvent", () => {
         idleDeferralTimers: new Map(),
         validateSessionHasOutput: () => Promise.resolve(true),
         checkSessionTodos: () => Promise.resolve(false),
+        isOpenCodeSessionActive: () => Promise.resolve(false),
         tryCompleteTask,
         emitIdleEvent: () => {},
       })
@@ -74,6 +76,7 @@ describe("handleSessionIdleBackgroundEvent", () => {
         idleDeferralTimers: new Map(),
         validateSessionHasOutput: () => Promise.resolve(true),
         checkSessionTodos: () => Promise.resolve(false),
+        isOpenCodeSessionActive: () => Promise.resolve(false),
         tryCompleteTask,
         emitIdleEvent: () => {},
       })
@@ -96,6 +99,7 @@ describe("handleSessionIdleBackgroundEvent", () => {
         idleDeferralTimers: new Map(),
         validateSessionHasOutput: () => Promise.resolve(true),
         checkSessionTodos: () => Promise.resolve(false),
+        isOpenCodeSessionActive: () => Promise.resolve(false),
         tryCompleteTask,
         emitIdleEvent: () => {},
       })
@@ -118,6 +122,7 @@ describe("handleSessionIdleBackgroundEvent", () => {
         idleDeferralTimers: new Map(),
         validateSessionHasOutput: () => Promise.resolve(true),
         checkSessionTodos: () => Promise.resolve(false),
+        isOpenCodeSessionActive: () => Promise.resolve(false),
         tryCompleteTask,
         emitIdleEvent: () => {},
       })
@@ -146,6 +151,7 @@ describe("handleSessionIdleBackgroundEvent", () => {
           idleDeferralTimers,
           validateSessionHasOutput: () => Promise.resolve(true),
           checkSessionTodos: () => Promise.resolve(false),
+          isOpenCodeSessionActive: () => Promise.resolve(false),
           tryCompleteTask: () => Promise.resolve(true),
           emitIdleEvent,
         })
@@ -180,6 +186,7 @@ describe("handleSessionIdleBackgroundEvent", () => {
           idleDeferralTimers,
           validateSessionHasOutput: () => Promise.resolve(true),
           checkSessionTodos: () => Promise.resolve(false),
+          isOpenCodeSessionActive: () => Promise.resolve(false),
           tryCompleteTask: () => Promise.resolve(true),
           emitIdleEvent,
         })
@@ -211,6 +218,7 @@ describe("handleSessionIdleBackgroundEvent", () => {
           idleDeferralTimers,
           validateSessionHasOutput: () => Promise.resolve(true),
           checkSessionTodos: () => Promise.resolve(false),
+          isOpenCodeSessionActive: () => Promise.resolve(false),
           tryCompleteTask: () => Promise.resolve(true),
           emitIdleEvent,
         })
@@ -238,12 +246,61 @@ describe("handleSessionIdleBackgroundEvent", () => {
         idleDeferralTimers: new Map(),
         validateSessionHasOutput: () => Promise.resolve(true),
         checkSessionTodos: () => Promise.resolve(false),
+        isOpenCodeSessionActive: () => Promise.resolve(false),
         tryCompleteTask,
         emitIdleEvent: () => {},
       })
 
       //#then
       await new Promise((resolve) => setTimeout(resolve, 10))
+      expect(tryCompleteTask).toHaveBeenCalledWith(task, "session.idle event")
+    })
+
+    it("#when session is still active #then defers when session active", async () => {
+      //#given
+      const task = createRunningTask()
+      const tryCompleteTask = mock(() => Promise.resolve(true))
+      const isOpenCodeSessionActive = mock(() => Promise.resolve(true))
+
+      //#when
+      handleSessionIdleBackgroundEvent({
+        properties: { sessionID: task.sessionId! },
+        findBySession: () => task,
+        idleDeferralTimers: new Map(),
+        validateSessionHasOutput: () => Promise.resolve(true),
+        checkSessionTodos: () => Promise.resolve(false),
+        isOpenCodeSessionActive,
+        tryCompleteTask,
+        emitIdleEvent: () => {},
+      })
+
+      //#then
+      await new Promise((resolve) => setTimeout(resolve, 10))
+      expect(isOpenCodeSessionActive).toHaveBeenCalledWith(task.sessionId)
+      expect(tryCompleteTask).not.toHaveBeenCalled()
+    })
+
+    it("#when session is not active #then completes after active check", async () => {
+      //#given
+      const task = createRunningTask()
+      const tryCompleteTask = mock(() => Promise.resolve(true))
+      const isOpenCodeSessionActive = mock(() => Promise.resolve(false))
+
+      //#when
+      handleSessionIdleBackgroundEvent({
+        properties: { sessionID: task.sessionId! },
+        findBySession: () => task,
+        idleDeferralTimers: new Map(),
+        validateSessionHasOutput: () => Promise.resolve(true),
+        checkSessionTodos: () => Promise.resolve(false),
+        isOpenCodeSessionActive,
+        tryCompleteTask,
+        emitIdleEvent: () => {},
+      })
+
+      //#then
+      await new Promise((resolve) => setTimeout(resolve, 10))
+      expect(isOpenCodeSessionActive).toHaveBeenCalledWith(task.sessionId)
       expect(tryCompleteTask).toHaveBeenCalledWith(task, "session.idle event")
     })
 
@@ -259,6 +316,7 @@ describe("handleSessionIdleBackgroundEvent", () => {
         idleDeferralTimers: new Map(),
         validateSessionHasOutput: () => Promise.resolve(true),
         checkSessionTodos: () => Promise.resolve(false),
+        isOpenCodeSessionActive: () => Promise.resolve(false),
         tryCompleteTask,
         emitIdleEvent: () => {},
       })
@@ -301,6 +359,7 @@ describe("handleSessionIdleBackgroundEvent", () => {
         idleDeferralTimers: new Map(),
         validateSessionHasOutput: () => Promise.resolve(true),
         checkSessionTodos: () => Promise.resolve(true),
+        isOpenCodeSessionActive: () => Promise.resolve(false),
         tryCompleteTask,
         emitIdleEvent: () => {},
       })
@@ -325,6 +384,7 @@ describe("handleSessionIdleBackgroundEvent", () => {
           return true
         },
         checkSessionTodos: () => Promise.resolve(false),
+        isOpenCodeSessionActive: () => Promise.resolve(false),
         tryCompleteTask,
         emitIdleEvent: () => {},
       })
@@ -349,6 +409,7 @@ describe("handleSessionIdleBackgroundEvent", () => {
           task.status = "cancelled"
           return false
         },
+        isOpenCodeSessionActive: () => Promise.resolve(false),
         tryCompleteTask,
         emitIdleEvent: () => {},
       })

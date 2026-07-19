@@ -1835,6 +1835,7 @@ The fallback retry session is now created and can be inspected directly.
         idleDeferralTimers: this.idleDeferralTimers,
         validateSessionHasOutput: (id) => this.validateSessionHasOutput(id),
         checkSessionTodos: (id) => this.checkSessionTodos(id),
+        isOpenCodeSessionActive: (id) => isOpenCodeSessionActive(this.client, id),
         tryCompleteTask: (task, source) => this.tryCompleteTask(task, source),
         emitIdleEvent: (sessionID) => this.handleEvent({ type: "session.idle", properties: { sessionID } }),
       })
@@ -2547,6 +2548,11 @@ The task was re-queued on a fallback model after a retryable failure.
       return false
     }
 
+    if (task.sessionId && await this.isSessionActive(task.sessionId)) {
+      log("tryCompleteTask called on active session, skipping", { taskId: task.id, sessionID: task.sessionId, source })
+      return false
+    }
+
     // Reserve a notification-preparation slot for the parent BEFORE flipping the
     // child to a terminal status. The instant status becomes "completed",
     // hasActiveChildTasks() returns false, yet the parent wake is not queued until
@@ -2601,6 +2607,7 @@ The task was re-queued on a fallback model after a retryable failure.
           task.sessionId,
           BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE,
         )
+        log("[background-agent] teardown abort", { sessionID: task.sessionId, source })
         await this.abortSessionWithLogging(task.sessionId, `task completion (${source})`)
 
         // @allow Notify tmux to close the pane immediately. client.session.abort() does not
