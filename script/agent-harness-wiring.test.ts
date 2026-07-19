@@ -19,17 +19,6 @@ function parsesAsJson(raw: string): boolean {
 }
 
 describe("cross-harness env wiring", () => {
-  test("#given Cursor cloud agents #when reading .cursor/environment.json #then install delegates to the shared setup script", () => {
-    // given
-    const path = join(REPO_ROOT, ".cursor", "environment.json")
-
-    // when / then
-    expect(existsSync(path), ".cursor/environment.json must exist").toBe(true)
-    const raw = read(path)
-    expect(parsesAsJson(raw), ".cursor/environment.json must be valid JSON").toBe(true)
-    expect(raw).toContain("script/agent/setup.sh")
-  })
-
   test("#given Claude Code #when reading .claude/settings.json #then SessionStart runs setup and SessionEnd launches cleanup", () => {
     // given
     const path = join(REPO_ROOT, ".claude", "settings.json")

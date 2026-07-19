@@ -14,6 +14,7 @@ import {
   unregisterManagerForCleanup,
   __disableScheduledForcedExitForTesting,
   __enableScheduledForcedExitForTesting,
+  __getProcessCleanupErrorListenerForTesting,
   __isShutdownInProgressForTesting,
   __setShutdownInProgressForTesting,
 } from "./process-cleanup"
@@ -240,10 +241,13 @@ describe("#given process cleanup registration", () => {
         uncaughtExceptionListenersBefore.length,
       )
 
-      // After unregistration our listener is gone, so we use process.emit
-      // (safe when no listener is registered) to verify emits no longer
-      // reach this plugin's handler.
-      process.emit("uncaughtException", new Error("boom"))
+      // After unregistration our seam-exposed listener is gone. Assert
+      // directly on the registration seam instead of emitting a real
+      // 'uncaughtException' with zero listeners attached — Node's default
+      // behavior for that case is to crash the process, which Bun's test
+      // runner surfaces as a fatal test failure rather than a passing
+      // assertion.
+      expect(__getProcessCleanupErrorListenerForTesting("uncaughtException")).toBeUndefined()
       expect(shutdown).not.toHaveBeenCalled()
     })
   })
@@ -332,9 +336,11 @@ describe("#given process cleanup registration", () => {
       try {
         registerManagerForCleanup(manager)
 
-        // When OMO_DISABLE_PROCESS_CLEANUP is set, the listener is not registered,
-        // so we use process.emit to verify that emits do not trigger cleanup.
-        process.emit("uncaughtException", new Error("boom"))
+        // When OMO_DISABLE_PROCESS_CLEANUP is set, no uncaughtException
+        // listener is registered at all. Assert directly on the seam
+        // instead of emitting a real event with zero listeners attached —
+        // Node's default behavior for that case is to crash the process.
+        expect(__getProcessCleanupErrorListenerForTesting("uncaughtException")).toBeUndefined()
         await flushMicrotasks()
 
         expect(shutdown).not.toHaveBeenCalled()
@@ -490,9 +496,11 @@ describe("#given process cleanup registration", () => {
       )
 
       _resetForTesting()
-      // After _resetForTesting() our listener is unregistered, so we use process.emit
-      // to verify that emits no longer trigger cleanup.
-      process.emit("uncaughtException", new Error("boom"))
+      // After _resetForTesting() the seam-exposed listener is cleared.
+      // Assert directly on the seam instead of emitting a real event with
+      // zero listeners attached — Node's default behavior for that case is
+      // to crash the process.
+      expect(__getProcessCleanupErrorListenerForTesting("uncaughtException")).toBeUndefined()
 
       expect(shutdown).not.toHaveBeenCalled()
       expect(process.listeners("uncaughtException")).toHaveLength(

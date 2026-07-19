@@ -1,6 +1,7 @@
-import { afterAll, beforeEach, describe, expect, it, mock, spyOn } from "bun:test"
+import { beforeEach, describe, expect, it, mock, spyOn } from "bun:test"
 
 import type { CrossProjectMailboxConfig } from "../config"
+import { createLiveMailboxConfigResolver } from "./live-config"
 
 type ConfigRead = {
   readonly valid: boolean
@@ -44,14 +45,6 @@ let readConfig: (directory: string) => ConfigRead = () => ({
 })
 const validatePluginConfig = mock((directory: string): ConfigRead => readConfig(directory))
 
-mock.module("../../../config/validate", () => ({ validatePluginConfig }))
-
-const { createLiveMailboxConfigResolver } = await import(`./live-config?test=${crypto.randomUUID()}`)
-
-afterAll(() => {
-  mock.restore()
-})
-
 beforeEach(() => {
   validatePluginConfig.mockClear()
   readConfig = () => ({ valid: true, config: { cross_project_mailbox: CONFIG_V1 } })
@@ -64,7 +57,7 @@ describe("createLiveMailboxConfigResolver", () => {
     let current = CONFIG_V1
     const nowSpy = spyOn(Date, "now").mockImplementation(() => now)
     readConfig = () => ({ valid: true, config: { cross_project_mailbox: current } })
-    const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG)
+    const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG, { validate: validatePluginConfig })
 
     // when
     const first = await resolver.resolve()
@@ -87,7 +80,7 @@ describe("createLiveMailboxConfigResolver", () => {
     readConfig = () => {
       throw new Error("config read failed")
     }
-    const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG)
+    const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG, { validate: validatePluginConfig })
 
     // when
     const result = await resolver.resolve()
@@ -98,7 +91,7 @@ describe("createLiveMailboxConfigResolver", () => {
 
   it("#given one TTL window #when resolve is called 100 times #then one read and no extra stat-triggering reads occur", async () => {
     // given
-    const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG)
+    const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG, { validate: validatePluginConfig })
 
     // when
     const first = await resolver.resolve()
@@ -114,7 +107,7 @@ describe("createLiveMailboxConfigResolver", () => {
     // given
     let now = 10
     const nowSpy = spyOn(Date, "now").mockImplementation(() => now)
-    const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG)
+    const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG, { validate: validatePluginConfig })
     await resolver.resolve()
     now = 3_010
 
@@ -128,7 +121,7 @@ describe("createLiveMailboxConfigResolver", () => {
 
   it("#given concurrent callers during a deferred read #when all resolve #then they share one underlying read", async () => {
     // given
-    const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG)
+    const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG, { validate: validatePluginConfig })
 
     // when
     const pending = Array.from({ length: 50 }, () => resolver.resolve())
@@ -144,7 +137,7 @@ describe("createLiveMailboxConfigResolver", () => {
     // given
     let current = CONFIG_V1
     readConfig = () => ({ valid: true, config: { cross_project_mailbox: current } })
-    const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG)
+    const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG, { validate: validatePluginConfig })
     await resolver.resolve()
     current = CONFIG_V2
 
