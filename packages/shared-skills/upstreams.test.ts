@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const repoRoot = join(import.meta.dir, "..", "..");
@@ -35,8 +35,13 @@ function parseGitmodules(content: string): SubmoduleEntry[] {
 	return entries;
 }
 
-describe("frontend upstream provenance submodules", () => {
-	const content = readFileSync(gitmodulesPath, "utf8");
+const gitmodulesPresent = existsSync(gitmodulesPath);
+
+const describeIfGitmodules = gitmodulesPresent ? describe : describe.skip;
+const describeIfNoGitmodules = gitmodulesPresent ? describe.skip : describe;
+
+describeIfGitmodules("frontend upstream provenance submodules", () => {
+	const content = gitmodulesPresent ? readFileSync(gitmodulesPath, "utf8") : "";
 	const submodules = parseGitmodules(content);
 
 	const expectedUpstreams = [
@@ -68,5 +73,13 @@ describe("frontend upstream provenance submodules", () => {
 			expect(entry.path.includes("shared-skills/skills/")).toBe(false);
 			expect(/(^|\/)skills\//.test(entry.path)).toBe(false);
 		}
+	});
+});
+
+describeIfNoGitmodules("frontend upstream provenance submodules (fork: dropped)", () => {
+	test("declares no submodules at all", () => {
+		// given this fork deliberately purges the provenance submodules
+		// then there is no committed .gitmodules to declare any submodule
+		expect(existsSync(gitmodulesPath)).toBe(false);
 	});
 });

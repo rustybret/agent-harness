@@ -28,6 +28,15 @@ function submoduleHead(name: string): string {
 	return git(["-C", join(upstreamsRoot, name), "rev-parse", "HEAD"]);
 }
 
+const provenanceUpstreamNames = ["open-design", "taste-skill", "ui-ux-pro-max", "designpowers"] as const;
+
+function upstreamPopulated(name: string): boolean {
+	return existsSync(join(upstreamsRoot, name, ".git"));
+}
+
+const allUpstreamsPresent = provenanceUpstreamNames.every(upstreamPopulated);
+const gitmodulesPresent = existsSync(join(repoRoot, ".gitmodules"));
+
 describe("DMCA provenance gate", () => {
 	const keptDesign = new Set((designOriginals as string[]).map((name) => `references/design/${name}`));
 	const thirdParty: string[] = thirdPartyRelativePaths();
@@ -73,12 +82,13 @@ describe("DMCA provenance gate", () => {
 		expect(mismatches).toEqual([]);
 	});
 
-	test("each ATTRIBUTION pin equals the live submodule HEAD", () => {
+	const attributionPinTest = allUpstreamsPresent ? test : test.skip;
+	attributionPinTest("each ATTRIBUTION pin equals the live submodule HEAD", () => {
 		// given the ATTRIBUTION pins (optionally overridden by a fixture)
 		const attributionPath = process.env.ATTRIBUTION_OVERRIDE ?? join(repoRoot, attributionRel);
 		const attribution = readFileSync(attributionPath, "utf8");
 		const pins = [...attribution.matchAll(/Pinned upstream commit:\s*([0-9a-f]{40})/g)].map((match) => match[1]);
-		const heads = ["open-design", "taste-skill", "ui-ux-pro-max", "designpowers"].map((name) => submoduleHead(name));
+		const heads = provenanceUpstreamNames.map((name) => submoduleHead(name));
 		// then every recorded pin matches a live submodule HEAD
 		for (const head of heads) {
 			expect(pins).toContain(head);
@@ -86,12 +96,35 @@ describe("DMCA provenance gate", () => {
 	});
 
 	test("no submodule gitlink lives under any shipped skills/ directory", () => {
-		// given the declared submodules
-		const gitmodules = readFileSync(join(repoRoot, ".gitmodules"), "utf8");
+		// given the declared submodules (this fork drops .gitmodules; treat absence as zero submodules)
+		const gitmodules = gitmodulesPresent ? readFileSync(join(repoRoot, ".gitmodules"), "utf8") : "";
 		const paths = [...gitmodules.matchAll(/path\s*=\s*(.+)/g)].map((match) => match[1].trim());
 		// then none of them is under a skills/ tree
 		for (const submodulePath of paths) {
 			expect(/(^|\/)skills\//.test(submodulePath)).toBe(false);
 		}
+	});
+
+	test("no git-tracked gitlink lives under any shipped skills/ directory", () => {
+		// given every git-tracked entry under packages/shared-skills/skills/ with its mode
+		const output = git(["ls-files", "-s", "packages/shared-skills/skills/"]);
+		const gitlinkModePrefix = "160000 ";
+		const gitlinks = output
+			.split("\n")
+			.filter((line) => line.startsWith(gitlinkModePrefix))
+			.map((line) => line.trim());
+		// then no shipped skills/ path is a submodule gitlink (would package upstream payload accidentally)
+		expect(gitlinks).toEqual([]);
+	});
+
+	test("no untracked upstream payload is committed under shipped skills/", () => {
+		// given the tracked reference tree
+		const tracked = trackedFrontendReferenceFiles();
+		// then no materialized upstream family (ui-ux-db or designpowers vendor) is committed
+		const committedUpstreamPayload = tracked.filter(
+			(relPath) =>
+				relPath.startsWith("references/ui-ux-db/") || relPath.startsWith("references/designpowers/vendor/"),
+		);
+		expect(committedUpstreamPayload).toEqual([]);
 	});
 });

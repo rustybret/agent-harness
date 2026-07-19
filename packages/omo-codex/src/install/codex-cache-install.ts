@@ -124,7 +124,8 @@ function shouldCopyPluginPath(path: string, root: string): boolean {
   if (relative === "") return true
   const parts = relative.split(sep)
   if (parts.some((part) => part === ".git" || part === "node_modules")) return false
-  return !isNestedComponentMcpManifest(parts)
+  if (isNestedComponentMcpManifest(parts)) return false
+  return !isNestedReferenceSkillManifest(parts)
 }
 
 // Codex loads MCP servers only from the plugin-root .mcp.json (.codex-plugin/plugin.json declares
@@ -133,6 +134,16 @@ function shouldCopyPluginPath(path: string, root: string): boolean {
 // layout but dangles in the flattened cache layout, so it must never be copied into the cache.
 function isNestedComponentMcpManifest(parts: readonly string[]): boolean {
   return parts.length > 1 && parts.at(-1) === ".mcp.json"
+}
+
+// Codex discovers skills by recursively scanning for SKILL.md. A SKILL.md nested under a skill's
+// references/ subtree (e.g. skills/frontend/references/designpowers/vendor/skills/*/SKILL.md) is
+// upstream reference material, not an installable skill. Materialize normally renames those to
+// reference.md, but when upstreams are absent that rename is skipped, so collection must exclude
+// them here or they leak into the cache as accidental top-level skills.
+function isNestedReferenceSkillManifest(parts: readonly string[]): boolean {
+  if (parts.at(-1) !== "SKILL.md") return false
+  return parts.includes("references")
 }
 
 const removedSparkshellReferencePattern = /\b(?:sparkshell|spark[-_\s]+shell)\b/i
