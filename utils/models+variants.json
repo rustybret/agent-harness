@@ -111,6 +111,26 @@
       ]
     },
     {
+      "key": "anthropic/claude-opus-5",
+      "variants": [
+        "high",
+        "low",
+        "max",
+        "medium",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "anthropic/claude-opus-5-fast",
+      "variants": [
+        "high",
+        "low",
+        "max",
+        "medium",
+        "xhigh"
+      ]
+    },
+    {
       "key": "anthropic/claude-sonnet-4-5",
       "variants": [
         "high",
@@ -916,6 +936,16 @@
       ]
     },
     {
+      "key": "opencode/claude-opus-5",
+      "variants": [
+        "high",
+        "low",
+        "max",
+        "medium",
+        "xhigh"
+      ]
+    },
+    {
       "key": "opencode/claude-sonnet-4",
       "variants": [
         "high",
@@ -988,6 +1018,24 @@
     },
     {
       "key": "opencode/gemini-3.5-flash",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal"
+      ]
+    },
+    {
+      "key": "opencode/gemini-3.5-flash-lite",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal"
+      ]
+    },
+    {
+      "key": "opencode/gemini-3.6-flash",
       "variants": [
         "high",
         "low",
@@ -1210,10 +1258,6 @@
       "variants": []
     },
     {
-      "key": "opencode/hy3-free",
-      "variants": []
-    },
-    {
       "key": "opencode/kimi-k2.5",
       "variants": []
     },
@@ -1224,6 +1268,22 @@
     {
       "key": "opencode/kimi-k2.7-code",
       "variants": []
+    },
+    {
+      "key": "opencode/laguna-s-2.1-free",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "key": "opencode/ling-3.0-flash-free",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
     },
     {
       "key": "opencode/mimo-v2.5-free",
@@ -1407,6 +1467,26 @@
       ]
     },
     {
+      "key": "openrouter/anthropic/claude-opus-5",
+      "variants": [
+        "high",
+        "low",
+        "max",
+        "medium",
+        "xhigh"
+      ]
+    },
+    {
+      "key": "openrouter/anthropic/claude-opus-5-fast",
+      "variants": [
+        "high",
+        "low",
+        "max",
+        "medium",
+        "xhigh"
+      ]
+    },
+    {
       "key": "openrouter/anthropic/claude-sonnet-4",
       "variants": [
         "high",
@@ -1483,10 +1563,6 @@
     },
     {
       "key": "openrouter/cognitivecomputations/dolphin-mistral-24b-venice-edition",
-      "variants": []
-    },
-    {
-      "key": "openrouter/cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
       "variants": []
     },
     {
@@ -1684,6 +1760,24 @@
       ]
     },
     {
+      "key": "openrouter/google/gemini-3.5-flash-lite",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal"
+      ]
+    },
+    {
+      "key": "openrouter/google/gemini-3.6-flash",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal"
+      ]
+    },
+    {
       "key": "openrouter/google/gemma-2-27b-it",
       "variants": []
     },
@@ -1773,6 +1867,14 @@
       "variants": []
     },
     {
+      "key": "openrouter/inclusionai/ling-3.0-flash:free",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
       "key": "openrouter/inclusionai/ring-2.6-1t",
       "variants": [
         "high",
@@ -1804,6 +1906,13 @@
       "variants": []
     },
     {
+      "key": "openrouter/meituan/longcat-2.0",
+      "variants": [
+        "high",
+        "max"
+      ]
+    },
+    {
       "key": "openrouter/meta-llama/llama-3.1-70b-instruct",
       "variants": []
     },
@@ -1820,15 +1929,7 @@
       "variants": []
     },
     {
-      "key": "openrouter/meta-llama/llama-3.2-3b-instruct:free",
-      "variants": []
-    },
-    {
       "key": "openrouter/meta-llama/llama-3.3-70b-instruct",
-      "variants": []
-    },
-    {
-      "key": "openrouter/meta-llama/llama-3.3-70b-instruct:free",
       "variants": []
     },
     {
@@ -1998,6 +2099,8 @@
     {
       "key": "openrouter/moonshotai/kimi-k3",
       "variants": [
+        "high",
+        "low",
         "max"
       ]
     },
@@ -2019,10 +2122,6 @@
     },
     {
       "key": "openrouter/nousresearch/hermes-3-llama-3.1-405b",
-      "variants": []
-    },
-    {
-      "key": "openrouter/nousresearch/hermes-3-llama-3.1-405b:free",
       "variants": []
     },
     {
@@ -2597,6 +2696,14 @@
       "variants": []
     },
     {
+      "key": "openrouter/poolside/laguna-s-2.1",
+      "variants": []
+    },
+    {
+      "key": "openrouter/poolside/laguna-s-2.1:free",
+      "variants": []
+    },
+    {
       "key": "openrouter/poolside/laguna-xs-2.1",
       "variants": []
     },
@@ -2695,10 +2802,6 @@
       "variants": []
     },
     {
-      "key": "openrouter/qwen/qwen3-coder:free",
-      "variants": []
-    },
-    {
       "key": "openrouter/qwen/qwen3-max",
       "variants": []
     },
@@ -2711,10 +2814,6 @@
     },
     {
       "key": "openrouter/qwen/qwen3-next-80b-a3b-instruct",
-      "variants": []
-    },
-    {
-      "key": "openrouter/qwen/qwen3-next-80b-a3b-instruct:free",
       "variants": []
     },
     {
@@ -2895,14 +2994,6 @@
     },
     {
       "key": "openrouter/tencent/hy3-preview",
-      "variants": [
-        "high",
-        "low",
-        "none"
-      ]
-    },
-    {
-      "key": "openrouter/tencent/hy3:free",
       "variants": [
         "high",
         "low",

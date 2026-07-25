@@ -39,6 +39,12 @@
       "key": "anthropic/claude-opus-4-8-fast"
     },
     {
+      "key": "anthropic/claude-opus-5"
+    },
+    {
+      "key": "anthropic/claude-opus-5-fast"
+    },
+    {
       "key": "anthropic/claude-sonnet-4-5"
     },
     {
@@ -465,6 +471,9 @@
       "key": "opencode/claude-opus-4-8"
     },
     {
+      "key": "opencode/claude-opus-5"
+    },
+    {
       "key": "opencode/claude-sonnet-4"
     },
     {
@@ -493,6 +502,12 @@
     },
     {
       "key": "opencode/gemini-3.5-flash"
+    },
+    {
+      "key": "opencode/gemini-3.5-flash-lite"
+    },
+    {
+      "key": "opencode/gemini-3.6-flash"
     },
     {
       "key": "opencode/glm-5"
@@ -570,9 +585,6 @@
       "key": "opencode/grok-build-0.1"
     },
     {
-      "key": "opencode/hy3-free"
-    },
-    {
       "key": "opencode/kimi-k2.5"
     },
     {
@@ -580,6 +592,12 @@
     },
     {
       "key": "opencode/kimi-k2.7-code"
+    },
+    {
+      "key": "opencode/laguna-s-2.1-free"
+    },
+    {
+      "key": "opencode/ling-3.0-flash-free"
     },
     {
       "key": "opencode/mimo-v2.5-free"
@@ -675,6 +693,12 @@
       "key": "openrouter/anthropic/claude-opus-4.8-fast"
     },
     {
+      "key": "openrouter/anthropic/claude-opus-5"
+    },
+    {
+      "key": "openrouter/anthropic/claude-opus-5-fast"
+    },
+    {
       "key": "openrouter/anthropic/claude-sonnet-4"
     },
     {
@@ -712,9 +736,6 @@
     },
     {
       "key": "openrouter/cognitivecomputations/dolphin-mistral-24b-venice-edition"
-    },
-    {
-      "key": "openrouter/cognitivecomputations/dolphin-mistral-24b-venice-edition:free"
     },
     {
       "key": "openrouter/cohere/command-a"
@@ -819,6 +840,12 @@
       "key": "openrouter/google/gemini-3.5-flash"
     },
     {
+      "key": "openrouter/google/gemini-3.5-flash-lite"
+    },
+    {
+      "key": "openrouter/google/gemini-3.6-flash"
+    },
+    {
       "key": "openrouter/google/gemma-2-27b-it"
     },
     {
@@ -870,6 +897,9 @@
       "key": "openrouter/inclusionai/ling-2.6-flash"
     },
     {
+      "key": "openrouter/inclusionai/ling-3.0-flash:free"
+    },
+    {
       "key": "openrouter/inclusionai/ring-2.6-1t"
     },
     {
@@ -891,6 +921,9 @@
       "key": "openrouter/mancer/weaver"
     },
     {
+      "key": "openrouter/meituan/longcat-2.0"
+    },
+    {
       "key": "openrouter/meta-llama/llama-3.1-70b-instruct"
     },
     {
@@ -903,13 +936,7 @@
       "key": "openrouter/meta-llama/llama-3.2-3b-instruct"
     },
     {
-      "key": "openrouter/meta-llama/llama-3.2-3b-instruct:free"
-    },
-    {
       "key": "openrouter/meta-llama/llama-3.3-70b-instruct"
-    },
-    {
-      "key": "openrouter/meta-llama/llama-3.3-70b-instruct:free"
     },
     {
       "key": "openrouter/meta-llama/llama-4-maverick"
@@ -1042,9 +1069,6 @@
     },
     {
       "key": "openrouter/nousresearch/hermes-3-llama-3.1-405b"
-    },
-    {
-      "key": "openrouter/nousresearch/hermes-3-llama-3.1-405b:free"
     },
     {
       "key": "openrouter/nousresearch/hermes-3-llama-3.1-70b"
@@ -1323,6 +1347,12 @@
       "key": "openrouter/poolside/laguna-m.1:free"
     },
     {
+      "key": "openrouter/poolside/laguna-s-2.1"
+    },
+    {
+      "key": "openrouter/poolside/laguna-s-2.1:free"
+    },
+    {
       "key": "openrouter/poolside/laguna-xs-2.1"
     },
     {
@@ -1392,9 +1422,6 @@
       "key": "openrouter/qwen/qwen3-coder-plus"
     },
     {
-      "key": "openrouter/qwen/qwen3-coder:free"
-    },
-    {
       "key": "openrouter/qwen/qwen3-max"
     },
     {
@@ -1402,9 +1429,6 @@
     },
     {
       "key": "openrouter/qwen/qwen3-next-80b-a3b-instruct"
-    },
-    {
-      "key": "openrouter/qwen/qwen3-next-80b-a3b-instruct:free"
     },
     {
       "key": "openrouter/qwen/qwen3-next-80b-a3b-thinking"
@@ -1513,9 +1537,6 @@
     },
     {
       "key": "openrouter/tencent/hy3-preview"
-    },
-    {
-      "key": "openrouter/tencent/hy3:free"
     },
     {
       "key": "openrouter/thedrummer/cydonia-24b-v4.1"
