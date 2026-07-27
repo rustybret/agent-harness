@@ -3,7 +3,8 @@ import type { ExecutorContext } from "./executor-types"
 export async function cancelUnstableAgentTask(
   manager: ExecutorContext["manager"],
   taskID: string | undefined,
-  reason: string
+  reason: string,
+  internalAbortSource?: string
 ): Promise<void> {
   if (!taskID || typeof manager.cancelTask !== "function") {
     return
@@ -14,6 +15,7 @@ export async function cancelUnstableAgentTask(
       source: "unstable-agent-task",
       reason,
       skipNotification: true,
+      ...(internalAbortSource ? { internalAbortSource } : {}),
     }),
   ])
 }

@@ -5,6 +5,7 @@ import { releasePromptAsyncReservation } from "../shared/prompt-async-gate"
 
 export const BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE = "background-agent.completion-teardown"
 export const BACKGROUND_QUOTA_WATCHDOG_ABORT_SOURCE = "background-agent.quota-watchdog"
+export const BACKGROUND_MONITOR_TIMEOUT_ABORT_SOURCE = "background-agent.monitor-timeout"
 export const INTERNAL_ABORT_RESUME_BUDGET = 2
 export const INTERNAL_ABORT_RESUME_BUDGET_EXHAUSTED_MESSAGE = `resume budget exhausted (${INTERNAL_ABORT_RESUME_BUDGET}) — internal interruptions kept recurring`
 
@@ -15,11 +16,13 @@ const INTERNAL_ABORT_SOURCES: ReadonlySet<string> = new Set([
   "session.timeout",
   BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE,
   BACKGROUND_QUOTA_WATCHDOG_ABORT_SOURCE,
+  BACKGROUND_MONITOR_TIMEOUT_ABORT_SOURCE,
 ])
 
 const INTERNAL_ABORT_RESUME_BUDGET_SOURCES: ReadonlySet<string> = new Set([
   BACKGROUND_COMPLETION_TEARDOWN_ABORT_SOURCE,
   BACKGROUND_QUOTA_WATCHDOG_ABORT_SOURCE,
+  BACKGROUND_MONITOR_TIMEOUT_ABORT_SOURCE,
 ])
 
 function isResumeBudgetedInternalAbortSource(source: string | undefined): boolean {

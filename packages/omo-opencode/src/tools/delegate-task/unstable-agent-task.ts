@@ -3,6 +3,7 @@ import type { ExecutorContext, ParentContext, SessionMessage } from "./executor-
 import { DEFAULT_SYNC_POLL_TIMEOUT_MS, getTimingConfig } from "./timing"
 import { buildTaskPrompt } from "./prompt-builder"
 import { cancelUnstableAgentTask } from "./cancel-unstable-agent-task"
+import { BACKGROUND_MONITOR_TIMEOUT_ABORT_SOURCE } from "../../hooks/runtime-fallback/auto-retry-abort"
 import { publishToolMetadata } from "../../features/tool-metadata-store"
 import { formatDuration } from "./time-formatter"
 import { formatDetailedError } from "./error-formatting"
@@ -25,6 +26,7 @@ export async function executeUnstableAgentTask(
 ): Promise<string> {
   const { manager, client, syncPollTimeoutMs, sisyphusAgentConfig } = executorCtx
   let cleanupReason: string | undefined
+  let internalAbortSource: string | undefined
   let launchedTaskID: string | undefined
 
   try {
@@ -172,6 +174,7 @@ ${taskMetadataBlock}`
 
     if (!completedDuringMonitoring) {
       cleanupReason = "Monitored unstable background task exceeded timeout budget"
+      internalAbortSource = BACKGROUND_MONITOR_TIMEOUT_ABORT_SOURCE
       const duration = formatDuration(startTime)
       const timeoutBudgetMs = syncPollTimeoutMs ?? DEFAULT_SYNC_POLL_TIMEOUT_MS
       return `SUPERVISED TASK TIMED OUT
@@ -253,7 +256,7 @@ ${taskMetadataBlock}`
     })
   } finally {
     if (cleanupReason) {
-      await cancelUnstableAgentTask(manager, launchedTaskID, cleanupReason)
+      await cancelUnstableAgentTask(manager, launchedTaskID, cleanupReason, internalAbortSource)
     }
   }
 }

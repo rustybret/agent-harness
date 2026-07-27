@@ -78,4 +78,73 @@ describe("executeUnstableAgentTask timeout handling", () => {
     expect(result).toContain("TIMED OUT")
     expect(result).not.toContain("SUPERVISED TASK COMPLETED SUCCESSFULLY")
   })
+
+  test("registers the monitor-timeout internal abort source when cleanup cancels the task", async () => {
+    // #given
+    const { executeUnstableAgentTask } = require("./unstable-agent-task")
+    const { BACKGROUND_MONITOR_TIMEOUT_ABORT_SOURCE } = require("../../hooks/runtime-fallback/auto-retry-abort")
+
+    let cancelTaskCall: { taskId: string; options: Record<string, unknown> } | undefined
+
+    const mockManager = {
+      launch: async () => ({ id: "task_002", sessionId: "ses_timeout_2", status: "running" }),
+      getTask: () => ({ id: "task_002", sessionId: "ses_timeout_2", status: "running" }),
+      cancelTask: async (taskId: string, options: Record<string, unknown>) => {
+        cancelTaskCall = { taskId, options }
+        return true
+      },
+    }
+
+    const mockClient = {
+      session: {
+        status: async () => ({ data: { ses_timeout_2: { type: "running" } } }),
+        messages: async () => ({
+          data: [
+            {
+              info: { id: "msg_003", role: "assistant", time: { created: 2000 } },
+              parts: [{ type: "text", text: "still running" }],
+            },
+          ],
+        }),
+      },
+    }
+
+    const args = {
+      description: "timeout case",
+      prompt: "run",
+      category: "unspecified-low",
+      run_in_background: false,
+      load_skills: [],
+      command: undefined,
+    }
+
+    // #when
+    await executeUnstableAgentTask(
+      args,
+      {
+        sessionID: "parent-session",
+        messageID: "parent-message",
+        metadata: () => Promise.resolve(),
+      },
+      {
+        manager: mockManager,
+        client: mockClient,
+        syncPollTimeoutMs: 0,
+      },
+      {
+        sessionID: "parent-session",
+        messageID: "parent-message",
+        model: "gpt-test",
+        agent: "test-agent",
+      },
+      "test-agent",
+      undefined,
+      undefined,
+      "gpt-test"
+    )
+
+    // #then
+    expect(cancelTaskCall).toBeDefined()
+    expect(cancelTaskCall?.options.internalAbortSource).toBe(BACKGROUND_MONITOR_TIMEOUT_ABORT_SOURCE)
+  })
 })

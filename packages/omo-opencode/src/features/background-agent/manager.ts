@@ -2401,7 +2401,7 @@ The task was re-queued on a fallback model after a retryable failure.
 
   async cancelTask(
     taskId: string,
-    options?: { source?: string; reason?: string; abortSession?: boolean; skipNotification?: boolean }
+    options?: { source?: string; reason?: string; abortSession?: boolean; skipNotification?: boolean; internalAbortSource?: string }
   ): Promise<boolean> {
     const task = this.tasks.get(taskId)
     if (!task || (task.status !== "running" && task.status !== "pending")) {
@@ -2432,6 +2432,14 @@ The task was re-queued on a fallback model after a retryable failure.
 
     const wasRunning = task.status === "running"
     if (wasRunning && abortSession && task.sessionId) {
+      if (options?.internalAbortSource) {
+        markInternalAbortSession(
+          this.runtimeFallbackAbortRegistry,
+          task.sessionId,
+          options.internalAbortSource,
+        )
+        log("[background-agent] internal-abort registered on cancel", { taskId, sessionID: task.sessionId, source: options.internalAbortSource })
+      }
       const aborted = await this.abortSessionWithLogging(task.sessionId, `task cancellation (${source})`)
       if (!aborted) return false
 

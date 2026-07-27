@@ -9,6 +9,7 @@ import {
 import { dispatchInternalPrompt, releaseAllPromptAsyncReservationsForTesting } from "../../shared/prompt-async-gate"
 import { clearSessionPromptParams, getSessionPromptParams } from "../../shared/session-prompt-params-state"
 import {
+  BACKGROUND_MONITOR_TIMEOUT_ABORT_SOURCE,
   BACKGROUND_QUOTA_WATCHDOG_ABORT_SOURCE,
   createAbortSessionRequest,
   markInternalAbortSession,
@@ -417,6 +418,40 @@ describe("BackgroundManager internal abort source routing", () => {
     // then
     expect(deps.internallyAbortedSessions.has("child-session-cancel")).toBe(false)
     expect(deps.internalAbortSources.has("child-session-cancel")).toBe(false)
+  })
+
+  test("#given runtime-fallback tracking is active #when cancelTask is called with an explicit internalAbortSource #then the session is registered as an internal abort", async () => {
+    // given
+    const client = {
+      session: {
+        prompt: async () => ({}),
+        promptAsync: async () => ({}),
+        abort: mock(() => Promise.resolve({})),
+      },
+    }
+    const deps = createRuntimeFallbackAbortDeps(client)
+    createAbortSessionRequest(deps)
+    const manager = new BackgroundManager({
+      pluginContext: createPluginInput(client),
+      runtimeFallbackAbortRegistry: deps,
+    })
+    const task = createMockTask({
+      id: "task-monitor-timeout-internal-abort",
+      parentSessionId: "parent-session",
+      sessionId: "child-session-monitor-timeout",
+    })
+    getTaskMap(manager).set(task.id, task)
+
+    // when
+    await manager.cancelTask(task.id, {
+      source: "unstable-agent-task",
+      abortSession: true,
+      internalAbortSource: BACKGROUND_MONITOR_TIMEOUT_ABORT_SOURCE,
+    })
+
+    // then
+    expect(deps.internallyAbortedSessions.has("child-session-monitor-timeout")).toBe(true)
+    expect(deps.internalAbortSources.get("child-session-monitor-timeout")).toBe(BACKGROUND_MONITOR_TIMEOUT_ABORT_SOURCE)
   })
 
   test("#given runtime-fallback tracking is active #when manager shutdown aborts running tasks #then shutdown remains an external abort", async () => {
