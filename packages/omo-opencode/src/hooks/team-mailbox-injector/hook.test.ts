@@ -80,6 +80,26 @@ function createOutput(sessionID: string): {
   }
 }
 
+function createOutputWithMessageId(sessionID: string, messageID: string): {
+  messages: Array<{
+    info: { role: string; sessionID: string; id?: string }
+    parts: Array<{ type: string; text?: string; synthetic?: boolean }>
+  }>
+} {
+  return {
+    messages: [
+      {
+        info: {
+          role: "user",
+          sessionID,
+          id: messageID,
+        },
+        parts: [{ type: "text", text: "original message" }],
+      },
+    ],
+  }
+}
+
 describe("createTeamMailboxInjector", () => {
   const temporaryDirectories: string[] = []
 
@@ -222,6 +242,52 @@ describe("createTeamMailboxInjector", () => {
     // then
     expect(firstOutput.messages).toHaveLength(2)
     expect(secondOutput.messages).toEqual(originalSecondMessages)
+  })
+
+  it("injects on a later turn that repeats an earlier message count", async () => {
+    // given
+    const baseDir = await createTemporaryBaseDir()
+    temporaryDirectories.push(baseDir)
+    const config = TeamModeConfigSchema.parse({ base_dir: baseDir, enabled: true })
+    const hook = createHook(baseDir)
+    const runtimeState = createRuntimeState("session-member")
+    await seedRuntimeState(baseDir, runtimeState)
+    await sendMessage({
+      version: 1,
+      messageId: randomUUID(),
+      from: "lead",
+      to: "member-a",
+      kind: "message",
+      body: "round one",
+      timestamp: 1,
+    }, runtimeState.teamRunId, config, { isLead: true, activeMembers: ["lead", "member-a"] })
+    const firstOutput = createOutputWithMessageId("session-member", "msg-1")
+
+    // when
+    await hook["experimental.chat.messages.transform"]?.(
+      { sessionID: "session-member" },
+      firstOutput,
+    )
+    await sendMessage({
+      version: 1,
+      messageId: randomUUID(),
+      from: "lead",
+      to: "member-a",
+      kind: "message",
+      body: "round two",
+      timestamp: 2,
+    }, runtimeState.teamRunId, config, { isLead: true, activeMembers: ["lead", "member-a"] })
+    const secondOutput = createOutputWithMessageId("session-member", "msg-2")
+    await hook["experimental.chat.messages.transform"]?.(
+      { sessionID: "session-member" },
+      secondOutput,
+    )
+
+    // then
+    expect(firstOutput.messages).toHaveLength(2)
+    expect(firstOutput.messages[0]?.parts[0]?.text).toContain("round one")
+    expect(secondOutput.messages).toHaveLength(2)
+    expect(secondOutput.messages[0]?.parts[0]?.text).toContain("round two")
   })
 
   it("injects mailbox messages during the spawn race when the registry has the fresh member session but disk state is stale", async () => {

@@ -1,0 +1,23 @@
+=== BEFORE FIX (count-only turn marker) ===
+bun test v1.3.14 (0d9b296a)
+
+.omo/evidence/20260731-team-mailbox-turn-marker/compaction-repro.test.ts:
+119 |     const second = await deliver("round two", [turn("m2"), turn("m3"), turn("m4")])
+120 |     const third = await deliver("round three", [turn("m3"), turn("m4"), turn("m5")])
+121 | 
+122 |     // then every round reaches the member; pre-fix, rounds two and three are silently dropped
+123 |     expect(first.join("\n")).toContain("round one")
+124 |     expect(second.join("\n")).toContain("round two")
+                                    ^
+error: expect(received).toContain(expected)
+
+Expected to contain: "round two"
+Received: ""
+
+      at <anonymous> (/Volumes/Topper2TB/Git/agent-harness/.omo/evidence/20260731-team-mailbox-turn-marker/compaction-repro.test.ts:124:31)
+(fail) team mailbox injection across a compaction cycle > delivers a peer message on a new turn whose message count equals the previous turn [15.32ms]
+
+ 0 pass
+ 1 fail
+ 2 expect() calls
+Ran 1 test across 1 file. [109.00ms]

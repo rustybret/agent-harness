@@ -60,8 +60,31 @@ function resolveSessionID(
   return undefined
 }
 
+// The turn marker deduplicates repeated transform invocations WITHIN one turn. Message count alone is
+// not a turn identity: the marker is compared against the immediately preceding one, so two CONSECUTIVE
+// turns at equal message count are misread as a same-turn retry and the second turn's peer message is
+// silently dropped while still counting as handled. Equal-length windows on consecutive turns are
+// ordinary once compaction reaches a steady state (summary plus recent tail). Anchoring on the last
+// message id keeps the marker stable within a turn and distinct across turns; the count stays as a
+// fallback for messages that carry no id.
 function buildTurnMarker(sessionID: string, messages: MessageWithParts[]): string {
-  return `${sessionID}#${messages.length}`
+  const lastMessageID = findLastMessageID(messages)
+  if (lastMessageID === undefined) {
+    return `${sessionID}#${messages.length}`
+  }
+
+  return `${sessionID}#${messages.length}#${lastMessageID}`
+}
+
+function findLastMessageID(messages: MessageWithParts[]): string | undefined {
+  for (let index = messages.length - 1; index >= 0; index -= 1) {
+    const id = messages[index]?.info.id
+    if (typeof id === "string" && id.length > 0) {
+      return id
+    }
+  }
+
+  return undefined
 }
 
 function findLastUserMessageIndex(messages: MessageWithParts[]): number {
