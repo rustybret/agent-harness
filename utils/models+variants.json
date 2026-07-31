@@ -195,6 +195,10 @@
       "variants": []
     },
     {
+      "key": "google/antigravity-gemini-3.1-flash-image",
+      "variants": []
+    },
+    {
       "key": "google/antigravity-gemini-3.1-pro",
       "variants": [
         "high",
@@ -209,6 +213,36 @@
         "low",
         "medium",
         "minimal"
+      ]
+    },
+    {
+      "key": "google/antigravity-gemini-3.6-flash",
+      "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal"
+      ]
+    },
+    {
+      "key": "google/antigravity-gpt-oss-120b-medium",
+      "variants": [
+        "high",
+        "low"
+      ]
+    },
+    {
+      "key": "google/gemma-4-26b-a4b-it",
+      "variants": [
+        "high",
+        "low"
+      ]
+    },
+    {
+      "key": "google/gemma-4-31b-it",
+      "variants": [
+        "high",
+        "low"
       ]
     },
     {
@@ -347,7 +381,7 @@
       ]
     },
     {
-      "key": "nvidia/abacusai/dracarys-llama-3_1-70b-instruct",
+      "key": "nvidia/abacusai/dracarys-llama-3.1-70b-instruct",
       "variants": []
     },
     {
@@ -392,6 +426,14 @@
     },
     {
       "key": "nvidia/google/gemma-2-2b-it",
+      "variants": []
+    },
+    {
+      "key": "nvidia/google/gemma-3-12b-it",
+      "variants": []
+    },
+    {
+      "key": "nvidia/google/gemma-3-4b-it",
       "variants": []
     },
     {
@@ -482,7 +524,11 @@
       "variants": []
     },
     {
-      "key": "nvidia/mistralai/mistral-7b-instruct-v03",
+      "key": "nvidia/mistralai/ministral-14b-instruct-2512",
+      "variants": []
+    },
+    {
+      "key": "nvidia/mistralai/mistral-7b-instruct-v0.3",
       "variants": []
     },
     {
@@ -492,6 +538,13 @@
     {
       "key": "nvidia/mistralai/mistral-medium-3-instruct",
       "variants": []
+    },
+    {
+      "key": "nvidia/mistralai/mistral-medium-3.5-128b",
+      "variants": [
+        "high",
+        "none"
+      ]
     },
     {
       "key": "nvidia/mistralai/mistral-nemotron",
@@ -525,6 +578,10 @@
       "variants": []
     },
     {
+      "key": "nvidia/nvidia/cosmos-reason2-8b",
+      "variants": []
+    },
+    {
       "key": "nvidia/nvidia/cosmos-transfer1-7b",
       "variants": []
     },
@@ -537,8 +594,48 @@
       "variants": []
     },
     {
-      "key": "nvidia/nvidia/llama-3_1-nemotron-safety-guard-8b-v3",
+      "key": "nvidia/nvidia/llama-3.1-nemotron-70b-instruct",
       "variants": []
+    },
+    {
+      "key": "nvidia/nvidia/llama-3.1-nemotron-nano-8b-v1",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "key": "nvidia/nvidia/llama-3.1-nemotron-nano-vl-8b-v1",
+      "variants": []
+    },
+    {
+      "key": "nvidia/nvidia/llama-3.1-nemotron-safety-guard-8b-v3",
+      "variants": []
+    },
+    {
+      "key": "nvidia/nvidia/llama-3.1-nemotron-ultra-253b-v1",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "key": "nvidia/nvidia/llama-3.3-nemotron-super-49b-v1",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
+    },
+    {
+      "key": "nvidia/nvidia/llama-3.3-nemotron-super-49b-v1.5",
+      "variants": [
+        "high",
+        "low",
+        "medium"
+      ]
     },
     {
       "key": "nvidia/nvidia/llama-3_2-nemoretriever-300m-embed-v1",
@@ -601,6 +698,10 @@
       "variants": []
     },
     {
+      "key": "nvidia/nvidia/nemotron-nano-12b-v2-vl",
+      "variants": []
+    },
+    {
       "key": "nvidia/nvidia/nemotron-voicechat",
       "variants": []
     },
@@ -625,7 +726,7 @@
       "variants": []
     },
     {
-      "key": "nvidia/nvidia/riva-translate-4b-instruct-v1_1",
+      "key": "nvidia/nvidia/riva-translate-4b-instruct-v1.1",
       "variants": []
     },
     {
@@ -670,6 +771,10 @@
     },
     {
       "key": "nvidia/openai/whisper-large-v3",
+      "variants": []
+    },
+    {
+      "key": "nvidia/poolside/laguna-xs-2.1",
       "variants": []
     },
     {
@@ -724,7 +829,11 @@
       ]
     },
     {
-      "key": "nvidia/upstage/solar-10_7b-instruct",
+      "key": "nvidia/thinkingmachines/inkling",
+      "variants": []
+    },
+    {
+      "key": "nvidia/upstage/solar-10.7b-instruct",
       "variants": []
     },
     {
@@ -1270,6 +1379,12 @@
       "variants": []
     },
     {
+      "key": "opencode/kimi-k3",
+      "variants": [
+        "max"
+      ]
+    },
+    {
       "key": "opencode/laguna-s-2.1-free",
       "variants": [
         "high",
@@ -1633,6 +1748,14 @@
       ]
     },
     {
+      "key": "openrouter/deepseek/deepseek-v4-flash-0731",
+      "variants": [
+        "high",
+        "low",
+        "max"
+      ]
+    },
+    {
       "key": "openrouter/deepseek/deepseek-v4-pro",
       "variants": [
         "high",
@@ -1880,14 +2003,6 @@
         "high",
         "xhigh"
       ]
-    },
-    {
-      "key": "openrouter/inflection/inflection-3-pi",
-      "variants": []
-    },
-    {
-      "key": "openrouter/inflection/inflection-3-productivity",
-      "variants": []
     },
     {
       "key": "openrouter/kwaipilot/kat-coder-air-v2.5",
@@ -2264,28 +2379,12 @@
       "variants": []
     },
     {
-      "key": "openrouter/openai/gpt-4o-mini-search-preview",
-      "variants": []
-    },
-    {
-      "key": "openrouter/openai/gpt-4o-search-preview",
-      "variants": []
-    },
-    {
       "key": "openrouter/openai/gpt-5",
       "variants": [
         "high",
         "low",
         "medium",
         "minimal"
-      ]
-    },
-    {
-      "key": "openrouter/openai/gpt-5-codex",
-      "variants": [
-        "high",
-        "low",
-        "medium"
       ]
     },
     {
@@ -2328,10 +2427,6 @@
         "medium",
         "none"
       ]
-    },
-    {
-      "key": "openrouter/openai/gpt-5.1-chat",
-      "variants": []
     },
     {
       "key": "openrouter/openai/gpt-5.1-codex",
@@ -2600,10 +2695,6 @@
       ]
     },
     {
-      "key": "openrouter/openai/o3-deep-research",
-      "variants": []
-    },
-    {
       "key": "openrouter/openai/o3-mini",
       "variants": [
         "high",
@@ -2632,10 +2723,6 @@
         "low",
         "medium"
       ]
-    },
-    {
-      "key": "openrouter/openai/o4-mini-deep-research",
-      "variants": []
     },
     {
       "key": "openrouter/openai/o4-mini-high",
@@ -2685,14 +2772,6 @@
     },
     {
       "key": "openrouter/perplexity/sonar-reasoning-pro",
-      "variants": []
-    },
-    {
-      "key": "openrouter/poolside/laguna-m.1",
-      "variants": []
-    },
-    {
-      "key": "openrouter/poolside/laguna-m.1:free",
       "variants": []
     },
     {
@@ -2919,6 +2998,13 @@
       ]
     },
     {
+      "key": "openrouter/qwen/qwen3.7-flash",
+      "variants": [
+        "high",
+        "max"
+      ]
+    },
+    {
       "key": "openrouter/qwen/qwen3.7-max",
       "variants": [
         "high",
@@ -3018,6 +3104,17 @@
     },
     {
       "key": "openrouter/thinkingmachines/inkling",
+      "variants": [
+        "high",
+        "low",
+        "max",
+        "medium",
+        "minimal",
+        "none"
+      ]
+    },
+    {
+      "key": "openrouter/thinkingmachines/inkling-small",
       "variants": [
         "high",
         "low",

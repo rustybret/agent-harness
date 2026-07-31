@@ -72,10 +72,25 @@
       "key": "google/antigravity-claude-sonnet-4-6-thinking"
     },
     {
+      "key": "google/antigravity-gemini-3.1-flash-image"
+    },
+    {
       "key": "google/antigravity-gemini-3.1-pro"
     },
     {
       "key": "google/antigravity-gemini-3.5-flash"
+    },
+    {
+      "key": "google/antigravity-gemini-3.6-flash"
+    },
+    {
+      "key": "google/antigravity-gpt-oss-120b-medium"
+    },
+    {
+      "key": "google/gemma-4-26b-a4b-it"
+    },
+    {
+      "key": "google/gemma-4-31b-it"
     },
     {
       "key": "groq/canopylabs/orpheus-arabic-saudi"
@@ -162,7 +177,7 @@
       "key": "moonshotai/kimi-k3"
     },
     {
-      "key": "nvidia/abacusai/dracarys-llama-3_1-70b-instruct"
+      "key": "nvidia/abacusai/dracarys-llama-3.1-70b-instruct"
     },
     {
       "key": "nvidia/baai/bge-m3"
@@ -190,6 +205,12 @@
     },
     {
       "key": "nvidia/google/gemma-2-2b-it"
+    },
+    {
+      "key": "nvidia/google/gemma-3-12b-it"
+    },
+    {
+      "key": "nvidia/google/gemma-3-4b-it"
     },
     {
       "key": "nvidia/google/gemma-3n-e2b-it"
@@ -252,13 +273,19 @@
       "key": "nvidia/mistralai/magistral-small-2506"
     },
     {
-      "key": "nvidia/mistralai/mistral-7b-instruct-v03"
+      "key": "nvidia/mistralai/ministral-14b-instruct-2512"
+    },
+    {
+      "key": "nvidia/mistralai/mistral-7b-instruct-v0.3"
     },
     {
       "key": "nvidia/mistralai/mistral-large-3-675b-instruct-2512"
     },
     {
       "key": "nvidia/mistralai/mistral-medium-3-instruct"
+    },
+    {
+      "key": "nvidia/mistralai/mistral-medium-3.5-128b"
     },
     {
       "key": "nvidia/mistralai/mistral-nemotron"
@@ -282,6 +309,9 @@
       "key": "nvidia/nvidia/cosmos-predict1-5b"
     },
     {
+      "key": "nvidia/nvidia/cosmos-reason2-8b"
+    },
+    {
       "key": "nvidia/nvidia/cosmos-transfer1-7b"
     },
     {
@@ -291,7 +321,25 @@
       "key": "nvidia/nvidia/gliner-pii"
     },
     {
-      "key": "nvidia/nvidia/llama-3_1-nemotron-safety-guard-8b-v3"
+      "key": "nvidia/nvidia/llama-3.1-nemotron-70b-instruct"
+    },
+    {
+      "key": "nvidia/nvidia/llama-3.1-nemotron-nano-8b-v1"
+    },
+    {
+      "key": "nvidia/nvidia/llama-3.1-nemotron-nano-vl-8b-v1"
+    },
+    {
+      "key": "nvidia/nvidia/llama-3.1-nemotron-safety-guard-8b-v3"
+    },
+    {
+      "key": "nvidia/nvidia/llama-3.1-nemotron-ultra-253b-v1"
+    },
+    {
+      "key": "nvidia/nvidia/llama-3.3-nemotron-super-49b-v1"
+    },
+    {
+      "key": "nvidia/nvidia/llama-3.3-nemotron-super-49b-v1.5"
     },
     {
       "key": "nvidia/nvidia/llama-3_2-nemoretriever-300m-embed-v1"
@@ -327,6 +375,9 @@
       "key": "nvidia/nvidia/nemotron-mini-4b-instruct"
     },
     {
+      "key": "nvidia/nvidia/nemotron-nano-12b-v2-vl"
+    },
+    {
       "key": "nvidia/nvidia/nemotron-voicechat"
     },
     {
@@ -342,7 +393,7 @@
       "key": "nvidia/nvidia/rerank-qa-mistral-4b"
     },
     {
-      "key": "nvidia/nvidia/riva-translate-4b-instruct-v1_1"
+      "key": "nvidia/nvidia/riva-translate-4b-instruct-v1.1"
     },
     {
       "key": "nvidia/nvidia/sparsedrive"
@@ -370,6 +421,9 @@
     },
     {
       "key": "nvidia/openai/whisper-large-v3"
+    },
+    {
+      "key": "nvidia/poolside/laguna-xs-2.1"
     },
     {
       "key": "nvidia/qwen/qwen-image"
@@ -402,7 +456,10 @@
       "key": "nvidia/stepfun-ai/step-3.7-flash"
     },
     {
-      "key": "nvidia/upstage/solar-10_7b-instruct"
+      "key": "nvidia/thinkingmachines/inkling"
+    },
+    {
+      "key": "nvidia/upstage/solar-10.7b-instruct"
     },
     {
       "key": "nvidia/z-ai/glm-5.2"
@@ -592,6 +649,9 @@
     },
     {
       "key": "opencode/kimi-k2.7-code"
+    },
+    {
+      "key": "opencode/kimi-k3"
     },
     {
       "key": "opencode/laguna-s-2.1-free"
@@ -786,6 +846,9 @@
       "key": "openrouter/deepseek/deepseek-v4-flash"
     },
     {
+      "key": "openrouter/deepseek/deepseek-v4-flash-0731"
+    },
+    {
       "key": "openrouter/deepseek/deepseek-v4-pro"
     },
     {
@@ -901,12 +964,6 @@
     },
     {
       "key": "openrouter/inclusionai/ring-2.6-1t"
-    },
-    {
-      "key": "openrouter/inflection/inflection-3-pi"
-    },
-    {
-      "key": "openrouter/inflection/inflection-3-productivity"
     },
     {
       "key": "openrouter/kwaipilot/kat-coder-air-v2.5"
@@ -1158,16 +1215,7 @@
       "key": "openrouter/openai/gpt-4o-mini-2024-07-18"
     },
     {
-      "key": "openrouter/openai/gpt-4o-mini-search-preview"
-    },
-    {
-      "key": "openrouter/openai/gpt-4o-search-preview"
-    },
-    {
       "key": "openrouter/openai/gpt-5"
-    },
-    {
-      "key": "openrouter/openai/gpt-5-codex"
     },
     {
       "key": "openrouter/openai/gpt-5-image"
@@ -1186,9 +1234,6 @@
     },
     {
       "key": "openrouter/openai/gpt-5.1"
-    },
-    {
-      "key": "openrouter/openai/gpt-5.1-chat"
     },
     {
       "key": "openrouter/openai/gpt-5.1-codex"
@@ -1287,9 +1332,6 @@
       "key": "openrouter/openai/o3"
     },
     {
-      "key": "openrouter/openai/o3-deep-research"
-    },
-    {
       "key": "openrouter/openai/o3-mini"
     },
     {
@@ -1300,9 +1342,6 @@
     },
     {
       "key": "openrouter/openai/o4-mini"
-    },
-    {
-      "key": "openrouter/openai/o4-mini-deep-research"
     },
     {
       "key": "openrouter/openai/o4-mini-high"
@@ -1339,12 +1378,6 @@
     },
     {
       "key": "openrouter/perplexity/sonar-reasoning-pro"
-    },
-    {
-      "key": "openrouter/poolside/laguna-m.1"
-    },
-    {
-      "key": "openrouter/poolside/laguna-m.1:free"
     },
     {
       "key": "openrouter/poolside/laguna-s-2.1"
@@ -1494,6 +1527,9 @@
       "key": "openrouter/qwen/qwen3.6-plus"
     },
     {
+      "key": "openrouter/qwen/qwen3.7-flash"
+    },
+    {
       "key": "openrouter/qwen/qwen3.7-max"
     },
     {
@@ -1552,6 +1588,9 @@
     },
     {
       "key": "openrouter/thinkingmachines/inkling"
+    },
+    {
+      "key": "openrouter/thinkingmachines/inkling-small"
     },
     {
       "key": "openrouter/undi95/remm-slerp-l2-13b"
