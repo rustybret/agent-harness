@@ -3,6 +3,8 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 
+import { _resetLoggerForTesting, _setLoggerForTesting } from "../../shared/logger"
+
 const originalClaudePluginsHome = process.env.CLAUDE_PLUGINS_HOME
 const temporaryDirectories: string[] = []
 
@@ -18,14 +20,13 @@ function writeDatabase(pluginsHome: string, database: unknown): void {
 
 describe("discoverInstalledPlugins components", () => {
   beforeEach(() => {
-    mock.module("../../shared/logger", () => ({
-      log: () => {},
-    }))
+    _setLoggerForTesting({ sink: () => {} })
 
     process.env.CLAUDE_PLUGINS_HOME = createTemporaryDirectory("omo-component-plugins-")
   })
 
   afterEach(() => {
+    _resetLoggerForTesting()
     mock.restore()
 
     if (originalClaudePluginsHome === undefined) {

@@ -3,6 +3,8 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { basename, join } from "node:path"
 
+import { _resetLoggerForTesting, _setLoggerForTesting } from "../../shared/logger"
+
 const originalClaudePluginsHome = process.env.CLAUDE_PLUGINS_HOME
 const temporaryDirectories: string[] = []
 const originalCwd = process.cwd()
@@ -23,15 +25,14 @@ function createInstallPath(prefix: string): string {
 
 describe("discoverInstalledPlugins", () => {
   beforeEach(() => {
-    mock.module("../../shared/logger", () => ({
-      log: () => {},
-    }))
+    _setLoggerForTesting({ sink: () => {} })
 
     const pluginsHome = createTemporaryDirectory("omo-claude-plugins-")
     process.env.CLAUDE_PLUGINS_HOME = pluginsHome
   })
 
   afterEach(() => {
+    _resetLoggerForTesting()
     mock.restore()
 
     if (originalClaudePluginsHome === undefined) {

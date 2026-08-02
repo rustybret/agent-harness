@@ -6,6 +6,8 @@ import { afterEach, beforeEach, describe, expect, mock, test } from "bun:test"
 import type { DelegateTaskArgs } from "../types"
 import type { ExecutorContext } from "../executor-types"
 
+import { _resetLoggerForTesting, _setLoggerForTesting } from "../../../shared/logger"
+
 type SubagentResolverModule = typeof import("../subagent-resolver")
 
 const logMock = mock((..._args: unknown[]) => {})
@@ -79,9 +81,7 @@ describe("resolveSubagentExecution", () => {
     loadProjectAgentsMock.mockReset()
     loadUserAgentsMock.mockImplementation(() => ({}))
     loadProjectAgentsMock.mockImplementation(() => ({}))
-    mock.module("../../../shared/logger", () => ({
-      log: logMock,
-    }))
+    _setLoggerForTesting({ sink: logMock })
     mock.module("../../../shared/connected-providers-cache", () => ({
       readConnectedProvidersCache: readConnectedProvidersCacheMock,
       readProviderModelsCache: readProviderModelsCacheMock,
@@ -101,6 +101,7 @@ describe("resolveSubagentExecution", () => {
   })
 
   afterEach(() => {
+    _resetLoggerForTesting()
     mock.restore()
   })
 
@@ -1350,9 +1351,7 @@ describe("resolveSubagentExecution - agent name sanitization", () => {
     loadProjectAgentsMock.mockReset()
     loadUserAgentsMock.mockImplementation(() => ({}))
     loadProjectAgentsMock.mockImplementation(() => ({}))
-    mock.module("../../../shared/logger", () => ({
-      log: logMock,
-    }))
+    _setLoggerForTesting({ sink: logMock })
     mock.module("../../../shared/connected-providers-cache", () => ({
       readConnectedProvidersCache: readConnectedProvidersCacheMock,
       readProviderModelsCache: readProviderModelsCacheMock,
@@ -1372,6 +1371,7 @@ describe("resolveSubagentExecution - agent name sanitization", () => {
   })
 
   afterEach(() => {
+    _resetLoggerForTesting()
     mock.restore()
   })
 

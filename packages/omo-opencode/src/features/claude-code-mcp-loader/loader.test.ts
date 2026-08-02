@@ -5,6 +5,8 @@ import { mkdirSync, writeFileSync, rmSync } from "fs"
 import { join } from "path"
 import { tmpdir } from "os"
 
+import { _resetLoggerForTesting, _setLoggerForTesting } from "../../shared/logger"
+
 const TEST_DIR = join(tmpdir(), "mcp-loader-test-" + Date.now())
 const TEST_HOME = join(TEST_DIR, "home")
 
@@ -315,12 +317,11 @@ describe("loadMcpConfigs", () => {
     mkdirSync(TEST_HOME, { recursive: true })
     process.env.HOME = TEST_HOME
     process.env.CLAUDE_CONFIG_DIR = join(TEST_HOME, ".claude")
-    mock.module("../../shared/logger", () => ({
-      log: () => {},
-    }))
+    _setLoggerForTesting({ sink: () => {} })
   })
 
   afterEach(() => {
+    _resetLoggerForTesting()
     mock.restore()
     rmSync(TEST_DIR, { recursive: true, force: true })
   })

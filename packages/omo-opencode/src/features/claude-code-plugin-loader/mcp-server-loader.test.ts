@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test"
 import { mkdirSync, rmSync, writeFileSync } from "fs"
 import { tmpdir } from "os"
 import { join } from "path"
+import { _resetLoggerForTesting, _setLoggerForTesting } from "../../shared/logger"
 import type { LoadedPlugin } from "./types"
 
 const TEST_DIR = join(tmpdir(), `plugin-mcp-loader-test-${Date.now()}`)
@@ -15,12 +16,11 @@ describe("loadPluginMcpServers", () => {
     mkdirSync(PROJECT_DIR, { recursive: true })
     mkdirSync(PROJECT_SUBDIRECTORY, { recursive: true })
     mkdirSync(PLUGIN_DIR, { recursive: true })
-    mock.module("../../shared/logger", () => ({
-      log: () => {},
-    }))
+    _setLoggerForTesting({ sink: () => {} })
   })
 
   afterEach(() => {
+    _resetLoggerForTesting()
     mock.restore()
     rmSync(TEST_DIR, { recursive: true, force: true })
   })

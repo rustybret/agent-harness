@@ -40,6 +40,40 @@ describe("#given a bound utils logger", () => {
     expect(fs.existsSync(logFilePath)).toBe(false)
   })
 
+  test("#when a sink override is installed #then log calls are captured and nothing reaches the log file", () => {
+    const logger = createLogger({ logFileName: "unused.log", resolveLogFilePath: () => logFilePath })
+    const captured: Array<{ message: string; data?: unknown }> = []
+
+    logger._setLoggerForTesting({
+      sink: (message, data) => {
+        captured.push({ message, data })
+      },
+    })
+    logger.log("SINK-CAPTURED", { qa: true })
+    logger._flushForTesting()
+
+    expect(captured).toEqual([{ message: "SINK-CAPTURED", data: { qa: true } }])
+    expect(fs.existsSync(logFilePath)).toBe(false)
+  })
+
+  test("#when reset follows a sink override #then logging returns to the real file buffer", () => {
+    const logger = createLogger({ logFileName: "unused.log", resolveLogFilePath: () => logFilePath })
+    const captured: Array<{ message: string; data?: unknown }> = []
+
+    logger._setLoggerForTesting({
+      sink: (message, data) => {
+        captured.push({ message, data })
+      },
+    })
+    logger.log("SINK-CAPTURED", { qa: true })
+    logger._resetLoggerForTesting()
+    logger.log("FILE-RESTORED", { qa: true })
+    logger._flushForTesting()
+
+    expect(captured).toEqual([{ message: "SINK-CAPTURED", data: { qa: true } }])
+    expect(fs.readFileSync(logFilePath, "utf8")).toMatch(/FILE-RESTORED \{"qa":true\}\n$/)
+  })
+
   test("#when reset follows a test override #then the default resolved path is restored", () => {
     const defaultLogFilePath = path.join(tempDir, "default.log")
     const overrideLogFilePath = path.join(tempDir, "override.log")

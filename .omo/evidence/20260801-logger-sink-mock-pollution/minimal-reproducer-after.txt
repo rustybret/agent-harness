@@ -1,0 +1,7 @@
+### AFTER FIX: bun test $L $V $E
+bun test v1.3.14 (0d9b296a)
+
+ 80 pass
+ 0 fail
+ 168 expect() calls
+Ran 80 tests across 3 files. [403.00ms]

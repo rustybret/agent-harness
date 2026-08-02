@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it, mock } from "bun:test"
 
+import { _resetLoggerForTesting, _setLoggerForTesting } from "../../shared/logger"
+
 const virtualSolidJsSpecifier = "opentui:runtime-module:" + encodeURIComponent("solid-js")
 const virtualOpenTuiSolidSpecifier = "opentui:runtime-module:" + encodeURIComponent("@opentui/solid")
 
@@ -9,13 +11,11 @@ type LogEntry = {
 }
 
 async function loadFreshHostRuntime(logs: LogEntry[]) {
-  const loggerMock = () => ({
-    log: (message: string, fields?: Readonly<Record<string, unknown>>): void => {
-      logs.push({ message, fields })
+  _setLoggerForTesting({
+    sink: (message: string, fields?: unknown): void => {
+      logs.push({ message, fields: fields as Readonly<Record<string, unknown>> | undefined })
     },
   })
-  mock.module("../../shared/logger", loggerMock)
-  mock.module("../../shared/logger.ts", loggerMock)
   return import(`./host-runtime?case=${Date.now()}-${Math.random()}`)
 }
 
@@ -51,6 +51,7 @@ function createThrowingOpenTuiSolidRuntime() {
 
 describe("loadHostSolidRuntime", () => {
   afterEach(() => {
+    _resetLoggerForTesting()
     mock.restore()
   })
 

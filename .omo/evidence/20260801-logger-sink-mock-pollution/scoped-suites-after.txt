@@ -1,0 +1,31 @@
+### hooks/runtime-fallback isolated
+bun test v1.3.14 (0d9b296a)
+
+ 258 pass
+ 0 fail
+ 500 expect() calls
+Ran 258 tests across 28 files. [296.00ms]
+
+### hooks suite
+bun test v1.3.14 (0d9b296a)
+
+ 2129 pass
+ 0 fail
+ 4675 expect() calls
+Ran 2129 tests across 268 files. [22.20s]
+
+### claude-code-compat-core
+bun test v1.3.14 (0d9b296a)
+
+ 182 pass
+ 0 fail
+ 380 expect() calls
+Ran 182 tests across 20 files. [293.00ms]
+
+### packages/utils logger
+bun test v1.3.14 (0d9b296a)
+
+ 7 pass
+ 0 fail
+ 10 expect() calls
+Ran 7 tests across 2 files. [85.00ms]

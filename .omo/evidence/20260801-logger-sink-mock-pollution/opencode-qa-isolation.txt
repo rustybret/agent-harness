@@ -1,0 +1,2 @@
+real DB session count BEFORE: 6839
+real DB session count AFTER: 6839

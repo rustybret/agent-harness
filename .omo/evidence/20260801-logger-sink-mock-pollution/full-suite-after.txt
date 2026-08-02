@@ -1,0 +1,9 @@
+### AFTER FIX - full root suite
+empty-project: cold=64.3ms warm=[38.8, 39.0] median=39.0ms
+in-tree-fixture: cold=50.3ms warm=[43.2, 39.6] median=43.2ms
+
+ 12915 pass
+ 7 skip
+ 0 fail
+ 2 snapshots, 58795 expect() calls
+Ran 12922 tests across 1618 files. [162.39s]

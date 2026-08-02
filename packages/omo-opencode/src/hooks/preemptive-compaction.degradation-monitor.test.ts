@@ -2,13 +2,13 @@
 
 import { beforeEach, describe, expect, it, mock, afterAll } from "bun:test"
 
-const logMock = mock(() => {})
+import { _resetLoggerForTesting, _setLoggerForTesting } from "../shared/logger"
 
-mock.module("../shared/logger", () => ({
-  log: logMock,
-}))
+const logMock = mock((_message: string, _data?: unknown) => {})
 
-afterAll(() => { mock.restore() })
+afterAll(() => {
+  _resetLoggerForTesting()
+})
 
 const { createPreemptiveCompactionHook } = await import("./preemptive-compaction")
 
@@ -94,6 +94,7 @@ function buildAssistantUpdate(input: {
 describe("preemptive-compaction post-compaction degradation monitor", () => {
   beforeEach(() => {
     logMock.mockClear()
+    _setLoggerForTesting({ sink: logMock })
   })
 
   it("triggers recovery summarize after three consecutive no-text tail messages", async () => {

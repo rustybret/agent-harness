@@ -1,0 +1,24 @@
+### FINAL RE-VERIFICATION (post-stash-pop tree state)
+
+Reason: the sse-hook-probe baseline check used `git stash push` / `git stash pop`,
+which rewrote source mtimes AFTER the first green full-suite run. Because mtime
+drives bun's test-file discovery order (the exact contamination documented in
+invalid-baseline-attempts.md), the earlier green result predated the current
+tree ordering and had to be re-established.
+
+Content integrity check on the current tree:
+  LoggerSink occurrences in packages/utils/src/logging/logger.ts : 3
+  remaining mock.module(".../shared/logger") in packages/*/src   : 0
+  _setLoggerForTesting({ sink ... }) call sites                  : 21
+
+bun run typecheck  -> TYPECHECK_EXIT=0 (all 27 workspace projects, no errors)
+
+bun test
+  12915 pass
+  7 skip
+  0 fail
+  2 snapshots, 61175 expect() calls
+  Ran 12922 tests across 1618 files. [165.96s]
+
+Matches the pre-stash run exactly (12915 pass / 7 skip / 0 fail), confirming the
+result is stable across two independent file orderings.

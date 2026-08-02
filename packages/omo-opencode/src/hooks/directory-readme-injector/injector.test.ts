@@ -6,8 +6,10 @@ import { join } from "node:path"
 
 import type { PluginInput } from "@opencode-ai/plugin"
 
+import { _resetLoggerForTesting, _setLoggerForTesting } from "../../shared/logger"
+
 const storageMaps = new Map<string, Set<string>>()
-const logMock = mock(() => undefined)
+const logMock = mock((_message: string, _data?: unknown) => undefined)
 
 mock.module("./storage", () => ({
   loadInjectedPaths: (sessionID: string) => storageMaps.get(sessionID) ?? new Set<string>(),
@@ -16,12 +18,9 @@ mock.module("./storage", () => ({
   },
 }))
 
-mock.module("../../shared/logger", () => ({
-  log: logMock,
-}))
-
 afterAll(() => {
   mock.restore()
+  _resetLoggerForTesting()
 })
 
 function createPluginContext(directory: string): PluginInput {
@@ -51,6 +50,7 @@ describe("processFilePathForReadmeInjection", () => {
     mkdirSync(testRoot, { recursive: true })
     storageMaps.clear()
     logMock.mockClear()
+    _setLoggerForTesting({ sink: logMock })
   })
 
   afterEach(() => {

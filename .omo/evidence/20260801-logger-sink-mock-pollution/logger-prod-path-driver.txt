@@ -1,0 +1,4 @@
+prod default path writes to file: true
+sink captures: true | sink leaked to file: false
+prod path restored after reset: true
+DRIVER PASS

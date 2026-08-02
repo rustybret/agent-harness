@@ -6,7 +6,7 @@ import {
   getDelegatedChildSessionBootstrap,
   registerDelegatedChildSessionBootstrap,
 } from "../../shared/delegated-child-session-bootstrap"
-import * as loggerModule from "../../shared/logger"
+import { _resetLoggerForTesting, _setLoggerForTesting } from "../../shared/logger"
 import { SessionCategoryRegistry } from "../../shared/session-category-registry"
 import {
   _resetForTesting as resetClaudeCodeSessionState,
@@ -40,18 +40,18 @@ describe("runtime-fallback", () => {
 
     const cacheBuster = `${Date.now()}-${Math.random()}`
 
-    mock.module("../../shared/logger", () => ({
-      ...loggerModule,
-      log: (msg: string, data?: unknown) => {
+    _setLoggerForTesting({
+      sink: (msg: string, data?: unknown) => {
         logCalls.push({ msg, data })
       },
-    }))
+    })
 
     const runtimeFallbackModule: RuntimeFallbackModule = await import(`./hook?test=${cacheBuster}`)
     createRuntimeFallbackHook = runtimeFallbackModule.createRuntimeFallbackHook
   })
 
   afterEach(() => {
+    _resetLoggerForTesting()
     restoreRuntimeFallbackTestClock()
     SessionCategoryRegistry.clear()
     resetClaudeCodeSessionState()

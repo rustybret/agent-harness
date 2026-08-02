@@ -1,0 +1,2 @@
+sse-hook-probe --self-test: FAIL at BOTH baseline (HEAD, LoggerSink=0) and with fix (LoggerSink=3)
+=> pre-existing environment issue, NOT caused by this change

@@ -7,10 +7,13 @@ export const DEFAULT_MAX_LOG_FILE_BACKUPS = 2
 export const DEFAULT_LOG_FLUSH_INTERVAL_MS = 500
 export const DEFAULT_LOG_BUFFER_SIZE_LIMIT = 50
 
+export type LoggerSink = (message: string, data?: unknown) => void
+
 export type LoggerTestOverrides = {
   readonly filePath?: string
   readonly maxSizeBytes?: number
   readonly maxBackups?: number
+  readonly sink?: LoggerSink
 }
 
 export type LoggerOptions = {
@@ -47,6 +50,7 @@ export function createLogger(options: LoggerOptions): BoundLogger {
   let maxLogFileBackups = maxLogFileBackupsDefault
   let buffer: string[] = []
   let flushTimer: ReturnType<typeof setTimeout> | null = null
+  let sink: LoggerSink | null = null
 
   function rotateLogFileIfNeeded(): void {
     try {
@@ -92,6 +96,11 @@ export function createLogger(options: LoggerOptions): BoundLogger {
   }
 
   function log(message: string, data?: unknown): void {
+    if (sink) {
+      sink(message, data)
+      return
+    }
+
     try {
       const timestamp = new Date().toISOString()
       const logEntry = `[${timestamp}] ${message} ${data ? JSON.stringify(data) : ""}\n`
@@ -119,12 +128,14 @@ export function createLogger(options: LoggerOptions): BoundLogger {
     if (overrides.filePath !== undefined) logFile = overrides.filePath
     if (overrides.maxSizeBytes !== undefined) maxLogFileSizeBytes = overrides.maxSizeBytes
     if (overrides.maxBackups !== undefined) maxLogFileBackups = overrides.maxBackups
+    if (overrides.sink !== undefined) sink = overrides.sink
   }
 
   function _resetLoggerForTesting(): void {
     logFile = initialLogFile
     maxLogFileSizeBytes = maxLogFileSizeDefault
     maxLogFileBackups = maxLogFileBackupsDefault
+    sink = null
     buffer = []
     if (flushTimer) {
       clearTimeout(flushTimer)

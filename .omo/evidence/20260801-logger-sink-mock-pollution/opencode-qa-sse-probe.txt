@@ -1,0 +1,2 @@
+stream head (no 'server.connected' within 15s):
+FAIL: did not observe server.connected

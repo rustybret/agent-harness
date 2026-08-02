@@ -2,14 +2,15 @@ import { describe, expect, it, mock, afterAll } from "bun:test"
 
 import { applyProviderConfig } from "../plugin-handlers/provider-config-handler"
 import { createModelCacheState } from "../plugin-state"
+import { _resetLoggerForTesting, _setLoggerForTesting } from "../shared/logger"
 
-const logMock = mock(() => {})
+const logMock = mock((_message: string, _data?: unknown) => {})
 
-mock.module("../shared/logger", () => ({
-  log: logMock,
-}))
+_setLoggerForTesting({ sink: logMock })
 
-afterAll(() => { mock.restore() })
+afterAll(() => {
+  _resetLoggerForTesting()
+})
 
 const { createPreemptiveCompactionHook } = await import("./preemptive-compaction")
 

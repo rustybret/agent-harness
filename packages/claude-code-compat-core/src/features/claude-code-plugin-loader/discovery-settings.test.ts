@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test"
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
+import { _resetLoggerForTesting, _setLoggerForTesting } from "../../shared/logger"
 import type { LoadedPlugin } from "./types"
 
 const originalClaudePluginsHome = process.env.CLAUDE_PLUGINS_HOME
@@ -20,14 +21,13 @@ function writeDatabase(pluginsHome: string, database: unknown): void {
 
 describe("discoverInstalledPlugins settings", () => {
   beforeEach(() => {
-    mock.module("../../shared/logger", () => ({
-      log: () => {},
-    }))
+    _setLoggerForTesting({ sink: () => {} })
 
     process.env.CLAUDE_PLUGINS_HOME = createTemporaryDirectory("omo-settings-plugins-")
   })
 
   afterEach(() => {
+    _resetLoggerForTesting()
     mock.restore()
 
     if (originalClaudePluginsHome === undefined) {

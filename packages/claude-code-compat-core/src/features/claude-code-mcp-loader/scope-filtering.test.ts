@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, mock } from "bun:test"
 import { mkdirSync, rmSync, writeFileSync } from "fs"
 import { tmpdir } from "os"
 import { join } from "path"
+import { _resetLoggerForTesting, _setLoggerForTesting } from "../../shared/logger"
 import { shouldLoadMcpServer } from "./scope-filter"
 
 const TEST_DIR = join(tmpdir(), `mcp-scope-filtering-test-${Date.now()}`)
@@ -17,12 +18,11 @@ describe("loadMcpConfigs", () => {
     process.env.HOME = TEST_HOME
     process.env.USERPROFILE = TEST_HOME
     process.env.CLAUDE_CONFIG_DIR = join(TEST_HOME, ".claude")
-    mock.module("../../shared/logger", () => ({
-      log: () => {},
-    }))
+    _setLoggerForTesting({ sink: () => {} })
   })
 
   afterEach(() => {
+    _resetLoggerForTesting()
     mock.restore()
     if (ORIGINAL_HOME === undefined) {
       delete process.env.HOME

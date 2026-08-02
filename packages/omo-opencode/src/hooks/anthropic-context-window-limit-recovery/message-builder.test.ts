@@ -1,12 +1,12 @@
 import { afterAll, beforeEach, describe, expect, mock, test } from "bun:test"
 
+import { _resetLoggerForTesting, _setLoggerForTesting } from "../../shared/logger"
+
 const replaceEmptyTextPartsAsync = mock(() => Promise.resolve(false))
 const injectTextPartAsync = mock(() => Promise.resolve(false))
 const findMessagesWithEmptyTextPartsFromSDK = mock(() => Promise.resolve([] as string[]))
 
-mock.module("../../shared/logger", () => ({
-  log: () => {},
-}))
+_setLoggerForTesting({ sink: () => {} })
 
 mock.module("../../shared/opencode-storage-detection", () => ({
   isSqliteBackend: () => true,
@@ -31,6 +31,7 @@ mock.module("./storage/text-part-injector.ts", textPartInjectorMockFactory)
 const messageBuilderModulePromise = import("./message-builder")
 
 afterAll(() => {
+  _resetLoggerForTesting()
   mock.restore()
 })
 
