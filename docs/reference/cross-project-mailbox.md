@@ -50,7 +50,9 @@ Configure the mailbox by adding the `cross_project_mailbox` block to your user c
     "senders": {
       "abc12345": {
         "access": "allow", // "allow" or "deny" access to deliver to this mailbox
-        "intent_budget": "impl" // Maximum intent permitted: "question" | "impl" | "plan"
+        "intent_budget": "impl", // Maximum intent permitted: "question" | "impl" | "plan"
+        "allowed_modes": ["todo-append", "subagent"], // Optional. Allowlist of requested_mode lanes this sender may use. Absent = every mode whose tier fits intent_budget is implicitly allowed.
+        "worker_pr_variant": "local" // Optional. Substrate for this sender's worker-pr notes: "local" (default, headless worktree worker) | "cloudhome" (delegate execution to cloudhome).
       }
     },
 
@@ -130,6 +132,7 @@ This tool is used in external sessions to send asynchronous, presence-aware coor
     "intent": "impl", // "question" | "impl" | "plan" (optional if category is provided)
     "category": "quick", // Optional category to route the task
     "mode": "list", // Optional mode: "list" for budget probe, or omit for normal message delivery
+    "requested_mode": "subagent", // Optional advisory delivery mode: "answer" | "todo-append" | "todo-next" | "subagent" | "worker-pr" | "interrupt". See Requested Delivery Modes.
     "body": "Markdown text describing the task or coordination request.",
     "priority": 0, // Higher numbers are drained first
     "threadId": "optional-uuid", // Correlation thread grouping (UUID v4)
@@ -157,6 +160,7 @@ This tool is a fire-and-forget doc-drop tool designed for internal sessions. It 
   "name": "project_note",
   "arguments": {
     "targetProjectId": "abc12345", // Target project to send note to
+    "requested_mode": "todo-append", // Optional advisory delivery mode: "answer" | "todo-append" | "todo-next" | "subagent" | "worker-pr" | "interrupt". See Requested Delivery Modes.
     "body": "Markdown text describing the task or coordination request.",
     "priority": 0, // Higher numbers are drained first
     "threadId": "optional-uuid", // Correlation thread grouping (UUID v4)
@@ -244,6 +248,56 @@ The gating rule is defined as:
 `requiredTier(category ?? intent) <= grantedCeiling(sender)`
 
 The `category` field on `project_message` is optional. If omitted, the `intent` determines the required tier.
+
+---
+
+## Requested Delivery Modes & Routing Lanes
+
+Beyond the intent tier (which gates *whether* a note is accepted), a sender may attach an optional `requested_mode` to a `project_message` or `project_note` call to advise *how* the note should be handled on arrival. The field is additive and optional: a note without it behaves exactly as before (legacy main-session triage). The receiver is always authoritative — a `requested_mode` is a request, never a command (see [Roadmap](#roadmap)).
+
+### The Six Mode Values
+
+`requested_mode` is one of the following canonical kebab-case values:
+
+| Mode | Required tier | What the receiver does |
+| :--- | :--- | :--- |
+| `answer` | `question` | Answers the note in a fresh side session (or a cloudhome-hosted session when no local presence exists) and sends the answer back as a threaded reply. Never touches the main session. |
+| `todo-append` | `impl` | Appends a todo built from the note body to the *end* of the active session's todo list. Falls back to durable boulder-state when no live session exists. |
+| `todo-next` | `impl` | Inserts the todo immediately *after* the current in-progress item instead of at the end. |
+| `subagent` | `impl` | Fulfills the note with one or more background subagents (single, or an investigate-then-implement pair) without occupying the main turn; reports back with a threaded reply. |
+| `worker-pr` | `plan` | Runs a headless worker in a task-owned git worktree that implements, QAs, and opens a PR; the PR URL is reported back for main-session review. See `worker_pr_variant` below. |
+| `interrupt` | `plan` | Queue-jumps the drain poller and prepends an urgent todo, injecting a re-evaluation prompt at the next safe boundary. It is **not** a mid-turn abort — it never interrupts a running turn, only cuts the queue for the next safe injection point. |
+
+The required tier is checked against the sender's `intent_budget` ceiling. An over-budget or disallowed mode is **silently downgraded** to legacy main-session triage with a recorded reason (`mode-over-budget` or `mode-not-allowed`) — a valid note is never hard-rejected because of its requested mode.
+
+### Receiver-Side Mode Configuration
+
+Two optional per-sender fields shape mode handling:
+
+* **`allowed_modes`** (`string[]`, optional): An explicit allowlist of the modes this sender may use. When absent, every mode whose required tier fits within the sender's `intent_budget` is implicitly allowed. When present, any mode not in the list is downgraded to triage with reason `mode-not-allowed`. Budget is still checked first, so an over-budget mode downgrades with `mode-over-budget` even if it appears in the allowlist.
+* **`worker_pr_variant`** (`"local" | "cloudhome"`, optional): Selects the substrate for this sender's `worker-pr` notes. Absent or `"local"` uses the default local headless-worktree worker. `"cloudhome"` delegates execution to cloudhome through the request/PR-intake contract (agent-harness ships only the contract half; cloudhome performs the actual work). A note whose category is `worker-pr-cloudhome` overrides this per-sender default for that single note.
+
+### Routing Lanes
+
+Inbound notes route deterministically to one of these lanes based on `requested_mode`, sender budget, and target presence:
+
+* **`triage`** — legacy/fallback: the note is surfaced to the main session as a static triage prompt. This is the lane for notes with no `requested_mode`, for downgraded notes, and for the manual `project_mailbox_drain` output.
+* **`answer-local`** / **`answer-remote`** — side-session Q&A locally, or a cloudhome-hosted answer contract when no local presence exists and the question is not about in-flight local work.
+* **`todo-append`** / **`todo-next`** — live-worklist injection into the active session's todo list.
+* **`subagent`** — background subagent fulfillment.
+* **`worker-pr-local`** / **`worker-pr-cloudhome`** — headless worker-PR, local or cloudhome-delegated per `worker_pr_variant`.
+* **`interrupt`** — safe queue-jump injection.
+* **`classify`** — a cheap classifier subagent runs only for notes that carry *no* `requested_mode` and whose intent is ambiguous; its constrained output re-enters the same budget gating.
+
+The manual `project_mailbox_drain` tool remains a raw synchronous return; it surfaces each note's `requested_mode` plus per-mode guidance in its output rather than executing the lane automatically.
+
+---
+
+## Roadmap
+
+**Current (Phase 1) — sender requests, receiver decides.** The `requested_mode` field is advisory. The sender asks for a lane, and the receiving project's own budget and per-sender config (`intent_budget`, `allowed_modes`, `worker_pr_variant`) decide the mode that actually runs, silently downgrading anything over-budget or disallowed. This keeps the trust model intact: the receiver is always the authority on what executes.
+
+**Phase 2 (future) — orchestrator authority model.** A sender requests a mode, an orchestrator decides the actual mode, and the receiver follows the orchestrator's commands. The wire format is deliberately additive so this evolution needs no breaking change. This is likely implemented as either a full orchestrator or a dedicated intake agent (undecided; tracked here for future work). Neither the orchestrator nor a dedicated intake agent is implemented in Phase 1.
 
 ---
 

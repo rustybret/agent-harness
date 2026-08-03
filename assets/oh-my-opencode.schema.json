@@ -6746,6 +6746,29 @@
                   "impl",
                   "plan"
                 ]
+              },
+              "allowed_modes": {
+                "description": "Optional allowlist of requested_mode lanes this source project may use. Absent = every mode whose tier fits within intent_budget is implicitly allowed.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "answer",
+                    "todo-append",
+                    "todo-next",
+                    "subagent",
+                    "worker-pr",
+                    "interrupt"
+                  ]
+                }
+              },
+              "worker_pr_variant": {
+                "description": "Optional substrate for this source project's worker-pr notes. Absent or 'local' = local headless worktree worker (default); 'cloudhome' = delegate execution to cloudhome via the request/PR-intake contract. A note-level worker-pr-cloudhome category overrides this per-sender default.",
+                "type": "string",
+                "enum": [
+                  "local",
+                  "cloudhome"
+                ]
               }
             },
             "required": [
