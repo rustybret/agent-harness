@@ -58,6 +58,7 @@ const nodes: BuildNode[] = [
 	{ id: "codex-plugin", command: "bun", args: ["run", "build:codex-plugin"], deps: ["git-bash-mcp", "lsp-tools-mcp", "lsp-daemon"] },
 	{ id: "senpi-plugin", command: "bun", args: ["run", "build:senpi-plugin:stage"], deps: ["lsp-daemon"] },
 	{ id: "index", command: "bun", args: ["build", "packages/omo-opencode/src/index.ts", "--outdir", "dist", "--target", "bun", "--format", "esm", "--external", "zod"], deps: [] },
+	{ id: "mailbox-worker-pr-wrapper", command: "bun", args: ["build", "packages/omo-opencode/src/features/cross-project-mailbox/lanes/worker-pr/run-worker.mjs", "--outdir", "dist/worker-pr", "--target", "bun", "--format", "esm"], deps: [] },
 	{ id: "tui-solid", command: "bun", args: ["run", "script/build-tui-solid.ts"], deps: [] },
 	{ id: "tui", command: "bun", args: ["build", "packages/omo-opencode/src/tui.ts", "--outdir", "dist", "--target", "bun", "--format", "esm", ...OPENTUI_EXTERNALS.flatMap((name) => ["--external", name])], deps: ["tui-solid"] },
 	{ id: "shared-skills-assets", command: "bun", args: ["run", "build:shared-skills-assets"], deps: ["index"] },
