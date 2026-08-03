@@ -59,3 +59,24 @@ export function requiredTier(categoryOrAgent: string): CanonicalIntent {
 export function withinBudget(requiredIntent: CanonicalIntent, grantedCeiling: CanonicalIntent): boolean {
   return TIER_ORDER[requiredIntent] <= TIER_ORDER[grantedCeiling]
 }
+
+// Local mode vocabulary. Task-1 (envelope) owns the canonical MAILBOX_MODES/MailboxMode
+// definition in envelope/schema.ts. Until task-1 lands and task-4 (router) unifies the two,
+// this module keeps its own literal tuple so task-2 does not depend on in-flight work.
+// FOLLOW-UP: unify these two MailboxMode definitions into one import once task-1 lands.
+export const MAILBOX_MODES = ["answer", "todo-append", "todo-next", "subagent", "worker-pr", "interrupt"] as const
+
+export type MailboxMode = (typeof MAILBOX_MODES)[number]
+
+export const MODE_TIER: Record<MailboxMode, CanonicalIntent> = {
+  answer: "question",
+  "todo-append": "impl",
+  "todo-next": "impl",
+  subagent: "impl",
+  "worker-pr": "plan",
+  interrupt: "plan",
+}
+
+export function modeWithinBudget(mode: MailboxMode, grantedCeiling: CanonicalIntent): boolean {
+  return withinBudget(MODE_TIER[mode], grantedCeiling)
+}

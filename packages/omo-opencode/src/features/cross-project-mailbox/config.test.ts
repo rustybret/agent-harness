@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test"
-import { CrossProjectMailboxConfigSchema } from "./config"
+import { CrossProjectMailboxConfigSchema, SenderConfigSchema } from "./config"
 
 describe("CrossProjectMailboxConfigSchema", () => {
   describe("#given no config provided", () => {
@@ -105,6 +105,120 @@ describe("CrossProjectMailboxConfigSchema", () => {
       it("#then throws because OverridableAgentNameSchema rejects it", () => {
         // given
         const input = { intake_eligible_agents: ["bogus-agent"] }
+
+        // when / then
+        expect(() => CrossProjectMailboxConfigSchema.parse(input)).toThrow()
+      })
+    })
+  })
+
+  describe("#given a sender with allowed_modes", () => {
+    describe("#when parsing a valid mode allowlist", () => {
+      it("#then keeps the provided modes", () => {
+        // given
+        const input = {
+          senders: {
+            "project-eps": { access: "allow", intent_budget: "plan", allowed_modes: ["answer", "worker-pr"] },
+          },
+        }
+
+        // when
+        const result = CrossProjectMailboxConfigSchema.parse(input)
+
+        // then
+        expect(result.senders["project-eps"]?.allowed_modes).toEqual(["answer", "worker-pr"])
+      })
+    })
+
+    describe("#when allowed_modes is omitted", () => {
+      it("#then the field is undefined (implicitly all budget-fitting modes)", () => {
+        // given
+        const input = {
+          senders: {
+            "project-zeta": { access: "allow", intent_budget: "impl" },
+          },
+        }
+
+        // when
+        const result = CrossProjectMailboxConfigSchema.parse(input)
+
+        // then
+        expect(result.senders["project-zeta"]?.allowed_modes).toBeUndefined()
+      })
+    })
+
+    describe("#when allowed_modes contains an invalid mode", () => {
+      it("#then throws because the enum rejects it", () => {
+        // given
+        const input = {
+          senders: {
+            "project-eta": { access: "allow", intent_budget: "plan", allowed_modes: ["bogus-mode"] },
+          },
+        }
+
+        // when / then
+        expect(() => CrossProjectMailboxConfigSchema.parse(input)).toThrow()
+      })
+    })
+  })
+
+  describe("#given SenderConfigSchema directly", () => {
+    describe("#when parsing a minimal sender", () => {
+      it("#then defaults access to allow and leaves allowed_modes undefined", () => {
+        // given / when
+        const result = SenderConfigSchema.parse({ intent_budget: "question" })
+
+        // then
+        expect(result.access).toBe("allow")
+        expect(result.allowed_modes).toBeUndefined()
+      })
+    })
+  })
+
+  describe("#given a sender with worker_pr_variant", () => {
+    describe("#when parsing a valid variant value", () => {
+      it("#then keeps the provided variant", () => {
+        // given
+        const input = {
+          senders: {
+            "project-theta": { access: "allow", intent_budget: "plan", worker_pr_variant: "cloudhome" },
+          },
+        }
+
+        // when
+        const result = CrossProjectMailboxConfigSchema.parse(input)
+
+        // then
+        expect(result.senders["project-theta"]?.worker_pr_variant).toBe("cloudhome")
+      })
+
+      it("#then accepts the local variant", () => {
+        // given / when
+        const result = SenderConfigSchema.parse({ intent_budget: "plan", worker_pr_variant: "local" })
+
+        // then
+        expect(result.worker_pr_variant).toBe("local")
+      })
+    })
+
+    describe("#when worker_pr_variant is omitted", () => {
+      it("#then the field is undefined (router keeps the local default)", () => {
+        // given / when
+        const result = SenderConfigSchema.parse({ intent_budget: "impl" })
+
+        // then
+        expect(result.worker_pr_variant).toBeUndefined()
+      })
+    })
+
+    describe("#when worker_pr_variant contains an invalid value", () => {
+      it("#then throws because the enum rejects it", () => {
+        // given
+        const input = {
+          senders: {
+            "project-iota": { access: "allow", intent_budget: "plan", worker_pr_variant: "remote" },
+          },
+        }
 
         // when / then
         expect(() => CrossProjectMailboxConfigSchema.parse(input)).toThrow()

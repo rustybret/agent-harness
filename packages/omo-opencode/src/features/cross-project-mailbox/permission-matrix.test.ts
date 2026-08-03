@@ -2,10 +2,11 @@ import { randomUUID } from "node:crypto"
 
 import { describe, expect, it } from "bun:test"
 
-import { CrossProjectMailboxConfigSchema } from "./config"
+import { CrossProjectMailboxConfigSchema, SenderConfigSchema, decideDowngrade } from "./config"
 import type { CrossProjectMailboxConfig } from "./config"
 import type { MailboxMessage } from "./envelope/schema"
-import type { CanonicalIntent } from "./permission-tiers"
+import { MAILBOX_MODES } from "./permission-tiers"
+import type { CanonicalIntent, MailboxMode } from "./permission-tiers"
 import type { ProjectEntry } from "./registry/types"
 import { runSendPreflight } from "./send-tool/send-preflight"
 import type { SendInput } from "./send-tool/envelope-builder"
@@ -194,6 +195,145 @@ describe("legacy subjects canonicalize through the gate", () => {
         expect(inboundAccepts("quick", "impl")).toBe(true)
         expect(await senderAccepts("quick", "question")).toBe(false)
         expect(inboundAccepts("quick", "question")).toBe(false)
+      })
+    })
+  })
+})
+
+// decideDowngrade matrix: (mode x sender budget ceiling x allowed_modes presence)
+// Independent oracle mode->tier (NOT importing MODE_TIER), so the matrix is a real check.
+const MODE_ORACLE: Record<MailboxMode, CanonicalIntent> = {
+  answer: "question",
+  "todo-append": "impl",
+  "todo-next": "impl",
+  subagent: "impl",
+  "worker-pr": "plan",
+  interrupt: "plan",
+}
+const MODE_RANK: Record<CanonicalIntent, number> = { question: 0, impl: 1, plan: 2 }
+
+type AllowlistShape = "absent" | "present-including" | "present-excluding"
+
+function makeSenderCfg(ceiling: CanonicalIntent, mode: MailboxMode, shape: AllowlistShape) {
+  if (shape === "absent") {
+    return SenderConfigSchema.parse({ access: "allow", intent_budget: ceiling })
+  }
+  if (shape === "present-including") {
+    return SenderConfigSchema.parse({ access: "allow", intent_budget: ceiling, allowed_modes: [mode] })
+  }
+  // present-excluding: allowlist that deliberately omits `mode`
+  const others = MAILBOX_MODES.filter((m) => m !== mode)
+  return SenderConfigSchema.parse({ access: "allow", intent_budget: ceiling, allowed_modes: others })
+}
+
+interface ModeMatrixRow {
+  mode: MailboxMode
+  ceiling: CanonicalIntent
+  shape: AllowlistShape
+  expectedEffective: MailboxMode | undefined
+  expectedReason: string | undefined
+}
+
+function buildModeMatrix(): ModeMatrixRow[] {
+  const rows: ModeMatrixRow[] = []
+  const shapes: AllowlistShape[] = ["absent", "present-including", "present-excluding"]
+  for (const mode of MAILBOX_MODES) {
+    for (const ceiling of CEILINGS) {
+      for (const shape of shapes) {
+        const overBudget = MODE_RANK[MODE_ORACLE[mode]] > MODE_RANK[ceiling]
+        const disallowed = shape === "present-excluding"
+        let expectedEffective: MailboxMode | undefined = mode
+        let expectedReason: string | undefined
+        if (overBudget) {
+          // budget check runs first: over-budget wins over allowlist
+          expectedEffective = undefined
+          expectedReason = "mode-over-budget"
+        } else if (disallowed) {
+          expectedEffective = undefined
+          expectedReason = "mode-not-allowed"
+        }
+        rows.push({ mode, ceiling, shape, expectedEffective, expectedReason })
+      }
+    }
+  }
+  return rows
+}
+
+const modeMatrix: ModeMatrixRow[] = buildModeMatrix()
+
+describe("decideDowngrade permission matrix", () => {
+  describe("#given every (mode x ceiling x allowed_modes shape) cell", () => {
+    for (const row of modeMatrix) {
+      const outcome = row.expectedEffective === undefined ? `downgrade(${row.expectedReason})` : "keep"
+      describe(`#when mode=${row.mode} ceiling=${row.ceiling} allowlist=${row.shape}`, () => {
+        it(`#then ${outcome}`, () => {
+          // given
+          const senderCfg = makeSenderCfg(row.ceiling, row.mode, row.shape)
+          // when
+          const result = decideDowngrade({ requested_mode: row.mode }, senderCfg)
+          // then
+          expect(result.effectiveMode).toBe(row.expectedEffective)
+          expect(result.downgradeReason).toBe(row.expectedReason)
+        })
+      })
+    }
+  })
+
+  describe("#given the full mode matrix", () => {
+    describe("#when counted", () => {
+      it("#then covers 6 modes x 3 ceilings x 3 allowlist shapes", () => {
+        // given / when / then
+        expect(modeMatrix.length).toBe(6 * 3 * 3)
+      })
+    })
+  })
+
+  describe("#given a note carrying NO requested_mode", () => {
+    describe("#when decided against any sender", () => {
+      it("#then legacy path: effectiveMode undefined with NO downgradeReason", () => {
+        // given
+        const senderCfg = SenderConfigSchema.parse({ access: "allow", intent_budget: "plan" })
+        // when
+        const result = decideDowngrade({}, senderCfg)
+        // then
+        expect(result.effectiveMode).toBeUndefined()
+        expect(result.downgradeReason).toBeUndefined()
+      })
+    })
+  })
+
+  describe("#given over-budget AND disallowed simultaneously", () => {
+    describe("#when decided", () => {
+      it("#then budget check wins: reason is mode-over-budget", () => {
+        // given: interrupt (plan tier) at question ceiling, allowlist excluding interrupt
+        const senderCfg = SenderConfigSchema.parse({
+          access: "allow",
+          intent_budget: "question",
+          allowed_modes: ["answer"],
+        })
+        // when
+        const result = decideDowngrade({ requested_mode: "interrupt" }, senderCfg)
+        // then
+        expect(result.effectiveMode).toBeUndefined()
+        expect(result.downgradeReason).toBe("mode-over-budget")
+      })
+    })
+  })
+
+  describe("#given within-budget and allowlist present-including", () => {
+    describe("#when decided", () => {
+      it("#then mode kept with no reason", () => {
+        // given
+        const senderCfg = SenderConfigSchema.parse({
+          access: "allow",
+          intent_budget: "plan",
+          allowed_modes: ["worker-pr", "answer"],
+        })
+        // when
+        const result = decideDowngrade({ requested_mode: "worker-pr" }, senderCfg)
+        // then
+        expect(result.effectiveMode).toBe("worker-pr")
+        expect(result.downgradeReason).toBeUndefined()
       })
     })
   })

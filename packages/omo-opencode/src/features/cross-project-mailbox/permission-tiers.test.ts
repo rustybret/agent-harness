@@ -5,11 +5,15 @@ import {
   CANONICAL_INTENTS,
   CATEGORY_TIER,
   LEGACY_INTENT_MAP,
+  MAILBOX_MODES,
+  MODE_TIER,
   TIER_ORDER,
   canonicalizeLegacyIntent,
+  modeWithinBudget,
   requiredTier,
   withinBudget,
 } from "./permission-tiers"
+import type { CanonicalIntent, MailboxMode } from "./permission-tiers"
 
 describe("CANONICAL_INTENTS", () => {
   describe("#given the canonical 3-tier ladder", () => {
@@ -183,6 +187,88 @@ describe("requiredTier", () => {
       it("#then throws", () => {
         // given / when / then
         expect(() => requiredTier("frobnicate")).toThrow()
+      })
+    })
+  })
+})
+
+describe("MAILBOX_MODES", () => {
+  describe("#given the canonical mode vocabulary", () => {
+    describe("#when read in order", () => {
+      it("#then is the 6 kebab-case modes", () => {
+        // given / when / then
+        expect(MAILBOX_MODES).toEqual(["answer", "todo-append", "todo-next", "subagent", "worker-pr", "interrupt"])
+      })
+    })
+  })
+})
+
+describe("MODE_TIER", () => {
+  describe("#given each mode", () => {
+    describe("#when mapped to a canonical tier", () => {
+      it("#then answer -> question", () => {
+        expect(MODE_TIER.answer).toBe("question")
+      })
+      it("#then todo-append/todo-next/subagent -> impl", () => {
+        expect(MODE_TIER["todo-append"]).toBe("impl")
+        expect(MODE_TIER["todo-next"]).toBe("impl")
+        expect(MODE_TIER.subagent).toBe("impl")
+      })
+      it("#then worker-pr/interrupt -> plan", () => {
+        expect(MODE_TIER["worker-pr"]).toBe("plan")
+        expect(MODE_TIER.interrupt).toBe("plan")
+      })
+      it("#then every mode has a mapping", () => {
+        for (const mode of MAILBOX_MODES) {
+          expect(MODE_TIER[mode]).toBeDefined()
+        }
+      })
+    })
+  })
+})
+
+describe("modeWithinBudget", () => {
+  // Independent oracle: hand-authored mode -> tier, NOT importing MODE_TIER, so the
+  // assertions are a real external check rather than a restatement of production data.
+  const ORACLE: Record<MailboxMode, CanonicalIntent> = {
+    answer: "question",
+    "todo-append": "impl",
+    "todo-next": "impl",
+    subagent: "impl",
+    "worker-pr": "plan",
+    interrupt: "plan",
+  }
+  const RANK: Record<CanonicalIntent, number> = { question: 0, impl: 1, plan: 2 }
+  const CEILINGS: readonly CanonicalIntent[] = ["question", "impl", "plan"]
+
+  describe("#given every (mode x ceiling) pair", () => {
+    for (const mode of MAILBOX_MODES) {
+      for (const ceiling of CEILINGS) {
+        const expected = RANK[ORACLE[mode]] <= RANK[ceiling]
+        describe(`#when mode=${mode} ceiling=${ceiling}`, () => {
+          it(`#then modeWithinBudget is ${expected}`, () => {
+            // given / when / then
+            expect(modeWithinBudget(mode, ceiling)).toBe(expected)
+          })
+        })
+      }
+    }
+  })
+
+  describe("#given a mode whose tier equals the ceiling", () => {
+    describe("#when checked", () => {
+      it("#then accepts (worker-pr at plan)", () => {
+        // given / when / then
+        expect(modeWithinBudget("worker-pr", "plan")).toBe(true)
+      })
+    })
+  })
+
+  describe("#given a mode whose tier exceeds the ceiling", () => {
+    describe("#when checked", () => {
+      it("#then rejects (interrupt at question)", () => {
+        // given / when / then
+        expect(modeWithinBudget("interrupt", "question")).toBe(false)
       })
     })
   })
