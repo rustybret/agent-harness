@@ -1,0 +1,74 @@
+{
+  "configValid": false,
+  "unknownKeyMessages": [
+    "../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.atlas.models",
+    "../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.explore.models",
+    "../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.hephaestus.models",
+    "../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.librarian.models",
+    "../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.metis.models",
+    "../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.momus.models",
+    "../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.multimodal-looker.models",
+    "../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.oracle.models",
+    "../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.prometheus.models",
+    "../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.sisyphus.models",
+    "../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.sisyphus-junior.models"
+  ],
+  "agentsWithResolvedModel": [
+    {
+      "agent": "atlas",
+      "model": null,
+      "fallbackCount": 0
+    },
+    {
+      "agent": "explore",
+      "model": null,
+      "fallbackCount": 0
+    },
+    {
+      "agent": "hephaestus",
+      "model": null,
+      "fallbackCount": 0
+    },
+    {
+      "agent": "librarian",
+      "model": null,
+      "fallbackCount": 0
+    },
+    {
+      "agent": "metis",
+      "model": null,
+      "fallbackCount": 0
+    },
+    {
+      "agent": "momus",
+      "model": null,
+      "fallbackCount": 0
+    },
+    {
+      "agent": "multimodal-looker",
+      "model": null,
+      "fallbackCount": 0
+    },
+    {
+      "agent": "oracle",
+      "model": null,
+      "fallbackCount": 0
+    },
+    {
+      "agent": "prometheus",
+      "model": null,
+      "fallbackCount": 0
+    },
+    {
+      "agent": "sisyphus",
+      "model": null,
+      "fallbackCount": 0
+    },
+    {
+      "agent": "sisyphus-junior",
+      "model": null,
+      "fallbackCount": 0
+    }
+  ],
+  "sidebarViewKind": "active"
+}

@@ -1,0 +1,10 @@
+
+ oMoMoMoMo Doctor 
+
+ ⚠ 1 issue found:
+
+1. Legacy OMO configuration remains
+   Legacy configuration remains at /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc, /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.migrations.json, /Users/brethoffman/.omo/config.jsonc. It is not part of the unified OMO config chain.
+   Fix: Run `oh-my-openagent config migrate` to move it into ~/.omo/omo.jsonc.
+   Affects: configuration migration
+

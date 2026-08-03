@@ -9,6 +9,7 @@ type SchemaDefinition = {
   readonly element?: Schema
   readonly getter?: () => Schema
   readonly in?: Schema
+  readonly out?: Schema
   readonly innerType?: Schema
   readonly items?: readonly Schema[]
   readonly left?: Schema
@@ -33,7 +34,13 @@ function unwrap(schema: Schema): Schema {
   if (["optional", "nullable", "default", "prefault", "nonoptional", "catch", "readonly"].includes(def.type)) {
     return def.innerType === undefined ? schema : unwrap(def.innerType)
   }
-  if (def.type === "pipe") return def.in === undefined ? schema : unwrap(def.in)
+  // z.preprocess compiles to a pipe whose input side is the transform itself. Following `in` there
+  // lands on a transform node with no shape, which would silently suppress every nested diagnostic,
+  // so a preprocessed schema is traversed through its output object instead.
+  if (def.type === "pipe") {
+    const inner = def.in !== undefined && definition(def.in).type === "transform" ? def.out : def.in
+    return inner === undefined ? schema : unwrap(inner)
+  }
   if (def.type === "lazy") return def.getter === undefined ? schema : unwrap(def.getter())
   return schema
 }

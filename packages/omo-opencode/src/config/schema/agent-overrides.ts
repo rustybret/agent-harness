@@ -1,11 +1,17 @@
 import { OmoReasoningSchema } from "@oh-my-opencode/omo-config-core"
 import { z } from "zod"
-import { FallbackModelsSchema } from "./fallback-models"
+import { canonicalizeAgentModels } from "./agent-models-canonical"
+import { FallbackModelObjectSchema, FallbackModelsSchema } from "./fallback-models"
 import { AgentPermissionSchema } from "./internal/permission"
 
-export const AgentOverrideConfigSchema = z.object({
+const AgentOverrideConfigObjectSchema = z.object({
   /** @deprecated Use `category` instead. Model is inherited from category defaults. */
   model: z.string().optional(),
+  /**
+   * Ordered model chain; the first entry is the primary model and the rest are fallbacks.
+   * Unpacked into `model` + `fallback_models` before validation, so it never survives parsing.
+   */
+  models: z.array(z.union([z.string(), FallbackModelObjectSchema])).optional(),
   fallback_models: FallbackModelsSchema.optional(),
   reasoning: OmoReasoningSchema.optional(),
   /** @deprecated Use `reasoning` instead. */
@@ -64,13 +70,26 @@ export const AgentOverrideConfigSchema = z.object({
     .optional(),
 })
 
+/**
+ * Accepts the canonical `models` chain the config migration writes and unpacks it
+ * into `model` + `fallback_models` before validation, so agent readers keep
+ * working against the one shape they know.
+ */
+export const AgentOverrideConfigSchema = z.preprocess(
+  canonicalizeAgentModels,
+  AgentOverrideConfigObjectSchema,
+)
+
 export const AgentOverridesSchema = z.object({
   build: AgentOverrideConfigSchema.optional(),
   plan: AgentOverrideConfigSchema.optional(),
   sisyphus: AgentOverrideConfigSchema.optional(),
-  hephaestus: AgentOverrideConfigSchema.extend({
-    allow_non_gpt_model: z.boolean().optional(),
-  }).optional(),
+  hephaestus: z.preprocess(
+    canonicalizeAgentModels,
+    AgentOverrideConfigObjectSchema.extend({
+      allow_non_gpt_model: z.boolean().optional(),
+    }),
+  ).optional(),
   "sisyphus-junior": AgentOverrideConfigSchema.optional(),
   "OpenCode-Builder": AgentOverrideConfigSchema.optional(),
   prometheus: AgentOverrideConfigSchema.optional(),
@@ -85,3 +104,4 @@ export const AgentOverridesSchema = z.object({
 
 export type AgentOverrideConfig = z.infer<typeof AgentOverrideConfigSchema>
 export type AgentOverrides = z.infer<typeof AgentOverridesSchema>
+export { AgentOverrideConfigObjectSchema }

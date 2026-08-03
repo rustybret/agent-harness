@@ -1,0 +1,54 @@
+
+ oMoMoMoMo Doctor 
+
+ ⚠ 12 issues found:
+
+1. Legacy OMO configuration remains
+   Legacy configuration remains at /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc, /Users/brethoffman/.config/opencode/oh-my-openagent.jsonc.migrations.json, /Users/brethoffman/.omo/config.jsonc. It is not part of the unified OMO config chain.
+   Fix: Run `oh-my-openagent config migrate` to move it into ~/.omo/omo.jsonc.
+   Affects: configuration migration
+
+2. Invalid configuration
+   ../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.atlas.models
+   Affects: plugin startup
+
+3. Invalid configuration
+   ../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.explore.models
+   Affects: plugin startup
+
+4. Invalid configuration
+   ../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.hephaestus.models
+   Affects: plugin startup
+
+5. Invalid configuration
+   ../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.librarian.models
+   Affects: plugin startup
+
+6. Invalid configuration
+   ../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.metis.models
+   Affects: plugin startup
+
+7. Invalid configuration
+   ../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.momus.models
+   Affects: plugin startup
+
+8. Invalid configuration
+   ../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.multimodal-looker.models
+   Affects: plugin startup
+
+9. Invalid configuration
+   ../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.oracle.models
+   Affects: plugin startup
+
+10. Invalid configuration
+   ../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.prometheus.models
+   Affects: plugin startup
+
+11. Invalid configuration
+   ../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.sisyphus.models
+   Affects: plugin startup
+
+12. Invalid configuration
+   ../../../../Users/brethoffman/.omo/omo.jsonc: Unknown config key: agents.sisyphus-junior.models
+   Affects: plugin startup
+

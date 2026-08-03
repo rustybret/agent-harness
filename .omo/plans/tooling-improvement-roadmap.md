@@ -29,6 +29,23 @@ the remainder and pick again. Items are only added here when a real session prod
   fail. Two different definitions of "a note".
 - **Fix:** validate the YAML envelope head in the sidebar count so the two paths agree.
 
+### 2. Migrated `agents.*.models` silently dropped at runtime — DONE
+
+- **Source:** found while QA'ing item 1 — `readView` on a clean fixture returned `kind: "broken"` with
+  eleven `Unknown config key: agents.<name>.models` messages sourced from this machine's own
+  `~/.omo/omo.jsonc`.
+- **Observed:** all 11 configured agents resolved `model: null` with zero fallbacks. The user's entire
+  model selection (77 fallback entries) was inert while the config file looked correct on disk.
+- **Root cause:** the 2026-08 reasoning-unification migration rewrites an agent's
+  `model`+`variant`+`fallback_models` into a canonical `models` array, but `AgentOverrideConfigSchema`
+  never had a `models` field — and being non-strict, it dropped the key instead of rejecting it. The
+  migration emitted config its own validator could not read.
+- **Second defect found in the fix:** `findUnknownKeyPaths` unwrapped a `pipe` through its `in` side,
+  but `z.preprocess` compiles to a pipe whose `in` is the transform (no shape) — so every nested key
+  under a preprocessed schema was silently un-diagnosed. This already affected `categories.*`.
+- **Fix:** unpack the canonical chain into `model` + `fallback_models` before validation; traverse
+  preprocessed schemas through their output object.
+
 ---
 
 ## P1 — trust gaps
@@ -101,3 +118,5 @@ the remainder and pick again. Items are only added here when a real session prod
 
 - **P0-1** sidebar `isNoteFile()` stale-doc counting — envelope-validated count now matches the
   delivery path's definition of a note.
+- **P0-2** migrated `agents.*.models` silently dropped — canonical chain now unpacked before
+  validation; preprocessed schemas no longer blind the unknown-key diagnostics.
