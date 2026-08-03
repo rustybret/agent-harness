@@ -4,15 +4,12 @@ import { z } from "zod"
 import type { CrossProjectMailboxConfig } from "../config"
 import { MAILBOX_INTENTS, MAILBOX_MODES, MAX_BODY_BYTES, type MailboxMessage } from "../envelope/schema"
 import { MailboxStore } from "../mailbox/mailbox-store"
-import type { MailboxModeState, ModeDetector } from "../presence"
 import type { MailboxTraceSink } from "../trace"
 import { emitSendBlockedNoEnvelope, emitSendEnvelopeTrace, type SendTraceContext } from "./send-trace"
 import { buildSendEnvelope, type SendInput } from "./envelope-builder"
 import { appendOutboxLog } from "./outbox-log"
 import { type ProjectMessageRegistry, type SendResult } from "./project-message-tool"
 import { runSendPreflight } from "./send-preflight"
-
-export const NOTE_EXTERNAL_GUIDANCE = "external session; use project_message"
 
 export type ProjectNoteExecResult = SendResult | { blocked: true; reason: string }
 
@@ -40,7 +37,6 @@ export interface ProjectNoteToolDeps {
   thisRepoRoot: string
   thisProjectDisplayName: string
   registry: ProjectMessageRegistry
-  modeDetector: Pick<ModeDetector, "currentMode" | "detect">
   writeNote?: (targetRepoRoot: string, fromProjectId: string, envelope: MailboxMessage, body: string) => Promise<void>
   appendOutbox?: typeof appendOutboxLog
   liveConfigResolver?: { resolve: () => Promise<CrossProjectMailboxConfig> }
@@ -157,18 +153,6 @@ export async function runProjectNoteSend(
   }
 }
 
-// Resolve the current session mode; lazily detect when no detect has run yet for this session
-// (tool executed before the first idle/heartbeat). currentMode() is a zero-I/O memoized read;
-// only "unknown" triggers a real detect via the "tool-exec" trigger.
-export async function resolveNoteMode(
-  modeDetector: Pick<ModeDetector, "currentMode" | "detect">,
-  sessionId: string,
-): Promise<MailboxModeState> {
-  const current = modeDetector.currentMode()
-  if (current !== "unknown") return current
-  return modeDetector.detect(sessionId, "tool-exec")
-}
-
 async function resolveFreshSendConfig(deps: ProjectNoteToolDeps): Promise<CrossProjectMailboxConfig> {
   if (deps.liveConfigResolver) {
     return deps.liveConfigResolver.resolve()
@@ -180,7 +164,7 @@ export function createProjectNoteTool(deps: ProjectNoteToolDeps): ToolDefinition
   const inputSchema = createProjectNoteInputSchema(MAX_BODY_BYTES)
   return tool({
     description:
-      "Drop a fire-and-forget note into another registered project's coordination_notes/ for its idle-drain filewatcher (internal sessions only; no presence probe, no launch)",
+      "DEPRECATED - use project_message instead, which now sends from both internal and external sessions. Retained only so existing callers keep working; it drops a fire-and-forget note with no presence probe and no launch.",
     args: {
       targetProjectId: tool.schema
         .string()
@@ -199,14 +183,6 @@ export function createProjectNoteTool(deps: ProjectNoteToolDeps): ToolDefinition
       const freshConfig = await resolveFreshSendConfig(deps)
       if (freshConfig.enabled === false) {
         return JSON.stringify({ blocked: true, reason: "mailbox disabled" })
-      }
-
-      // Mode gate BEFORE preflight: an external-mode call short-circuits with guidance without
-      // touching preflight/allowlist. Lazy-detect closes the tool-executes-before-first-idle race.
-      const sessionId = (toolContext as { sessionID?: string })?.sessionID ?? ""
-      const mode = await resolveNoteMode(deps.modeDetector, sessionId)
-      if (mode === "external") {
-        return JSON.stringify({ blocked: true, reason: NOTE_EXTERNAL_GUIDANCE })
       }
 
       const effectiveBodyCap = Math.min(freshConfig.bounds.max_body_bytes, MAX_BODY_BYTES)

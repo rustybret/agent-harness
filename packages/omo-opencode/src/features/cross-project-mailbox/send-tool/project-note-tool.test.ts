@@ -6,7 +6,6 @@ import { afterEach, beforeEach, describe, expect, it } from "bun:test"
 
 import { CrossProjectMailboxConfigSchema, type CrossProjectMailboxConfig } from "../config"
 import type { MailboxMessage } from "../envelope/schema"
-import type { MailboxModeState, ModeDetectTrigger } from "../presence"
 import type { ProjectEntry } from "../registry/types"
 import { createProjectNoteTool, runProjectNoteSend, type ProjectNoteToolDeps } from "./index"
 
@@ -58,49 +57,13 @@ function cfg(overrides: Record<string, unknown> = {}): CrossProjectMailboxConfig
   })
 }
 
-interface ModeSpy {
-  detector: Pick<import("../presence").ModeDetector, "currentMode" | "detect">
-  detectCalls: Array<{ sessionId: string; trigger: ModeDetectTrigger }>
-}
-
-function fixedModeDetector(mode: MailboxModeState): ModeSpy {
-  const detectCalls: ModeSpy["detectCalls"] = []
-  return {
-    detectCalls,
-    detector: {
-      currentMode: () => mode,
-      detect: async (sessionId: string, trigger: ModeDetectTrigger) => {
-        detectCalls.push({ sessionId, trigger })
-        if (mode === "internal" || mode === "external") return mode
-        return "internal"
-      },
-    },
-  }
-}
-
-function lazyModeDetector(resolved: "internal" | "external"): ModeSpy {
-  const detectCalls: ModeSpy["detectCalls"] = []
-  let current: MailboxModeState = "unknown"
-  return {
-    detectCalls,
-    detector: {
-      currentMode: () => current,
-      detect: async (sessionId: string, trigger: ModeDetectTrigger) => {
-        detectCalls.push({ sessionId, trigger })
-        current = resolved
-        return resolved
-      },
-    },
-  }
-}
-
 interface NoteSpyHandle {
   deps: ProjectNoteToolDeps
   writeCalls: number
   outboxCalls: number
 }
 
-function spyDeps(config: CrossProjectMailboxConfig, detector: ModeSpy["detector"]): NoteSpyHandle {
+function spyDeps(config: CrossProjectMailboxConfig): NoteSpyHandle {
   const handle: NoteSpyHandle = {
     writeCalls: 0,
     outboxCalls: 0,
@@ -110,7 +73,6 @@ function spyDeps(config: CrossProjectMailboxConfig, detector: ModeSpy["detector"
       thisRepoRoot,
       thisProjectDisplayName: "Project C",
       registry: { listProjects: async () => projects },
-      modeDetector: detector,
       writeNote: async () => {
         handle.writeCalls += 1
       },
@@ -122,23 +84,21 @@ function spyDeps(config: CrossProjectMailboxConfig, detector: ModeSpy["detector"
   return handle
 }
 
-function realDeps(config: CrossProjectMailboxConfig, detector: ModeSpy["detector"]): ProjectNoteToolDeps {
+function realDeps(config: CrossProjectMailboxConfig): ProjectNoteToolDeps {
   return {
     config,
     thisProjectId: THIS_PROJECT_ID,
     thisRepoRoot,
     thisProjectDisplayName: "Project C",
     registry: { listProjects: async () => projects },
-    modeDetector: detector,
   }
 }
 
-describe("createProjectNoteTool - internal-mode happy path", () => {
-  it("drops an enveloped note with frontmatter and appends the outbox when mode is internal", async () => {
+describe("createProjectNoteTool - happy path", () => {
+  it("drops an enveloped note with frontmatter and appends the outbox", async () => {
     // given
     await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
-    const spy = fixedModeDetector("internal")
-    const def = createProjectNoteTool(realDeps(cfg(), spy.detector))
+    const def = createProjectNoteTool(realDeps(cfg()))
 
     // when
     const out = await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "hello note" }, { sessionID: "ses_1" })
@@ -164,8 +124,7 @@ describe("createProjectNoteTool - internal-mode happy path", () => {
 
   it("exposes no presence or launch dependency on the note tool deps", () => {
     // given
-    const spy = fixedModeDetector("internal")
-    const deps = realDeps(cfg(), spy.detector)
+    const deps = realDeps(cfg())
 
     // then: the deps surface is a pure file drop; no sender-side liveness hooks exist to call
     expect("readPresence" in deps).toBe(false)
@@ -178,8 +137,7 @@ describe("createProjectNoteTool - requested_mode", () => {
   it("writes requested_mode into the target envelope frontmatter and the outbox line", async () => {
     // given
     await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
-    const spy = fixedModeDetector("internal")
-    const def = createProjectNoteTool(realDeps(cfg(), spy.detector))
+    const def = createProjectNoteTool(realDeps(cfg()))
 
     // when
     const out = await def.execute(
@@ -204,8 +162,7 @@ describe("createProjectNoteTool - requested_mode", () => {
   it("omits requested_mode when not requested (legacy shape)", async () => {
     // given
     await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
-    const spy = fixedModeDetector("internal")
-    const def = createProjectNoteTool(realDeps(cfg(), spy.detector))
+    const def = createProjectNoteTool(realDeps(cfg()))
 
     // when
     const out = await def.execute(
@@ -228,66 +185,32 @@ describe("createProjectNoteTool - requested_mode", () => {
   })
 })
 
-describe("createProjectNoteTool - external-mode blocked", () => {
-  it("returns guidance and writes nothing when mode is external", async () => {
+describe("createProjectNoteTool - deprecated surface", () => {
+  it("advertises the deprecation and points callers at project_message", () => {
+    // given
+    const def = createProjectNoteTool(realDeps(cfg()))
+
+    // then
+    expect(def.description).toContain("DEPRECATED")
+    expect(def.description).toContain("project_message")
+  })
+
+  it("still delivers regardless of session mode now that the internal-only gate is gone", async () => {
     // given
     await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
-    const spy = fixedModeDetector("external")
-    const handle = spyDeps(cfg(), spy.detector)
+    const handle = spyDeps(cfg())
     const def = createProjectNoteTool(handle.deps)
 
     // when
     const out = JSON.parse(
       (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "hello" }, { sessionID: "ses_1" })) as string,
-    ) as { blocked?: boolean; reason?: string }
+    ) as { ok?: boolean; blocked?: boolean }
 
     // then
-    expect(out.blocked).toBe(true)
-    expect(out.reason).toContain("project_message")
-    expect(handle.writeCalls).toBe(0)
-    expect(handle.outboxCalls).toBe(0)
-
-    const outboxExists = await readFile(path.join(thisRepoRoot, ".omo", "mailbox-outbox.jsonl"), "utf8")
-      .then(() => true)
-      .catch(() => false)
-    expect(outboxExists).toBe(false)
-  })
-})
-
-describe("createProjectNoteTool - unknown-mode lazy detect", () => {
-  it("lazily detects with the tool-exec trigger then proceeds when detect resolves internal", async () => {
-    // given
-    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
-    const spy = lazyModeDetector("internal")
-    const def = createProjectNoteTool(realDeps(cfg(), spy.detector))
-
-    // when
-    const out = JSON.parse(
-      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "lazy note" }, { sessionID: "ses_lazy" })) as string,
-    ) as { ok?: boolean }
-
-    // then
+    expect(out.blocked).toBeUndefined()
     expect(out.ok).toBe(true)
-    expect(spy.detectCalls).toEqual([{ sessionId: "ses_lazy", trigger: "tool-exec" }])
-  })
-
-  it("lazily detects then blocks when detect resolves external", async () => {
-    // given
-    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
-    const spy = lazyModeDetector("external")
-    const handle = spyDeps(cfg(), spy.detector)
-    const def = createProjectNoteTool(handle.deps)
-
-    // when
-    const out = JSON.parse(
-      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "lazy" }, { sessionID: "ses_lazy2" })) as string,
-    ) as { blocked?: boolean; reason?: string }
-
-    // then
-    expect(out.blocked).toBe(true)
-    expect(out.reason).toContain("project_message")
-    expect(spy.detectCalls).toEqual([{ sessionId: "ses_lazy2", trigger: "tool-exec" }])
-    expect(handle.writeCalls).toBe(0)
+    expect(handle.writeCalls).toBe(1)
+    expect(handle.outboxCalls).toBe(1)
   })
 })
 
@@ -298,8 +221,7 @@ describe("createProjectNoteTool - preflight-blocked", () => {
       enabled: true,
       senders: { "proj-b": { access: "deny", intent_budget: "plan" } },
     })
-    const spy = fixedModeDetector("internal")
-    const handle = spyDeps(cfg({ senders: { "proj-b": { access: "deny", intent_budget: "plan" } } }), spy.detector)
+    const handle = spyDeps(cfg({ senders: { "proj-b": { access: "deny", intent_budget: "plan" } } }))
     const def = createProjectNoteTool(handle.deps)
 
     // when
@@ -320,8 +242,7 @@ describe("createProjectNoteTool - preflight-blocked", () => {
       enabled: true,
       senders: { "proj-b": { access: "allow", intent_budget: "quick" } },
     })
-    const spy = fixedModeDetector("internal")
-    const handle = spyDeps(cfg({ senders: { "proj-b": { access: "allow", intent_budget: "quick" } } }), spy.detector)
+    const handle = spyDeps(cfg({ senders: { "proj-b": { access: "allow", intent_budget: "quick" } } }))
     const def = createProjectNoteTool(handle.deps)
 
     // when
@@ -341,8 +262,7 @@ describe("runProjectNoteSend - write-failed trace", () => {
   it("emits exactly one write-failed event and rethrows when the note write throws", async () => {
     // given
     const records: Record<string, unknown>[] = []
-    const spy = fixedModeDetector("internal")
-    const deps = realDeps(cfg(), spy.detector)
+    const deps = realDeps(cfg())
     const boom = new Error("disk full")
     deps.writeNote = async () => {
       throw boom

@@ -4,7 +4,7 @@ import { z } from "zod"
 import { validatePluginConfig } from "../../../config/validate"
 import type { CrossProjectMailboxConfig } from "../config"
 import { MAILBOX_INTENTS, MAILBOX_MODES, MAX_BODY_BYTES, type MailboxMessage } from "../envelope/schema"
-import { type MailboxModeState, type ModeDetector, readPresenceStatus, type PresenceStatus } from "../presence"
+import { readPresenceStatus, type PresenceStatus } from "../presence"
 import type { ProjectEntry } from "../registry/types"
 import type { MailboxTraceSink } from "../trace"
 import { defaultWriteNote, maybeLaunchOfflineTarget } from "./offline-launch"
@@ -41,14 +41,10 @@ export interface ProjectMessageRegistry {
   listProjects(): Promise<ProjectEntry[]>
 }
 
-export const MESSAGE_INTERNAL_GUIDANCE = "internal session - use project_note"
-
-// Omitting modeDetector defaults to this external-resolving stub, preserving pre-split send behavior
-// for callers that never wired one. Only an explicitly-internal injected detector blocks a send.
-const EXTERNAL_DEFAULT_MODE_DETECTOR: Pick<ModeDetector, "currentMode" | "detect"> = {
-  currentMode: () => "external",
-  detect: async () => "external",
-}
+// Sends are no longer mode-gated: project_message is the single send path for both internal
+// (portless TUI) and external sessions, superseding the deprecated project_note. The file drop
+// itself never depended on sender liveness; only the optional presence probe and offline launch
+// do, and those stay gated by launch_policy (default "disabled") rather than by session mode.
 
 export interface ProjectMessageToolDeps {
   config: CrossProjectMailboxConfig
@@ -56,9 +52,6 @@ export interface ProjectMessageToolDeps {
   thisRepoRoot: string
   thisProjectDisplayName: string
   registry: ProjectMessageRegistry
-  // Same injection contract as ProjectNoteToolDeps (T7). Optional; defaults to
-  // EXTERNAL_DEFAULT_MODE_DETECTOR when unset so pre-existing send fixtures stay green.
-  modeDetector?: Pick<ModeDetector, "currentMode" | "detect">
   writeNote?: (targetRepoRoot: string, fromProjectId: string, envelope: MailboxMessage, body: string) => Promise<void>
   appendOutbox?: typeof appendOutboxLog
   readPresence?: (projectId: string) => Promise<PresenceStatus>
@@ -190,16 +183,6 @@ export async function runProjectMessageList(deps: ProjectMessageToolDeps): Promi
   }
 }
 
-export async function resolveSendMode(
-  modeDetector: Pick<ModeDetector, "currentMode" | "detect">,
-  sessionId: string,
-): Promise<MailboxModeState> {
-  const current = modeDetector.currentMode()
-  if (current !== "unknown") return current
-  const detected = await modeDetector.detect(sessionId, "tool-exec")
-  return detected
-}
-
 async function resolveFreshSendConfig(deps: ProjectMessageToolDeps): Promise<CrossProjectMailboxConfig> {
   if (deps.liveConfigResolver) {
     return deps.liveConfigResolver.resolve()
@@ -214,7 +197,8 @@ async function resolveFreshSendConfig(deps: ProjectMessageToolDeps): Promise<Cro
 export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefinition {
   const inputSchema = createProjectMessageInputSchema(MAX_BODY_BYTES)
   return tool({
-    description: "Send a note to another registered project's agent session",
+    description:
+      "Send a note to another registered project's agent session. Works from both internal (TUI) and external (served) sessions; supersedes the deprecated project_note tool.",
     args: {
       mode: tool.schema
         .enum(["send", "list"])
@@ -237,17 +221,9 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
         return JSON.stringify({ blocked: true, reason: "mailbox disabled" })
       }
 
-      // list (advisory budget read) is allowed in both modes; gate only the send path.
       if (rawArgs.mode === "list") {
         const listResult = await runProjectMessageList({ ...deps, config: freshConfig })
         return JSON.stringify(listResult)
-      }
-
-      const modeDetector = deps.modeDetector ?? EXTERNAL_DEFAULT_MODE_DETECTOR
-      const sessionId = (toolContext as { sessionID?: string })?.sessionID ?? ""
-      const mode = await resolveSendMode(modeDetector, sessionId)
-      if (mode === "internal") {
-        return JSON.stringify({ blocked: true, reason: MESSAGE_INTERNAL_GUIDANCE })
       }
 
       const effectiveBodyCap = Math.min(freshConfig.bounds.max_body_bytes, MAX_BODY_BYTES)

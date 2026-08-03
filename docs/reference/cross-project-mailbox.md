@@ -142,16 +142,17 @@ This tool is used in external sessions to send asynchronous, presence-aware coor
 }
 ```
 
-##### Mode Gating Behavior
+##### Mode Behavior
 
-If `project_message` is called in an internal session, the send operation is blocked and returns the following guidance:
-`"internal session - use project_note"`
+`project_message` sends from both internal (plain TUI) and external (served) sessions. Internal sessions have no reachable HTTP port, so a live handoff is not attempted; the note is written to the target's `coordination_notes/` directory and drains on the receiver's next idle sweep. External sessions additionally probe target presence and may launch the target per `launch_policy`.
 
-However, calling `project_message` with `mode: "list"` (advisory outbound-budget read) remains allowed in both internal and external modes.
+Calling `project_message` with `mode: "list"` (advisory outbound-budget read) is allowed in both modes.
 
-#### The `project_note` Tool
+#### The `project_note` Tool (deprecated)
 
-This tool is a fire-and-forget doc-drop tool designed for internal sessions. It writes the note directly into the target's `coordination_notes/` directory without performing presence probing or target launching.
+**Deprecated - use `project_message`,** which now sends from both internal and external sessions. `project_note` is retained only so existing callers keep working.
+
+This tool is a fire-and-forget doc-drop tool. It writes the note directly into the target's `coordination_notes/` directory without performing presence probing or target launching.
 
 ##### Tool Schema
 
@@ -170,10 +171,9 @@ This tool is a fire-and-forget doc-drop tool designed for internal sessions. It 
 }
 ```
 
-##### Mode Gating Behavior
+##### Mode Behavior
 
-If `project_note` is called in an external session, the operation is blocked and returns the following guidance:
-`"external session; use project_message"`
+`project_note` runs in any session mode. It never probes presence and never launches the target.
 
 ##### Guard Parity
 
@@ -305,8 +305,8 @@ The manual `project_mailbox_drain` tool remains a raw synchronous return; it sur
 
 Active sessions maintain presence information to allow other projects to verify their status. The mailbox classifies each session into one of two modes:
 
-* **Internal Mode**: Applies to plain `opencode` or `opencode --continue` TUI sessions. The mailbox is disabled by default for sending messages, and coordination is restricted to file-based doc-drops via the `project_note` tool.
-* **External Mode**: Applies to sessions launched via `opencode serve`, `opencode web`, or with an explicit `--port` flag. These sessions support full presence-aware message delivery via the `project_message` tool.
+* **Internal Mode**: Applies to plain `opencode` or `opencode --continue` TUI sessions. No HTTP port is bound, so live handoff is not attempted; `project_message` still sends, writing a file-based doc-drop that drains on the receiver's next idle sweep.
+* **External Mode**: Applies to sessions launched via `opencode serve`, `opencode web`, or with an explicit `--port` flag. These sessions additionally support presence probing and target launch on delivery.
 
 ### Mode Detection via the Listener Registry
 

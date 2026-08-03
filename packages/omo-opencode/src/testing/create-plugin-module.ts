@@ -315,7 +315,6 @@ export function createPluginModule(overrides: Partial<PluginModuleDeps> = {}): P
       ctx: input,
       pluginConfig,
       managers,
-      mailboxModeDetector,
     })
 
     const hooks = deps.createHooks({

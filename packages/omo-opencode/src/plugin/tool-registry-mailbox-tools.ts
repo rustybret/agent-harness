@@ -12,21 +12,15 @@ import { projectIdForRoot } from "../features/cross-project-mailbox/envelope"
 import { createLiveMailboxConfigResolver } from "../features/cross-project-mailbox/config/live-config"
 import { BodyDigestStore, SamePairRateLimiter } from "../features/cross-project-mailbox/loop-guard"
 import { MailboxStore } from "../features/cross-project-mailbox/mailbox"
-import {
-  createModeDetector,
-  type ModeDetector,
-} from "../features/cross-project-mailbox/presence"
 import { createProjectRegistry } from "../features/cross-project-mailbox/registry"
 import { validateInbound } from "../features/cross-project-mailbox/validation"
-import { getServerBaseUrl } from "../shared/opencode-http-api"
 import type { PluginContext } from "./types"
 import type { ToolRegistryFactories } from "./tool-registry-factories"
 import type { BackgroundManager } from "../features/background-agent"
 import { buildClassifyNote } from "../features/cross-project-mailbox/hooks/create-mailbox-hooks"
 
-// Both tools register whenever config.enabled; the internal/external split is enforced at execution
-// time via a shared mode detector, not at registration. One detector instance keeps both tools on a
-// consistent memoized mode for the session.
+// Both tools register whenever config.enabled. project_message sends from either session mode;
+// project_note is deprecated and kept only so existing callers keep working.
 export function createMailboxToolsRecord(args: {
   readonly pluginConfig: OhMyOpenCodeConfig
   readonly ctx: PluginContext
@@ -37,7 +31,6 @@ export function createMailboxToolsRecord(args: {
     | "createProjectMessageTool"
     | "createProjectNoteTool"
   >
-  readonly modeDetector?: Pick<ModeDetector, "currentMode" | "detect">
   readonly backgroundManager?: BackgroundManager
 }): Record<string, ToolDefinition> {
   const { pluginConfig, ctx, factories, backgroundManager } = args
@@ -50,12 +43,6 @@ export function createMailboxToolsRecord(args: {
   const noteFactory = factories?.createProjectNoteTool ?? createProjectNoteTool
   const repoRoot = ctx.directory
   const registry = createProjectRegistry()
-  const modeDetector =
-    args.modeDetector ??
-    createModeDetector({
-      resolveServerUrl: () => ctx.serverUrl?.toString() ?? getServerBaseUrl(ctx.client),
-      repoRoot,
-    })
 
   const liveConfigResolver = createLiveMailboxConfigResolver(repoRoot, config)
 
@@ -88,7 +75,7 @@ export function createMailboxToolsRecord(args: {
   return {
     project_mailbox_peek: peekFactory(manualDeps),
     project_mailbox_drain: drainFactory(manualDeps),
-    project_message: messageFactory({ ...sharedDeps, modeDetector }),
-    project_note: noteFactory({ ...sharedDeps, modeDetector }),
+    project_message: messageFactory(sharedDeps),
+    project_note: noteFactory(sharedDeps),
   }
 }
