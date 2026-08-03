@@ -79,3 +79,20 @@ export function parseEnvelope(fileContent: string): { envelope: MailboxMessage; 
   const envelope: MailboxMessage = { ...parsed, intent: canonicalIntent }
   return { envelope, body: match[2] ?? "" }
 }
+
+// Cheap classifier for "is this file a real mailbox note?" without materializing the body.
+// Only the frontmatter block is inspected, so callers may pass a truncated head of the file.
+// Kept in lockstep with parseEnvelope: anything listUnread() would skip must classify false here.
+export function hasValidEnvelopeFrontmatter(fileHead: string): boolean {
+  const match = fileHead.match(FRONTMATTER_REGEX)
+  if (!match) return false
+
+  let rawFrontmatter: unknown
+  try {
+    rawFrontmatter = yaml.load(match[1] ?? "", { schema: yaml.JSON_SCHEMA })
+  } catch {
+    return false
+  }
+
+  return LenientMailboxMessageSchema.safeParse(rawFrontmatter).success
+}

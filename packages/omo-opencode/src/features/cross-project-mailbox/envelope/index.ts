@@ -2,6 +2,7 @@ export {
   MAILBOX_INTENTS,
   MAX_BODY_BYTES,
   MailboxMessageSchema,
+  hasValidEnvelopeFrontmatter,
   parseEnvelope,
   serializeEnvelope,
 } from "./schema"

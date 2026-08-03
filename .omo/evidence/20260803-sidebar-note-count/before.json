@@ -1,0 +1,17 @@
+{
+  "fixtureRoot": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sidebar-ZORdm5",
+  "filesInInbox": 4,
+  "genuineEnvelopes": 1,
+  "staleDocs": 3,
+  "observedInboundUnread": 4,
+  "mailboxSection": {
+    "inboundUnread": 4,
+    "inboundProcessed": 0,
+    "recentSentCount": 0,
+    "recentSent": [],
+    "outboundUnresolved": 0,
+    "outboundRead": 0,
+    "outboundFailed": 0,
+    "projects": []
+  }
+}

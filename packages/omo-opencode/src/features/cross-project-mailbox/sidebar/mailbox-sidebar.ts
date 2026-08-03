@@ -5,6 +5,7 @@ import path from "node:path"
 
 import { log } from "../../../shared/logger"
 import type { CrossProjectMailboxConfig } from "../config"
+import { hasValidEnvelopeFrontmatter } from "../envelope/schema"
 import { projectIdForRoot } from "../envelope/project-id"
 import type { PresenceCache } from "../presence"
 import type { ProjectEntry } from "../registry/types"
@@ -17,6 +18,9 @@ const RESERVED_PREFIX = ".delivering-"
 const RECENT_SENT_LIMIT = 3
 const OUTBOX_ACK_WINDOW = 50
 const OUTBOX_TAIL_BYTES = 64 * 1024
+// An envelope frontmatter block is ~16 short scalar fields plus a hopPath array; 4 KiB is far more
+// than any real note needs, and bounds the per-file read the sidebar does on every poll.
+const NOTE_HEAD_BYTES = 4 * 1024
 
 export interface MailboxSidebarRegistryPort {
   getRepoRootForProjectId(id: string): string | undefined
@@ -95,14 +99,18 @@ async function readSenderDirs(repoRoot: string): Promise<string[]> {
 
 async function countNotes(dir: string): Promise<number> {
   const entries = await readDirSafe(dir)
-  return entries.filter(isNoteFile).length
+  return entries.filter((entry) => isNoteFile(path.join(dir, entry.name), entry)).length
 }
 
-function isNoteFile(entry: Dirent): boolean {
+// Must agree with MailboxStore.listUnread(): a file only counts as a note if the delivery path would
+// actually hand it to an agent. Matching on the .md suffix alone let hand-authored legacy docs
+// sitting in coordination_notes/<sender>/ inflate inboundUnread even though they are never delivered.
+function isNoteFile(filePath: string, entry: Dirent): boolean {
   if (!entry.isFile()) return false
   if (!entry.name.endsWith(NOTE_SUFFIX)) return false
   if (entry.name.startsWith(RESERVED_PREFIX)) return false
-  return !entry.name.startsWith(".")
+  if (entry.name.startsWith(".")) return false
+  return hasValidEnvelopeFrontmatter(readFirstBytes(filePath, NOTE_HEAD_BYTES))
 }
 
 async function readDirSafe(dir: string): Promise<Dirent[]> {
@@ -111,6 +119,21 @@ async function readDirSafe(dir: string): Promise<Dirent[]> {
   } catch (error) {
     log("mailbox sidebar readdir failed", { error, dir })
     return []
+  }
+}
+
+function readFirstBytes(filePath: string, maxBytes: number): string {
+  let fd: number | null = null
+  try {
+    fd = openSync(filePath, "r")
+    const buf = Buffer.alloc(maxBytes)
+    const bytesRead = readSync(fd, buf, 0, maxBytes, 0)
+    return buf.toString("utf8", 0, bytesRead)
+  } catch (error) {
+    log("mailbox sidebar note head read failed", { error, filePath })
+    return ""
+  } finally {
+    if (fd !== null) closeSync(fd)
   }
 }
 

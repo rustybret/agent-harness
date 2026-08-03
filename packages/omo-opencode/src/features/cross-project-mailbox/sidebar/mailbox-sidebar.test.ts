@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto"
 import { mkdir, mkdtemp, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import path from "node:path"
@@ -6,6 +7,8 @@ import { afterEach, describe, expect, it } from "bun:test"
 import type { PresenceDetail } from "../presence"
 import type { ProjectEntry } from "../registry/types"
 import { CrossProjectMailboxConfigSchema } from "../config"
+import type { MailboxMessage } from "../envelope/schema"
+import { serializeEnvelope } from "../envelope/schema"
 import { projectIdForRoot } from "../envelope/project-id"
 import type { OutboxEntry } from "../send-tool"
 import {
@@ -50,16 +53,46 @@ function countingRegistry(resolver: (id: string) => string | undefined): {
   }
 }
 
+function noteEnvelope(): MailboxMessage {
+  return {
+    version: 1,
+    messageId: randomUUID(),
+    timestamp: 1_700_000_000_000,
+    correlationId: randomUUID(),
+    inReplyToMessageId: null,
+    fromProject: "alpha",
+    toProject: "beta",
+    fromProjectId: "alpha-1234abcd",
+    toProjectId: "beta-5678efgh",
+    intent: "question",
+    priority: 0,
+    hopCount: 0,
+    hopPath: ["alpha-1234abcd"],
+    supersedes: null,
+  }
+}
+
 async function writeNote(root: string, sender: string, name: string): Promise<void> {
   const dir = path.join(root, "coordination_notes", sender)
   await mkdir(dir, { recursive: true })
-  await writeFile(path.join(dir, name), "note body\n", "utf8")
+  await writeFile(path.join(dir, name), serializeEnvelope(noteEnvelope(), "note body\n"), "utf8")
+}
+
+// a hand-authored markdown doc parked in the inbox dir - never delivered by the store
+async function writeLegacyDoc(root: string, sender: string, name: string, content: string): Promise<void> {
+  const dir = path.join(root, "coordination_notes", sender)
+  await mkdir(dir, { recursive: true })
+  await writeFile(path.join(dir, name), content, "utf8")
 }
 
 async function writeProcessed(root: string, sender: string, name: string): Promise<void> {
   const dir = path.join(root, "coordination_notes", sender, "processed")
   await mkdir(dir, { recursive: true })
-  await writeFile(path.join(dir, name), "processed body\n", "utf8")
+  await writeFile(
+    path.join(dir, name),
+    serializeEnvelope(noteEnvelope(), "processed body\n"),
+    "utf8",
+  )
 }
 
 function outboxEntry(index: number): OutboxEntry {
@@ -140,6 +173,51 @@ describe("readMailboxSidebarState", () => {
 
     // then
     expect(result?.inboundUnread).toBe(1)
+  })
+
+  it("#given a hand-authored markdown doc beside a real note #when reading sidebar state #then only the enveloped note counts as unread", async () => {
+    // given
+    const root = await makeRepo()
+    await writeNote(root, "alpha", "msg-1.md")
+    await writeLegacyDoc(root, "alpha", "NOTES.md", "# Coordination scratchpad\n\nnot a mailbox note\n")
+
+    // when
+    const result = await readMailboxSidebarState(root, enabledConfig(), emptyRegistry())
+
+    // then
+    expect(result?.inboundUnread).toBe(1)
+  })
+
+  it("#given a doc with frontmatter that is not a mailbox envelope #when reading sidebar state #then it is excluded from inbound unread", async () => {
+    // given
+    const root = await makeRepo()
+    await writeLegacyDoc(
+      root,
+      "alpha",
+      "design.md",
+      "---\ntitle: some design doc\nauthor: a human\n---\nbody text\n",
+    )
+
+    // when
+    const result = await readMailboxSidebarState(root, enabledConfig(), emptyRegistry())
+
+    // then
+    expect(result?.inboundUnread).toBe(0)
+  })
+
+  it("#given a stale doc in the processed dir #when reading sidebar state #then inbound processed excludes it", async () => {
+    // given
+    const root = await makeRepo()
+    await writeProcessed(root, "alpha", "msg-0.md")
+    const processedDir = path.join(root, "coordination_notes", "alpha", "processed")
+    await mkdir(processedDir, { recursive: true })
+    await writeFile(path.join(processedDir, "README.md"), "just a readme\n", "utf8")
+
+    // when
+    const result = await readMailboxSidebarState(root, enabledConfig(), emptyRegistry())
+
+    // then
+    expect(result?.inboundProcessed).toBe(1)
   })
 
   it("#given three sent notes acked rejected and pending #when reading sidebar state #then outbound counts split 1 read 1 failed 1 unresolved", async () => {
