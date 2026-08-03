@@ -66,6 +66,7 @@ utils/models-verbose.json
 # cross-project agent mailbox
 coordination_notes/
 .omo/mailbox-outbox.jsonl
+.omo/mailbox-trace.jsonl
 
 # Agent workspace (.omo): this fork TRACKS .omo/ (evidence, notepads, plans, drafts,
 # boulder.json, rules). Only ephemeral runtime state stays ignored. These rules are at
@@ -75,3 +76,4 @@ coordination_notes/
 !.omo/evidence/**/*.log
 .omo/run-continuation/
 .omo/**/.DS_Store
+.omo/ralph-loop.local.md
