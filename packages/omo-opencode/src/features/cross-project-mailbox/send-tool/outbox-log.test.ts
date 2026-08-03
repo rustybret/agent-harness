@@ -42,6 +42,32 @@ describe("appendOutboxLog", () => {
     // then
     expect(parsed.toRepoRoot).toBe("/tmp/target-repo")
   })
+
+  it("serializes requestedMode into the outbox line when present", async () => {
+    // given
+    const written = entry({ requestedMode: "subagent" })
+
+    // when
+    await appendOutboxLog(repoRoot, written)
+    const raw = await readFile(outboxLogPath(repoRoot), "utf8")
+    const parsed = JSON.parse(raw.trim()) as { requestedMode?: string }
+
+    // then
+    expect(parsed.requestedMode).toBe("subagent")
+  })
+
+  it("omits requestedMode from the outbox line when absent (legacy shape)", async () => {
+    // given
+    const written = entry()
+
+    // when
+    await appendOutboxLog(repoRoot, written)
+    const raw = await readFile(outboxLogPath(repoRoot), "utf8")
+    const parsed = JSON.parse(raw.trim()) as Record<string, unknown>
+
+    // then
+    expect("requestedMode" in parsed).toBe(false)
+  })
 })
 
 describe("parseOutboxLine", () => {

@@ -8,7 +8,7 @@ import { CrossProjectMailboxConfigSchema, type CrossProjectMailboxConfig } from 
 import type { MailboxMessage } from "../envelope/schema"
 import type { MailboxModeState, ModeDetectTrigger } from "../presence"
 import type { ProjectEntry } from "../registry/types"
-import { createProjectNoteTool, type ProjectNoteToolDeps } from "./index"
+import { createProjectNoteTool, runProjectNoteSend, type ProjectNoteToolDeps } from "./index"
 
 const THIS_PROJECT_ID = "proj-c"
 
@@ -174,6 +174,60 @@ describe("createProjectNoteTool - internal-mode happy path", () => {
   })
 })
 
+describe("createProjectNoteTool - requested_mode", () => {
+  it("writes requested_mode into the target envelope frontmatter and the outbox line", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const spy = fixedModeDetector("internal")
+    const def = createProjectNoteTool(realDeps(cfg(), spy.detector))
+
+    // when
+    const out = await def.execute(
+      { targetProjectId: "proj-b", intent: "quick", body: "routed note", requested_mode: "subagent" },
+      { sessionID: "ses_1" },
+    )
+    const parsed = JSON.parse(out as string) as { ok: boolean; envelope: MailboxMessage }
+
+    // then
+    expect(parsed.ok).toBe(true)
+    expect(parsed.envelope.requested_mode).toBe("subagent")
+
+    const notePath = path.join(targetBRoot, "coordination_notes", THIS_PROJECT_ID, `${parsed.envelope.messageId}.md`)
+    const noteContent = await readFile(notePath, "utf8")
+    expect(noteContent).toContain("requested_mode: subagent")
+
+    const outboxRaw = await readFile(path.join(thisRepoRoot, ".omo", "mailbox-outbox.jsonl"), "utf8")
+    const entry = JSON.parse(outboxRaw.trim()) as { requestedMode?: string }
+    expect(entry.requestedMode).toBe("subagent")
+  })
+
+  it("omits requested_mode when not requested (legacy shape)", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const spy = fixedModeDetector("internal")
+    const def = createProjectNoteTool(realDeps(cfg(), spy.detector))
+
+    // when
+    const out = await def.execute(
+      { targetProjectId: "proj-b", intent: "quick", body: "plain note" },
+      { sessionID: "ses_1" },
+    )
+    const parsed = JSON.parse(out as string) as { ok: boolean; envelope: MailboxMessage }
+
+    // then
+    expect(parsed.ok).toBe(true)
+    expect(parsed.envelope.requested_mode).toBeUndefined()
+
+    const notePath = path.join(targetBRoot, "coordination_notes", THIS_PROJECT_ID, `${parsed.envelope.messageId}.md`)
+    const noteContent = await readFile(notePath, "utf8")
+    expect(noteContent).not.toContain("requested_mode")
+
+    const outboxRaw = await readFile(path.join(thisRepoRoot, ".omo", "mailbox-outbox.jsonl"), "utf8")
+    const entry = JSON.parse(outboxRaw.trim()) as Record<string, unknown>
+    expect("requestedMode" in entry).toBe(false)
+  })
+})
+
 describe("createProjectNoteTool - external-mode blocked", () => {
   it("returns guidance and writes nothing when mode is external", async () => {
     // given
@@ -279,5 +333,36 @@ describe("createProjectNoteTool - preflight-blocked", () => {
     expect(out.blocked).toBe(true)
     expect(out.reason).toBe("over-budget")
     expect(handle.writeCalls).toBe(0)
+  })
+})
+
+
+describe("runProjectNoteSend - write-failed trace", () => {
+  it("emits exactly one write-failed event and rethrows when the note write throws", async () => {
+    // given
+    const records: Record<string, unknown>[] = []
+    const spy = fixedModeDetector("internal")
+    const deps = realDeps(cfg(), spy.detector)
+    const boom = new Error("disk full")
+    deps.writeNote = async () => {
+      throw boom
+    }
+    deps.traceSink = { append: (record) => void records.push(record) }
+
+    // when
+    const call = runProjectNoteSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello note" },
+      deps,
+    )
+
+    // then
+    await expect(call).rejects.toBe(boom)
+    const writeFailed = records.filter((r) => r["phase"] === "write-failed")
+    expect(writeFailed).toHaveLength(1)
+    expect(typeof writeFailed[0]?.["messageId"]).toBe("string")
+    expect((writeFailed[0]?.["messageId"] as string).length).toBeGreaterThan(0)
+    expect(typeof writeFailed[0]?.["correlationId"]).toBe("string")
+    expect(writeFailed[0]?.["detail"]).toBe("disk full")
+    expect(records.some((r) => r["phase"] === "sent")).toBe(false)
   })
 })

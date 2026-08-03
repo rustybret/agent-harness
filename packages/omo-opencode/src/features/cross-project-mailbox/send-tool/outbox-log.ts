@@ -2,6 +2,7 @@ import { appendFile, mkdir } from "node:fs/promises"
 import path from "node:path"
 
 import { log } from "../../../shared/logger"
+import type { MailboxMode } from "../envelope/schema"
 import type { IntentEnum } from "../validation/types"
 
 const BODY_PREVIEW_MAX = 100
@@ -14,6 +15,7 @@ export interface OutboxEntry {
   intent: IntentEnum
   correlationId: string
   body: string
+  requestedMode?: MailboxMode
 }
 
 export function outboxLogPath(repoRoot: string): string {
@@ -31,6 +33,7 @@ export async function appendOutboxLog(repoRoot: string, entry: OutboxEntry): Pro
     intent: entry.intent,
     correlationId: entry.correlationId,
     body: entry.body.slice(0, BODY_PREVIEW_MAX),
+    ...(entry.requestedMode === undefined ? {} : { requestedMode: entry.requestedMode }),
   }
   await appendFile(logPath, `${JSON.stringify(record)}\n`, "utf8")
 }

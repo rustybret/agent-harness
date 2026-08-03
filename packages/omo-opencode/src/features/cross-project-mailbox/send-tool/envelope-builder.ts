@@ -3,7 +3,7 @@ import { readdir, readFile } from "node:fs/promises"
 import path from "node:path"
 
 import { parseEnvelope } from "../envelope/schema"
-import type { MailboxMessage } from "../envelope/schema"
+import type { MailboxMessage, MailboxMode } from "../envelope/schema"
 import { safeMessageIdFilename } from "../envelope/path-guard"
 import type { IntentEnum } from "../validation/types"
 
@@ -16,6 +16,7 @@ export interface SendInput {
   threadId?: string | null
   supersedes?: string | null
   inReplyToMessageId?: string | null
+  requested_mode?: MailboxMode
 }
 
 export interface BuiltEnvelope {
@@ -107,6 +108,7 @@ export async function buildSendEnvelope(
     hopCount,
     hopPath,
     supersedes: input.supersedes ?? null,
+    requested_mode: input.requested_mode,
   }
 
   return { envelope, body: input.body }

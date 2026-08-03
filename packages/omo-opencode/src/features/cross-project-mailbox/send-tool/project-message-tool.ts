@@ -3,15 +3,18 @@ import { z } from "zod"
 
 import { validatePluginConfig } from "../../../config/validate"
 import type { CrossProjectMailboxConfig } from "../config"
-import { MAILBOX_INTENTS, MAX_BODY_BYTES, type MailboxMessage } from "../envelope/schema"
-import { launchTargetSession } from "../launch"
-import { MailboxStore } from "../mailbox/mailbox-store"
+import { MAILBOX_INTENTS, MAILBOX_MODES, MAX_BODY_BYTES, type MailboxMessage } from "../envelope/schema"
 import { type MailboxModeState, type ModeDetector, readPresenceStatus, type PresenceStatus } from "../presence"
 import type { ProjectEntry } from "../registry/types"
+import type { MailboxTraceSink } from "../trace"
+import { defaultWriteNote, maybeLaunchOfflineTarget } from "./offline-launch"
+import { emitSendBlockedNoEnvelope, emitSendEnvelopeTrace, type SendTraceContext } from "./send-trace"
 import { readOutboundBudget } from "../visibility"
 import { buildSendEnvelope, type SendInput } from "./envelope-builder"
 import { appendOutboxLog } from "./outbox-log"
 import { type PreflightReason, runSendPreflight } from "./send-preflight"
+import { triggerInterruptMailboxDrainNow } from "../lanes/interrupt-sender-trigger"
+import type { InterruptDrainNowResult } from "../lanes/interrupt-sender-trigger"
 
 export const IntentEnumSchema = z.enum(MAILBOX_INTENTS)
 
@@ -27,6 +30,7 @@ export function createProjectMessageInputSchema(maxBodyBytes: number) {
       threadId: z.string().nullable().optional(),
       supersedes: z.string().nullable().optional(),
       inReplyToMessageId: z.string().nullable().optional(),
+      requested_mode: z.enum(MAILBOX_MODES).optional(),
     })
     .strict()
 }
@@ -61,44 +65,19 @@ export interface ProjectMessageToolDeps {
   launchTarget?: (repoRoot: string, projectId: string, policy: CrossProjectMailboxConfig["launch_policy"]) => Promise<boolean>
   launchPermissionAsk?: (target: string) => Promise<boolean>
   liveConfigResolver?: { resolve: () => Promise<CrossProjectMailboxConfig> }
+  triggerInterruptDrainNow?: (targetRepoRoot: string) => Promise<InterruptDrainNowResult>
+  traceSink?: MailboxTraceSink
 }
 
 export type SendResult =
-  | { ok: true; envelope: MailboxMessage; messageId: string; correlationId: string }
+  | { ok: true; envelope: MailboxMessage; messageId: string; correlationId: string; interruptDrainNow?: InterruptDrainNowResult }
   | { error: "target-not-found" | "reply-parent-not-found" }
   | { blocked: true; reason: PreflightReason }
 
-async function defaultWriteNote(
-  targetRepoRoot: string,
-  fromProjectId: string,
-  envelope: MailboxMessage,
-  body: string,
-  reservationTtlMs: number,
-): Promise<void> {
-  const store = new MailboxStore(targetRepoRoot, fromProjectId, { reservation_ttl_ms: reservationTtlMs })
-  await store.writeNote(envelope, body)
-}
-
-async function maybeLaunchOfflineTarget(
-  targetEntry: ProjectEntry,
-  deps: ProjectMessageToolDeps,
-): Promise<void> {
-  const policy = deps.config.launch_policy
-  if (policy === "disabled") return
-
-  const readPresence = deps.readPresence ?? ((projectId: string) => readPresenceStatus(projectId))
-  const status = await readPresence(targetEntry.projectId)
-  if (status !== "offline") return
-
-  const launch =
-    deps.launchTarget ??
-    ((repoRoot: string, projectId: string, launchPolicy: CrossProjectMailboxConfig["launch_policy"]) =>
-      launchTargetSession(repoRoot, {
-        policy: launchPolicy,
-        projectId,
-        launchPermissionAsk: deps.launchPermissionAsk,
-      }))
-  await launch(targetEntry.repoRoot, targetEntry.projectId, policy)
+function traceCtx(deps: ProjectMessageToolDeps): SendTraceContext {
+  return deps.traceSink === undefined
+    ? { repoRoot: deps.thisRepoRoot, fromProjectId: deps.thisProjectId }
+    : { repoRoot: deps.thisRepoRoot, fromProjectId: deps.thisProjectId, sink: deps.traceSink }
 }
 
 export async function runProjectMessageSend(
@@ -110,6 +89,7 @@ export async function runProjectMessageSend(
     projects.find((entry) => entry.projectId === input.targetProjectId) ??
     projects.find((entry) => entry.displayName.toLowerCase() === input.targetProjectId.toLowerCase())
   if (targetEntry === undefined) {
+    emitSendBlockedNoEnvelope(traceCtx(deps), input.targetProjectId, "target-not-found")
     return { error: "target-not-found" }
   }
 
@@ -129,21 +109,39 @@ export async function runProjectMessageSend(
 
   const preflight = await runSendPreflight(normalizedInput, built.envelope.hopCount, deps.config, targetEntry)
   if (preflight.blocked) {
+    emitSendEnvelopeTrace({
+      ctx: traceCtx(deps),
+      phase: "blocked",
+      envelope: built.envelope,
+      toProjectId: targetEntry.projectId,
+      detail: preflight.reason,
+    })
     return { blocked: true, reason: preflight.reason }
   }
 
   await maybeLaunchOfflineTarget(targetEntry, deps)
 
-  if (deps.writeNote) {
-    await deps.writeNote(targetEntry.repoRoot, deps.thisProjectId, built.envelope, built.body)
-  } else {
-    await defaultWriteNote(
-      targetEntry.repoRoot,
-      deps.thisProjectId,
-      built.envelope,
-      built.body,
-      deps.config.bounds.reservation_ttl_ms,
-    )
+  try {
+    if (deps.writeNote) {
+      await deps.writeNote(targetEntry.repoRoot, deps.thisProjectId, built.envelope, built.body)
+    } else {
+      await defaultWriteNote(
+        targetEntry.repoRoot,
+        deps.thisProjectId,
+        built.envelope,
+        built.body,
+        deps.config.bounds.reservation_ttl_ms,
+      )
+    }
+  } catch (error) {
+    emitSendEnvelopeTrace({
+      ctx: traceCtx(deps),
+      phase: "write-failed",
+      envelope: built.envelope,
+      toProjectId: targetEntry.projectId,
+      detail: error instanceof Error ? error.message : String(error),
+    })
+    throw error
   }
 
   const append = deps.appendOutbox ?? appendOutboxLog
@@ -155,13 +153,26 @@ export async function runProjectMessageSend(
     intent: built.envelope.intent,
     correlationId: built.envelope.correlationId,
     body: built.body,
+    requestedMode: built.envelope.requested_mode,
   })
+
+  emitSendEnvelopeTrace({
+    ctx: traceCtx(deps),
+    phase: "sent",
+    envelope: built.envelope,
+    toProjectId: targetEntry.projectId,
+  })
+
+  const interruptDrainNow = built.envelope.requested_mode === "interrupt"
+    ? await (deps.triggerInterruptDrainNow ?? triggerInterruptMailboxDrainNow)(targetEntry.repoRoot)
+    : undefined
 
   return {
     ok: true,
     envelope: built.envelope,
     messageId: built.envelope.messageId,
     correlationId: built.envelope.correlationId,
+    ...(interruptDrainNow === undefined ? {} : { interruptDrainNow }),
   }
 }
 
@@ -218,6 +229,7 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
       threadId: tool.schema.string().optional().describe("Optional correlation UUID for a fresh thread (ignored on replies)"),
       supersedes: tool.schema.string().optional().describe("Optional messageId this note supersedes"),
       inReplyToMessageId: tool.schema.string().optional().describe("Optional parent messageId when replying to a received note"),
+      requested_mode: tool.schema.enum(MAILBOX_MODES).optional().describe("Optional fulfillment mode hint for the receiver (advisory; receiver may downgrade)"),
     },
     execute: async (rawArgs, toolContext) => {
       const freshConfig = await resolveFreshSendConfig(deps)

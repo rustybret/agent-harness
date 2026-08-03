@@ -2,9 +2,11 @@ import { type ToolDefinition, tool } from "@opencode-ai/plugin/tool"
 import { z } from "zod"
 
 import type { CrossProjectMailboxConfig } from "../config"
-import { MAILBOX_INTENTS, MAX_BODY_BYTES, type MailboxMessage } from "../envelope/schema"
+import { MAILBOX_INTENTS, MAILBOX_MODES, MAX_BODY_BYTES, type MailboxMessage } from "../envelope/schema"
 import { MailboxStore } from "../mailbox/mailbox-store"
 import type { MailboxModeState, ModeDetector } from "../presence"
+import type { MailboxTraceSink } from "../trace"
+import { emitSendBlockedNoEnvelope, emitSendEnvelopeTrace, type SendTraceContext } from "./send-trace"
 import { buildSendEnvelope, type SendInput } from "./envelope-builder"
 import { appendOutboxLog } from "./outbox-log"
 import { type ProjectMessageRegistry, type SendResult } from "./project-message-tool"
@@ -25,6 +27,7 @@ export function createProjectNoteInputSchema(maxBodyBytes: number) {
       threadId: z.string().nullable().optional(),
       supersedes: z.string().nullable().optional(),
       inReplyToMessageId: z.string().nullable().optional(),
+      requested_mode: z.enum(MAILBOX_MODES).optional(),
     })
     .strict()
 }
@@ -41,6 +44,13 @@ export interface ProjectNoteToolDeps {
   writeNote?: (targetRepoRoot: string, fromProjectId: string, envelope: MailboxMessage, body: string) => Promise<void>
   appendOutbox?: typeof appendOutboxLog
   liveConfigResolver?: { resolve: () => Promise<CrossProjectMailboxConfig> }
+  traceSink?: MailboxTraceSink
+}
+
+function traceCtx(deps: ProjectNoteToolDeps): SendTraceContext {
+  return deps.traceSink === undefined
+    ? { repoRoot: deps.thisRepoRoot, fromProjectId: deps.thisProjectId }
+    : { repoRoot: deps.thisRepoRoot, fromProjectId: deps.thisProjectId, sink: deps.traceSink }
 }
 
 async function defaultWriteNote(
@@ -67,6 +77,7 @@ export async function runProjectNoteSend(
     projects.find((entry) => entry.projectId === input.targetProjectId) ??
     projects.find((entry) => entry.displayName.toLowerCase() === input.targetProjectId.toLowerCase())
   if (targetEntry === undefined) {
+    emitSendBlockedNoEnvelope(traceCtx(deps), input.targetProjectId, "target-not-found")
     return { error: "target-not-found" }
   }
 
@@ -86,19 +97,37 @@ export async function runProjectNoteSend(
 
   const preflight = await runSendPreflight(normalizedInput, built.envelope.hopCount, deps.config, targetEntry)
   if (preflight.blocked) {
+    emitSendEnvelopeTrace({
+      ctx: traceCtx(deps),
+      phase: "blocked",
+      envelope: built.envelope,
+      toProjectId: targetEntry.projectId,
+      detail: preflight.reason,
+    })
     return { blocked: true, reason: preflight.reason }
   }
 
-  if (deps.writeNote) {
-    await deps.writeNote(targetEntry.repoRoot, deps.thisProjectId, built.envelope, built.body)
-  } else {
-    await defaultWriteNote(
-      targetEntry.repoRoot,
-      deps.thisProjectId,
-      built.envelope,
-      built.body,
-      deps.config.bounds.reservation_ttl_ms,
-    )
+  try {
+    if (deps.writeNote) {
+      await deps.writeNote(targetEntry.repoRoot, deps.thisProjectId, built.envelope, built.body)
+    } else {
+      await defaultWriteNote(
+        targetEntry.repoRoot,
+        deps.thisProjectId,
+        built.envelope,
+        built.body,
+        deps.config.bounds.reservation_ttl_ms,
+      )
+    }
+  } catch (error) {
+    emitSendEnvelopeTrace({
+      ctx: traceCtx(deps),
+      phase: "write-failed",
+      envelope: built.envelope,
+      toProjectId: targetEntry.projectId,
+      detail: error instanceof Error ? error.message : String(error),
+    })
+    throw error
   }
 
   const append = deps.appendOutbox ?? appendOutboxLog
@@ -110,6 +139,14 @@ export async function runProjectNoteSend(
     intent: built.envelope.intent,
     correlationId: built.envelope.correlationId,
     body: built.body,
+    requestedMode: built.envelope.requested_mode,
+  })
+
+  emitSendEnvelopeTrace({
+    ctx: traceCtx(deps),
+    phase: "sent",
+    envelope: built.envelope,
+    toProjectId: targetEntry.projectId,
   })
 
   return {
@@ -156,6 +193,7 @@ export function createProjectNoteTool(deps: ProjectNoteToolDeps): ToolDefinition
       threadId: tool.schema.string().optional().describe("Optional correlation UUID for a fresh thread (ignored on replies)"),
       supersedes: tool.schema.string().optional().describe("Optional messageId this note supersedes"),
       inReplyToMessageId: tool.schema.string().optional().describe("Optional parent messageId when replying to a received note"),
+      requested_mode: tool.schema.enum(MAILBOX_MODES).optional().describe("Optional fulfillment mode hint for the receiver (advisory; receiver may downgrade)"),
     },
     execute: async (rawArgs, toolContext) => {
       const freshConfig = await resolveFreshSendConfig(deps)

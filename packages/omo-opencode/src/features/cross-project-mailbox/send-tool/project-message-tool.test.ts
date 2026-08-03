@@ -212,6 +212,131 @@ describe("runProjectMessageSend - fresh send", () => {
   })
 })
 
+describe("runProjectMessageSend - requested_mode", () => {
+  it("writes requested_mode into the target envelope frontmatter and the outbox line", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    const out = await def.execute(
+      { targetProjectId: "proj-b", intent: "quick", body: "routed", requested_mode: "subagent" },
+      {},
+    )
+    const parsed = JSON.parse(out as string) as { ok: boolean; envelope: MailboxMessage }
+
+    // then
+    expect(parsed.ok).toBe(true)
+    expect(parsed.envelope.requested_mode).toBe("subagent")
+
+    const notePath = path.join(
+      targetBRoot,
+      "coordination_notes",
+      THIS_PROJECT_ID,
+      `${parsed.envelope.messageId}.md`,
+    )
+    const noteContent = await readFile(notePath, "utf8")
+    expect(noteContent).toContain("requested_mode: subagent")
+
+    const outboxRaw = await readFile(path.join(thisRepoRoot, ".omo", "mailbox-outbox.jsonl"), "utf8")
+    const entry = JSON.parse(outboxRaw.trim()) as { requestedMode?: string }
+    expect(entry.requestedMode).toBe("subagent")
+  })
+
+  it("triggers the target mailbox drain immediately after an interrupt-mode note is written", async () => {
+    // given
+    const triggerCalls: string[] = []
+    const handle = spyDeps(cfg())
+    handle.deps.triggerInterruptDrainNow = async (targetRepoRoot) => {
+      triggerCalls.push(targetRepoRoot)
+      return { triggered: true }
+    }
+
+    // when
+    const result = await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "plan", body: "urgent", requested_mode: "interrupt" },
+      handle.deps,
+    )
+
+    // then
+    if (!("ok" in result)) throw new Error("expected ok result")
+    expect(result.interruptDrainNow).toEqual({ triggered: true })
+    expect(triggerCalls).toEqual([targetBRoot])
+    expect(handle.writeCalls).toBe(1)
+  })
+
+  it("keeps an interrupt-mode send successful when the immediate drain trigger degrades", async () => {
+    // given
+    const handle = spyDeps(cfg())
+    handle.deps.triggerInterruptDrainNow = async () => ({ triggered: false })
+
+    // when
+    const result = await runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "plan", body: "urgent", requested_mode: "interrupt" },
+      handle.deps,
+    )
+
+    // then
+    if (!("ok" in result)) throw new Error("expected ok result")
+    expect(result.interruptDrainNow).toEqual({ triggered: false })
+    expect(handle.writeCalls).toBe(1)
+  })
+
+  it("omits requested_mode from envelope frontmatter and outbox line when not requested (legacy shape)", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    const out = await def.execute(
+      { targetProjectId: "proj-b", intent: "quick", body: "plain" },
+      {},
+    )
+    const parsed = JSON.parse(out as string) as { ok: boolean; envelope: MailboxMessage }
+
+    // then
+    expect(parsed.ok).toBe(true)
+    expect(parsed.envelope.requested_mode).toBeUndefined()
+
+    const notePath = path.join(
+      targetBRoot,
+      "coordination_notes",
+      THIS_PROJECT_ID,
+      `${parsed.envelope.messageId}.md`,
+    )
+    const noteContent = await readFile(notePath, "utf8")
+    expect(noteContent).not.toContain("requested_mode")
+
+    const outboxRaw = await readFile(path.join(thisRepoRoot, ".omo", "mailbox-outbox.jsonl"), "utf8")
+    const entry = JSON.parse(outboxRaw.trim()) as Record<string, unknown>
+    expect("requestedMode" in entry).toBe(false)
+  })
+
+  it("rejects an invalid requested_mode value without writing (blocked JSON, no file)", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    let threw = false
+    try {
+      await def.execute(
+        { targetProjectId: "proj-b", intent: "quick", body: "bogus", requested_mode: "bogus" },
+        {},
+      )
+    } catch {
+      threw = true
+    }
+
+    // then: invalid enum is rejected at zod parse (strict send side), nothing written
+    expect(threw).toBe(true)
+    const outboxExists = await readFile(path.join(thisRepoRoot, ".omo", "mailbox-outbox.jsonl"), "utf8")
+      .then(() => true)
+      .catch(() => false)
+    expect(outboxExists).toBe(false)
+  })
+})
+
 describe("runProjectMessageSend - reply", () => {
   it("appends a hop, extends the hopPath, and inherits the parent correlationId", async () => {
     // given
@@ -1044,5 +1169,35 @@ describe("createProjectMessageTool - internal/external mode gate", () => {
 
     // then
     expect(out.ok).toBe(true)
+  })
+})
+
+
+describe("runProjectMessageSend - write-failed trace", () => {
+  it("emits exactly one write-failed event and rethrows when the note write throws", async () => {
+    // given
+    const records: Record<string, unknown>[] = []
+    const handle = spyDeps(cfg())
+    const boom = new Error("disk full")
+    handle.deps.writeNote = async () => {
+      throw boom
+    }
+    handle.deps.traceSink = { append: (record) => void records.push(record) }
+
+    // when
+    const call = runProjectMessageSend(
+      { targetProjectId: "proj-b", intent: "quick", body: "hello", threadId: undefined },
+      handle.deps,
+    )
+
+    // then
+    await expect(call).rejects.toBe(boom)
+    const writeFailed = records.filter((r) => r["phase"] === "write-failed")
+    expect(writeFailed).toHaveLength(1)
+    expect(typeof writeFailed[0]?.["messageId"]).toBe("string")
+    expect((writeFailed[0]?.["messageId"] as string).length).toBeGreaterThan(0)
+    expect(typeof writeFailed[0]?.["correlationId"]).toBe("string")
+    expect(writeFailed[0]?.["detail"]).toBe("disk full")
+    expect(records.some((r) => r["phase"] === "sent")).toBe(false)
   })
 })
