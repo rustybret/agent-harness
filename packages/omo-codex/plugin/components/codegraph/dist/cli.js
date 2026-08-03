@@ -2027,7 +2027,7 @@ function isNonFatalCodegraphGcError(error) {
 
 // components/codegraph/src/hook-sweep.ts
 import { fileURLToPath } from "node:url";
-// ../../utils/src/codegraph/process-sweeper.ts
+// ../../utils/src/process-sweep/sweeper.ts
 import { existsSync as existsSync7, mkdirSync as mkdirSync2, statSync as statSync2, utimesSync, writeFileSync as writeFileSync2 } from "node:fs";
 import { homedir as homedir10 } from "node:os";
 import { dirname as dirname5, join as join11 } from "node:path";
@@ -2118,13 +2118,103 @@ function realpathIfPossible2(path) {
   }
 }
 
-// ../../utils/src/codegraph/process-exec.ts
-import { execFile } from "node:child_process";
-
-// ../../utils/src/codegraph/process-match.ts
+// ../../utils/src/process-sweep/command-match.ts
 import { posix, win32 } from "node:path";
-var SERVE_WRAPPER_SUFFIX = "/components/codegraph/dist/serve.js";
-var UPSTREAM_PACKAGE_SEGMENT = "/@colbymchenry/codegraph/";
+function splitCommandTokens(command) {
+  const tokens = [];
+  let current = "";
+  let quote = null;
+  let tokenStarted = false;
+  for (const char of command) {
+    if (quote !== null) {
+      if (char === quote) {
+        quote = null;
+      } else {
+        current += char;
+      }
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      quote = char;
+      tokenStarted = true;
+      continue;
+    }
+    if (/\s/.test(char)) {
+      if (tokenStarted || current.length > 0) {
+        tokens.push(current);
+        current = "";
+        tokenStarted = false;
+      }
+      continue;
+    }
+    current += char;
+  }
+  if (tokenStarted || current.length > 0)
+    tokens.push(current);
+  return tokens;
+}
+function hasExecutableToken(command, expectedPath) {
+  let searchFrom = 0;
+  for (;; ) {
+    const pathIndex = command.indexOf(expectedPath, searchFrom);
+    if (pathIndex < 0)
+      return false;
+    const tokenStart = findTokenStart(command, pathIndex);
+    const tokenEnd = findTokenEnd(command, pathIndex + expectedPath.length);
+    if (command.slice(tokenStart, tokenEnd) === expectedPath && tokenLooksExecutable(command, tokenStart))
+      return true;
+    searchFrom = pathIndex + expectedPath.length;
+  }
+}
+function tokenLooksExecutable(command, tokenStart) {
+  let prefix = command.slice(0, tokenStart).trimEnd();
+  if (prefix.length === 0)
+    return true;
+  for (;; ) {
+    const previousTokenStart = findTokenStart(prefix, prefix.length - 1);
+    const previousToken = prefix.slice(previousTokenStart);
+    if (!previousToken.startsWith("-")) {
+      const executableName = previousToken.split("/").at(-1) ?? previousToken;
+      return /^node\d*(\.exe)?$/i.test(executableName) || /^bun(\.exe)?$/i.test(executableName);
+    }
+    prefix = prefix.slice(0, previousTokenStart).trimEnd();
+    if (prefix.length === 0)
+      return false;
+  }
+}
+function findTokenStart(command, index) {
+  for (let cursor = index - 1;cursor >= 0; cursor -= 1) {
+    if (/\s|["']/.test(command[cursor] ?? ""))
+      return cursor + 1;
+  }
+  return 0;
+}
+function findTokenEnd(command, index) {
+  for (let cursor = index;cursor < command.length; cursor += 1) {
+    if (/\s|["']/.test(command[cursor] ?? ""))
+      return cursor;
+  }
+  return command.length;
+}
+function normalizeRoots(roots, platform) {
+  const normalized = new Set;
+  for (const root of roots) {
+    const trimmed = root.trim();
+    if (trimmed.length === 0)
+      continue;
+    normalized.add(normalizeForComparison2(resolvePathForPlatform(trimmed, platform), platform));
+  }
+  return [...normalized].sort((left, right) => right.length - left.length || left.localeCompare(right));
+}
+function resolvePathForPlatform(value, platform) {
+  return platform === "win32" ? win32.resolve(value) : posix.resolve(value);
+}
+function normalizeForComparison2(value, platform) {
+  const normalized = value.replaceAll("\\", "/").replace(/\/+$/, "");
+  return platform === "win32" ? normalized.toLowerCase() : normalized;
+}
+
+// ../../utils/src/process-sweep/process-table.ts
 function parsePosixProcessTable(output) {
   const processes = [];
   for (const line of output.split(/\r?\n/)) {
@@ -2156,6 +2246,36 @@ function parseWindowsProcessTable(output) {
   }
   return processes;
 }
+function isOrphaned(processInfo, livePids) {
+  return processInfo.ppid === 1 || !livePids.has(processInfo.ppid);
+}
+function isValidProcessId(value) {
+  return Number.isSafeInteger(value) && value > 0;
+}
+function parseJson(text) {
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    if (error instanceof SyntaxError)
+      return;
+    throw error;
+  }
+}
+function numberField(record, key) {
+  const value = record[key];
+  return typeof value === "number" && isValidProcessId(value) ? value : undefined;
+}
+function stringField(record, key) {
+  const value = record[key];
+  return typeof value === "string" ? value : undefined;
+}
+function isRecord3(value) {
+  return typeof value === "object" && value !== null;
+}
+
+// ../../utils/src/process-sweep/codegraph-family.ts
+var SERVE_WRAPPER_SUFFIX = "/components/codegraph/dist/serve.js";
+var UPSTREAM_PACKAGE_SEGMENT = "/@colbymchenry/codegraph/";
 function selectZombieCodegraphProcesses(processes, options) {
   const platform = options.platform ?? process.platform;
   const livePids = new Set(processes.map((processInfo) => processInfo.pid));
@@ -2215,39 +2335,6 @@ function extractDaemonProjectRoot(tokens) {
     return null;
   return value;
 }
-function splitCommandTokens(command) {
-  const tokens = [];
-  let current = "";
-  let quote = null;
-  let tokenStarted = false;
-  for (const char of command) {
-    if (quote !== null) {
-      if (char === quote) {
-        quote = null;
-      } else {
-        current += char;
-      }
-      continue;
-    }
-    if (char === '"' || char === "'") {
-      quote = char;
-      tokenStarted = true;
-      continue;
-    }
-    if (/\s/.test(char)) {
-      if (tokenStarted || current.length > 0) {
-        tokens.push(current);
-        current = "";
-        tokenStarted = false;
-      }
-      continue;
-    }
-    current += char;
-  }
-  if (tokenStarted || current.length > 0)
-    tokens.push(current);
-  return tokens;
-}
 function matchOwnedCodegraphCommand(command, roots, platform) {
   const normalizedCommand = normalizeForComparison2(command, platform);
   for (const root of roots) {
@@ -2262,35 +2349,6 @@ function matchOwnedCodegraphCommand(command, roots, platform) {
   }
   return null;
 }
-function hasExecutableToken(command, expectedPath) {
-  let searchFrom = 0;
-  for (;; ) {
-    const pathIndex = command.indexOf(expectedPath, searchFrom);
-    if (pathIndex < 0)
-      return false;
-    const tokenStart = findTokenStart(command, pathIndex);
-    const tokenEnd = findTokenEnd(command, pathIndex + expectedPath.length);
-    if (command.slice(tokenStart, tokenEnd) === expectedPath && tokenLooksExecutable(command, tokenStart))
-      return true;
-    searchFrom = pathIndex + expectedPath.length;
-  }
-}
-function tokenLooksExecutable(command, tokenStart) {
-  let prefix = command.slice(0, tokenStart).trimEnd();
-  if (prefix.length === 0)
-    return true;
-  for (;; ) {
-    const previousTokenStart = findTokenStart(prefix, prefix.length - 1);
-    const previousToken = prefix.slice(previousTokenStart);
-    if (!previousToken.startsWith("-")) {
-      const executableName = previousToken.split("/").at(-1) ?? previousToken;
-      return /^node\d*(\.exe)?$/.test(executableName) || /^bun(\.exe)?$/.test(executableName);
-    }
-    prefix = prefix.slice(0, previousTokenStart).trimEnd();
-    if (prefix.length === 0)
-      return false;
-  }
-}
 function upstreamPackagePathIsUnderRoot(command, root) {
   let searchFrom = 0;
   for (;; ) {
@@ -2303,70 +2361,24 @@ function upstreamPackagePathIsUnderRoot(command, root) {
     searchFrom = packageIndex + UPSTREAM_PACKAGE_SEGMENT.length;
   }
 }
-function findTokenStart(command, index) {
-  for (let cursor = index - 1;cursor >= 0; cursor -= 1) {
-    if (/\s|["']/.test(command[cursor] ?? ""))
-      return cursor + 1;
-  }
-  return 0;
-}
-function findTokenEnd(command, index) {
-  for (let cursor = index;cursor < command.length; cursor += 1) {
-    if (/\s|["']/.test(command[cursor] ?? ""))
-      return cursor;
-  }
-  return command.length;
-}
-function normalizeRoots(roots, platform) {
-  const normalized = new Set;
-  for (const root of roots) {
-    const trimmed = root.trim();
-    if (trimmed.length === 0)
-      continue;
-    normalized.add(normalizeForComparison2(resolvePathForPlatform(trimmed, platform), platform));
-  }
-  return [...normalized].sort((left, right) => right.length - left.length || left.localeCompare(right));
-}
-function resolvePathForPlatform(value, platform) {
-  return platform === "win32" ? win32.resolve(value) : posix.resolve(value);
-}
-function normalizeForComparison2(value, platform) {
-  const normalized = value.replaceAll("\\", "/").replace(/\/+$/, "");
-  return platform === "win32" ? normalized.toLowerCase() : normalized;
-}
-function isOrphaned(processInfo, livePids) {
-  return processInfo.ppid === 1 || !livePids.has(processInfo.ppid);
-}
-function isValidProcessId(value) {
-  return Number.isSafeInteger(value) && value > 0;
-}
-function parseJson(text) {
-  try {
-    return JSON.parse(text);
-  } catch (error) {
-    if (error instanceof SyntaxError)
-      return;
-    throw error;
-  }
-}
-function numberField(record, key) {
-  const value = record[key];
-  return typeof value === "number" && isValidProcessId(value) ? value : undefined;
-}
-function stringField(record, key) {
-  const value = record[key];
-  return typeof value === "string" ? value : undefined;
-}
-function isRecord3(value) {
-  return typeof value === "object" && value !== null;
-}
 
-// ../../utils/src/codegraph/process-exec.ts
-function enumerateCodegraphProcesses(platform = process.platform) {
+// ../../utils/src/process-sweep/exec.ts
+import { execFile } from "node:child_process";
+function enumerateProcesses(platform = process.platform) {
   return platform === "win32" ? enumerateWindowsProcesses() : enumeratePosixProcesses();
 }
-function createDefaultCodegraphProcessKiller(platform = process.platform) {
+function createDefaultProcessKiller(platform = process.platform) {
   return platform === "win32" ? createWindowsKiller() : createPosixKiller();
+}
+function defaultIsProcessAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    if (!(error instanceof Error))
+      throw error;
+    return processKillErrorMeansAlive(error);
+  }
 }
 function enumeratePosixProcesses() {
   return execFileText("ps", ["-eo", "pid=,ppid=,command="]).then(parsePosixProcessTable);
@@ -2381,16 +2393,7 @@ function enumerateWindowsProcesses() {
 }
 function createPosixKiller() {
   return {
-    isAlive: (pid) => {
-      try {
-        process.kill(pid, 0);
-        return true;
-      } catch (error) {
-        if (!(error instanceof Error))
-          throw error;
-        return processKillErrorMeansAlive(error);
-      }
-    },
+    isAlive: defaultIsProcessAlive,
     kill: (pid) => {
       process.kill(pid, "SIGKILL");
       return Promise.resolve();
@@ -2403,16 +2406,7 @@ function createPosixKiller() {
 }
 function createWindowsKiller() {
   return {
-    isAlive: (pid) => {
-      try {
-        process.kill(pid, 0);
-        return true;
-      } catch (error) {
-        if (!(error instanceof Error))
-          throw error;
-        return processKillErrorMeansAlive(error);
-      }
-    },
+    isAlive: defaultIsProcessAlive,
     kill: (pid) => execFileVoid("taskkill.exe", ["/PID", String(pid), "/T", "/F"]),
     terminate: (pid) => execFileVoid("taskkill.exe", ["/PID", String(pid), "/T"])
   };
@@ -2442,7 +2436,7 @@ function processKillErrorMeansAlive(error) {
   return false;
 }
 
-// ../../utils/src/codegraph/process-roots.ts
+// ../../utils/src/process-sweep/roots.ts
 import { existsSync as existsSync6, readdirSync as readdirSync2, realpathSync as realpathSync5 } from "node:fs";
 import { homedir as homedir9 } from "node:os";
 import { join as join10, resolve as resolve6 } from "node:path";
@@ -2509,34 +2503,53 @@ function isNonFatalFsError(error) {
 }
 var OMO_CODEX_PLUGIN_CACHE_PUBLISHERS = new Set(["sisyphuslabs"]);
 
-// ../../utils/src/codegraph/process-sweeper.ts
+// ../../utils/src/process-sweep/sweeper.ts
 var DEFAULT_GRACE_MS = 2000;
 var DEFAULT_THROTTLE_MS = 60 * 60 * 1000;
-var SWEEP_STAMP_FILE = "zombie-sweep.stamp";
-async function sweepCodegraphZombies(options = {}) {
-  const homeDir = options.homeDir ?? options.env?.["HOME"] ?? options.env?.["USERPROFILE"] ?? homedir10();
-  const stampFile = join11(codegraphDataRoot(homeDir), SWEEP_STAMP_FILE);
+async function runProcessFamilySweep(config, options) {
   const nowMs = options.nowMs ?? Date.now();
   const dryRun = options.dryRun === true;
-  const ownedRoots = options.ownedRoots ?? discoverCodegraphOwnedRoots(options);
-  if (options.force !== true && isSweepThrottled(stampFile, nowMs, options.throttleMs ?? DEFAULT_THROTTLE_MS)) {
-    return emptyResult("throttled", dryRun, ownedRoots, stampFile);
+  if (options.force !== true && isSweepThrottled(config.stampFile, nowMs, options.throttleMs ?? DEFAULT_THROTTLE_MS)) {
+    return { action: "throttled", candidates: [], dryRun, failed: [], killed: [], spared: [], stampFile: config.stampFile };
   }
   try {
-    const provider = options.processProvider ?? (() => enumerateCodegraphProcesses(options.platform));
-    const candidates = selectZombieCodegraphProcesses(await provider(), {
-      ownedRoots,
-      ...options.platform === undefined ? {} : { platform: options.platform }
-    });
-    const { killList, spared } = partitionByDaemonStaleness(candidates, options.log);
-    const result = dryRun ? { failed: [], killed: [] } : await killCandidates(killList, options.killer ?? createDefaultCodegraphProcessKiller(options.platform), options);
+    const plan = await config.collect();
+    const { failed, killed } = dryRun ? { failed: [], killed: [] } : await killTargets(plan.killList, options.killer ?? createDefaultProcessKiller(options.platform), options, config.familyLabel);
     if (!dryRun)
-      writeSweepStamp(stampFile, nowMs);
-    return { action: "swept", candidates, dryRun, failed: result.failed, killed: result.killed, ownedRoots, spared, stampFile };
+      writeSweepStamp(config.stampFile, nowMs);
+    return {
+      action: "swept",
+      candidates: plan.candidates,
+      dryRun,
+      failed,
+      killed,
+      spared: plan.spared,
+      stampFile: config.stampFile
+    };
   } catch (error) {
-    options.log?.(`CodeGraph zombie sweep skipped: ${error instanceof Error ? error.message : String(error)}`);
-    return emptyResult("failed", dryRun, ownedRoots, stampFile);
+    options.log?.(`${config.familyLabel} skipped: ${error instanceof Error ? error.message : String(error)}`);
+    return { action: "failed", candidates: [], dryRun, failed: [], killed: [], spared: [], stampFile: config.stampFile };
   }
+}
+var CODEGRAPH_SWEEP_STAMP_FILE = "zombie-sweep.stamp";
+async function sweepCodegraphZombies(options = {}) {
+  const homeDir = options.homeDir ?? options.env?.["HOME"] ?? options.env?.["USERPROFILE"] ?? homedir10();
+  const stampFile = join11(codegraphDataRoot(homeDir), CODEGRAPH_SWEEP_STAMP_FILE);
+  const ownedRoots = options.ownedRoots ?? discoverCodegraphOwnedRoots(options);
+  const result = await runProcessFamilySweep({
+    familyLabel: "CodeGraph zombie sweep",
+    stampFile,
+    collect: async () => {
+      const provider = options.processProvider ?? (() => enumerateProcesses(options.platform));
+      const candidates = selectZombieCodegraphProcesses(await provider(), {
+        ownedRoots,
+        ...options.platform === undefined ? {} : { platform: options.platform }
+      });
+      const { killList, spared } = partitionByDaemonStaleness(candidates, options.log);
+      return { candidates, killList, spared };
+    }
+  }, options);
+  return { ...result, ownedRoots };
 }
 function partitionByDaemonStaleness(candidates, log) {
   const killList = [];
@@ -2557,42 +2570,42 @@ function partitionByDaemonStaleness(candidates, log) {
   }
   return { killList, spared };
 }
-async function killCandidates(candidates, killer, options) {
+async function killTargets(targets, killer, options, familyLabel) {
   const failed = [];
   const killed = [];
-  for (const candidate of candidates) {
-    const terminated = await safelyTerminate(candidate.pid, killer, failed, options.log);
+  for (const target of targets) {
+    const terminated = await safelyTerminate(target.pid, killer, failed, options.log, familyLabel);
     if (!terminated)
       continue;
     await delay(options.graceMs ?? DEFAULT_GRACE_MS);
-    if (!await killer.isAlive(candidate.pid)) {
-      killed.push(candidate);
+    if (!await killer.isAlive(target.pid)) {
+      killed.push(target);
       continue;
     }
-    if (await safelyKill(candidate.pid, killer, failed, options.log))
-      killed.push(candidate);
+    if (await safelyKill(target.pid, killer, failed, options.log, familyLabel))
+      killed.push(target);
   }
   return { failed, killed };
 }
-async function safelyTerminate(pid, killer, failed, log) {
+async function safelyTerminate(pid, killer, failed, log, familyLabel) {
   try {
     await killer.terminate(pid);
     return true;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     failed.push({ error: message, pid, stage: "terminate" });
-    log?.(`CodeGraph zombie sweep failed to terminate pid ${pid}: ${message}`);
+    log?.(`${familyLabel} failed to terminate pid ${pid}: ${message}`);
     return false;
   }
 }
-async function safelyKill(pid, killer, failed, log) {
+async function safelyKill(pid, killer, failed, log, familyLabel) {
   try {
     await killer.kill(pid);
     return true;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     failed.push({ error: message, pid, stage: "kill" });
-    log?.(`CodeGraph zombie sweep failed to kill pid ${pid}: ${message}`);
+    log?.(`${familyLabel} failed to kill pid ${pid}: ${message}`);
     return false;
   }
 }
@@ -2607,9 +2620,6 @@ function writeSweepStamp(stampFile, nowMs) {
 `);
   const stampDate = new Date(nowMs);
   utimesSync(stampFile, stampDate, stampDate);
-}
-function emptyResult(action, dryRun, ownedRoots, stampFile) {
-  return { action, candidates: [], dryRun, failed: [], killed: [], ownedRoots, spared: [], stampFile };
 }
 function delay(ms) {
   if (ms <= 0)
@@ -3419,11 +3429,7 @@ function isProcessAlive(pid) {
     process.kill(pid, 0);
     return true;
   } catch (error) {
-    if (hasErrorCode(error, "ESRCH"))
-      return false;
-    if (hasErrorCode(error, "EPERM"))
-      return true;
-    throw error;
+    return !hasErrorCode(error, "ESRCH");
   }
 }
 async function runJsonRpcStdioServer(config) {
