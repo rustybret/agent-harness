@@ -1,24 +1,34 @@
 import * as fs from "node:fs"
 import * as path from "node:path"
 import { parse, modify, applyEdits } from "jsonc-parser"
-import { getOpenCodeConfigDirs, detectPluginConfigFile, CONFIG_BASENAME, LEGACY_CONFIG_BASENAME, log } from "../../../shared"
 import { readAppliedMigrations, writeAppliedMigrations, getSidecarPath } from "@oh-my-opencode/utils"
+
+import { OMO_SCHEMA_URL } from "../../../config-migration"
+import { log } from "../../../shared"
 import { writeFileAtomically } from "../../../shared/write-file-atomically"
+import {
+  MAILBOX_CONFIG_KEY,
+  MAILBOX_HARNESS_KEY,
+  mailboxKeyPath,
+  resolveUserOmoConfigTargetPath,
+} from "./omo-config-target"
 
 const MIGRATION_KEY = "2026-07-mailbox-default-sender-access-allow-all"
 
+const INITIAL_CONTENT = `{
+  "$schema": "${OMO_SCHEMA_URL}",
+  "${MAILBOX_HARNESS_KEY}": {
+    "${MAILBOX_CONFIG_KEY}": {
+      // Allow inbound cross-project messages by default
+      "default_sender_access": "allow-all"
+    }
+  }
+}
+`
+
 export function seedUserDefaultSenderAccess(): void {
   try {
-    const userConfigDirs = [...getOpenCodeConfigDirs({ binary: "opencode" })].reverse()
-    const primaryConfigDir = userConfigDirs[0]
-    if (!primaryConfigDir) return
-
-    const detected = detectPluginConfigFile(primaryConfigDir, {
-      basenames: [CONFIG_BASENAME],
-      legacyBasenames: [LEGACY_CONFIG_BASENAME],
-    })
-
-    const configPath = detected.format !== "none" ? detected.path : path.join(primaryConfigDir, `${CONFIG_BASENAME}.jsonc`)
+    const configPath = resolveUserOmoConfigTargetPath()
 
     const applied = readAppliedMigrations(configPath)
     if (applied.has(MIGRATION_KEY)) {
@@ -27,9 +37,8 @@ export function seedUserDefaultSenderAccess(): void {
 
     if (!fs.existsSync(configPath)) {
       // 1. absent-file -> created with key
-      const initialContent = `// https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json\n{\n  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-openagent/dev/assets/oh-my-opencode.schema.json",\n  "cross_project_mailbox": {\n    // Allow inbound cross-project messages by default\n    "default_sender_access": "allow-all"\n  }\n}\n`
       fs.mkdirSync(path.dirname(configPath), { recursive: true })
-      writeFileAtomically(configPath, initialContent)
+      writeFileAtomically(configPath, INITIAL_CONTENT)
       applied.add(MIGRATION_KEY)
       writeAppliedMigrations(configPath, applied)
       return
@@ -38,8 +47,8 @@ export function seedUserDefaultSenderAccess(): void {
     const text = fs.readFileSync(configPath, "utf-8")
     let root: unknown
     try {
-      const errors: any[] = []
-      root = parse(text, errors)
+      const errors: unknown[] = []
+      root = parse(text, errors as Parameters<typeof parse>[1])
       if (errors.length > 0) {
         log("seedUserDefaultSenderAccess skipped: malformed file", { errors })
         return
@@ -54,16 +63,21 @@ export function seedUserDefaultSenderAccess(): void {
       return
     }
 
-    const config = root as Record<string, any>
-    const mailbox = config.cross_project_mailbox
+    const config = root as Record<string, Record<string, unknown> | undefined>
+    const harness = config[MAILBOX_HARNESS_KEY]
+    const mailbox =
+      harness && typeof harness === "object" && !Array.isArray(harness)
+        ? (harness[MAILBOX_CONFIG_KEY] as Record<string, unknown> | undefined)
+        : undefined
 
     if (mailbox && typeof mailbox === "object" && !Array.isArray(mailbox)) {
-      if (mailbox.senders && Object.keys(mailbox.senders).length > 0) {
-        const senders = Object.keys(mailbox.senders)
-        log("Legacy cross_project_mailbox.senders detected", { senders })
+      const senders = mailbox.senders
+      if (senders && typeof senders === "object" && Object.keys(senders).length > 0) {
+        const senderIds = Object.keys(senders)
+        log("Legacy cross_project_mailbox.senders detected", { senders: senderIds })
         const sidecarPath = getSidecarPath(configPath)
         const noticePath = path.join(path.dirname(sidecarPath), "legacy-senders-notice.json")
-        writeFileAtomically(noticePath, JSON.stringify({ senders }, null, 2) + "\n")
+        writeFileAtomically(noticePath, JSON.stringify({ senders: senderIds }, null, 2) + "\n")
       }
 
       if ("default_sender_access" in mailbox) {
@@ -77,16 +91,15 @@ export function seedUserDefaultSenderAccess(): void {
     const backupPath = `${configPath}.bak.${timestamp}`
     fs.copyFileSync(configPath, backupPath)
 
-    const edits = modify(text, ["cross_project_mailbox", "default_sender_access"], "allow-all", {
+    const edits = modify(text, mailboxKeyPath("default_sender_access"), "allow-all", {
       formattingOptions: { insertSpaces: true, tabSize: 2 },
     })
     const next = applyEdits(text, edits)
 
     writeFileAtomically(configPath, next)
-    
+
     applied.add(MIGRATION_KEY)
     writeAppliedMigrations(configPath, applied)
-
   } catch (error) {
     log("seedUserDefaultSenderAccess failed", { error })
   }

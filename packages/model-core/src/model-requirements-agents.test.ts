@@ -24,7 +24,7 @@ describe("AGENT_MODEL_REQUIREMENTS", () => {
     })
   })
 
-  test("sisyphus keeps opus primary before Kimi K3, gpt-5.6-sol, GLM, and big-pickle fallbacks", () => {
+  test("sisyphus keeps opus primary before Kimi K3, gpt-5.6-sol, GLM 5.2, and big-pickle fallbacks", () => {
     // given
     const sisyphus = AGENT_MODEL_REQUIREMENTS["sisyphus"]
 
@@ -36,7 +36,7 @@ describe("AGENT_MODEL_REQUIREMENTS", () => {
     expect(sisyphus.requiresAnyModel).toBe(true)
     expect(primary).toEqual({
       providers: ["anthropic", "github-copilot", "opencode", "vercel"],
-      model: "claude-opus-4-8",
+      model: "claude-opus-5",
       variant: "max",
     })
     expect(second).toEqual({
@@ -60,7 +60,7 @@ describe("AGENT_MODEL_REQUIREMENTS", () => {
       variant: "medium",
     })
     expect(fourth?.providers[0]).toBe("zai-coding-plan")
-    expect(fourth?.model).toBe("glm-5")
+    expect(fourth?.model).toBe("glm-5.2")
     expect(last?.providers[0]).toBe("opencode")
     expect(last?.model).toBe("big-pickle")
   })
@@ -70,15 +70,15 @@ describe("AGENT_MODEL_REQUIREMENTS", () => {
     const librarian = AGENT_MODEL_REQUIREMENTS["librarian"]
 
     // when
-    const [primary, second, third, fourth, fifth, sixth, seventh, eighth] =
+    const [primary, , second, third, fourth, fifth, sixth, seventh, eighth] =
       librarian.fallbackChain
 
     // then
-    expect(librarian.fallbackChain).toHaveLength(8)
-    expect(primary).toEqual({ providers: ["openai"], model: "gpt-5.4-mini-fast" })
+    expect(librarian.fallbackChain).toHaveLength(9)
+    expect(primary).toEqual({ providers: ["openai"], model: "gpt-5.6-luna-fast", variant: "low" })
     expect(second?.providers).toContain("opencode-go")
     expect(second?.providers).toContain("bailian-coding-plan")
-    expect(second?.model).toBe("qwen3.5-plus")
+    expect(second?.model).toBe("qwen3.7-plus")
     expect(third).toEqual({ providers: ["vercel"], model: "minimax-m2.7-highspeed" })
     expect(fourth?.providers).toContain("opencode-go")
     expect(fourth?.model).toBe("minimax-m3")
@@ -99,14 +99,14 @@ describe("AGENT_MODEL_REQUIREMENTS", () => {
     const explore = AGENT_MODEL_REQUIREMENTS["explore"]
 
     // when
-    const [primary, second, third, fourth, fifth, sixth, seventh, eighth] = explore.fallbackChain
+    const [primary, , second, third, fourth, fifth, sixth, seventh, eighth] = explore.fallbackChain
 
     // then
-    expect(explore.fallbackChain).toHaveLength(8)
-    expect(primary).toEqual({ providers: ["openai"], model: "gpt-5.4-mini-fast" })
+    expect(explore.fallbackChain).toHaveLength(9)
+    expect(primary).toEqual({ providers: ["openai"], model: "gpt-5.6-luna-fast", variant: "low" })
     expect(second?.providers).toContain("opencode-go")
     expect(second?.providers).toContain("bailian-coding-plan")
-    expect(second?.model).toBe("qwen3.5-plus")
+    expect(second?.model).toBe("qwen3.7-plus")
     expect(third).toEqual({ providers: ["vercel"], model: "minimax-m2.7-highspeed" })
     expect(fourth?.providers).toContain("opencode-go")
     expect(fourth?.model).toBe("minimax-m3")
@@ -144,49 +144,45 @@ describe("AGENT_MODEL_REQUIREMENTS", () => {
     })
   })
 
-  test("prometheus keeps claude-opus-4-8 primary before gpt-5.6-sol high", () => {
+  test("prometheus uses Fable 5 xhigh before Kimi K3 max", () => {
     // given
     const prometheus = AGENT_MODEL_REQUIREMENTS["prometheus"]
 
     // when
-    const [primary, gptFallback] = prometheus.fallbackChain
+    const [primary, kimiFallback] = prometheus.fallbackChain
 
     // then
-    expect(prometheus.fallbackChain.length).toBeGreaterThan(1)
+    expect(prometheus.fallbackChain).toHaveLength(2)
     expect(primary).toEqual({
       providers: ["anthropic", "github-copilot", "opencode", "vercel"],
-      model: "claude-opus-4-8",
-      variant: "max",
+      model: "claude-fable-5",
+      variant: "xhigh",
     })
-    expect(gptFallback).toEqual({
-      providers: ["openai", "github-copilot", "opencode", "vercel"],
-      model: "gpt-5.6-sol",
-      variant: "high",
+    expect(kimiFallback).toEqual({
+      providers: ["opencode-go", "kimi-for-coding", "moonshotai", "opencode", "vercel"],
+      model: "kimi-k3",
+      variant: "max",
     })
   })
 
-  test("metis has sonnet primary, opus fallback, and gpt-5.6-sol medium fallback", () => {
+  test("metis uses Opus 5 high before Kimi K3 low", () => {
     // given
     const metis = AGENT_MODEL_REQUIREMENTS["metis"]
 
     // when
-    const primary = metis.fallbackChain[0]
-    const opusFallback = metis.fallbackChain[1]
-    const openAiFallback = metis.fallbackChain.find((entry) => entry.providers.includes("openai"))
+    const [primary, kimiFallback] = metis.fallbackChain
 
     // then
-    expect(metis.fallbackChain.length).toBeGreaterThan(1)
+    expect(metis.fallbackChain).toHaveLength(2)
     expect(primary).toEqual({
       providers: ["anthropic", "github-copilot", "opencode", "vercel"],
-      model: "claude-sonnet-4-6",
+      model: "claude-opus-5",
+      variant: "high",
     })
-    expect(opusFallback?.model).toBe("claude-opus-4-8")
-    expect(opusFallback?.variant).toBe("max")
-    expect(metis.fallbackChain.at(-1)).toEqual({ providers: ["kimi-for-coding"], model: "kimi-k3" })
-    expect(openAiFallback).toEqual({
-      providers: ["openai", "github-copilot", "opencode", "vercel"],
-      model: "gpt-5.6-sol",
-      variant: "medium",
+    expect(kimiFallback).toEqual({
+      providers: ["opencode-go", "kimi-for-coding", "moonshotai", "opencode", "vercel"],
+      model: "kimi-k3",
+      variant: "low",
     })
   })
 
@@ -221,7 +217,7 @@ describe("AGENT_MODEL_REQUIREMENTS", () => {
     })
     expect(opusFallback).toEqual({
       providers: ["anthropic", "github-copilot", "opencode", "vercel"],
-      model: "claude-opus-4-8",
+      model: "claude-opus-5",
       variant: "max",
     })
   })
@@ -235,7 +231,7 @@ describe("AGENT_MODEL_REQUIREMENTS", () => {
 
     // then
     expect(atlas.fallbackChain).toHaveLength(6)
-    expect(primary?.model).toBe("claude-sonnet-4-6")
+    expect(primary?.model).toBe("claude-sonnet-5")
     expect(primary?.providers[0]).toBe("anthropic")
     expect(secondary?.model).toBe("kimi-k3")
     expect(secondary?.providers[0]).toBe("opencode-go")
@@ -263,7 +259,7 @@ describe("AGENT_MODEL_REQUIREMENTS", () => {
 
     // then
     expect(modelIDs).toEqual([
-      "claude-sonnet-4-6",
+      "claude-sonnet-5",
       "kimi-k3",
       "gpt-5.6-sol",
       "minimax-m3",

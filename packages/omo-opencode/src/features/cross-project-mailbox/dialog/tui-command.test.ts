@@ -72,8 +72,8 @@ describe("registerProjectMailboxCommand", () => {
   })
 
   it("#given onSelect fires with the host's wrapped-option shape #when a project and choice are selected #then the write targets the real projectId, not undefined", async () => {
-    const configPath = join(tempDir, ".opencode", "oh-my-openagent.jsonc")
-    await mkdir(join(tempDir, ".opencode"), { recursive: true })
+    const configPath = join(tempDir, ".omo", "omo.jsonc")
+    await mkdir(join(tempDir, ".omo"), { recursive: true })
     await writeFile(configPath, "{}", "utf8")
 
     registerProjectMailboxCommand(api, { directory: tempDir, registryPath })
@@ -95,24 +95,26 @@ describe("registerProjectMailboxCommand", () => {
     await new Promise((resolve) => setTimeout(resolve, 50))
 
     const updatedConfig = JSON.parse(await readFile(configPath, "utf8"))
-    expect(updatedConfig.cross_project_mailbox.senders["project-a"]).toEqual({
+    expect(updatedConfig["[opencode]"].cross_project_mailbox.senders["project-a"]).toEqual({
       access: "allow",
       intent_budget: "impl",
     })
-    expect(updatedConfig.cross_project_mailbox.senders.undefined).toBeUndefined()
+    expect(updatedConfig["[opencode]"].cross_project_mailbox.senders.undefined).toBeUndefined()
   })
 
   it("preserves JSONC comments byte-for-byte outside the edited span", async () => {
-    const configPath = join(tempDir, ".opencode", "oh-my-openagent.jsonc")
-    await mkdir(join(tempDir, ".opencode"), { recursive: true })
+    const configPath = join(tempDir, ".omo", "omo.jsonc")
+    await mkdir(join(tempDir, ".omo"), { recursive: true })
     
     const initialConfig = `// Top level comment
 {
   // Mailbox config
-  "cross_project_mailbox": {
-    "senders": {
-      "project-a": {
-        "access": "deny" // Inline comment
+  "[opencode]": {
+    "cross_project_mailbox": {
+      "senders": {
+        "project-a": {
+          "access": "deny" // Inline comment
+        }
       }
     }
   }
@@ -148,8 +150,8 @@ describe("registerProjectMailboxCommand", () => {
   })
 
   it("shows a toast with the host toast shape for malformed config errors", async () => {
-    const configPath = join(tempDir, ".opencode", "oh-my-openagent.jsonc")
-    await mkdir(join(tempDir, ".opencode"), { recursive: true })
+    const configPath = join(tempDir, ".omo", "omo.jsonc")
+    await mkdir(join(tempDir, ".omo"), { recursive: true })
     await writeFile(configPath, "{", "utf8")
 
     registerProjectMailboxCommand(api, { directory: tempDir, registryPath })

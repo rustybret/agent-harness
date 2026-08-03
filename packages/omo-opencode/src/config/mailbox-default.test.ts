@@ -3,7 +3,7 @@ import { mkdirSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 
-import { loadPluginConfig } from "../plugin-config/layered-config-loader"
+import { loadPluginConfig } from "../plugin-config"
 import { OhMyOpenCodeConfigSchema } from "./schema"
 import { validatePluginConfig } from "./validate"
 
@@ -111,11 +111,11 @@ describe("cross_project_mailbox default injection", () => {
         withIsolatedConfig("validate-explicit-false", (root) => {
           // given
           const project = join(root, "project")
-          writeJson(join(root, "custom-config", "oh-my-openagent.json"), {
-            cross_project_mailbox: { enabled: false },
+          writeJson(join(root, ".omo", "omo.jsonc"), {
+            "[opencode]": { cross_project_mailbox: { enabled: false } },
           })
-          writeJson(join(project, ".opencode", "oh-my-openagent.json"), {
-            tui: { sidebar: { enabled: true } },
+          writeJson(join(project, ".omo", "omo.jsonc"), {
+            "[opencode]": { tui: { sidebar: { enabled: true } } },
           })
 
           // when
@@ -132,11 +132,11 @@ describe("cross_project_mailbox default injection", () => {
         withIsolatedConfig("load-explicit-false", (root) => {
           // given
           const project = join(root, "project")
-          writeJson(join(root, "custom-config", "oh-my-openagent.json"), {
-            cross_project_mailbox: { enabled: false },
+          writeJson(join(root, ".omo", "omo.jsonc"), {
+            "[opencode]": { cross_project_mailbox: { enabled: false } },
           })
-          writeJson(join(project, ".opencode", "oh-my-openagent.json"), {
-            tui: { sidebar: { enabled: true } },
+          writeJson(join(project, ".omo", "omo.jsonc"), {
+            "[opencode]": { tui: { sidebar: { enabled: true } } },
           })
 
           // when

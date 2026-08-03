@@ -8,7 +8,7 @@
     // Primary orchestrator: aggressive parallel delegation
     "sisyphus": {
       "model": "kimi-for-coding/kimi-k3",
-      "ultrawork": { "model": "anthropic/claude-opus-4-8", "variant": "max" },
+      "ultrawork": { "model": "anthropic/claude-opus-5", "variant": "max" },
       "prompt_append": "Delegate heavily to hephaestus for implementation. Parallelize exploration.",
     },
 
@@ -61,10 +61,10 @@
     "unspecified-high": { "model": "openai/gpt-5.6-sol" },
 
     // Visual work
-    "visual-engineering": { "model": "google/gemini-3.1-pro", "variant": "high" },
+    "visual-engineering": { "model": "anthropic/claude-opus-5", "variant": "max" },
 
     // Deep autonomous work
-    "deep": { "model": "openai/gpt-5.6-terra", "variant": "xhigh" },
+    "deep": { "model": "openai/gpt-5.6-sol", "variant": "medium" },
 
     // Architecture decisions
     "ultrabrain": { "model": "openai/gpt-5.6-sol", "variant": "xhigh" },

@@ -486,10 +486,10 @@ describe("T13: end-to-end explicit registration + live grant integration", () =>
         expect(implResult.valid).toBe(false)
         expect(implResult.reason).toBe("over-budget")
 
-        const configPath = path.join(receiverRoot, ".opencode", "oh-my-opencode.jsonc")
+        const configPath = path.join(receiverRoot, ".omo", "omo.jsonc")
         await mkdir(path.dirname(configPath), { recursive: true })
         const configText = JSON.stringify(
-          { cross_project_mailbox: effectiveConfig },
+          { "[opencode]": { cross_project_mailbox: effectiveConfig } },
           null,
           2,
         )
@@ -511,7 +511,11 @@ describe("T13: end-to-end explicit registration + live grant integration", () =>
               if (cached !== null) return cached
               const raw = readFileSync(configPath, "utf8")
               const parsed: unknown = JSON.parse(raw)
-              const mboxConfig = (parsed as Record<string, unknown>)["cross_project_mailbox"]
+              const harness = (parsed as Record<string, unknown>)["[opencode]"]
+              const mboxConfig =
+                typeof harness === "object" && harness !== null
+                  ? (harness as Record<string, unknown>)["cross_project_mailbox"]
+                  : undefined
               if (typeof mboxConfig === "object" && mboxConfig !== null) {
                 cached = CrossProjectMailboxConfigSchema.parse(mboxConfig)
               } else {

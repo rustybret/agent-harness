@@ -6,7 +6,7 @@ import path from "node:path"
 import type { OhMyOpenCodeConfig } from "../../config"
 import { HookNameSchema } from "../../config/schema/hooks"
 import { CrossProjectMailboxConfigSchema } from "../../features/cross-project-mailbox/config"
-import { CONFIG_BASENAME } from "../../shared/plugin-identity"
+import { resolveProjectOmoConfigPath } from "../../features/cross-project-mailbox/config/omo-config-target"
 import type { PluginContext } from "../types"
 import { createMailboxSessionHooks } from "./create-mailbox-session-hooks"
 
@@ -23,7 +23,7 @@ describe("createMailboxSessionHooks", () => {
     let repoRoot: string
 
     function stubPath(): string {
-      return path.join(repoRoot, ".opencode", `${CONFIG_BASENAME}.jsonc`)
+      return resolveProjectOmoConfigPath(repoRoot)
     }
 
     beforeEach(() => {

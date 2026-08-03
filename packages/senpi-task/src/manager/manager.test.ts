@@ -293,7 +293,7 @@ describe("TaskManager.start", () => {
       reason: "Task runner failed to start.",
     })
     expect(row).toBe(
-      `task category:ultrabrain (openai GPT-5.6 Sol reasoning:xhigh) <i>background</i> error id:${result.details.task_id} reason:Task runner failed to start.`,
+      `task category:ultrabrain(openai/gpt-5.6-sol:xhigh) <i>background</i> error id:${result.details.task_id} reason:Task runner failed to start.`,
     )
     expect(JSON.stringify({ result, row })).not.toContain(privatePrompt)
   })
@@ -417,7 +417,8 @@ describe("TaskManager child subscriptions", () => {
     await flush()
 
     const promoted = runner.handles.get(queued.task_id)
-    expect(promoted?.subscribeCount()).toBe(2)
+    // Owned transcript + run-stats subscriptions plus the deferred external child listener.
+    expect(promoted?.subscribeCount()).toBe(3)
     unsubscribe()
     expect(promoted?.unsubscribeCount()).toBe(1)
   })

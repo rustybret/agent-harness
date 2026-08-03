@@ -10,6 +10,10 @@ import type { ProjectEntry } from "../registry/types"
 import type { CrossProjectMailboxConfig } from "../config"
 import { CrossProjectMailboxConfigSchema } from "../config"
 
+function parseMailboxSenders(text: string): Record<string, unknown> {
+  return JSON.parse(text)["[opencode]"].cross_project_mailbox.senders
+}
+
 describe("menu-model", () => {
   describe("buildTopMenu", () => {
     const selfProjectId = "self-123"
@@ -122,8 +126,7 @@ describe("menu-model", () => {
   describe("applySelection", () => {
     test("#given unlisted project #when choice is question #then it sets access allow and intent_budget question", () => {
       const result = applySelection("{}", "proj-1", "question")
-      const parsed = JSON.parse(result)
-      expect(parsed.cross_project_mailbox.senders["proj-1"]).toEqual({
+      expect(parseMailboxSenders(result)["proj-1"]).toEqual({
         access: "allow",
         intent_budget: "question",
       })
@@ -131,8 +134,7 @@ describe("menu-model", () => {
 
     test("#given unlisted project #when choice is impl #then it sets access allow and intent_budget impl", () => {
       const result = applySelection("{}", "proj-1", "impl")
-      const parsed = JSON.parse(result)
-      expect(parsed.cross_project_mailbox.senders["proj-1"]).toEqual({
+      expect(parseMailboxSenders(result)["proj-1"]).toEqual({
         access: "allow",
         intent_budget: "impl",
       })
@@ -140,8 +142,7 @@ describe("menu-model", () => {
 
     test("#given unlisted project #when choice is plan #then it sets access allow and intent_budget plan", () => {
       const result = applySelection("{}", "proj-1", "plan")
-      const parsed = JSON.parse(result)
-      expect(parsed.cross_project_mailbox.senders["proj-1"]).toEqual({
+      expect(parseMailboxSenders(result)["proj-1"]).toEqual({
         access: "allow",
         intent_budget: "plan",
       })
@@ -149,8 +150,7 @@ describe("menu-model", () => {
 
     test("#given unlisted project #when choice is Disabled #then it sets access deny and intent_budget question", () => {
       const result = applySelection("{}", "proj-1", "Disabled")
-      const parsed = JSON.parse(result)
-      expect(parsed.cross_project_mailbox.senders["proj-1"]).toEqual({
+      expect(parseMailboxSenders(result)["proj-1"]).toEqual({
         access: "deny",
         intent_budget: "question",
       })
@@ -158,15 +158,16 @@ describe("menu-model", () => {
 
     test("#given allow+impl project #when choice is Disabled #then it sets access deny and preserves existing intent_budget impl", () => {
       const initial = JSON.stringify({
-        cross_project_mailbox: {
-          senders: {
-            "proj-1": { access: "allow", intent_budget: "impl" },
+        "[opencode]": {
+          cross_project_mailbox: {
+            senders: {
+              "proj-1": { access: "allow", intent_budget: "impl" },
+            },
           },
         },
       })
       const result = applySelection(initial, "proj-1", "Disabled")
-      const parsed = JSON.parse(result)
-      expect(parsed.cross_project_mailbox.senders["proj-1"]).toEqual({
+      expect(parseMailboxSenders(result)["proj-1"]).toEqual({
         access: "deny",
         intent_budget: "impl",
       })
@@ -174,15 +175,16 @@ describe("menu-model", () => {
 
     test("#given allow project without intent_budget #when choice is Disabled #then it sets access deny and adds intent_budget question", () => {
       const initial = JSON.stringify({
-        cross_project_mailbox: {
-          senders: {
-            "proj-1": { access: "allow" },
+        "[opencode]": {
+          cross_project_mailbox: {
+            senders: {
+              "proj-1": { access: "allow" },
+            },
           },
         },
       })
       const result = applySelection(initial, "proj-1", "Disabled")
-      const parsed = JSON.parse(result)
-      expect(parsed.cross_project_mailbox.senders["proj-1"]).toEqual({
+      expect(parseMailboxSenders(result)["proj-1"]).toEqual({
         access: "deny",
         intent_budget: "question",
       })
@@ -190,15 +192,16 @@ describe("menu-model", () => {
 
     test("#given deny+question project #when choice is question #then it sets access allow and intent_budget question", () => {
       const initial = JSON.stringify({
-        cross_project_mailbox: {
-          senders: {
-            "proj-1": { access: "deny", intent_budget: "question" },
+        "[opencode]": {
+          cross_project_mailbox: {
+            senders: {
+              "proj-1": { access: "deny", intent_budget: "question" },
+            },
           },
         },
       })
       const result = applySelection(initial, "proj-1", "question")
-      const parsed = JSON.parse(result)
-      expect(parsed.cross_project_mailbox.senders["proj-1"]).toEqual({
+      expect(parseMailboxSenders(result)["proj-1"]).toEqual({
         access: "allow",
         intent_budget: "question",
       })
@@ -206,15 +209,16 @@ describe("menu-model", () => {
 
     test("#given deny+question project #when choice is impl #then it sets access allow and intent_budget impl", () => {
       const initial = JSON.stringify({
-        cross_project_mailbox: {
-          senders: {
-            "proj-1": { access: "deny", intent_budget: "question" },
+        "[opencode]": {
+          cross_project_mailbox: {
+            senders: {
+              "proj-1": { access: "deny", intent_budget: "question" },
+            },
           },
         },
       })
       const result = applySelection(initial, "proj-1", "impl")
-      const parsed = JSON.parse(result)
-      expect(parsed.cross_project_mailbox.senders["proj-1"]).toEqual({
+      expect(parseMailboxSenders(result)["proj-1"]).toEqual({
         access: "allow",
         intent_budget: "impl",
       })
@@ -222,15 +226,16 @@ describe("menu-model", () => {
 
     test("#given deny+question project #when choice is plan #then it sets access allow and intent_budget plan", () => {
       const initial = JSON.stringify({
-        cross_project_mailbox: {
-          senders: {
-            "proj-1": { access: "deny", intent_budget: "question" },
+        "[opencode]": {
+          cross_project_mailbox: {
+            senders: {
+              "proj-1": { access: "deny", intent_budget: "question" },
+            },
           },
         },
       })
       const result = applySelection(initial, "proj-1", "plan")
-      const parsed = JSON.parse(result)
-      expect(parsed.cross_project_mailbox.senders["proj-1"]).toEqual({
+      expect(parseMailboxSenders(result)["proj-1"]).toEqual({
         access: "allow",
         intent_budget: "plan",
       })
@@ -241,11 +246,11 @@ describe("menu-model", () => {
       const result = applySelection(initial, "proj-1", "plan")
       const parsed = JSON.parse(result)
       expect(parsed.other_setting).toBe(true)
-      expect(parsed.cross_project_mailbox.senders["proj-1"]).toEqual({
+      expect(parseMailboxSenders(result)["proj-1"]).toEqual({
         access: "allow",
         intent_budget: "plan",
       })
-      const validated = CrossProjectMailboxConfigSchema.parse(parsed.cross_project_mailbox)
+      const validated = CrossProjectMailboxConfigSchema.parse(parsed["[opencode]"].cross_project_mailbox)
       expect(validated.senders["proj-1"]).toEqual({
         access: "allow",
         intent_budget: "plan",
@@ -254,8 +259,7 @@ describe("menu-model", () => {
 
     test("#given empty string config text #when choice is applied #then it initializes object and applies selection", () => {
       const result = applySelection("", "proj-1", "impl")
-      const parsed = JSON.parse(result)
-      expect(parsed.cross_project_mailbox.senders["proj-1"]).toEqual({
+      expect(parseMailboxSenders(result)["proj-1"]).toEqual({
         access: "allow",
         intent_budget: "impl",
       })
@@ -265,13 +269,15 @@ describe("menu-model", () => {
       const initial = `{
   // Top level comment
   "unrelated_key": "value",
-  "cross_project_mailbox": {
-    // Mailbox comment
-    "senders": {
-      // Existing sender comment
-      "proj-1": {
-        "access": "deny",
-        "intent_budget": "plan"
+  "[opencode]": {
+    "cross_project_mailbox": {
+      // Mailbox comment
+      "senders": {
+        // Existing sender comment
+        "proj-1": {
+          "access": "deny",
+          "intent_budget": "plan"
+        }
       }
     }
   }
@@ -293,7 +299,7 @@ describe("menu-model", () => {
     })
 
     test("#given malformed JSONC config text #when applySelection is called #then it throws MalformedConfigError with descriptive message", () => {
-      const malformed = `{ "cross_project_mailbox": { "senders": { "proj-1": { "access": "allow", } } } }`
+      const malformed = `{ "[opencode]": { "cross_project_mailbox": { "senders": { "proj-1": { "access": "allow", } } } } }`
       expect(() => applySelection(malformed, "proj-1", "impl")).toThrow(MalformedConfigError)
       expect(() => applySelection(malformed, "proj-1", "impl")).toThrow(/Malformed JSONC configuration text/)
     })

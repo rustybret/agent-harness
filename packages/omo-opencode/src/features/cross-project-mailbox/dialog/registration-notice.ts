@@ -3,8 +3,9 @@ import { dirname, join } from "node:path"
 
 import { getSidecarPath } from "@oh-my-opencode/utils"
 
-import { CONFIG_BASENAME, LEGACY_CONFIG_BASENAME, detectPluginConfigFile, getOpenCodeConfigDirs, log } from "../../../shared"
+import { log } from "../../../shared"
 import { queueTuiPreferenceUpdate, readTuiPreferencesFileSync } from "../../tui-sidebar/tui-preferences"
+import { resolveUserOmoConfigTargetPath } from "../config/omo-config-target"
 import { createProjectRegistry } from "../registry"
 import type { ProjectEntry } from "../registry/types"
 
@@ -100,20 +101,11 @@ export function decideLegacySendersNoticeFromContent(content: string | null): Le
   }
 }
 
+// Must resolve the same sidecar directory `seedUserDefaultSenderAccess` writes
+// the flag into, so both sides agree on the user-scope omo config path.
 function resolveLegacySendersNoticePath(): string | null {
   try {
-    const userConfigDirs = [...getOpenCodeConfigDirs({ binary: "opencode" })].reverse()
-    const primaryConfigDir = userConfigDirs[0]
-    if (!primaryConfigDir) return null
-
-    const detected = detectPluginConfigFile(primaryConfigDir, {
-      basenames: [CONFIG_BASENAME],
-      legacyBasenames: [LEGACY_CONFIG_BASENAME],
-    })
-    const configPath =
-      detected.format !== "none" ? detected.path : join(primaryConfigDir, `${CONFIG_BASENAME}.jsonc`)
-
-    const sidecarPath = getSidecarPath(configPath)
+    const sidecarPath = getSidecarPath(resolveUserOmoConfigTargetPath())
     return join(dirname(sidecarPath), "legacy-senders-notice.json")
   } catch (error) {
     log("[mailbox] failed to resolve legacy-senders-notice path", { error })

@@ -6,6 +6,30 @@ import {
 } from "./provider-model-id-transform"
 
 describe("provider model ID transforms", () => {
+	test("transforms kimi models for kimi coding providers", () => {
+		// #given a kimi coding provider
+		const provider = "kimi-coding"
+
+		// #when transforming kimi model IDs
+		const transformed = transformModelForProvider(provider, "kimi-k3")
+		const transformed256k = transformModelForProvider(provider, "kimi-k3-256k")
+
+		// #then they are shortened to their coding-provider form
+		expect(transformed).toBe("k3")
+		expect(transformed256k).toBe("k3-256k")
+	})
+
+	test("passes through unrelated models unchanged", () => {
+		// #given a kimi-for-coding provider with an unrelated model
+		const provider = "kimi-for-coding"
+
+		// #when transforming a non-kimi model
+		const transformed = transformModelForProvider(provider, "gpt-5.6-luna-fast")
+
+		// #then it passes through unchanged
+		expect(transformed).toBe("gpt-5.6-luna-fast")
+	})
+
 	test("preserves hyphenated Anthropic IDs for direct API calls", () => {
 		// #given Anthropic model IDs in config-display form
 		const provider = "anthropic"

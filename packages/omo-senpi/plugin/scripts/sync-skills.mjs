@@ -11,7 +11,7 @@ const sharedSkillsRoot = join(repoRoot, "shared-skills", "skills")
 const skillSources = [
   {
     name: "ulw-loop",
-    source: join(repoRoot, "omo-codex", "plugin", "components", "ulw-loop", "skills", "ulw-loop"),
+    source: join(repoRoot, "omo-senpi", "skills", "ulw-loop"),
   },
 ]
 const componentSkillNames = new Set(skillSources.map(({ name }) => name))
@@ -21,6 +21,10 @@ const componentSkillNames = new Set(skillSources.map(({ name }) => name))
 // section stripping, and no Senpi-compatibility banner (they already speak native Senpi tools).
 const nativeSkillsRoot = join(repoRoot, "omo-senpi", "skills")
 const nativeSkillSources = [
+  {
+    name: "give-me-tips",
+    source: join(nativeSkillsRoot, "give-me-tips"),
+  },
   {
     name: "hyperplan",
     source: join(nativeSkillsRoot, "hyperplan"),
@@ -41,6 +45,7 @@ const sectionHeadingsToStrip = new Set([
   "Codex Harness Tool Compatibility",
   "Codex Tool Mapping",
   "Codex subagent reliability",
+  "Codex Subagent Reliability",
   "Subagent-dependent transition barrier",
   "Senpi Harness Tool Compatibility",
 ])
@@ -64,11 +69,12 @@ This skill may include examples copied from the OpenCode harness. In Senpi, do n
 
 | OpenCode example | Senpi tool to use |
 | --- | --- |
-| \`call_omo_agent(subagent_type="explore", ...)\` | \`task\` tool with category/agent matching \`.omo/omo.json\` (e.g. \`agent: "scout"\`) |
-| \`call_omo_agent(subagent_type="librarian", ...)\` | \`task\` tool with category/agent matching \`.omo/omo.json\` (e.g. \`agent: "librarian"\`) |
-| \`task(...)\` | \`task\` tool |
+| \`call_omo_agent(subagent_type="explore", ...)\` | \`task\` tool with \`subagent_type: "explore"\` |
+| \`call_omo_agent(subagent_type="librarian", ...)\` | \`task\` tool with \`subagent_type: "librarian"\` |
+| worker/implementation \`task(...)\` | \`task\` tool with \`category\` from the delegation router (\`quick\`, \`unspecified-low\`, \`unspecified-high\`, \`deep\`, \`ultrabrain\`, \`visual-engineering\`, \`writing\`, \`git\`); honor the plan's \`Recommended task executor category:\` line |
+| final-review / gate-reviewer \`task(...)\` | fresh \`task\` with \`category: "unspecified-high"\` (or \`"deep"\`) and an adversarial-verifier prompt; \`momus\`/\`metis\` are plan-gated curated reviewers, spawnable only while the plan gate is open |
 | \`background_output(task_id="...")\` | \`task_output\` tool with the task id |
-| \`team_*(...)\` | Lead team tools (\`team_create\`, \`task_create\`, \`team_wait\`, ...); members poll with \`task_send\` / \`team_wait\` |
+| \`team_*(...)\` | Lead team tools (\`team_create\`, \`task_create\`, ...); send with \`task_send\`, then keep working or end your turn — member and lead mail arrive as injected notifications, never poll for it |
 
 If a code block below conflicts with this section, this section wins.
 
@@ -150,6 +156,79 @@ function applyStartWorkOverlay(content) {
   return content.replace(/codex:<session_id>/g, "senpi:<session_id>").replace(/\bcodex:/g, "senpi:")
 }
 
+const ulwPlanReviewOverride = `## Senpi Review Policy (authoritative)
+
+In omo-senpi the high-accuracy review is MOMUS-ONLY: one round is exactly ONE native \`momus\` review of the complete plan file, and a momus approval whose remaining items are notes counts as approval.
+
+Only a plan file produced by this skill and recorded with \`review_required\` authorizes a \`momus\` or \`metis\` review. A bare \`ulw\` run without that file uses notepad self-review instead, however large the work feels.
+
+If a section below conflicts with this section, this section wins.
+
+`
+
+const ulwPlanMomusOnlyRewrites = [
+  [
+    'The high-accuracy review is DUAL and both passes must return OKAY before handoff: (1) the native \`momus\` reviewer subagent, and (2) an independent Oracle review via \`task(subagent_type="oracle", ...)\` on the strongest available reasoning model, in a fully isolated sub-session with normal approval and sandbox policy. Do not add flags that disable approvals or sandboxing.',
+    'In omo-senpi the high-accuracy review is MOMUS-ONLY: one round is exactly ONE native \`momus\` review of the complete plan file.',
+  ],
+  ["### High-accuracy review (dual review)", "### High-accuracy review (momus-only in omo-senpi)"],
+  [
+    'One round = exactly ONE \`momus\` + ONE independent review, dispatched together',
+    'One round = exactly ONE \`momus\` review, dispatched',
+  ],
+  ['"independent_reviewer": "oracle",', '"independent_reviewer": null,'],
+  ['"lanes": ["momus", "independent"],', '"lanes": ["momus"],'],
+  [
+    '(all read-only, plus \`oracle\` for the high-accuracy review)',
+    '(all read-only; \`momus\` also runs the high-accuracy review)',
+  ],
+  [
+    'the dual high-accuracy review (native \`momus\` + the independent Oracle review) is now REQUIRED',
+    'the high-accuracy review (momus-only in omo-senpi) is now REQUIRED',
+  ],
+]
+
+function rewriteUlwPlanReviewToMomusOnly(content) {
+  let rewritten = content
+  for (const [source, replacement] of ulwPlanMomusOnlyRewrites) {
+    rewritten = rewritten.replaceAll(source, replacement)
+  }
+  return rewritten
+}
+
+const ulwPlanConsultationLanes = `## Senpi Design Consultation Lanes (authoritative)
+
+When the task tool's available categories include \`architect\` and/or \`ultrabrain\`, ACTIVELY consult them as background advisory lanes while grounding and drafting the plan:
+
+| Lane | Category | Ask it for |
+| --- | --- | --- |
+| Big-picture design | \`architect\` | module boundaries, decomposition options, trade-offs, blast radius |
+| Detail design | \`ultrabrain\` | algorithms, edge cases, exact interfaces and contracts |
+
+Spawn them with \`task(category: "architect" \\| "ultrabrain", run_in_background: true)\` in the same wave as your research lanes, and integrate their answers before the approval brief. Every such prompt MUST start with TASK / DELIVERABLE / SCOPE / VERIFY / STOP WHEN and MUST declare itself advisory-only: read-only analysis, NO file edits, recommendations returned as text. Treat what comes back as claims to verify, not as decisions already made.
+
+This section is an EXPLICIT EXCEPTION to the later rule "Never dispatch with \`category=\`": it authorizes exactly these two advisory lanes. Every other category dispatch stays forbidden. When neither category is listed as available, skip these lanes silently.
+
+`
+
+function applyUlwPlanOverlay(content) {
+  const rewritten = rewriteUlwPlanReviewToMomusOnly(content)
+  if (rewritten.includes("# ulw-plan - full workflow")) {
+    return insertAfterFrontmatter(rewritten, ulwPlanReviewOverride)
+  }
+  if (/^#\s+ulw-plan\s*$/m.test(rewritten)) {
+    return insertAfterFrontmatter(rewritten, `${ulwPlanReviewOverride}${ulwPlanConsultationLanes}`)
+  }
+  return rewritten
+}
+
+function insertAfterFrontmatter(content, section) {
+  const frontmatterEnd = content.indexOf("\n---\n", content.startsWith("---\n") ? 4 : 0)
+  if (!content.startsWith("---\n") || frontmatterEnd === -1) return `${section}${content}`
+  const insertAt = frontmatterEnd + "\n---\n".length
+  return `${content.slice(0, insertAt)}\n${section}${content.slice(insertAt)}`
+}
+
 function findSenpiCompatibilitySectionEnd(content, searchStart) {
   const structuralEndPattern = /\n(?:---|export\s+const\s+|#{1,6}\s)/g
   structuralEndPattern.lastIndex = searchStart
@@ -206,7 +285,11 @@ function applySharedTierAdaptation(skillName, content) {
   if (skillName === "start-work") {
     adapted = applyStartWorkOverlay(adapted)
   }
+  if (skillName === "ulw-plan") {
+    adapted = applyUlwPlanOverlay(adapted)
+  }
   adapted = stripNamedSections(adapted)
+  adapted = stripForbiddenGuidanceLines(adapted)
   adapted = insertSenpiCompatibilityGuidance(adapted)
   return normalizeBlankLines(adapted)
 }
@@ -266,7 +349,7 @@ export async function syncSkills() {
     await assertSourceExists(source)
     const destination = join(skillsRoot, name)
     await cp(source, destination, { filter: shouldCopySkillSource, recursive: true })
-    await adaptSkillTree(destination, applyTier1Adaptation)
+    await adaptSkillTree(destination, normalizeBlankLines)
   }
 
   for (const { name, source } of nativeSkillSources) {

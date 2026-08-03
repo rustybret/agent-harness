@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import test from "node:test";
@@ -64,14 +65,17 @@ test("#given reference-only designpowers frontend files #when synced for Codex #
 		.map((file) => file.replaceAll("\\", "/"))
 		.filter((file) => file.endsWith("/SKILL.md") || file === "SKILL.md")
 		.sort();
-	const designpowersReferenceFiles = (await listSkillFiles(designpowersVendorSkillsRoot))
-		.map((file) => file.replaceAll("\\", "/"))
-		.filter((file) => file.endsWith("/reference.md"))
-		.sort();
+	const vendorMaterialized = existsSync(designpowersVendorSkillsRoot);
+	const designpowersReferenceFiles = vendorMaterialized
+		? (await listSkillFiles(designpowersVendorSkillsRoot))
+			.map((file) => file.replaceAll("\\", "/"))
+			.filter((file) => file.endsWith("/reference.md"))
+			.sort()
+		: [];
 
 	// then
 	assert.deepEqual(nestedSkillFiles, []);
-	assert.equal(designpowersReferenceFiles.length, 27);
+	if (vendorMaterialized) assert.equal(designpowersReferenceFiles.length, 27);
 });
 
 test("#given aggregate Codex skills #when source wiring is inspected #then shared skills are imported from the shared-skills package", async () => {
@@ -329,6 +333,18 @@ test("#given packaged Codex ulw-plan surfaces #when inspected #then dangerous sa
 	// when / then
 	assert.doesNotMatch(packagedWorkflow.content, dangerousBypassPattern, `${packagedWorkflow.path} ships unsafe Codex bypass guidance`);
 	assert.doesNotMatch(componentWorkflow.content, dangerousBypassPattern, `${componentWorkflow.path} ships unsafe Codex bypass guidance`);
+});
+
+test("#given packaged ulw-research skill #when Codex delivery gates are inspected #then the category-based proofread gate is stripped", async () => {
+	// given
+	const content = await readFile(join(root, "skills", "ulw-research", "SKILL.md"), "utf8");
+
+	// then the writing-category proofread gate never ships to Codex (no category concept there)
+	assert.doesNotMatch(content, /category="writing"/, "codex ulw-research ships the writing-category proofread gate");
+	assert.doesNotMatch(content, /Proofread gate/, "codex ulw-research still references the proofread gate");
+	// and the visual-QA delivery gate survives as the single gate
+	assert.match(content, /### The delivery gate \u2014 visual QA must PASS/u, "codex ulw-research lost the visual-QA delivery gate");
+	assert.match(content, /Visual QA \(always\)/, "codex ulw-research lost the visual-QA gate body");
 });
 
 test("#given context-pressure-prone skills #when bundled for Codex #then the eagerly loaded payload stays budgeted", async () => {

@@ -1,6 +1,7 @@
 import { modify, applyEdits, parse, type ParseError } from "jsonc-parser"
 import type { ProjectEntry } from "../registry/types"
 import type { CrossProjectMailboxConfig } from "../config"
+import { MAILBOX_CONFIG_KEY, MAILBOX_HARNESS_KEY, mailboxKeyPath } from "../config/omo-config-target"
 
 export type SubmenuChoice = "Disabled" | "question" | "impl" | "plan"
 
@@ -103,8 +104,8 @@ export function applySelection(
     root = root || {}
   }
 
-  const sendersPath = ["cross_project_mailbox", "senders", projectId]
-  const existingSender = root?.cross_project_mailbox?.senders?.[projectId]
+  const sendersPath = mailboxKeyPath("senders", projectId)
+  const existingSender = root?.[MAILBOX_HARNESS_KEY]?.[MAILBOX_CONFIG_KEY]?.senders?.[projectId]
   const hasExistingIntentBudget =
     existingSender &&
     typeof existingSender === "object" &&

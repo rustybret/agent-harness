@@ -29,6 +29,7 @@ let projects: ProjectEntry[]
 let emptyConfigHome: string
 let savedXdgConfigHome: string | undefined
 let savedOpencodeConfigDir: string | undefined
+let savedHome: string | undefined
 
 const PERMISSIVE_SENDERS = {
   "proj-b": { access: "allow", intent_budget: "plan" },
@@ -36,15 +37,18 @@ const PERMISSIVE_SENDERS = {
 }
 
 async function writeProjectMailboxConfig(mailbox: Record<string, unknown>): Promise<void> {
-  const dir = path.join(thisRepoRoot, ".opencode")
+  const dir = path.join(thisRepoRoot, ".omo")
   await mkdir(dir, { recursive: true })
-  await writeFile(path.join(dir, "oh-my-openagent.json"), JSON.stringify({ cross_project_mailbox: mailbox }))
+  await writeFile(
+    path.join(dir, "omo.jsonc"),
+    JSON.stringify({ "[opencode]": { cross_project_mailbox: mailbox } }),
+  )
 }
 
 async function writeRawProjectConfig(content: string): Promise<void> {
-  const dir = path.join(thisRepoRoot, ".opencode")
+  const dir = path.join(thisRepoRoot, ".omo")
   await mkdir(dir, { recursive: true })
-  await writeFile(path.join(dir, "oh-my-openagent.json"), content)
+  await writeFile(path.join(dir, "omo.jsonc"), content)
 }
 
 beforeEach(async () => {
@@ -54,7 +58,9 @@ beforeEach(async () => {
   emptyConfigHome = await mkdtemp(path.join(os.tmpdir(), "cpm-xdg-"))
   savedXdgConfigHome = process.env.XDG_CONFIG_HOME
   savedOpencodeConfigDir = process.env.OPENCODE_CONFIG_DIR
+  savedHome = process.env.HOME
   process.env.XDG_CONFIG_HOME = emptyConfigHome
+  process.env.HOME = emptyConfigHome
   delete process.env.OPENCODE_CONFIG_DIR
   projects = [
     { projectId: "proj-b", repoRoot: targetBRoot, displayName: "Project B", lastSeen: 1 },
@@ -67,6 +73,8 @@ afterEach(async () => {
   else process.env.XDG_CONFIG_HOME = savedXdgConfigHome
   if (savedOpencodeConfigDir === undefined) delete process.env.OPENCODE_CONFIG_DIR
   else process.env.OPENCODE_CONFIG_DIR = savedOpencodeConfigDir
+  if (savedHome === undefined) delete process.env.HOME
+  else process.env.HOME = savedHome
   await rm(thisRepoRoot, { recursive: true, force: true })
   await rm(targetBRoot, { recursive: true, force: true })
   await rm(targetARoot, { recursive: true, force: true })

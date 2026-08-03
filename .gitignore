@@ -77,3 +77,12 @@ coordination_notes/
 .omo/run-continuation/
 .omo/**/.DS_Store
 .omo/ralph-loop.local.md
+# transient config-migration artifacts (upstream startup-migration writes these)
+.omo/migration-backup-*/
+.omo/omo.jsonc.bak.*
+.omo/omo.json.bak.*
+
+# Dev-only scratch: QA scripts, PR worktrees, vendored upstream clones. Never committed.
+.local-ignore/
+# Frontend provenance submodules: unlinked in this fork (see AGENTS.md fork scope policy).
+packages/shared-skills/upstreams/
