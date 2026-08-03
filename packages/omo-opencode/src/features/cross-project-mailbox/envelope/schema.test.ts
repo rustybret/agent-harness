@@ -6,12 +6,13 @@ import path from "node:path"
 import { describe, expect, test } from "bun:test"
 
 import {
+  MAILBOX_MODES,
   MAX_BODY_BYTES,
   MailboxMessageSchema,
   parseEnvelope,
   serializeEnvelope,
 } from "./schema"
-import type { MailboxMessage } from "./schema"
+import type { MailboxMessage, MailboxMode } from "./schema"
 
 function makeEnvelope(overrides: Partial<MailboxMessage> = {}): MailboxMessage {
   return MailboxMessageSchema.parse({
@@ -162,5 +163,119 @@ describe("schema validation", () => {
 
     // when / then
     expect(() => MailboxMessageSchema.parse(raw)).toThrow()
+  })
+})
+
+describe("requested_mode field", () => {
+  test("#given MAILBOX_MODES const #then contains the six canonical modes in order", () => {
+    // then
+    expect(MAILBOX_MODES).toEqual([
+      "answer",
+      "todo-append",
+      "todo-next",
+      "subagent",
+      "worker-pr",
+      "interrupt",
+    ])
+  })
+
+  test("#given envelope with requested_mode #when serialize then parse #then round-trips", () => {
+    // given
+    const mode: MailboxMode = "todo-next"
+    const envelope = makeEnvelope({ requested_mode: mode })
+    const body = "granular injection body"
+
+    // when
+    const parsed = parseEnvelope(serializeEnvelope(envelope, body))
+
+    // then
+    expect(parsed.envelope.requested_mode).toBe("todo-next")
+    expect(parsed.envelope).toEqual(envelope)
+    expect(parsed.body).toBe(body)
+  })
+
+  test("#given envelope WITHOUT requested_mode #when serialize then parse #then field is undefined (unchanged behavior)", () => {
+    // given
+    const envelope = makeEnvelope()
+    const body = "no mode body"
+
+    // when
+    const parsed = parseEnvelope(serializeEnvelope(envelope, body))
+
+    // then
+    expect(parsed.envelope.requested_mode).toBeUndefined()
+    expect(parsed.envelope).toEqual(envelope)
+  })
+})
+
+describe("tolerant parse", () => {
+  test("#given frontmatter with an unknown key #when parse #then does not throw and strips the unknown key", () => {
+    // given
+    const fileContent = [
+      "---",
+      "version: 1",
+      "messageId: 11111111-1111-4111-8111-111111111111",
+      "timestamp: 1719500000000",
+      "correlationId: 22222222-2222-4222-8222-222222222222",
+      "inReplyToMessageId: null",
+      "fromProject: A",
+      "toProject: B",
+      "fromProjectId: a-1",
+      "toProjectId: b-2",
+      "intent: impl",
+      "priority: 0",
+      "hopCount: 0",
+      "hopPath:",
+      "  - a-1",
+      "supersedes: null",
+      "future_field_from_newer_sender: some-value",
+      "---",
+      "body",
+    ].join("\n")
+
+    // when / then
+    expect(() => parseEnvelope(fileContent)).not.toThrow()
+    const parsed = parseEnvelope(fileContent)
+    expect(parsed.envelope.intent).toBe("impl")
+    expect((parsed.envelope as Record<string, unknown>).future_field_from_newer_sender).toBeUndefined()
+    expect(parsed.body).toBe("body")
+  })
+
+  test("#given invalid requested_mode enum value #when parse #then coerces to undefined instead of throwing", () => {
+    // given
+    const fileContent = [
+      "---",
+      "version: 1",
+      "messageId: 11111111-1111-4111-8111-111111111111",
+      "timestamp: 1719500000000",
+      "correlationId: 22222222-2222-4222-8222-222222222222",
+      "inReplyToMessageId: null",
+      "fromProject: A",
+      "toProject: B",
+      "fromProjectId: a-1",
+      "toProjectId: b-2",
+      "intent: impl",
+      "priority: 0",
+      "hopCount: 0",
+      "hopPath:",
+      "  - a-1",
+      "supersedes: null",
+      "requested_mode: bogus",
+      "---",
+      "body",
+    ].join("\n")
+
+    // when / then
+    expect(() => parseEnvelope(fileContent)).not.toThrow()
+    const parsed = parseEnvelope(fileContent)
+    expect(parsed.envelope.requested_mode).toBeUndefined()
+  })
+
+  test("#given still-missing required field #when parse #then throws (tolerance does not weaken required fields)", () => {
+    // given
+    const fileContent = "---\nmessageId: 11111111-1111-4111-8111-111111111111\nunknown_key: x\n---\nbody"
+
+    // when / then
+    expect(() => parseEnvelope(fileContent)).toThrow()
   })
 })

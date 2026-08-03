@@ -3,11 +3,23 @@ import { Buffer } from "node:buffer"
 import yaml from "js-yaml"
 import { z } from "zod"
 
+import { log } from "../../../shared/logger"
 import { canonicalizeLegacyIntent } from "../permission-tiers"
 
 export const MAX_BODY_BYTES = 32768
 
 export const MAILBOX_INTENTS = ["question", "quick", "impl", "review", "work-loop", "plan"] as const
+
+export const MAILBOX_MODES = [
+  "answer",
+  "todo-append",
+  "todo-next",
+  "subagent",
+  "worker-pr",
+  "interrupt",
+] as const
+
+export type MailboxMode = (typeof MAILBOX_MODES)[number]
 
 export const MailboxMessageSchema = z.object({
   version: z.literal(1).default(1),
@@ -25,9 +37,23 @@ export const MailboxMessageSchema = z.object({
   hopCount: z.number().int().min(0),
   hopPath: z.array(z.string()),
   supersedes: z.string().uuid().nullable(),
+  requested_mode: z.enum(MAILBOX_MODES).optional(),
 }).strict()
 
 export type MailboxMessage = z.infer<typeof MailboxMessageSchema>
+
+const LenientMailboxMessageSchema = MailboxMessageSchema.extend({
+  requested_mode: z
+    .enum(MAILBOX_MODES)
+    .optional()
+    .catch((ctx) => {
+      log("mailbox envelope: dropping invalid requested_mode", {
+        value: ctx.value,
+        issues: ctx.issues,
+      })
+      return undefined
+    }),
+}).strip()
 
 const FRONTMATTER_REGEX = /^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/
 
@@ -48,7 +74,7 @@ export function parseEnvelope(fileContent: string): { envelope: MailboxMessage; 
   }
 
   const rawFrontmatter = yaml.load(match[1] ?? "", { schema: yaml.JSON_SCHEMA })
-  const parsed = MailboxMessageSchema.parse(rawFrontmatter)
+  const parsed = LenientMailboxMessageSchema.parse(rawFrontmatter)
   const canonicalIntent = canonicalizeLegacyIntent(parsed.intent) ?? parsed.intent
   const envelope: MailboxMessage = { ...parsed, intent: canonicalIntent }
   return { envelope, body: match[2] ?? "" }
