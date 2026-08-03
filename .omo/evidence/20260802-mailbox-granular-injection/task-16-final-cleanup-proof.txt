@@ -1,0 +1,4 @@
+Sandbox directory /tmp/mailbox-cipher-relay-live exists: false
+Sandbox serve processes running: none
+Host project registry hash unchanged: true
+Host auth.json hash unchanged: true

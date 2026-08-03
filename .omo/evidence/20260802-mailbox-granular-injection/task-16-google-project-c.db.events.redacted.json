@@ -1,0 +1,47 @@
+[
+  {
+    "seq": 8,
+    "type": "message.updated.1",
+    "data": "{\"sessionID\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"info\":{\"id\":\"msg_fc46dd8c6001WROxys4lj4cWhQ\",\"sessionID\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"role\":\"assistant\",\"time\":{\"created\":1785706961094,\"completed\":1785706963152},\"error\":{\"name\":\"APIError\",\"data\":{\"message\":\"Method doesn't allow unregistered callers (callers without established identity). Please use API Key or other form of API consumer identity to call this API.\",\"statusCode\":403,\"isRetryable\":false,\"responseHeaders\":{\"alt-svc\":\"h3=\\\":443\\\"; ma=2592000,h3-29=\\\":443\\\"; ma=2592000\",\"content-length\":\"248\",\"content-type\":\"text/event-stream\",\"date\":\"Sun, 02 Aug 2026 21:42:43 GMT\",\"server\":\"scaffolding on HTTPServer2\",\"server-timing\":\"gfet4t7; dur=160\",\"vary\":\"Origin, X-Origin, Referer\",\"x-content-type-options\":\"nosniff\",\"x-frame-options\":\"SAMEORIGIN\",\"x-xss-protection\":\"0\"},\"responseBody\":\"{\\n  \\\"error\\\": {\\n    \\\"code\\\": 403,\\n    \\\"message\\\": \\\"Method doesn't allow unregistered callers (callers without established identity). Please use API Key or other form of API consumer identity to call this API.\\\",\\n    \\\"status\\\": \\\"PERMISSION_DENIED\\\"\\n  }\\n}\\n\",\"metadata\":{\"url\":\"https://generativelanguage.googleapis.com/v1beta/models/antigravity-gemini-3.5-flash:streamGenerateContent?alt=sse\"}}},\"parentID\":\"msg_fc46dd84a001mJypsjTaGq9Pce\",\"modelID\":\"antigravity-gemini-3.5-flash\",\"providerID\":\"google\",\"mode\":\"Sisyphus - ultraworker\",\"agent\":\"Sisyphus - ultraworker\",\"path\":{\"cwd\":\"/private/tmp/mailbox-cipher-relay-live/projects/project-c\",\"root\":\"/\"},\"cost\":0,\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}}}}"
+  },
+  {
+    "seq": 7,
+    "type": "message.updated.1",
+    "data": "{\"sessionID\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"info\":{\"id\":\"msg_fc46dd84a001mJypsjTaGq9Pce\",\"sessionID\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"role\":\"user\",\"time\":{\"created\":1785706960970},\"summary\":{\"diffs\":[]},\"agent\":\"Sisyphus - ultraworker\",\"model\":{\"providerID\":\"google\",\"modelID\":\"antigravity-gemini-3.5-flash\"}}}"
+  },
+  {
+    "seq": 6,
+    "type": "session.updated.1",
+    "data": "{\"sessionID\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"info\":{\"id\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"slug\":\"kind-harbor\",\"projectID\":\"global\",\"directory\":\"/private/tmp/mailbox-cipher-relay-live/projects/project-c\",\"path\":\"private/tmp/mailbox-cipher-relay-live/projects/project-c\",\"summary\":{\"additions\":0,\"deletions\":0,\"files\":0},\"cost\":0,\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}},\"title\":\"New session - 2026-08-02T21:42:39.823Z\",\"agent\":\"Sisyphus - ultraworker\",\"model\":{\"id\":\"antigravity-gemini-3.5-flash\",\"providerID\":\"google\",\"variant\":\"default\"},\"version\":\"1.18.5+f235ba6\",\"time\":{\"created\":1785706959823,\"updated\":1785706962164},\"permission\":[{\"permission\":\"question\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"plan_enter\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"plan_exit\",\"pattern\":\"*\",\"action\":\"deny\"}]}}"
+  },
+  {
+    "seq": 5,
+    "type": "message.updated.1",
+    "data": "{\"sessionID\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"info\":{\"id\":\"msg_fc46dd8c6001WROxys4lj4cWhQ\",\"sessionID\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"role\":\"assistant\",\"time\":{\"created\":1785706961094},\"parentID\":\"msg_fc46dd84a001mJypsjTaGq9Pce\",\"modelID\":\"antigravity-gemini-3.5-flash\",\"providerID\":\"google\",\"mode\":\"Sisyphus - ultraworker\",\"agent\":\"Sisyphus - ultraworker\",\"path\":{\"cwd\":\"/private/tmp/mailbox-cipher-relay-live/projects/project-c\",\"root\":\"/\"},\"cost\":0,\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}}}}"
+  },
+  {
+    "seq": 4,
+    "type": "session.updated.1",
+    "data": "{\"sessionID\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"info\":{\"id\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"slug\":\"kind-harbor\",\"projectID\":\"global\",\"directory\":\"/private/tmp/mailbox-cipher-relay-live/projects/project-c\",\"path\":\"private/tmp/mailbox-cipher-relay-live/projects/project-c\",\"cost\":0,\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}},\"title\":\"New session - 2026-08-02T21:42:39.823Z\",\"agent\":\"Sisyphus - ultraworker\",\"model\":{\"id\":\"antigravity-gemini-3.5-flash\",\"providerID\":\"google\",\"variant\":\"default\"},\"version\":\"1.18.5+f235ba6\",\"time\":{\"created\":1785706959823,\"updated\":1785706961073},\"permission\":[{\"permission\":\"question\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"plan_enter\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"plan_exit\",\"pattern\":\"*\",\"action\":\"deny\"}]}}"
+  },
+  {
+    "seq": 3,
+    "type": "message.part.updated.1",
+    "data": "{\"sessionID\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"part\":{\"id\":\"prt_fc46dd853001f4LWjSk0VknQ9L\",\"sessionID\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"messageID\":\"msg_fc46dd84a001mJypsjTaGq9Pce\",\"type\":\"text\",\"text\":\"\\\"Say OK.\\\"\"},\"time\":1785706961069}"
+  },
+  {
+    "seq": 2,
+    "type": "message.updated.1",
+    "data": "{\"sessionID\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"info\":{\"id\":\"msg_fc46dd84a001mJypsjTaGq9Pce\",\"sessionID\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"role\":\"user\",\"time\":{\"created\":1785706960970},\"agent\":\"Sisyphus - ultraworker\",\"model\":{\"providerID\":\"google\",\"modelID\":\"antigravity-gemini-3.5-flash\"}}}"
+  },
+  {
+    "seq": 1,
+    "type": "session.updated.1",
+    "data": "{\"sessionID\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"info\":{\"id\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"slug\":\"kind-harbor\",\"projectID\":\"global\",\"directory\":\"/private/tmp/mailbox-cipher-relay-live/projects/project-c\",\"path\":\"private/tmp/mailbox-cipher-relay-live/projects/project-c\",\"cost\":0,\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}},\"title\":\"New session - 2026-08-02T21:42:39.823Z\",\"agent\":\"Sisyphus - ultraworker\",\"model\":{\"id\":\"antigravity-gemini-3.5-flash\",\"providerID\":\"google\",\"variant\":\"default\"},\"version\":\"1.18.5+f235ba6\",\"time\":{\"created\":1785706959823,\"updated\":1785706960970},\"permission\":[{\"permission\":\"question\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"plan_enter\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"plan_exit\",\"pattern\":\"*\",\"action\":\"deny\"}]}}"
+  },
+  {
+    "seq": 0,
+    "type": "session.created.1",
+    "data": "{\"sessionID\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"info\":{\"id\":\"ses_03b922c31ffeeJ4aBWMIoHkqyG\",\"slug\":\"kind-harbor\",\"projectID\":\"global\",\"directory\":\"/private/tmp/mailbox-cipher-relay-live/projects/project-c\",\"path\":\"private/tmp/mailbox-cipher-relay-live/projects/project-c\",\"cost\":0,\"tokens\":{\"input\":0,\"output\":0,\"reasoning\":0,\"cache\":{\"read\":0,\"write\":0}},\"title\":\"New session - 2026-08-02T21:42:39.823Z\",\"version\":\"1.18.5+f235ba6\",\"time\":{\"created\":1785706959823,\"updated\":1785706959823},\"permission\":[{\"permission\":\"question\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"plan_enter\",\"pattern\":\"*\",\"action\":\"deny\"},{\"permission\":\"plan_exit\",\"pattern\":\"*\",\"action\":\"deny\"}]}}"
+  }
+]

@@ -1,0 +1,10 @@
+real_db=/Users/brethoffman/.local/share/opencode/opencode.db
+real_session_count_before=6868
+real_session_count_after=6869 (changed during QA, but not by QA session; see real_db_qa_session_hits)
+real_db_qa_session_hits=0
+qa_session_id=ses_03c16f01affePuYoMexN2c7qsg
+server_pid=cleaned_by_oqa_cleanup
+qa_root=/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/oqa-xdg.XXXXXX.zitJ3KRQAo removed=true
+server_log=/Users/brethoffman/Git/agent-harness/.omo/evidence/20260802-mailbox-granular-injection/task-5-server.log
+result_artifact=/Users/brethoffman/Git/agent-harness/.omo/evidence/20260802-mailbox-granular-injection/task-5-live-result.json
+todoupdate_unavailable_artifact=/Users/brethoffman/Git/agent-harness/.omo/evidence/20260802-mailbox-granular-injection/task-5-todoupdate-unavailable-result.json

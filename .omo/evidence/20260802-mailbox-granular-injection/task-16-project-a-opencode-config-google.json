@@ -1,0 +1,21 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "file:///Volumes/Topper2TB/Git/agent-harness/dist/index.js"
+  ],
+  "model": "google/antigravity-gemini-3.5-flash",
+  "provider": {
+    "google": {
+      "npm": "@ai-sdk/google",
+      "options": {
+        "apiKey": "{env:GLOBAL_GEMINI_KEY}"
+      },
+      "models": {
+        "antigravity-gemini-3.5-flash": {
+          "id": "antigravity-gemini-3.5-flash",
+          "name": "antigravity-gemini-3.5-flash"
+        }
+      }
+    }
+  }
+}

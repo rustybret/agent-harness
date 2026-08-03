@@ -1,0 +1,66 @@
+{
+  "success": false,
+  "sessionID": "ses_03c204af5ffej74jkLk4pgvDWh",
+  "appendResult": {
+    "outcome": "fallback",
+    "reason": "write-failed: ResolveMessage: Cannot find module 'opencode/session/todo' from '/Volumes/Topper2TB/Git/agent-harness/packages/omo-opencode/src/features/cross-project-mailbox/todo-inject/todo-inject.ts'"
+  },
+  "prependResult": {
+    "outcome": "fallback",
+    "reason": "write-failed: ResolveMessage: Cannot find module 'opencode/session/todo' from '/Volumes/Topper2TB/Git/agent-harness/packages/omo-opencode/src/features/cross-project-mailbox/todo-inject/todo-inject.ts'"
+  },
+  "todosAfterAppend": [],
+  "todosAfterPrepend": [],
+  "logs": [
+    {
+      "at": "2026-08-02T19:07:26.020Z",
+      "step": "created-session",
+      "sessionID": "ses_03c204af5ffej74jkLk4pgvDWh"
+    },
+    {
+      "at": "2026-08-02T19:07:26.048Z",
+      "step": "session-get",
+      "getResult": {
+        "id": "ses_03c204af5ffej74jkLk4pgvDWh",
+        "slug": "mighty-planet",
+        "projectID": "global",
+        "directory": "/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/todo-inject-qa.XXXXXX.ddBVpohh9e/workspace",
+        "path": "private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/todo-inject-qa.XXXXXX.ddBVpohh9e/workspace",
+        "cost": 0,
+        "tokens": {
+          "input": 0,
+          "output": 0,
+          "reasoning": 0,
+          "cache": {
+            "read": 0,
+            "write": 0
+          }
+        },
+        "title": "todo-inject-live-qa",
+        "version": "1.18.5+f235ba6",
+        "time": {
+          "created": 1785697645834,
+          "updated": 1785697645834
+        }
+      }
+    },
+    {
+      "at": "2026-08-02T19:07:26.065Z",
+      "step": "todo-inject-log",
+      "message": "[todo-inject] falling back to boulder work: write-failed: ResolveMessage: Cannot find module 'opencode/session/todo' from '/Volumes/Topper2TB/Git/agent-harness/packages/omo-opencode/src/features/cross-project-mailbox/todo-inject/todo-inject.ts'",
+      "data": {
+        "reason": "write-failed: ResolveMessage: Cannot find module 'opencode/session/todo' from '/Volumes/Topper2TB/Git/agent-harness/packages/omo-opencode/src/features/cross-project-mailbox/todo-inject/todo-inject.ts'",
+        "sessionID": "ses_03c204af5ffej74jkLk4pgvDWh"
+      }
+    },
+    {
+      "at": "2026-08-02T19:07:26.102Z",
+      "step": "todo-inject-log",
+      "message": "[todo-inject] falling back to boulder work: write-failed: ResolveMessage: Cannot find module 'opencode/session/todo' from '/Volumes/Topper2TB/Git/agent-harness/packages/omo-opencode/src/features/cross-project-mailbox/todo-inject/todo-inject.ts'",
+      "data": {
+        "reason": "write-failed: ResolveMessage: Cannot find module 'opencode/session/todo' from '/Volumes/Topper2TB/Git/agent-harness/packages/omo-opencode/src/features/cross-project-mailbox/todo-inject/todo-inject.ts'",
+        "sessionID": "ses_03c204af5ffej74jkLk4pgvDWh"
+      }
+    }
+  ]
+}

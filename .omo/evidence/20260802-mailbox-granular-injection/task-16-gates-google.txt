@@ -1,0 +1,15 @@
+Commands run after google provider harness patch and model-config refactor:
+- bun run build: passed
+- bun test packages/omo-opencode/src/shared/prompt-async-route-audit.test.ts: 10 pass, 0 fail
+- bun test test-support/e2e/mailbox-cipher-relay/generator.test.ts: 1 pass, 0 fail
+- bun test-support/e2e/mailbox-cipher-relay/cli.ts --self-test: passed true, includes todo-append and subagent simulated hops, real registry hash unchanged
+- bun run dist/skills/programming/scripts/typescript/check-no-excuse-rules.ts test-support/e2e/mailbox-cipher-relay/generator.ts test-support/e2e/mailbox-cipher-relay/model-config.ts test-support/e2e/mailbox-cipher-relay/types.ts test-support/e2e/mailbox-cipher-relay/generator.test.ts: No violations in 4 files
+- bun test: 13112 pass, 7 skip, 0 fail across 1633 files
+- bun run typecheck: passed
+- lsp_diagnostics on generator.ts, model-config.ts, types.ts, generator.test.ts: No diagnostics found
+
+Changed-file pure LOC after refactor:
+- generator.ts: 203
+- model-config.ts: 50
+- types.ts: 97
+- generator.test.ts: 32

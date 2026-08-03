@@ -1,0 +1,138 @@
+{
+  "root": "/tmp/mailbox-cipher-relay-live",
+  "home": "/tmp/mailbox-cipher-relay-live/home",
+  "registryPath": "/tmp/mailbox-cipher-relay-live/home/.omo/project-registry.json",
+  "arbiterDropDir": "/tmp/mailbox-cipher-relay-live/arbiter/drop",
+  "reportPath": "/tmp/mailbox-cipher-relay-live/arbiter/report.json",
+  "contextPath": "/tmp/mailbox-cipher-relay-live/relay-context.json",
+  "model": "google/antigravity-gemini-3.5-flash",
+  "projects": [
+    {
+      "index": 0,
+      "name": "project-a",
+      "displayName": "project-a",
+      "projectId": "project-a-9678c433",
+      "root": "/tmp/mailbox-cipher-relay-live/projects/project-a",
+      "xdg": {
+        "dataHome": "/tmp/mailbox-cipher-relay-live/xdg/project-a/data",
+        "configHome": "/tmp/mailbox-cipher-relay-live/xdg/project-a/config",
+        "cacheHome": "/tmp/mailbox-cipher-relay-live/xdg/project-a/cache",
+        "stateHome": "/tmp/mailbox-cipher-relay-live/xdg/project-a/state"
+      },
+      "dbPath": "/tmp/mailbox-cipher-relay-live/db/project-a.db",
+      "port": 59977,
+      "wordsPath": "/tmp/mailbox-cipher-relay-live/projects/project-a/.omo/cipher/words.json",
+      "env": {
+        "HOME": "/tmp/mailbox-cipher-relay-live/home",
+        "XDG_DATA_HOME": "/tmp/mailbox-cipher-relay-live/xdg/project-a/data",
+        "XDG_CONFIG_HOME": "/tmp/mailbox-cipher-relay-live/xdg/project-a/config",
+        "XDG_CACHE_HOME": "/tmp/mailbox-cipher-relay-live/xdg/project-a/cache",
+        "XDG_STATE_HOME": "/tmp/mailbox-cipher-relay-live/xdg/project-a/state",
+        "OPENCODE_DB": "/tmp/mailbox-cipher-relay-live/db/project-a.db",
+        "OPENCODE_DISABLE_AUTOUPDATE": "1",
+        "OPENCODE_DISABLE_MODELS_FETCH": "1"
+      },
+      "serveCommand": [
+        "opencode",
+        "serve",
+        "--hostname",
+        "127.0.0.1",
+        "--port",
+        "59977"
+      ]
+    },
+    {
+      "index": 1,
+      "name": "project-b",
+      "displayName": "project-b",
+      "projectId": "project-b-bf640a68",
+      "root": "/tmp/mailbox-cipher-relay-live/projects/project-b",
+      "xdg": {
+        "dataHome": "/tmp/mailbox-cipher-relay-live/xdg/project-b/data",
+        "configHome": "/tmp/mailbox-cipher-relay-live/xdg/project-b/config",
+        "cacheHome": "/tmp/mailbox-cipher-relay-live/xdg/project-b/cache",
+        "stateHome": "/tmp/mailbox-cipher-relay-live/xdg/project-b/state"
+      },
+      "dbPath": "/tmp/mailbox-cipher-relay-live/db/project-b.db",
+      "port": 59978,
+      "wordsPath": "/tmp/mailbox-cipher-relay-live/projects/project-b/.omo/cipher/words.json",
+      "env": {
+        "HOME": "/tmp/mailbox-cipher-relay-live/home",
+        "XDG_DATA_HOME": "/tmp/mailbox-cipher-relay-live/xdg/project-b/data",
+        "XDG_CONFIG_HOME": "/tmp/mailbox-cipher-relay-live/xdg/project-b/config",
+        "XDG_CACHE_HOME": "/tmp/mailbox-cipher-relay-live/xdg/project-b/cache",
+        "XDG_STATE_HOME": "/tmp/mailbox-cipher-relay-live/xdg/project-b/state",
+        "OPENCODE_DB": "/tmp/mailbox-cipher-relay-live/db/project-b.db",
+        "OPENCODE_DISABLE_AUTOUPDATE": "1",
+        "OPENCODE_DISABLE_MODELS_FETCH": "1"
+      },
+      "serveCommand": [
+        "opencode",
+        "serve",
+        "--hostname",
+        "127.0.0.1",
+        "--port",
+        "59978"
+      ]
+    },
+    {
+      "index": 2,
+      "name": "project-c",
+      "displayName": "project-c",
+      "projectId": "project-c-a141acf1",
+      "root": "/tmp/mailbox-cipher-relay-live/projects/project-c",
+      "xdg": {
+        "dataHome": "/tmp/mailbox-cipher-relay-live/xdg/project-c/data",
+        "configHome": "/tmp/mailbox-cipher-relay-live/xdg/project-c/config",
+        "cacheHome": "/tmp/mailbox-cipher-relay-live/xdg/project-c/cache",
+        "stateHome": "/tmp/mailbox-cipher-relay-live/xdg/project-c/state"
+      },
+      "dbPath": "/tmp/mailbox-cipher-relay-live/db/project-c.db",
+      "port": 59979,
+      "wordsPath": "/tmp/mailbox-cipher-relay-live/projects/project-c/.omo/cipher/words.json",
+      "env": {
+        "HOME": "/tmp/mailbox-cipher-relay-live/home",
+        "XDG_DATA_HOME": "/tmp/mailbox-cipher-relay-live/xdg/project-c/data",
+        "XDG_CONFIG_HOME": "/tmp/mailbox-cipher-relay-live/xdg/project-c/config",
+        "XDG_CACHE_HOME": "/tmp/mailbox-cipher-relay-live/xdg/project-c/cache",
+        "XDG_STATE_HOME": "/tmp/mailbox-cipher-relay-live/xdg/project-c/state",
+        "OPENCODE_DB": "/tmp/mailbox-cipher-relay-live/db/project-c.db",
+        "OPENCODE_DISABLE_AUTOUPDATE": "1",
+        "OPENCODE_DISABLE_MODELS_FETCH": "1"
+      },
+      "serveCommand": [
+        "opencode",
+        "serve",
+        "--hostname",
+        "127.0.0.1",
+        "--port",
+        "59979"
+      ]
+    }
+  ],
+  "hops": [
+    {
+      "fromProjectId": "project-a-9678c433",
+      "toProjectId": "project-b-bf640a68",
+      "requestedMode": "todo-append"
+    },
+    {
+      "fromProjectId": "project-b-bf640a68",
+      "toProjectId": "project-c-a141acf1",
+      "requestedMode": "subagent"
+    }
+  ],
+  "sentenceNumbers": [
+    0,
+    11,
+    22,
+    3,
+    14,
+    25,
+    6,
+    17,
+    28,
+    9
+  ],
+  "expectedSentence": "atlas lumen willow delta onyx zephyr glimmer ribbon cascade juniper"
+}

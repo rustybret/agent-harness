@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "expected": "atlas lumen willow delta onyx zephyr glimmer ribbon cascade juniper",
+  "actual": "atlas lumen willow delta onyx zephyr glimmer ribbon cascade juniper",
+  "elapsedMs": 0,
+  "hops": [
+    {
+      "projectId": "project-a-9678c433",
+      "substituted": [
+        0,
+        3,
+        6,
+        9
+      ],
+      "requestedMode": "todo-append"
+    },
+    {
+      "projectId": "project-b-bf640a68",
+      "substituted": [
+        11,
+        14,
+        17
+      ],
+      "requestedMode": "subagent"
+    },
+    {
+      "projectId": "project-c-a141acf1",
+      "substituted": [
+        22,
+        25,
+        28
+      ]
+    }
+  ],
+  "finalPath": "/tmp/mailbox-cipher-relay-live/arbiter/drop/final.json"
+}

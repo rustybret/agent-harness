@@ -1,0 +1,14 @@
+{
+  "projectRegistry": {
+    "path": "/Users/brethoffman/.omo/project-registry.json",
+    "beforeSha256": "26d4e237d2dabffed6662d64e9737b72245f96e1cefd693a20a349c71984ad71",
+    "afterSha256": "26d4e237d2dabffed6662d64e9737b72245f96e1cefd693a20a349c71984ad71",
+    "unchanged": true
+  },
+  "authJson": {
+    "path": "/Users/brethoffman/.local/share/opencode/auth.json",
+    "beforeSha256": "f0592509e0ebb9764f4823e4fdd607968c431f2c070f52debc784746725f95df",
+    "afterSha256": "f0592509e0ebb9764f4823e4fdd607968c431f2c070f52debc784746725f95df",
+    "unchanged": true
+  }
+}

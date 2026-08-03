@@ -1,0 +1,36 @@
+{
+  "messageId": "fab22f31-ba2a-4246-8e17-7e6a4e909f90",
+  "correlationId": "11a54627-8838-44c6-b8b6-c96ee9b94fff",
+  "filePath": "/tmp/mailbox-cipher-relay-live/projects/project-a/coordination_notes/cipher-relay-arbiter/fab22f31-ba2a-4246-8e17-7e6a4e909f90.md",
+  "body": {
+    "version": 1,
+    "sentenceNumbers": [
+      0,
+      11,
+      22,
+      3,
+      14,
+      25,
+      6,
+      17,
+      28,
+      9
+    ],
+    "arbiterDropDir": "/tmp/mailbox-cipher-relay-live/arbiter/drop",
+    "finalFile": "final.json",
+    "chain": [
+      {
+        "projectId": "project-a-9678c433",
+        "requestedMode": "todo-append"
+      },
+      {
+        "projectId": "project-b-bf640a68",
+        "requestedMode": "subagent"
+      },
+      {
+        "projectId": "project-c-a141acf1"
+      }
+    ],
+    "knownWords": {}
+  }
+}
