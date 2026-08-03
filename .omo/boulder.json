@@ -1,144 +1,133 @@
 {
-  "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.omo/plans/mailbox-sidebar-aft.md",
-  "started_at": "2026-07-12T04:41:50.207Z",
+  "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.omo/plans/mailbox-granular-injection.md",
+  "started_at": "2026-08-02T18:47:13.410Z",
   "session_ids": [
-    "opencode:ses_0b660fb8fffeFaqSApnd8cKG4S"
+    "opencode:ses_03ccae641ffeZ0NloW3uZnBjbZ"
   ],
   "session_origins": {
-    "opencode:ses_0b660fb8fffeFaqSApnd8cKG4S": "direct"
+    "opencode:ses_03ccae641ffeZ0NloW3uZnBjbZ": "direct"
   },
-  "plan_name": "mailbox-sidebar-aft",
+  "plan_name": "mailbox-granular-injection",
   "agent": "atlas",
   "task_sessions": {
-    "todo:2": {
-      "task_key": "todo:2",
-      "task_label": "2",
-      "task_title": "Bump @opentui/* production deps 0.2.16 -> 0.4.3 and prove the legacy materialize path still works",
-      "session_id": "opencode:ses_0ab5852f7ffe9QgRTucVz5QVpu",
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "**Barrel `index.ts` contains business logic**: `packages/omo-opencode/src/features/cross-project-mailbox/manual-drain/index.ts` contains dumped business logic (`runProjectMailboxPeek`, `runProjectMailboxDrain`, `drainedNote`, `guidanceFor`, etc.). Barrel files must only contain exports.",
+      "session_id": "opencode:ses_039cd58e6ffeGIb1eCikXMdTiW",
       "agent": "Sisyphus-Junior",
-      "category": "deep",
-      "updated_at": "2026-07-12T04:58:41.148Z",
-      "started_at": "2026-07-12T04:57:30.230Z",
+      "category": "unspecified-high",
+      "started_at": "2026-08-02T18:56:53.795Z",
+      "ended_at": "2026-08-03T06:06:03.799Z",
+      "elapsed_ms": 40150004,
       "status": "completed",
-      "ended_at": "2026-07-12T04:58:41.148Z",
-      "elapsed_ms": 70918
+      "updated_at": "2026-08-03T06:06:03.799Z"
     },
     "todo:3": {
       "task_key": "todo:3",
       "task_label": "3",
-      "task_title": "Build pipeline: TSX precompile step with virtual runtime-module ids + bundle externals fix",
-      "session_id": "opencode:ses_0ab4d74beffe4VyIV6Ke1mpaZC",
+      "task_title": "Send tools: requested_mode arg + outbox audit fields",
+      "session_id": "opencode:ses_03c10870bffeo8GBHgGEblCuyO",
       "agent": "Sisyphus-Junior",
-      "category": "deep",
-      "updated_at": "2026-07-12T05:15:29.106Z",
-      "started_at": "2026-07-12T05:12:31.740Z",
+      "category": "unspecified-high",
+      "updated_at": "2026-08-02T19:33:13.229Z",
+      "started_at": "2026-08-02T19:30:36.429Z",
       "status": "completed",
-      "ended_at": "2026-07-12T05:15:29.106Z",
-      "elapsed_ms": 177366
-    },
-    "todo:4": {
-      "task_key": "todo:4",
-      "task_label": "4",
-      "task_title": "Prefs: AFT-shaped schema under \"oh-my-openagent\" with mailbox back-compat + watcher",
-      "session_id": "opencode:ses_0ab3e43b0ffedLnE0E1fP2tega",
-      "agent": "Sisyphus-Junior",
-      "started_at": "2026-07-12T05:25:17.522Z",
-      "status": "completed",
-      "updated_at": "2026-07-12T05:34:38.056Z",
-      "ended_at": "2026-07-12T05:34:38.056Z",
-      "elapsed_ms": 560534
-    },
-    "todo:1": {
-      "task_key": "todo:1",
-      "task_label": "1",
-      "task_title": "`bun run build` in `/Volumes/Topper2TB/Git/agent-harness`.",
-      "session_id": "opencode:ses_0a96df1abffeO2T1VH5YqBS2Qs",
-      "agent": "Sisyphus-Junior",
-      "category": "deep",
-      "started_at": "2026-07-12T05:44:53.443Z",
-      "ended_at": "2026-07-12T13:45:24.883Z",
-      "elapsed_ms": 28831440,
-      "status": "completed",
-      "updated_at": "2026-07-12T13:45:24.883Z"
+      "ended_at": "2026-08-02T19:33:13.229Z",
+      "elapsed_ms": 156800
     },
     "todo:6": {
       "task_key": "todo:6",
       "task_label": "6",
-      "task_title": "Shared host-runtime loader for BOTH sidebar slots",
-      "session_id": "opencode:ses_0ab21fddeffedRBK6RTL3F7JVE",
+      "task_title": "Lane: side-session Q&A (answer-local)",
+      "session_id": "opencode:ses_03c053268ffedfB7LYSKMvE3nS",
       "agent": "Sisyphus-Junior",
       "category": "ultrabrain",
-      "updated_at": "2026-07-12T06:03:14.701Z",
-      "started_at": "2026-07-12T06:01:30.667Z",
+      "updated_at": "2026-08-02T19:58:32.227Z",
+      "started_at": "2026-08-02T19:51:09.471Z",
       "status": "completed",
-      "ended_at": "2026-07-12T06:03:14.701Z",
-      "elapsed_ms": 104034
+      "ended_at": "2026-08-02T19:58:32.227Z",
+      "elapsed_ms": 442756
     },
-    "todo:7": {
-      "task_key": "todo:7",
-      "task_label": "7",
-      "task_title": "Mailbox TSX component in AFT form/function/styling + semantic regression guard",
-      "session_id": "opencode:ses_0ab0fff7cffeAQuH91sad6h2Y2",
+    "todo:12": {
+      "task_key": "todo:12",
+      "task_label": "12",
+      "task_title": "Router integration: idle-drain + manual drain + heartbeat poller",
+      "session_id": "opencode:ses_03befdce7ffeAfq4J3xWcX5FRH",
       "agent": "Sisyphus-Junior",
-      "started_at": "2026-07-12T06:19:48.848Z",
+      "category": "ultrabrain",
+      "updated_at": "2026-08-02T20:43:51.817Z",
+      "started_at": "2026-08-02T20:27:06.785Z",
       "status": "completed",
-      "updated_at": "2026-07-12T06:27:55.647Z",
-      "ended_at": "2026-07-12T06:27:55.647Z",
-      "elapsed_ms": 486799
+      "ended_at": "2026-08-02T20:43:51.817Z",
+      "elapsed_ms": 1005032
     },
-    "todo:8": {
-      "task_key": "todo:8",
-      "task_label": "8",
-      "task_title": "Wire the mailbox slot: compiled-JSX path with materialize fallback",
-      "session_id": "opencode:ses_0aaf2c737fferwsX2QTz9k8xOa",
+    "todo:15": {
+      "task_key": "todo:15",
+      "task_label": "15",
+      "task_title": "Cipher-relay e2e harness (C8)",
+      "session_id": "opencode:ses_03bd462edffe3j1lFsF11FpR45",
       "agent": "Sisyphus-Junior",
-      "started_at": "2026-07-12T06:31:29.668Z",
+      "category": "quick",
+      "started_at": "2026-08-02T21:15:40.865Z",
       "status": "completed",
-      "updated_at": "2026-07-12T06:48:06.028Z",
-      "ended_at": "2026-07-12T06:48:06.028Z",
-      "elapsed_ms": 996360
+      "updated_at": "2026-08-02T21:16:50.379Z",
+      "ended_at": "2026-08-02T21:16:50.379Z",
+      "elapsed_ms": 69514
     },
-    "todo:9": {
-      "task_key": "todo:9",
-      "task_label": "9",
-      "task_title": "Pack-install smoke test (the AFT \"frozen sidebar from npm install\" gate)",
-      "session_id": "opencode:ses_0aad4d22dffegxR9SMcG3NDwEx",
+    "todo:16": {
+      "task_key": "todo:16",
+      "task_label": "16",
+      "task_title": "Live e2e run + full-suite QA evidence (model source: anthropic/claude-sonnet-4-6, ample capacity confirmed by user)",
+      "session_id": "opencode:ses_03ba8cffbffeaw3GCitv5Oz5eG",
       "agent": "Sisyphus-Junior",
-      "category": "deep",
-      "started_at": "2026-07-12T06:58:28.899Z",
+      "started_at": "2026-08-02T21:33:03.802Z",
       "status": "completed",
-      "updated_at": "2026-07-12T07:31:30.927Z",
-      "ended_at": "2026-07-12T07:31:30.927Z",
-      "elapsed_ms": 1982028
-    },
-    "todo:10": {
-      "task_key": "todo:10",
-      "task_label": "10",
-      "task_title": "Live QA: real click toggles the mailbox panel (macos-cua primary, tmux fallback)",
-      "session_id": "opencode:ses_0aaa51df6ffeUYKN0je2UdXkLt",
-      "agent": "Sisyphus-Junior",
-      "started_at": "2026-07-12T07:39:26.250Z",
-      "status": "completed",
-      "updated_at": "2026-07-12T08:32:55.900Z",
-      "ended_at": "2026-07-12T08:32:55.900Z",
-      "elapsed_ms": 3209650
+      "updated_at": "2026-08-03T05:55:54.422Z",
+      "ended_at": "2026-08-03T05:55:54.422Z",
+      "elapsed_ms": 30170620
     },
     "final-wave:f1": {
       "task_key": "final-wave:f1",
       "task_label": "F1",
-      "task_title": "Plan compliance audit - tool: `oracle` (read-only). Steps: read this plan file end-to-end, `git log --oneline fork/local -12` + `git diff` per T1-T10 commit against this plan's \"What to do\"/\"Must NOT\" text, confirm each todo's stated files were touched and no unlisted file (e.g. utils/models*.json, packages/web) was committed. Expected result: a per-todo compliance table (todo id, compliant Y/N, deviation if any) plus overall APPROVE/REJECT.",
-      "session_id": "opencode:ses_0a95d56d1ffeZBGnVO05pjlCC7",
+      "task_title": "Plan compliance audit — every todo's acceptance criteria re-verified against the diff; dependency matrix honored; no scope-out item present (no orchestrator/intake-agent code, no mid-turn abort, no raw prompt calls).",
+      "session_id": "opencode:ses_039d8e0bdffegYnk2Whso5Z9cw",
       "agent": "Sisyphus-Junior",
-      "started_at": "2026-07-12T08:40:11.559Z",
+      "category": "ultrabrain",
+      "updated_at": "2026-08-03T05:48:12.567Z",
+      "started_at": "2026-08-03T05:47:47.841Z",
       "status": "completed",
-      "updated_at": "2026-07-12T16:02:06.307Z",
-      "ended_at": "2026-07-12T16:02:06.307Z",
-      "elapsed_ms": 26514748
+      "ended_at": "2026-08-03T05:48:12.567Z",
+      "elapsed_ms": 24726
+    },
+    "todo:17": {
+      "task_key": "todo:17",
+      "task_label": "17",
+      "task_title": "Mailbox trace observability layer (replaces the e2e proof path)",
+      "session_id": "opencode:ses_039cc9d51ffeYWl2od444yT1yK",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-08-03T06:28:52.732Z",
+      "started_at": "2026-08-03T06:27:25.181Z",
+      "status": "completed",
+      "ended_at": "2026-08-03T06:28:52.732Z",
+      "elapsed_ms": 87551
+    },
+    "final-wave:f3": {
+      "task_key": "final-wave:f3",
+      "task_label": "F3",
+      "task_title": "Real manual QA — **REDEFINED per user directive**: no cipher-relay e2e. Instead (a) full non-e2e gates: `bun test`, `bun run typecheck`, prompt-async route audit, mock-module lifecycle audit — all green; (b) LIVE-SESSION OBSERVATION: with todo 17's trace layer in place, send real notes between this project and a live sibling project and read the resulting `.omo/mailbox-trace.jsonl` on both sides to confirm each lane's per-message timeline; (c) record the observed timelines as evidence. NO sandbox spawning, NO process-management commands, NO `pkill`.",
+      "session_id": "opencode:ses_039744ac1ffeDXwoWnlHhk4rQ8",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-08-03T07:37:11.787Z",
+      "started_at": "2026-08-03T07:37:11.787Z",
+      "status": "running"
     }
   },
-  "active_work_id": "mailbox-sidebar-aft-4dc5de92",
+  "active_work_id": "mailbox-granular-injection-53fe07f1",
   "status": "completed",
-  "updated_at": "2026-07-12T16:03:15.733Z",
+  "updated_at": "2026-08-03T07:40:58.317Z",
   "schema_version": 2,
   "works": {
     "provider-quirks-normalizer-legacy": {
@@ -641,8 +630,141 @@
       },
       "ended_at": "2026-07-12T16:03:15.733Z",
       "elapsed_ms": 40885526
+    },
+    "mailbox-granular-injection-53fe07f1": {
+      "work_id": "mailbox-granular-injection-53fe07f1",
+      "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.omo/plans/mailbox-granular-injection.md",
+      "plan_name": "mailbox-granular-injection",
+      "status": "completed",
+      "started_at": "2026-08-02T18:47:13.410Z",
+      "updated_at": "2026-08-03T07:40:58.317Z",
+      "session_ids": [
+        "opencode:ses_03ccae641ffeZ0NloW3uZnBjbZ"
+      ],
+      "session_origins": {
+        "opencode:ses_03ccae641ffeZ0NloW3uZnBjbZ": "direct"
+      },
+      "agent": "atlas",
+      "task_sessions": {
+        "todo:1": {
+          "task_key": "todo:1",
+          "task_label": "1",
+          "task_title": "**Barrel `index.ts` contains business logic**: `packages/omo-opencode/src/features/cross-project-mailbox/manual-drain/index.ts` contains dumped business logic (`runProjectMailboxPeek`, `runProjectMailboxDrain`, `drainedNote`, `guidanceFor`, etc.). Barrel files must only contain exports.",
+          "session_id": "opencode:ses_039cd58e6ffeGIb1eCikXMdTiW",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "started_at": "2026-08-02T18:56:53.795Z",
+          "ended_at": "2026-08-03T06:06:03.799Z",
+          "elapsed_ms": 40150004,
+          "status": "completed",
+          "updated_at": "2026-08-03T06:06:03.799Z"
+        },
+        "todo:3": {
+          "task_key": "todo:3",
+          "task_label": "3",
+          "task_title": "Send tools: requested_mode arg + outbox audit fields",
+          "session_id": "opencode:ses_03c10870bffeo8GBHgGEblCuyO",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-08-02T19:33:13.229Z",
+          "started_at": "2026-08-02T19:30:36.429Z",
+          "status": "completed",
+          "ended_at": "2026-08-02T19:33:13.229Z",
+          "elapsed_ms": 156800
+        },
+        "todo:6": {
+          "task_key": "todo:6",
+          "task_label": "6",
+          "task_title": "Lane: side-session Q&A (answer-local)",
+          "session_id": "opencode:ses_03c053268ffedfB7LYSKMvE3nS",
+          "agent": "Sisyphus-Junior",
+          "category": "ultrabrain",
+          "updated_at": "2026-08-02T19:58:32.227Z",
+          "started_at": "2026-08-02T19:51:09.471Z",
+          "status": "completed",
+          "ended_at": "2026-08-02T19:58:32.227Z",
+          "elapsed_ms": 442756
+        },
+        "todo:12": {
+          "task_key": "todo:12",
+          "task_label": "12",
+          "task_title": "Router integration: idle-drain + manual drain + heartbeat poller",
+          "session_id": "opencode:ses_03befdce7ffeAfq4J3xWcX5FRH",
+          "agent": "Sisyphus-Junior",
+          "category": "ultrabrain",
+          "updated_at": "2026-08-02T20:43:51.817Z",
+          "started_at": "2026-08-02T20:27:06.785Z",
+          "status": "completed",
+          "ended_at": "2026-08-02T20:43:51.817Z",
+          "elapsed_ms": 1005032
+        },
+        "todo:15": {
+          "task_key": "todo:15",
+          "task_label": "15",
+          "task_title": "Cipher-relay e2e harness (C8)",
+          "session_id": "opencode:ses_03bd462edffe3j1lFsF11FpR45",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "started_at": "2026-08-02T21:15:40.865Z",
+          "status": "completed",
+          "updated_at": "2026-08-02T21:16:50.379Z",
+          "ended_at": "2026-08-02T21:16:50.379Z",
+          "elapsed_ms": 69514
+        },
+        "todo:16": {
+          "task_key": "todo:16",
+          "task_label": "16",
+          "task_title": "Live e2e run + full-suite QA evidence (model source: anthropic/claude-sonnet-4-6, ample capacity confirmed by user)",
+          "session_id": "opencode:ses_03ba8cffbffeaw3GCitv5Oz5eG",
+          "agent": "Sisyphus-Junior",
+          "started_at": "2026-08-02T21:33:03.802Z",
+          "status": "completed",
+          "updated_at": "2026-08-03T05:55:54.422Z",
+          "ended_at": "2026-08-03T05:55:54.422Z",
+          "elapsed_ms": 30170620
+        },
+        "final-wave:f1": {
+          "task_key": "final-wave:f1",
+          "task_label": "F1",
+          "task_title": "Plan compliance audit — every todo's acceptance criteria re-verified against the diff; dependency matrix honored; no scope-out item present (no orchestrator/intake-agent code, no mid-turn abort, no raw prompt calls).",
+          "session_id": "opencode:ses_039d8e0bdffegYnk2Whso5Z9cw",
+          "agent": "Sisyphus-Junior",
+          "category": "ultrabrain",
+          "updated_at": "2026-08-03T05:48:12.567Z",
+          "started_at": "2026-08-03T05:47:47.841Z",
+          "status": "completed",
+          "ended_at": "2026-08-03T05:48:12.567Z",
+          "elapsed_ms": 24726
+        },
+        "todo:17": {
+          "task_key": "todo:17",
+          "task_label": "17",
+          "task_title": "Mailbox trace observability layer (replaces the e2e proof path)",
+          "session_id": "opencode:ses_039cc9d51ffeYWl2od444yT1yK",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-08-03T06:28:52.732Z",
+          "started_at": "2026-08-03T06:27:25.181Z",
+          "status": "completed",
+          "ended_at": "2026-08-03T06:28:52.732Z",
+          "elapsed_ms": 87551
+        },
+        "final-wave:f3": {
+          "task_key": "final-wave:f3",
+          "task_label": "F3",
+          "task_title": "Real manual QA — **REDEFINED per user directive**: no cipher-relay e2e. Instead (a) full non-e2e gates: `bun test`, `bun run typecheck`, prompt-async route audit, mock-module lifecycle audit — all green; (b) LIVE-SESSION OBSERVATION: with todo 17's trace layer in place, send real notes between this project and a live sibling project and read the resulting `.omo/mailbox-trace.jsonl` on both sides to confirm each lane's per-message timeline; (c) record the observed timelines as evidence. NO sandbox spawning, NO process-management commands, NO `pkill`.",
+          "session_id": "opencode:ses_039744ac1ffeDXwoWnlHhk4rQ8",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-08-03T07:37:11.787Z",
+          "started_at": "2026-08-03T07:37:11.787Z",
+          "status": "running"
+        }
+      },
+      "ended_at": "2026-08-03T07:40:58.317Z",
+      "elapsed_ms": 46424907
     }
   },
-  "ended_at": "2026-07-12T16:03:15.733Z",
-  "elapsed_ms": 40885526
+  "ended_at": "2026-08-03T07:40:58.317Z",
+  "elapsed_ms": 46424907
 }
