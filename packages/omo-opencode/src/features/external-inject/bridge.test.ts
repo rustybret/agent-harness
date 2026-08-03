@@ -53,12 +53,14 @@ function makeDispatch(): {
 async function start(
   cfg: ExternalInjectConfig,
   dispatch: (args: InternalPromptDispatchArgs) => Promise<InternalPromptDispatchResult>,
+  runMailboxDrainNow?: () => Promise<{ readonly triggered: boolean }>,
 ): Promise<ExternalInjectBridge> {
   const bridge = await startExternalInjectBridge({
     config: cfg,
     client: { session: { promptAsync: async () => ({}) } },
     directory: sandbox,
     dispatchInternalPrompt: dispatch,
+    runMailboxDrainNow,
   })
   bridges.push(bridge)
   return bridge
@@ -128,6 +130,26 @@ describe("external-inject bridge", () => {
     })
     expect(res.status).toBe(403)
     expect(calls).toHaveLength(0)
+  })
+
+  it("#given mailbox_drain_now #then forwards to the injected drain port", async () => {
+    const { dispatch } = makeDispatch()
+    let drainCalls = 0
+    const bridge = await start(config(), dispatch, async () => {
+      drainCalls += 1
+      return { triggered: true }
+    })
+    const token = await readToken(bridge)
+
+    const res = await fetch(url(bridge, "/rpc/mailbox_drain_now"), {
+      method: "POST",
+      body: JSON.stringify({ token }),
+    })
+    const body = (await res.json()) as { triggered: boolean }
+
+    expect(res.status).toBe(200)
+    expect(body).toEqual({ triggered: true })
+    expect(drainCalls).toBe(1)
   })
 
   it("#given a burst of identical events #then coalesces to a single gate dispatch", async () => {

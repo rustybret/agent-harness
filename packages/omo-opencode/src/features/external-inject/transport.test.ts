@@ -93,9 +93,54 @@ describe("external-inject loopback listener", () => {
     }
     expect(body.version).toBe(1)
     expect(body.methods).toContain("inject")
+    expect(body.methods).toContain("mailbox_drain_now")
     expect(body.addressing_modes).toContain("active-session")
     expect(body.max_text_bytes).toBe(32)
     expect(body.rate_limit.max).toBe(20)
+  })
+
+  it("#given mailbox_drain_now with a valid token #then invokes the injected drain function once", async () => {
+    // given
+    let calls = 0
+    const server = await startServer(makeDeps({
+      runMailboxDrainNow: async () => {
+        calls += 1
+        return { triggered: true }
+      },
+    }))
+
+    // when
+    const res = await fetch(url(server, "/rpc/mailbox_drain_now"), {
+      method: "POST",
+      body: JSON.stringify({ token: "secret-token" }),
+    })
+    const body = (await res.json()) as { triggered: boolean }
+
+    // then
+    expect(res.status).toBe(200)
+    expect(body).toEqual({ triggered: true })
+    expect(calls).toBe(1)
+  })
+
+  it("#given mailbox_drain_now with a bad token #then rejects before invoking drain", async () => {
+    // given
+    let calls = 0
+    const server = await startServer(makeDeps({
+      runMailboxDrainNow: async () => {
+        calls += 1
+        return { triggered: true }
+      },
+    }))
+
+    // when
+    const res = await fetch(url(server, "/rpc/mailbox_drain_now"), {
+      method: "POST",
+      body: JSON.stringify({ token: "wrong" }),
+    })
+
+    // then
+    expect(res.status).toBe(403)
+    expect(calls).toBe(0)
   })
 
   it("#given an unknown rpc method #then returns 404", async () => {

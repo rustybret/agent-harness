@@ -16,6 +16,8 @@ export interface DescribeCapabilities {
   readonly rate_limit: { readonly max: number; readonly window_ms: number }
 }
 
+export type MailboxDrainNowResult = { readonly triggered: boolean }
+
 export interface HandlerDeps {
   readonly token: string
   readonly maxTextBytes: number
@@ -23,6 +25,7 @@ export interface HandlerDeps {
   readonly rateLimit: { readonly max: number; readonly window_ms: number }
   /** Perform the injection; returns the HTTP status + body to relay. */
   readonly inject: (payload: InjectPayload) => Promise<InjectResponse>
+  readonly runMailboxDrainNow?: () => Promise<MailboxDrainNowResult>
 }
 
 function describe(deps: HandlerDeps): InjectResponse {
@@ -31,7 +34,7 @@ function describe(deps: HandlerDeps): InjectResponse {
     : ["explicit-session-id"]
   const capabilities: DescribeCapabilities = {
     version: BRIDGE_VERSION,
-    methods: ["inject", "describe"],
+    methods: ["inject", "describe", "mailbox_drain_now"],
     addressing_modes: addressingModes,
     max_text_bytes: deps.maxTextBytes,
     rate_limit: { max: deps.rateLimit.max, window_ms: deps.rateLimit.window_ms },
@@ -71,6 +74,11 @@ export function createRequestRouter(deps: HandlerDeps): (req: InjectRequest) => 
         return { status: 413, body: { error: "text exceeds max_text_bytes" } }
       }
       return deps.inject(payload)
+    }
+
+    if (req.method === "mailbox_drain_now") {
+      const runMailboxDrainNow = deps.runMailboxDrainNow ?? (async () => ({ triggered: false }))
+      return { status: 200, body: await runMailboxDrainNow() }
     }
 
     return { status: 404, body: { error: `Unknown method: ${req.method}` } }

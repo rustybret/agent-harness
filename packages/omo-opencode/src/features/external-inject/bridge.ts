@@ -3,6 +3,7 @@ import type {
   InternalPromptDispatchArgs,
   InternalPromptDispatchResult,
 } from "../../shared/prompt-async-gate"
+import type { MailboxDrainNowResult } from "./handler"
 import { createInjectAdapter } from "./inject-adapter"
 import {
   newInstanceId,
@@ -28,6 +29,7 @@ export interface ExternalInjectBridgeDeps {
   readonly dispatchInternalPrompt: (
     args: InternalPromptDispatchArgs,
   ) => Promise<InternalPromptDispatchResult>
+  readonly runMailboxDrainNow?: () => Promise<MailboxDrainNowResult>
 }
 
 export interface ExternalInjectBridge {
@@ -70,6 +72,7 @@ export async function startExternalInjectBridge(
     maxTextBytes: deps.config.max_text_bytes,
     allowDefaultActiveSession: deps.config.allow_default_active_session,
     rateLimit: deps.config.rate_limit,
+    runMailboxDrainNow: deps.runMailboxDrainNow,
     inject: async (payload) => {
       const resolved = resolveTargetSession(
         { sessionID: payload.sessionID },
