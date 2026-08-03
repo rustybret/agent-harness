@@ -211,3 +211,90 @@ describe("loadSessionMessageIds", () => {
     })
   })
 })
+
+import { buildClassifyNote } from "./create-mailbox-hooks"
+import { setMainSession } from "../../../features/claude-code-session-state"
+import type { BackgroundManager } from "../../../features/background-agent"
+
+describe("buildClassifyNote", () => {
+  const tmpDirs: string[] = []
+
+  afterEach(async () => {
+    await Promise.all(tmpDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })))
+  })
+
+  async function makeRepoRoot(prefix: string): Promise<string> {
+    const dir = await mkdtemp(path.join(os.tmpdir(), prefix))
+    tmpDirs.push(dir)
+    return dir
+  }
+
+  it("#given a mock backgroundManager #when classifyNote is called #then launches task and returns decision", async () => {
+    // given
+    setMainSession("main-session-id")
+    const repoRoot = await makeRepoRoot("omo-classify-")
+    const mockTask = {
+      id: "bg_task_1",
+      status: "completed" as const,
+      sessionId: "child-session-id",
+    }
+    const launch = async () => mockTask
+    const getTask = () => mockTask
+    const backgroundManager = {
+      launch,
+      getTask,
+    } as unknown as BackgroundManager
+
+    const messagesMock = async () => ({
+      data: [
+        {
+          info: { role: "assistant" },
+          parts: [{ type: "text", text: "subagent" }],
+        },
+      ],
+    })
+    const ctx = {
+      client: { session: { messages: messagesMock } },
+      directory: repoRoot,
+    } as unknown as PluginContext
+    const config = CrossProjectMailboxConfigSchema.parse({
+      bounds: {
+        body_digest_ttl_min: 60,
+      },
+    })
+
+    // when
+    const classifyNote = buildClassifyNote(ctx, config, backgroundManager)
+    expect(classifyNote).toBeDefined()
+
+    const note = {
+      messageId: "msg-1",
+      filePath: "/tmp/msg-1.json",
+      envelope: {
+        messageId: "msg-1",
+        fromProjectId: "sender",
+        toProjectId: "receiver",
+        intent: "impl" as const,
+        timestamp: 1,
+      },
+      body: "Please run a subagent task",
+    }
+    const deps = {
+      senderConfig: {
+        access: "allow" as const,
+        intent_budget: "impl" as const,
+      },
+      routeContext: {
+        presence: "none" as const,
+      },
+    }
+
+    const result = await classifyNote!(note, deps)
+
+    // then
+    expect(result).toEqual({
+      lane: "subagent",
+      effectiveMode: "subagent",
+    })
+  })
+})

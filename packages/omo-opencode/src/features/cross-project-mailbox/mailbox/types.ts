@@ -1,4 +1,5 @@
-import type { MailboxMessage } from "../envelope/schema"
+import type { MailboxMessage, MailboxMode } from "../envelope/schema"
+import type { RouteLane } from "../router"
 
 export type PendingState = "dispatch_sent" | "history_confirmed"
 
@@ -8,6 +9,10 @@ export interface PendingEntry {
   reservedPath: string
   dispatchedAt: number
   state: PendingState
+  requestedMode?: MailboxMode
+  effectiveMode?: MailboxMode
+  downgradeReason?: string
+  lane?: RouteLane
 }
 
 export interface UnreadMessage {

@@ -69,6 +69,7 @@ interface Spies {
   unreserve: ReturnType<typeof jest.fn>
   quarantine: ReturnType<typeof jest.fn>
   markDispatched: ReturnType<typeof jest.fn>
+  ack: ReturnType<typeof jest.fn>
   addDispatchSent: ReturnType<typeof jest.fn>
   checkAndRecord: ReturnType<typeof jest.fn>
   rollback: ReturnType<typeof jest.fn>
@@ -106,6 +107,7 @@ function makeHarness(opts: {
   const unreserve = jest.fn(async () => undefined)
   const quarantine = jest.fn(async () => undefined)
   const markDispatched = jest.fn(async () => undefined)
+  const ack = jest.fn(async () => undefined)
   const addDispatchSent = jest.fn(async () => undefined)
   const checkAndRecord = jest.fn(async () => ({ isDuplicate: opts.duplicate ?? false }))
   const rollback = jest.fn(async () => undefined)
@@ -125,7 +127,7 @@ function makeHarness(opts: {
     () => opts.freshConfigRead ?? { valid: true, config: { cross_project_mailbox: config } },
   )
 
-  const store: MailboxStorePort = { reclaimStale, drainUnread, reserve, unreserve, quarantine, markDispatched }
+  const store: MailboxStorePort = { reclaimStale, drainUnread, reserve, unreserve, quarantine, markDispatched, ack }
   const pending: PendingStorePort = { addDispatchSent }
   const digest: DigestStorePort = { checkAndRecord, rollback }
   const limiter: RateLimiterPort = { checkRateLimit }
@@ -161,6 +163,7 @@ function makeHarness(opts: {
       unreserve,
       quarantine,
       markDispatched,
+      ack,
       addDispatchSent,
       checkAndRecord,
       rollback,
@@ -486,14 +489,11 @@ describe("createIdleDrainHook", () => {
     it("#then the handler early-outs before resolving primary or scanning mailbox", async () => {
       // given
       const { deps, spies } = makeHarness({ primary: "sisyphus" })
-      deps.client.session = {
-        status: jest.fn(async () => ({
-          data: {
-            ses_1: { type: "busy" },
-          },
-        })),
+      const busySession: NonNullable<IdleDrainHookDeps["client"]["session"]> = {
+        status: jest.fn(async () => ({ data: { ses_1: { type: "busy" } } })),
         promptAsync: jest.fn(async () => ({})),
-      } as any
+      }
+      deps.client = { session: busySession }
       const hook = createIdleDrainHook(deps)
 
       // when
@@ -510,7 +510,6 @@ describe("createIdleDrainHook", () => {
       // given
       const { deps, spies } = makeHarness({ primary: "sisyphus" })
       spies.dispatchInternalPrompt.mockResolvedValue({ status: "reserved" })
-      const store = deps.makeMailboxStore("/repos/beta", "alpha-id") as any
       const hook = createIdleDrainHook(deps)
 
       // when
@@ -518,8 +517,175 @@ describe("createIdleDrainHook", () => {
 
       // then
       expect(spies.dispatchInternalPrompt).toHaveBeenCalledTimes(1)
-      expect(store.unreserve).toHaveBeenCalledWith("11111111-1111-1111-1111-111111111111")
-      expect(store.markDispatched).not.toHaveBeenCalled()
+      expect(spies.unreserve).toHaveBeenCalledWith("11111111-1111-1111-1111-111111111111")
+      expect(spies.markDispatched).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("#given requested_mode answer with live presence", () => {
+    it("#then routes through the injected answer-local lane without legacy triage dispatch", async () => {
+      // given
+      const config = makeConfig({
+        default_sender_access: "allow-none",
+        senders: { "alpha-id": { access: "allow", intent_budget: "plan" } },
+      })
+      const note = makeNote({ requested_mode: "answer", intent: "question" })
+      const answerFulfill = jest.fn(async (input: UnreadMessage) => {
+        await depsForAnswer.store.ack(input.messageId)
+        return { status: "replied", replyMessageId: "reply_1" } as const
+      })
+      const depsForAnswer: { store: MailboxStorePort } = { store: undefined as unknown as MailboxStorePort }
+      const { deps, spies } = makeHarness({ primary: "sisyphus", config, notes: [note] })
+      depsForAnswer.store = deps.makeMailboxStore("/repos/beta", "alpha-id")
+      deps.answerLocalLane = () => ({ fulfill: answerFulfill })
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(answerFulfill).toHaveBeenCalledWith(note)
+      expect(spies.buildTriagePrompt).not.toHaveBeenCalled()
+      expect(spies.dispatchInternalPrompt).not.toHaveBeenCalled()
+      expect(spies.markDispatched.mock.calls[0][0]).toMatchObject({
+        messageId: note.messageId,
+        requestedMode: "answer",
+        effectiveMode: "answer",
+        lane: "answer-local",
+      })
+    })
+  })
+
+  describe("#given requested_mode todo-next", () => {
+    it("#then routes through the todo injector and records route metadata", async () => {
+      // given
+      const config = makeConfig({
+        default_sender_access: "allow-none",
+        senders: { "alpha-id": { access: "allow", intent_budget: "impl" } },
+      })
+      const note = makeNote({ requested_mode: "todo-next" })
+      const todoInjector = {
+        append: jest.fn(async () => ({ outcome: "written", count: 1 }) as const),
+        insertNext: jest.fn(async () => ({ outcome: "written", count: 1 }) as const),
+        prepend: jest.fn(async () => ({ outcome: "written", count: 1 }) as const),
+        restore: jest.fn(async () => undefined),
+        snapshot: jest.fn(async () => []),
+      }
+      const { deps, spies } = makeHarness({ primary: "sisyphus", config, notes: [note] })
+      deps.todoInjector = todoInjector
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(todoInjector.insertNext).toHaveBeenCalledTimes(1)
+      expect(spies.ack).toHaveBeenCalledWith(note.messageId)
+      expect(spies.dispatchInternalPrompt).not.toHaveBeenCalled()
+      expect(spies.markDispatched.mock.calls[0][0]).toMatchObject({
+        requestedMode: "todo-next",
+        effectiveMode: "todo-next",
+        lane: "todo-next",
+      })
+    })
+  })
+
+  describe("#given requested_mode subagent", () => {
+    it("#then routes through runSubagentLane deps and leaves completion async", async () => {
+      // given
+      const config = makeConfig({
+        default_sender_access: "allow-none",
+        senders: { "alpha-id": { access: "allow", intent_budget: "impl" } },
+      })
+      const note = makeNote({ requested_mode: "subagent", category: "quick" })
+      const spawn = jest.fn(async () => ({ taskId: "task_1" }))
+      const { deps, spies } = makeHarness({ primary: "sisyphus", config, notes: [note] })
+      deps.subagentLaneDeps = {
+        senderCeiling: "impl",
+        spawn,
+        waitForTask: jest.fn(async () => ({ status: "completed", result: "done" }) as const),
+        sendReply: jest.fn(async () => undefined),
+      }
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(spawn).toHaveBeenCalledTimes(1)
+      expect(spies.ack).toHaveBeenCalledWith(note.messageId)
+      expect(spies.dispatchInternalPrompt).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("#given requested_mode worker-pr with cloudhome declaration", () => {
+    it("#then upgrades the local router decision to the remote worker contract lane", async () => {
+      // given
+      const config = makeConfig({
+        default_sender_access: "allow-none",
+        senders: { "alpha-id": { access: "allow", intent_budget: "plan" } },
+      })
+      const note = makeNote({ requested_mode: "worker-pr", category: "worker-pr-cloudhome" })
+      const dispatchRemote = jest.fn(async () => ({ status: "pending-remote", deduped: false, outboundMessageId: "out_1" }) as const)
+      const { deps, spies } = makeHarness({ primary: "sisyphus", config, notes: [note] })
+      deps.cloudhomeContractDeps = {
+        config: { thisProjectId: "beta-id", repo: "/repos/beta" },
+        deps: {
+          store: {
+            isPending: jest.fn(async () => false),
+            getPending: jest.fn(async () => undefined),
+            findByOutboundMessageId: jest.fn(async () => undefined),
+            markPending: jest.fn(async () => undefined),
+            clearPending: jest.fn(async () => undefined),
+          },
+          sendOutbound: jest.fn(async () => ({ outboundMessageId: "out_1" })),
+        },
+        dispatchRemoteContract: dispatchRemote,
+      }
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(dispatchRemote).toHaveBeenCalledTimes(1)
+      expect(spies.markDispatched.mock.calls[0][0]).toMatchObject({
+        effectiveMode: "worker-pr",
+        lane: "worker-pr-cloudhome",
+      })
+    })
+  })
+
+  describe("#given a lane throws after reservation", () => {
+    it("#then rolls back to unread and uses legacy triage on the next drain pass", async () => {
+      // given
+      const config = makeConfig({
+        default_sender_access: "allow-none",
+        senders: { "alpha-id": { access: "allow", intent_budget: "impl" } },
+      })
+      const note = makeNote({ requested_mode: "todo-append" })
+      const todoInjector = {
+        append: jest.fn(async () => {
+          throw new Error("boom")
+        }),
+        insertNext: jest.fn(async () => ({ outcome: "written", count: 1 }) as const),
+        prepend: jest.fn(async () => ({ outcome: "written", count: 1 }) as const),
+        restore: jest.fn(async () => undefined),
+        snapshot: jest.fn(async () => []),
+      }
+      const { deps, spies } = makeHarness({ primary: "sisyphus", config, notes: [note] })
+      deps.todoInjector = todoInjector
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(spies.unreserve).toHaveBeenCalledWith(note.messageId)
+      expect(spies.rollback).toHaveBeenCalled()
+      expect(spies.buildTriagePrompt).toHaveBeenCalledTimes(1)
+      expect(spies.dispatchInternalPrompt).toHaveBeenCalledTimes(1)
     })
   })
 })

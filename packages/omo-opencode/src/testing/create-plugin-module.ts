@@ -247,18 +247,6 @@ export function createPluginModule(overrides: Partial<PluginModuleDeps> = {}): P
       })
     }
 
-    const externalInjectBridge = pluginConfig.external_inject?.enabled
-      ? await startExternalInjectBridge({
-        client: input.client as Parameters<typeof startExternalInjectBridge>[0]["client"],
-        directory: input.directory,
-        config: pluginConfig.external_inject,
-        dispatchInternalPrompt,
-      }).catch((error: unknown) => {
-        log("[external-inject] bridge failed to start:", error)
-        return undefined
-      })
-      : undefined
-
     const toolsResult = await deps.createTools({
       ctx: input,
       pluginConfig,
@@ -279,6 +267,29 @@ export function createPluginModule(overrides: Partial<PluginModuleDeps> = {}): P
       availableSkills: toolsResult.availableSkills,
       mailboxModeDetector,
     })
+
+    let externalInjectBridge: Awaited<ReturnType<typeof startExternalInjectBridge>> | undefined
+    if (pluginConfig.external_inject?.enabled) {
+      externalInjectBridge = await startExternalInjectBridge({
+        client: input.client as Parameters<typeof startExternalInjectBridge>[0]["client"],
+        directory: input.directory,
+        config: pluginConfig.external_inject,
+        dispatchInternalPrompt,
+        runMailboxDrainNow: async () => {
+          const mailboxIdleDrain = hooks.mailboxIdleDrain
+          if (mailboxIdleDrain === null || mailboxIdleDrain === undefined) return { triggered: false }
+          let triggered = false
+          for (const session of externalInjectBridge?.tracker.liveSessions() ?? []) {
+            const result = await mailboxIdleDrain.runMailboxDrainNow(session.id)
+            triggered = triggered || result.triggered
+          }
+          return { triggered }
+        },
+      }).catch((error: unknown) => {
+        log("[external-inject] bridge failed to start:", error)
+        return undefined
+      })
+    }
 
     const pluginInterface = deps.createPluginInterface({
       ctx: input,

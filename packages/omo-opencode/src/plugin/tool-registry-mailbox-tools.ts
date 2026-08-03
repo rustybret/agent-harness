@@ -21,6 +21,8 @@ import { validateInbound } from "../features/cross-project-mailbox/validation"
 import { getServerBaseUrl } from "../shared/opencode-http-api"
 import type { PluginContext } from "./types"
 import type { ToolRegistryFactories } from "./tool-registry-factories"
+import type { BackgroundManager } from "../features/background-agent"
+import { buildClassifyNote } from "../features/cross-project-mailbox/hooks/create-mailbox-hooks"
 
 // Both tools register whenever config.enabled; the internal/external split is enforced at execution
 // time via a shared mode detector, not at registration. One detector instance keeps both tools on a
@@ -36,8 +38,9 @@ export function createMailboxToolsRecord(args: {
     | "createProjectNoteTool"
   >
   readonly modeDetector?: Pick<ModeDetector, "currentMode" | "detect">
+  readonly backgroundManager?: BackgroundManager
 }): Record<string, ToolDefinition> {
-  const { pluginConfig, ctx, factories } = args
+  const { pluginConfig, ctx, factories, backgroundManager } = args
   const config = pluginConfig.cross_project_mailbox
   if (!config?.enabled) return {}
 
@@ -79,6 +82,7 @@ export function createMailboxToolsRecord(args: {
       new SamePairRateLimiter(root, config.bounds.same_pair_rate_limit_per_min),
     validateInbound,
     liveConfigResolver,
+    classifyNote: buildClassifyNote(ctx, config, backgroundManager),
   }
 
   return {

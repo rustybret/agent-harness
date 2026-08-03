@@ -247,6 +247,7 @@ export function createSessionHooks(args: {
     isHookEnabled,
     safeHookEnabled,
     mailboxModeDetector,
+    backgroundManager,
   })
 
   return {

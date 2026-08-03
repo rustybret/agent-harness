@@ -8,11 +8,14 @@ import type { PluginContext } from "../../../plugin/types"
 import type { CrossProjectMailboxConfig } from "../config"
 import { createLiveMailboxConfigResolver } from "../config/live-config"
 import { BodyDigestStore, SamePairRateLimiter } from "../loop-guard"
+import { createTodoInjector } from "../todo-inject"
+import { defaultCheckWorkerReplyExists, runWorkerPrWatchdogTick } from "../lanes/worker-pr-watchdog"
 import { MailboxStore, PendingDeliveryStore } from "../mailbox"
 import { resolveSessionAgent } from "../../../plugin/session-agent-resolver"
 import { normalizePrimaryAgent, resolveActivePrimaryAgent } from "../primary-resolver"
 import { createProjectRegistry, type ProjectRegistry } from "../registry"
 import type { ProjectEntry } from "../registry/types"
+import { createMailboxTraceEmit } from "../trace"
 import { buildTriagePrompt } from "../triage"
 import { validateInbound } from "../validation"
 import { getServerBaseUrl } from "../../../shared/opencode-http-api"
@@ -26,6 +29,14 @@ import {
   type PresenceHeartbeatHook,
 } from "../presence"
 import { createIdleDrainHook, type IdleDrainHookDeps } from "./idle-drain-hook"
+import type { BackgroundManager } from "../../../features/background-agent"
+import { getMainSessionID } from "../../../features/claude-code-session-state"
+import { getTimingConfig } from "../../../tools/delegate-task/timing"
+import { CLASSIFIER_CATEGORY, ClassificationCache } from "../router/classifier"
+import { createProductionClassifyNote } from "../router/production-classifier-adapter"
+import type { UnreadMessage } from "../mailbox/types"
+import type { ClassifyNoteDeps } from "./route-note-dispatcher"
+import type { RouteDecision } from "../router/types"
 
 export type MailboxHooks = {
   mailboxIdleDrain: ReturnType<typeof createIdleDrainHook> | null
@@ -82,10 +93,90 @@ export async function loadSessionMessageIds(
   }
 }
 
+async function getTaskOutputText(client: any, sessionId: string, directory: string): Promise<string> {
+  const session = client.session
+  const messagesApi = session?.messages
+  if (typeof messagesApi !== "function") return ""
+  try {
+    const result = await messagesApi.call(session, {
+      path: { id: sessionId },
+      query: { directory },
+    })
+    const data = (result as { data?: unknown })?.data ?? result
+    if (!Array.isArray(data)) return ""
+    
+    const extractedContent: string[] = []
+    for (const message of data) {
+      if (message.info?.role === "assistant") {
+        for (const part of message.parts ?? []) {
+          if (part.type === "text" && part.text) {
+            extractedContent.push(part.text)
+          }
+        }
+      }
+    }
+    return extractedContent.filter((text) => text.length > 0).join("\n\n")
+  } catch (error) {
+    log("mailbox get task output text failed", { error })
+    return ""
+  }
+}
+
+export function buildClassifyNote(
+  ctx: PluginContext,
+  config: CrossProjectMailboxConfig,
+  backgroundManager?: BackgroundManager,
+): ((note: UnreadMessage, deps: ClassifyNoteDeps) => Promise<RouteDecision>) | undefined {
+  if (!backgroundManager) return undefined
+
+  const cache = new ClassificationCache({
+    repoRoot: ctx.directory,
+    ttlMs: config.bounds.body_digest_ttl_min * 60_000,
+  })
+
+  const classify = async (prompt: string): Promise<string> => {
+    const parentSessionId = getMainSessionID()
+    if (!parentSessionId) {
+      throw new Error("No active main session found for classification")
+    }
+    const task = await backgroundManager.launch({
+      description: "mailbox classification",
+      prompt,
+      agent: "sisyphus-junior",
+      category: CLASSIFIER_CATEGORY,
+      parentSessionId,
+      parentMessageId: "",
+    })
+
+    const timing = getTimingConfig()
+    const timeoutMs = timing.WAIT_FOR_SESSION_TIMEOUT_MS || 30000
+    const intervalMs = timing.WAIT_FOR_SESSION_INTERVAL_MS || 500
+    const deadline = Date.now() + timeoutMs
+
+    while (Date.now() < deadline) {
+      const updated = backgroundManager.getTask(task.id)
+      if (!updated) {
+        throw new Error("Task disappeared")
+      }
+      if (updated.status === "completed") {
+        return await getTaskOutputText(ctx.client, updated.sessionId || "", ctx.directory)
+      }
+      if (updated.status === "error" || updated.status === "cancelled" || updated.status === "interrupt") {
+        throw new Error(`Task failed with status: ${updated.status}. Error: ${updated.error}`)
+      }
+      await new Promise((resolve) => setTimeout(resolve, intervalMs))
+    }
+    throw new Error("Classification task timed out")
+  }
+
+  return createProductionClassifyNote({ classify, cache })
+}
+
 export function buildIdleDrainDeps(
   ctx: PluginContext,
   config: CrossProjectMailboxConfig,
   registry: Pick<ProjectRegistry, "listProjects"> = createProjectRegistry(),
+  backgroundManager?: BackgroundManager,
 ): IdleDrainHookDeps {
   const repoRoot = ctx.directory
   const liveConfigResolver = createLiveMailboxConfigResolver(repoRoot, config)
@@ -101,6 +192,10 @@ export function buildIdleDrainDeps(
       })
   }
   refreshSnapshot()
+
+  const todoInjector = createTodoInjector({ client: ctx.client, directory: ctx.directory, log })
+  const classifyNote = buildClassifyNote(ctx, config, backgroundManager)
+  const emitTrace = createMailboxTraceEmit({ repoRoot })
 
   return {
     config,
@@ -132,6 +227,25 @@ export function buildIdleDrainDeps(
     buildTriagePrompt,
     dispatchInternalPrompt,
     getSessionMessages: (sessionId) => loadSessionMessageIds(ctx, sessionId),
+    classifyNote,
+    todoInjector,
+    emitTrace,
+    workerPrLaneDeps: { repoRoot },
+    workerPrWatchdogDeps: {
+      checkWorkerReplyExists: (messageId) => defaultCheckWorkerReplyExists(repoRoot, messageId),
+      log,
+      now: Date.now,
+      repoRoot,
+      sendFallbackReply: async (messageId, body) => {
+        log("[mailbox-worker-pr] fallback reply requested", { messageId, body })
+      },
+    },
+    interruptLaneDeps: {
+      client: ctx.client as IdleDrainHookDeps["client"],
+      directory: ctx.directory,
+      dispatchInternalPrompt,
+      injector: todoInjector,
+    },
   }
 }
 
@@ -182,13 +296,18 @@ export function createMailboxHooks(
   ctx: PluginContext,
   config: CrossProjectMailboxConfig | undefined,
   sharedModeDetector?: ModeDetector,
+  backgroundManager?: BackgroundManager,
 ): MailboxHooks {
   if (!config?.enabled) return { mailboxIdleDrain: null, mailboxPresenceHeartbeat: null }
-  const mailboxIdleDrain = createIdleDrainHook(buildIdleDrainDeps(ctx, config))
+  const idleDrainDeps = buildIdleDrainDeps(ctx, config, undefined, backgroundManager)
+  const mailboxIdleDrain = createIdleDrainHook(idleDrainDeps)
   const mailboxPresenceHeartbeat = buildPresenceHeartbeatHook(
     ctx,
     {
       onBeat: async (sessionId) => {
+        if (idleDrainDeps.workerPrWatchdogDeps !== undefined) {
+          await runWorkerPrWatchdogTick(idleDrainDeps.workerPrWatchdogDeps)
+        }
         await mailboxIdleDrain["session.idle"]({ sessionId })
       },
     },

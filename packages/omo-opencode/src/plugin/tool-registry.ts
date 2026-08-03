@@ -67,7 +67,7 @@ export function createToolRegistry(args: {
     ...createMonitorToolsRecord({ pluginConfig, ctx, managers, factories }),
     ...createTaskToolsRecord({ taskSystemEnabled, pluginConfig, ctx, factories }),
     ...createHashlineToolsRecord({ pluginConfig, ctx, factories }),
-    ...createMailboxToolsRecord({ pluginConfig, ctx, factories, modeDetector: mailboxModeDetector }),
+    ...createMailboxToolsRecord({ pluginConfig, ctx, factories, modeDetector: mailboxModeDetector, backgroundManager: managers.backgroundManager }),
   }
 
   const allToolNames = Object.keys(allTools)

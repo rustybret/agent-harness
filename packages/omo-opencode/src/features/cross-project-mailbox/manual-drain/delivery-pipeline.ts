@@ -7,6 +7,7 @@ export interface MailboxStorePort {
   reclaimStale(sessionMessageIds: Set<string>): Promise<void>
   drainUnread(maxNotes: number): Promise<UnreadMessage[]>
   reserve(messageId: string): Promise<string | undefined>
+  ack(messageId: string): Promise<void>
   unreserve(messageId: string): Promise<void>
   quarantine(messageId: string, reason: QuarantineReason, detail?: string): Promise<void>
   markDispatched(entry: Omit<PendingEntry, "state">): Promise<void>

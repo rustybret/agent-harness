@@ -180,6 +180,42 @@ describe("project_mailbox_drain", () => {
     })
   })
 
+  describe("#given a valid unread note with requested_mode", () => {
+    it("#then reports requested and effective route guidance in the drain output", async () => {
+      // given
+      const env = await createToolEnv({
+        senders: { ["pending"]: { access: "allow", intent_budget: "plan" } },
+      })
+      const config = CrossProjectMailboxConfigSchema.parse({
+        ...env.config,
+        senders: { [env.senderProjectId]: { access: "allow", intent_budget: "plan" } },
+      })
+      const envelope = env.makeEnvelope({ requested_mode: "worker-pr", intent: "impl" })
+      await env.writeNote(envelope, "build a PR")
+      const toolDef = createProjectMailboxDrainTool({ ...toolDeps({ ...env, config }), config })
+
+      // when
+      const result = JSON.parse((await toolDef.execute({}, { sessionID: "ses_manual" })) as string) as {
+        drained: Array<{
+          requestedMode?: string
+          effectiveMode?: string
+          routeLane?: string
+          guidance?: string
+        }>
+      }
+
+      // then
+      expect(result.drained).toMatchObject([
+        {
+          requestedMode: "worker-pr",
+          effectiveMode: "worker-pr",
+          routeLane: "worker-pr-local",
+          guidance: "routed to worker-pr-local lane",
+        },
+      ])
+    })
+  })
+
   describe("#given the same-pair rate limiter blocks delivery", () => {
     it("#then leaves the note unread and does not quarantine it", async () => {
       // given
