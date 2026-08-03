@@ -201,6 +201,19 @@ async function completeRouteExecution(input: {
       })
     case "fallback-next-drain":
       input.fallbackIds.add(input.note.messageId)
+      await rollbackReservedDelivery({
+        store: input.store,
+        digestStore: input.digestStore,
+        note: input.note,
+        logPrefix: "[mailbox-idle-drain] lane deferred to next drain",
+      })
+      input.deps.emitTrace?.({
+        phase: "rolled-back",
+        ...traceIdentity(input.note),
+        ...routeMetadata(input.note, input.decision),
+        detail: `fallback-next-drain:${input.result.reason}`,
+        at: Date.now(),
+      })
       return false
   }
 }
