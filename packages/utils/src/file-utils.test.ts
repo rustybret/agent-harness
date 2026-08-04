@@ -2,7 +2,14 @@ import { describe, it, expect, beforeAll, afterAll } from "bun:test"
 import { chmodSync, mkdirSync, writeFileSync, symlinkSync, rmSync, realpathSync } from "fs"
 import { join } from "path"
 import { tmpdir } from "os"
-import { fileExists, fileExistsStrict, resolveSymlink, resolveSymlinkAsync, isSymbolicLink } from "./file-utils"
+import {
+	fileExists,
+	fileExistsStrict,
+	isMissingPathError,
+	isSymbolicLink,
+	resolveSymlink,
+	resolveSymlinkAsync,
+} from "./file-utils"
 
 const testDir = join(tmpdir(), "file-utils-test-" + Date.now())
 const supportsPosixChmodPermissions = process.platform !== "win32"
@@ -150,6 +157,52 @@ describe("fileExists", () => {
 		} finally {
 			chmodSync(lockedDir, 0o755)
 		}
+	})
+})
+
+describe("isMissingPathError", () => {
+	it("#given an ENOENT error #when classifying it #then it reports a missing path", () => {
+		// given
+		const error = Object.assign(new Error("no such file"), { code: "ENOENT" })
+
+		// when
+		const result = isMissingPathError(error)
+
+		// then
+		expect(result).toBe(true)
+	})
+
+	it("#given an ENOTDIR error #when classifying it #then it reports a missing path", () => {
+		// given a parent component that is a file makes the whole path unreachable, same as absent
+		const error = Object.assign(new Error("not a directory"), { code: "ENOTDIR" })
+
+		// when
+		const result = isMissingPathError(error)
+
+		// then
+		expect(result).toBe(true)
+	})
+
+	it("#given a permission error #when classifying it #then it is not treated as a missing path", () => {
+		// given a real fault callers must still surface
+		const error = Object.assign(new Error("permission denied"), { code: "EACCES" })
+
+		// when
+		const result = isMissingPathError(error)
+
+		// then
+		expect(result).toBe(false)
+	})
+
+	it("#given a non-errno value #when classifying it #then it is not treated as a missing path", () => {
+		// given
+		const values = [new Error("plain"), "ENOENT", null, undefined, 42]
+
+		// when
+		const results = values.map(isMissingPathError)
+
+		// then
+		expect(results).toEqual([false, false, false, false, false])
 	})
 })
 

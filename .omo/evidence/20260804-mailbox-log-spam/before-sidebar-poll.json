@@ -1,0 +1,14 @@
+{
+  "senders": 3,
+  "polls": 10,
+  "steadyStateLogLines": 40,
+  "steadyStateByMessage": {
+    "mailbox sidebar readdir failed": 30,
+    "mailbox sidebar outbox tail read failed": 10
+  },
+  "realFaultLogLines": 5,
+  "realFaultByMessage": {
+    "mailbox sidebar readdir failed": 4,
+    "mailbox sidebar outbox tail read failed": 1
+  }
+}

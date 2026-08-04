@@ -3,6 +3,8 @@ import { closeSync, existsSync, openSync, readSync, statSync } from "node:fs"
 import { readdir } from "node:fs/promises"
 import path from "node:path"
 
+import { isMissingPathError } from "@oh-my-opencode/utils"
+
 import { log } from "../../../shared/logger"
 import type { CrossProjectMailboxConfig } from "../config"
 import { hasValidEnvelopeFrontmatter } from "../envelope/schema"
@@ -49,7 +51,12 @@ export interface MailboxSidebarState {
 export interface MailboxSidebarDeps {
   presenceCache?: PresenceCache
   projectEntries?: readonly ProjectEntry[]
+  // Injected so tests can observe what the sidebar would report without reaching through the shared
+  // logger singleton, which other test files replace wholesale via mock.module.
+  reportError?: ErrorReporter
 }
+
+type ErrorReporter = (message: string, data?: unknown) => void
 
 export function allowedSenderIds(config: CrossProjectMailboxConfig): string[] {
   const senders = config.senders ?? {}
@@ -66,17 +73,18 @@ export async function readMailboxSidebarState(
 ): Promise<MailboxSidebarState | null> {
   if (!config.enabled) return null
 
-  const senderDirs = await readSenderDirs(repoRoot)
+  const report = deps?.reportError ?? log
+  const senderDirs = await readSenderDirs(repoRoot, report)
   let inboundUnread = 0
   let inboundProcessed = 0
   for (const sender of senderDirs) {
     const senderPath = path.join(repoRoot, "coordination_notes", sender)
-    inboundUnread += await countNotes(senderPath)
-    inboundProcessed += await countNotes(path.join(senderPath, "processed"))
+    inboundUnread += await countNotes(senderPath, report)
+    inboundProcessed += await countNotes(path.join(senderPath, "processed"), report)
   }
 
-  const { recentSent, recentSentCount } = await readRecentSent(repoRoot)
-  const ack = resolveOutboundAck(repoRoot, recentSent, registry)
+  const { recentSent, recentSentCount } = await readRecentSent(repoRoot, report)
+  const ack = resolveOutboundAck(repoRoot, recentSent, registry, report)
   const projects = await readProjectPresenceRows(config, registry.listProjects?.bind(registry), deps)
 
   return {
@@ -91,38 +99,42 @@ export async function readMailboxSidebarState(
   }
 }
 
-async function readSenderDirs(repoRoot: string): Promise<string[]> {
+async function readSenderDirs(repoRoot: string, report: ErrorReporter): Promise<string[]> {
   const notesRoot = path.join(repoRoot, "coordination_notes")
-  const entries = await readDirSafe(notesRoot)
+  const entries = await readDirSafe(notesRoot, report)
   return entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name)
 }
 
-async function countNotes(dir: string): Promise<number> {
-  const entries = await readDirSafe(dir)
-  return entries.filter((entry) => isNoteFile(path.join(dir, entry.name), entry)).length
+async function countNotes(dir: string, report: ErrorReporter): Promise<number> {
+  const entries = await readDirSafe(dir, report)
+  return entries.filter((entry) => isNoteFile(path.join(dir, entry.name), entry, report)).length
 }
 
 // Must agree with MailboxStore.listUnread(): a file only counts as a note if the delivery path would
 // actually hand it to an agent. Matching on the .md suffix alone let hand-authored legacy docs
 // sitting in coordination_notes/<sender>/ inflate inboundUnread even though they are never delivered.
-function isNoteFile(filePath: string, entry: Dirent): boolean {
+function isNoteFile(filePath: string, entry: Dirent, report: ErrorReporter): boolean {
   if (!entry.isFile()) return false
   if (!entry.name.endsWith(NOTE_SUFFIX)) return false
   if (entry.name.startsWith(RESERVED_PREFIX)) return false
   if (entry.name.startsWith(".")) return false
-  return hasValidEnvelopeFrontmatter(readFirstBytes(filePath, NOTE_HEAD_BYTES))
+  return hasValidEnvelopeFrontmatter(readFirstBytes(filePath, NOTE_HEAD_BYTES, report))
 }
 
-async function readDirSafe(dir: string): Promise<Dirent[]> {
+// The sidebar polls every second across every registered project, and most of those directories are
+// created lazily on first delivery. Treating "not there yet" as a failure logged one line per
+// missing directory per poll, which grew to roughly half of the plugin log and evicted real
+// diagnostics through rotation. Absence is an expected empty result; only real faults are logged.
+async function readDirSafe(dir: string, report: ErrorReporter): Promise<Dirent[]> {
   try {
     return await readdir(dir, { withFileTypes: true })
   } catch (error) {
-    log("mailbox sidebar readdir failed", { error, dir })
+    if (!isMissingPathError(error)) report("mailbox sidebar readdir failed", { error, dir })
     return []
   }
 }
 
-function readFirstBytes(filePath: string, maxBytes: number): string {
+function readFirstBytes(filePath: string, maxBytes: number, report: ErrorReporter): string {
   let fd: number | null = null
   try {
     fd = openSync(filePath, "r")
@@ -130,14 +142,14 @@ function readFirstBytes(filePath: string, maxBytes: number): string {
     const bytesRead = readSync(fd, buf, 0, maxBytes, 0)
     return buf.toString("utf8", 0, bytesRead)
   } catch (error) {
-    log("mailbox sidebar note head read failed", { error, filePath })
+    if (!isMissingPathError(error)) report("mailbox sidebar note head read failed", { error, filePath })
     return ""
   } finally {
     if (fd !== null) closeSync(fd)
   }
 }
 
-function readLastBytes(filePath: string, maxBytes: number): string {
+function readLastBytes(filePath: string, maxBytes: number, report: ErrorReporter): string {
   let fd: number | null = null
   try {
     const size = statSync(filePath).size
@@ -148,7 +160,7 @@ function readLastBytes(filePath: string, maxBytes: number): string {
     if (length > 0) readSync(fd, buf, 0, length, offset)
     return buf.toString("utf8")
   } catch (error) {
-    log("mailbox sidebar outbox tail read failed", { error, filePath })
+    if (!isMissingPathError(error)) report("mailbox sidebar outbox tail read failed", { error, filePath })
     return ""
   } finally {
     if (fd !== null) closeSync(fd)
@@ -157,8 +169,9 @@ function readLastBytes(filePath: string, maxBytes: number): string {
 
 async function readRecentSent(
   repoRoot: string,
+  report: ErrorReporter,
 ): Promise<{ recentSent: OutboxEntry[]; recentSentCount: number }> {
-  const raw = readLastBytes(outboxLogPath(repoRoot), OUTBOX_TAIL_BYTES)
+  const raw = readLastBytes(outboxLogPath(repoRoot), OUTBOX_TAIL_BYTES, report)
 
   const lines = raw
     .split("\n")
@@ -183,6 +196,7 @@ function resolveOutboundAck(
   repoRoot: string,
   windowedEntries: readonly OutboxEntry[],
   registry: MailboxSidebarRegistryPort,
+  report: ErrorReporter,
 ): OutboundAckCounts {
   const senderProjectId = projectIdForRoot(repoRoot)
   let outboundUnresolved = 0
@@ -195,7 +209,7 @@ function resolveOutboundAck(
       outboundUnresolved += 1
       continue
     }
-    const bucket = ackBucket(targetRepoRoot, senderProjectId, entry.messageId)
+    const bucket = ackBucket(targetRepoRoot, senderProjectId, entry.messageId, report)
     if (bucket === "processed") outboundRead += 1
     else if (bucket === "rejected") outboundFailed += 1
     else outboundUnresolved += 1
@@ -208,6 +222,7 @@ function ackBucket(
   targetRepoRoot: string,
   senderProjectId: string,
   messageId: string,
+  report: ErrorReporter,
 ): "processed" | "rejected" | null {
   const base = path.join(targetRepoRoot, "coordination_notes", senderProjectId)
   const fileName = `${messageId}${NOTE_SUFFIX}`
@@ -215,7 +230,7 @@ function ackBucket(
     if (existsSync(path.join(base, "processed", fileName))) return "processed"
     if (existsSync(path.join(base, "rejected", fileName))) return "rejected"
   } catch (error) {
-    log("mailbox sidebar ack stat failed", { error, messageId })
+    report("mailbox sidebar ack stat failed", { error, messageId })
   }
   return null
 }

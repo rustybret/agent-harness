@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto"
-import { mkdir, mkdtemp, writeFile } from "node:fs/promises"
+import { chmod, mkdir, mkdtemp, writeFile } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import path from "node:path"
 import { afterEach, describe, expect, it } from "bun:test"
@@ -125,6 +125,13 @@ async function writeTargetAck(
   await writeFile(path.join(dir, `${messageId}.md`), "acked\n", "utf8")
 }
 
+// Collects what the sidebar would report as an error for one read, via the injected reporter so the
+// assertion does not depend on the shared logger singleton other test files replace.
+function errorCollector(): { messages: string[]; reportError: (message: string) => void } {
+  const messages: string[] = []
+  return { messages, reportError: (message: string) => messages.push(message) }
+}
+
 describe("readMailboxSidebarState", () => {
   afterEach(async () => {
     const { rm } = await import("node:fs/promises")
@@ -132,6 +139,58 @@ describe("readMailboxSidebarState", () => {
       const root = createdRoots.pop()
       if (root !== undefined) await rm(root, { recursive: true, force: true })
     }
+  })
+
+  // The sidebar polls once a second per project and most of these directories are created lazily on
+  // first delivery, so logging their absence dominated the plugin log and evicted real diagnostics.
+  it("#given a repo with no coordination_notes or outbox yet #when reading sidebar state #then absent paths are not reported as failures", async () => {
+    // given
+    const root = await makeRepo()
+    const collector = errorCollector()
+
+    // when
+    await readMailboxSidebarState(root, enabledConfig(), emptyRegistry(), {
+      reportError: collector.reportError,
+    })
+
+    // then
+    expect(collector.messages).toEqual([])
+  })
+
+  it("#given a sender path that is a file rather than a directory #when reading sidebar state #then the read still yields no notes", async () => {
+    // given a non-directory where a sender dir is expected, the readdir fails with ENOTDIR
+    const root = await makeRepo()
+    await writeNote(root, "alpha", "msg-1.md")
+    await writeFile(path.join(root, "coordination_notes", "alpha", "processed"), "not a dir\n", "utf8")
+
+    // when
+    const result = await readMailboxSidebarState(root, enabledConfig(), emptyRegistry())
+
+    // then
+    expect(result?.inboundUnread).toBe(1)
+    expect(result?.inboundProcessed).toBe(0)
+  })
+
+  it("#given a coordination_notes dir that cannot be read #when reading sidebar state #then the real fault is still reported", async () => {
+    // given a directory with no read permission - a genuine fault, not an absent path
+    if (process.platform === "win32") return
+    const root = await makeRepo()
+    await writeNote(root, "alpha", "msg-1.md")
+    const senderDir = path.join(root, "coordination_notes", "alpha")
+    await chmod(senderDir, 0o000)
+    const collector = errorCollector()
+
+    // when
+    try {
+      await readMailboxSidebarState(root, enabledConfig(), emptyRegistry(), {
+        reportError: collector.reportError,
+      })
+    } finally {
+      await chmod(senderDir, 0o700)
+    }
+
+    // then
+    expect(collector.messages.filter((message) => message.includes("readdir failed")).length).toBeGreaterThan(0)
   })
 
   it("#given two unread and one processed note #when reading sidebar state #then it counts inbound unread and processed", async () => {

@@ -65,3 +65,15 @@ export async function resolveSymlinkAsync(filePath: string): Promise<string> {
 function isNodeErrorWithCode(error: unknown): error is NodeJS.ErrnoException {
 	return typeof error === "object" && error !== null && "code" in error
 }
+
+/**
+ * True when a filesystem error means "this path is not there" rather than "this path failed".
+ *
+ * Callers that poll optional paths use it to tell absence apart from a real fault (EACCES, EIO),
+ * so a directory that simply has not been created yet is treated as an empty result instead of
+ * being reported as a failure on every poll.
+ */
+export function isMissingPathError(error: unknown): boolean {
+	if (!isNodeErrorWithCode(error)) return false
+	return error.code === "ENOENT" || error.code === "ENOTDIR"
+}

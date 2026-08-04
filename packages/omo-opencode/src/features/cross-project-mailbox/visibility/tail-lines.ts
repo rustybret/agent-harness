@@ -1,5 +1,7 @@
 import { closeSync, openSync, readSync, statSync } from "node:fs"
 
+import { isMissingPathError } from "@oh-my-opencode/utils"
+
 import { log } from "../../../shared/logger"
 
 /**
@@ -24,7 +26,9 @@ export function readLastLines(filePath: string, maxBytes: number): string[] {
       .filter((line) => line.length > 0)
     return offset > 0 ? lines.slice(1) : lines
   } catch (error) {
-    log("mailbox outbox tail read failed", { error, filePath })
+    // An outbox that has never been written to is the normal state for a project that has not sent
+    // anything yet, not a read failure worth reporting on every poll.
+    if (!isMissingPathError(error)) log("mailbox outbox tail read failed", { error, filePath })
     return []
   } finally {
     if (fd !== null) closeSync(fd)

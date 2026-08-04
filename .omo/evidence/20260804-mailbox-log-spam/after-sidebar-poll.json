@@ -1,0 +1,10 @@
+{
+  "senders": 3,
+  "polls": 10,
+  "steadyStateLogLines": 0,
+  "steadyStateByMessage": {},
+  "realFaultLogLines": 2,
+  "realFaultByMessage": {
+    "mailbox sidebar readdir failed": 2
+  }
+}
