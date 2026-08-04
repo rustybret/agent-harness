@@ -30,6 +30,7 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P0-14 | A gated drain re-reported the same verdict every poll - 1593 lines/hr, ~80% of real-session output (regression from P1-2) | log mining | `1cc9fdf06` |
 | P1-5 | Context injector logged every synthetic turn (157/hr) and stayed silent on the one that actually held context back | log mining | `5b3b9250d` |
 | P0-15 | `bash` was not truncatable - a real `git log` returned 4.29MB (~1.07M tokens), larger than any context window | session-database mining | `c35d99ba8` |
+| P1-6 | `lsp_diagnostics` doubled the package path, reporting present files as missing - 39 cases across 14 sessions | hit live, then session-database mining | `813ab74fb` |
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real
@@ -50,9 +51,7 @@ response as a defect report rather than noise is what turned it into a fix.
 - **`task` outputs reached 674k chars** (7 calls over 200k). Subagent results are a summary the
   parent asked for rather than an unbounded dump, so capping them needs its own judgment about what
   to keep - not folded into the bash fix.
-- **39 `lsp_diagnostics` ENOENT errors from a doubled path** (`packages/omo-opencode/packages/omo-opencode/...`).
-  Hit live in this session. The path is resolved against a request cwd that is already inside the
-  package, so a package-relative path doubles. Not yet root-caused.
+
 - **552 `String(error)` occurrences remain**, mostly outside logging (message construction,
   user-facing text). Only the 17 sites that produced observed `[object Object]` log lines were
   converted. All 10 no-op `instanceof Error ? String(error) : String(error)` ternaries are gone.
