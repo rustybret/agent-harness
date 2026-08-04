@@ -26,6 +26,7 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P0-10 | Presence probes ran serially and uncached on every chat turn - 26s worst case on the chat path | log mining (238 timeout lines) | `7e1481b97` |
 | P0-11 | `normalizeSDKResponse` returned values contradicting the caller's declared type, crashing todo continuation in 24 sessions | log mining (`[event] hook execution failed`) | `73d28ce00` |
 | P0-12 | A busy peer was reported the same as a dead one - 267 real-session probe timeouts, all against servers that were alive | log mining (`[presence-reader] health probe failed`) | `a35eb1b4a` |
+| P0-13 | The drain gate read the agent a session STARTED with, not its current one - 30 of 40 replayed real sessions decided wrongly | log mining (4939 skips reporting subagents as primary) | `9cdf5dd74` |
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real
@@ -54,6 +55,10 @@ response as a defect report rather than noise is what turned it into a fix.
   entry will drop silently the same way P0-6 did. The registry test cannot detect a missing entry.
 
 ### Investigated and dropped
+- **`null` primary on 4418 drain skips.** Same conclusion as the earlier `primary: null` item: the
+  affected session ids exist in no database on this machine and the plugin log is machine-wide, so
+  they originate in other repos' opencode instances. P0-13 fixed the *wrong-agent* half of this
+  cluster, which is the part reproducible here.
 - **`primary: null` drain skips (654 lines).** The three affected session ids exist in NO database
   on this machine, and the plugin log is machine-wide (`$TMPDIR`), so these came from other repos'
   opencode instances rather than this harness. Also checked whether the resolver omitting
