@@ -1,5 +1,5 @@
 import { existsSync, statSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, isAbsolute, join, resolve, sep } from "node:path";
 import {
 	canonicalizeExistingOrNearestAncestor,
 	contextCwd,
@@ -66,9 +66,39 @@ export async function findWorkspaceRoot(
 	return dirname(abs);
 }
 
+/**
+ * Recovers a relative path that was written against a repository root while the request cwd sits in
+ * a subdirectory of it.
+ *
+ * In a monorepo the caller and the LSP process do not always agree on the base. A path such as
+ * `packages/pkg/src/x.ts` is how the file is named everywhere - commit messages, imports,
+ * documentation - but resolving it against a cwd of `<repo>/packages/pkg` produces
+ * `<repo>/packages/pkg/packages/pkg/src/x.ts`, which does not exist.
+ *
+ * The overlap is only trusted when the resulting file EXISTS and the naive resolution does not, so a
+ * genuinely missing file still reports its own path rather than a speculative one.
+ */
+function resolveOverlappingRelativePath(cwd: string, filePath: string): string | undefined {
+	if (isAbsolute(filePath)) return undefined;
+	const cwdSegments = cwd.split(sep).filter((segment) => segment.length > 0);
+	const fileSegments = filePath.split("/").filter((segment) => segment.length > 0);
+
+	const maxOverlap = Math.min(cwdSegments.length, fileSegments.length);
+	for (let overlap = maxOverlap; overlap > 0; overlap -= 1) {
+		const cwdTail = cwdSegments.slice(cwdSegments.length - overlap);
+		const fileHead = fileSegments.slice(0, overlap);
+		if (cwdTail.join("/") !== fileHead.join("/")) continue;
+
+		const candidate = resolve(cwd, fileSegments.slice(overlap).join("/"));
+		if (existsSync(candidate)) return candidate;
+	}
+	return undefined;
+}
+
 export function resolvePathInsideContext(filePath: string): string {
 	const cwd = contextCwd();
-	const abs = resolve(cwd, filePath);
+	const direct = resolve(cwd, filePath);
+	const abs = existsSync(direct) ? direct : (resolveOverlappingRelativePath(cwd, filePath) ?? direct);
 	const canonical = canonicalizeExistingOrNearestAncestor(abs);
 	if (!isPathInside(cwd, canonical)) {
 		throw new LspInvalidPathError(`LSP file path must be inside request cwd: ${filePath}`);

@@ -63,4 +63,52 @@ describe("LSP client path confinement", () => {
 			),
 		).toThrow(LspInvalidPathError);
 	});
+
+	it("#given a repo-relative path and a cwd inside that repo #when resolving #then shared segments are not duplicated", () => {
+		// given: a monorepo where the caller names files from the repo root while the LSP process runs
+		// inside the package - naive resolution yields <pkg>/packages/pkg/src/file.ts, which is absent
+		const repoRoot = tempRoot("lsp-client-wrapper-monorepo-");
+		const packageRoot = join(repoRoot, "packages", "pkg");
+		mkdirSync(join(packageRoot, "src"), { recursive: true });
+		writeFileSync(join(packageRoot, "src", "file.ts"), "export const value = 1;\n");
+
+		// when
+		const resolved = runWithRequestContext(createStandaloneMcpRequestContext({ cwd: packageRoot }), () =>
+			resolvePathInsideContext("packages/pkg/src/file.ts"),
+		);
+
+		// then
+		expect(resolved).toBe(join(realpathSync(packageRoot), "src", "file.ts"));
+	});
+
+	it("#given a path relative to the cwd itself #when resolving #then it still resolves directly", () => {
+		// given
+		const repoRoot = tempRoot("lsp-client-wrapper-direct-");
+		const packageRoot = join(repoRoot, "packages", "pkg");
+		mkdirSync(join(packageRoot, "src"), { recursive: true });
+		writeFileSync(join(packageRoot, "src", "file.ts"), "export const value = 1;\n");
+
+		// when
+		const resolved = runWithRequestContext(createStandaloneMcpRequestContext({ cwd: packageRoot }), () =>
+			resolvePathInsideContext("src/file.ts"),
+		);
+
+		// then
+		expect(resolved).toBe(join(realpathSync(packageRoot), "src", "file.ts"));
+	});
+
+	it("#given a missing file whose prefix overlaps the cwd #when resolving #then it reports the path as written", () => {
+		// given: overlap recovery must not invent a path for a file that simply does not exist
+		const repoRoot = tempRoot("lsp-client-wrapper-missing-");
+		const packageRoot = join(repoRoot, "packages", "pkg");
+		mkdirSync(packageRoot, { recursive: true });
+
+		// when
+		const resolved = runWithRequestContext(createStandaloneMcpRequestContext({ cwd: packageRoot }), () =>
+			resolvePathInsideContext("packages/pkg/src/nope.ts"),
+		);
+
+		// then
+		expect(resolved).toBe(join(realpathSync(packageRoot), "packages", "pkg", "src", "nope.ts"));
+	});
 });

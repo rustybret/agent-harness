@@ -1,0 +1,19 @@
+{
+  "recordedFailures": 36,
+  "resolvedCorrectly": 36,
+  "notResolved": 0,
+  "samples": [
+    {
+      "input": "packages/omo-opencode/src/features/cross-project-mailbox/dia",
+      "outcome": "resolved"
+    },
+    {
+      "input": "packages/omo-opencode/src/features/cross-project-mailbox/dia",
+      "outcome": "resolved"
+    },
+    {
+      "input": "packages/omo-opencode/src/features/cross-project-mailbox/dia",
+      "outcome": "resolved"
+    }
+  ]
+}
