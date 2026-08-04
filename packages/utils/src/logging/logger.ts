@@ -2,6 +2,8 @@ import * as fs from "fs"
 import * as os from "os"
 import * as path from "path"
 
+import { serializeLogData } from "./serialize-log-data"
+
 export const DEFAULT_MAX_LOG_FILE_SIZE_BYTES = 50 * 1024 * 1024
 export const DEFAULT_MAX_LOG_FILE_BACKUPS = 2
 export const DEFAULT_LOG_FLUSH_INTERVAL_MS = 500
@@ -103,7 +105,11 @@ export function createLogger(options: LoggerOptions): BoundLogger {
 
     try {
       const timestamp = new Date().toISOString()
-      const logEntry = `[${timestamp}] ${message} ${data ? JSON.stringify(data) : ""}\n`
+      // A payload that cannot be serialized yields undefined, and the line is skipped rather than
+      // written half-formed.
+      const serialized = data ? serializeLogData(data) : ""
+      if (serialized === undefined) return
+      const logEntry = `[${timestamp}] ${message} ${serialized}\n`
       buffer.push(logEntry)
       if (buffer.length >= bufferSizeLimit) {
         flush()

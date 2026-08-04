@@ -1,0 +1,44 @@
+{
+  "linesWritten": 4,
+  "report": [
+    {
+      "label": "tui-sidebar mirror flush failed",
+      "empty": false,
+      "message": "ENOSPC: no space left on device, write",
+      "code": null,
+      "causeMessage": null,
+      "aggregated": null,
+      "stackFrames": 2
+    },
+    {
+      "label": "wrapped cause",
+      "empty": false,
+      "message": "flush failed",
+      "code": null,
+      "causeMessage": "disk full",
+      "aggregated": null,
+      "stackFrames": 2
+    },
+    {
+      "label": "errno error",
+      "empty": false,
+      "message": "permission denied",
+      "code": "EACCES",
+      "causeMessage": null,
+      "aggregated": null,
+      "stackFrames": 2
+    },
+    {
+      "label": "aggregate",
+      "empty": false,
+      "message": "all attempts failed",
+      "code": null,
+      "causeMessage": null,
+      "aggregated": [
+        "first",
+        "second"
+      ],
+      "stackFrames": 2
+    }
+  ]
+}

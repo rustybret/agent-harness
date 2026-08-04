@@ -1,0 +1,41 @@
+{
+  "linesWritten": 4,
+  "report": [
+    {
+      "label": "tui-sidebar mirror flush failed",
+      "empty": true,
+      "message": null,
+      "code": null,
+      "causeMessage": null,
+      "aggregated": null,
+      "stackFrames": 0
+    },
+    {
+      "label": "wrapped cause",
+      "empty": true,
+      "message": null,
+      "code": null,
+      "causeMessage": null,
+      "aggregated": null,
+      "stackFrames": 0
+    },
+    {
+      "label": "errno error",
+      "empty": false,
+      "message": null,
+      "code": "EACCES",
+      "causeMessage": null,
+      "aggregated": null,
+      "stackFrames": 0
+    },
+    {
+      "label": "aggregate",
+      "empty": true,
+      "message": null,
+      "code": null,
+      "causeMessage": null,
+      "aggregated": null,
+      "stackFrames": 0
+    }
+  ]
+}

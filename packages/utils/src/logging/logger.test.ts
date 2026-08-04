@@ -40,6 +40,18 @@ describe("#given a bound utils logger", () => {
     expect(fs.existsSync(logFilePath)).toBe(false)
   })
 
+  test("#when an Error is logged #then the written line carries its message rather than an empty object", () => {
+    const logger = createLogger({ logFileName: "unused.log", resolveLogFilePath: () => logFilePath })
+
+    logger.log("READ-FAILED", { error: Object.assign(new Error("permission denied"), { code: "EACCES" }) })
+    logger._flushForTesting()
+
+    const written = fs.readFileSync(logFilePath, "utf8")
+    expect(written).toContain('"message":"permission denied"')
+    expect(written).toContain('"code":"EACCES"')
+    expect(written).not.toContain('"error":{}')
+  })
+
   test("#when a sink override is installed #then log calls are captured and nothing reaches the log file", () => {
     const logger = createLogger({ logFileName: "unused.log", resolveLogFilePath: () => logFilePath })
     const captured: Array<{ message: string; data?: unknown }> = []
