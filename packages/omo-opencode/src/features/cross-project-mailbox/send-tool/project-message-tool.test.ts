@@ -1,11 +1,12 @@
 import { randomUUID } from "node:crypto"
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises"
+import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises"
 import os from "node:os"
 import path from "node:path"
 
 import { afterEach, beforeEach, describe, expect, it } from "bun:test"
 
 import { CrossProjectMailboxConfigSchema, type CrossProjectMailboxConfig } from "../config"
+import { projectIdForRoot } from "../envelope/project-id"
 import { type MailboxMessage, serializeEnvelope } from "../envelope/schema"
 import type { PresenceStatus } from "../presence"
 import type { ProjectEntry } from "../registry/types"
@@ -1142,5 +1143,92 @@ describe("runProjectMessageSend - write-failed trace", () => {
     expect(typeof writeFailed[0]?.["correlationId"]).toBe("string")
     expect(writeFailed[0]?.["detail"]).toBe("disk full")
     expect(records.some((r) => r["phase"] === "sent")).toBe(false)
+  })
+})
+
+describe("project_message mode=status", () => {
+  it("reports a send the target quarantined, with the receiver's recorded reason", async () => {
+    // given a delivered-then-rejected note: the outbox records the send, the target quarantines it
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const def = createProjectMessageTool(realDeps(cfg()))
+    const sent = JSON.parse(
+      (await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "hello" }, {})) as string,
+    ) as { messageId: string }
+
+    const senderProjectId = projectIdForRoot(thisRepoRoot)
+    const rejectedDir = path.join(targetBRoot, "coordination_notes", senderProjectId, "rejected")
+    await mkdir(rejectedDir, { recursive: true })
+    await writeFile(path.join(rejectedDir, `${sent.messageId}.md`), "quarantined\n")
+    await writeFile(
+      path.join(rejectedDir, `${sent.messageId}.reason.json`),
+      JSON.stringify({ reason: "over-budget", detail: "intent above ceiling" }),
+    )
+
+    // when
+    const parsed = JSON.parse((await def.execute({ mode: "status" }, {})) as string) as {
+      mode: string
+      summary: { rejected: number }
+      needsAttention: { messageId: string; outcome: string; rejectionReason?: string }[]
+    }
+
+    // then
+    expect(parsed.mode).toBe("status")
+    expect(parsed.summary.rejected).toBe(1)
+    expect(parsed.needsAttention[0]?.messageId).toBe(sent.messageId)
+    expect(parsed.needsAttention[0]?.outcome).toBe("rejected")
+    expect(parsed.needsAttention[0]?.rejectionReason).toBe("over-budget")
+  })
+
+  it("reports a just-sent unacknowledged note as pending, not stale", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const def = createProjectMessageTool(realDeps(cfg()))
+    await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "hello" }, {})
+
+    // when
+    const parsed = JSON.parse((await def.execute({ mode: "status" }, {})) as string) as {
+      summary: { pending: number; stale: number }
+      needsAttention: unknown[]
+    }
+
+    // then
+    expect(parsed.summary.pending).toBe(1)
+    expect(parsed.summary.stale).toBe(0)
+    expect(parsed.needsAttention).toHaveLength(0)
+  })
+
+  it("ages an unacknowledged note into stale once staleAfterHours is exceeded", async () => {
+    // given a note sent 6 hours ago and never acknowledged
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const def = createProjectMessageTool(realDeps(cfg()))
+    await def.execute({ targetProjectId: "proj-b", intent: "quick", body: "hello" }, {})
+    const logPath = path.join(thisRepoRoot, ".omo", "mailbox-outbox.jsonl")
+    const aged = JSON.parse((await readFile(logPath, "utf8")).trim()) as Record<string, unknown>
+    aged["sentAt"] = Date.now() - 6 * 3_600_000
+    await writeFile(logPath, `${JSON.stringify(aged)}\n`)
+
+    // when
+    const parsed = JSON.parse((await def.execute({ mode: "status", staleAfterHours: 4 }, {})) as string) as {
+      summary: { stale: number }
+      needsAttention: { outcome: string }[]
+    }
+
+    // then
+    expect(parsed.summary.stale).toBe(1)
+    expect(parsed.needsAttention[0]?.outcome).toBe("stale")
+  })
+
+  it("does not send or write a note when invoked in status mode", async () => {
+    // given
+    await writeProjectMailboxConfig({ enabled: true, senders: PERMISSIVE_SENDERS })
+    const def = createProjectMessageTool(realDeps(cfg()))
+
+    // when
+    await def.execute({ mode: "status" }, {})
+
+    // then no inbox note and no outbox line were produced
+    const inbox = path.join(targetBRoot, "coordination_notes", projectIdForRoot(thisRepoRoot))
+    await expect(readFile(path.join(thisRepoRoot, ".omo", "mailbox-outbox.jsonl"), "utf8")).rejects.toThrow()
+    await expect(readdir(inbox)).rejects.toThrow()
   })
 })

@@ -9,7 +9,12 @@ import type { ProjectEntry } from "../registry/types"
 import type { MailboxTraceSink } from "../trace"
 import { defaultWriteNote, maybeLaunchOfflineTarget } from "./offline-launch"
 import { emitSendBlockedNoEnvelope, emitSendEnvelopeTrace, type SendTraceContext } from "./send-trace"
-import { readOutboundBudget } from "../visibility"
+import { readDeliveryStatus, readOutboundBudget } from "../visibility"
+import type {
+  DeliveryStatusRegistryPort,
+  DeliveryStatusReport,
+  ReadDeliveryStatusOptions,
+} from "../visibility"
 import { buildSendEnvelope, type SendInput } from "./envelope-builder"
 import { appendOutboxLog } from "./outbox-log"
 import { type PreflightReason, runSendPreflight } from "./send-preflight"
@@ -21,7 +26,7 @@ export const IntentEnumSchema = z.enum(MAILBOX_INTENTS)
 export function createProjectMessageInputSchema(maxBodyBytes: number) {
   return z
     .object({
-      mode: z.enum(["send", "list"]).default("send"),
+      mode: z.enum(["send", "list", "status"]).default("send"),
       targetProjectId: z.string(),
       intent: IntentEnumSchema,
       category: z.string().optional(),
@@ -60,6 +65,8 @@ export interface ProjectMessageToolDeps {
   liveConfigResolver?: { resolve: () => Promise<CrossProjectMailboxConfig> }
   triggerInterruptDrainNow?: (targetRepoRoot: string) => Promise<InterruptDrainNowResult>
   traceSink?: MailboxTraceSink
+  /** Resolves a target's repo root so mode=status can read that target's acknowledgement dirs. */
+  deliveryStatusRegistry?: DeliveryStatusRegistryPort
 }
 
 export type SendResult =
@@ -183,6 +190,27 @@ export async function runProjectMessageList(deps: ProjectMessageToolDeps): Promi
   }
 }
 
+/**
+ * Answers "did my notes land?" for the sender. A hard reject quarantines the note on the receiver
+ * side and writes nothing back, so without this a dropped note is indistinguishable from one still
+ * waiting for the target to idle.
+ */
+export async function runProjectMessageStatus(
+  deps: ProjectMessageToolDeps,
+  options: ReadDeliveryStatusOptions = {},
+): Promise<DeliveryStatusReport & { mode: "status" }> {
+  const registry = deps.deliveryStatusRegistry ?? (await registrySnapshot(deps))
+  return { mode: "status", ...readDeliveryStatus(deps.thisRepoRoot, registry, options) }
+}
+
+// The project registry is async while the status read is a synchronous filesystem walk, so the
+// project list is snapshotted once up front rather than awaited per outbox entry.
+async function registrySnapshot(deps: ProjectMessageToolDeps): Promise<DeliveryStatusRegistryPort> {
+  const projects = await deps.registry.listProjects().catch(() => [])
+  const rootById = new Map(projects.map((entry) => [entry.projectId, entry.repoRoot]))
+  return { getRepoRootForProjectId: (id) => rootById.get(id) }
+}
+
 async function resolveFreshSendConfig(deps: ProjectMessageToolDeps): Promise<CrossProjectMailboxConfig> {
   if (deps.liveConfigResolver) {
     return deps.liveConfigResolver.resolve()
@@ -201,10 +229,17 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
       "Send a note to another registered project's agent session. Works from both internal (TUI) and external (served) sessions; supersedes the deprecated project_note tool.",
     args: {
       mode: tool.schema
-        .enum(["send", "list"])
+        .enum(["send", "list", "status"])
         .optional()
         .default("send")
-        .describe("send delivers the note; list returns the ADVISORY outbound-budget table without sending"),
+        .describe(
+          "send delivers the note; list returns the ADVISORY outbound-budget table without sending; " +
+            "status reports whether recent sends were processed, rejected (with the receiver's reason), or are still undelivered",
+        ),
+      staleAfterHours: tool.schema
+        .number()
+        .optional()
+        .describe("mode=status only: hours without acknowledgement before a send counts as stale (default 4)"),
       targetProjectId: tool.schema.string().optional().describe("Registered projectId or display name of the destination project (required for mode=send)"),
       intent: tool.schema.enum(MAILBOX_INTENTS).optional().describe("Intent tier of this note (required for mode=send)"),
       category: tool.schema.string().optional().describe("Optional task category; when set it gates the note in place of intent"),
@@ -224,6 +259,16 @@ export function createProjectMessageTool(deps: ProjectMessageToolDeps): ToolDefi
       if (rawArgs.mode === "list") {
         const listResult = await runProjectMessageList({ ...deps, config: freshConfig })
         return JSON.stringify(listResult)
+      }
+
+      if (rawArgs.mode === "status") {
+        const staleAfterHours = typeof rawArgs.staleAfterHours === "number" ? rawArgs.staleAfterHours : undefined
+        return JSON.stringify(
+          await runProjectMessageStatus(
+            { ...deps, config: freshConfig },
+            staleAfterHours === undefined ? {} : { staleAfterHours },
+          ),
+        )
       }
 
       const effectiveBodyCap = Math.min(freshConfig.bounds.max_body_bytes, MAX_BODY_BYTES)

@@ -1,0 +1,9 @@
+{
+  "note": "everything the sender could observe about the rejected note before mode=status",
+  "outboundRead": 0,
+  "outboundFailed": 1,
+  "outboundUnresolved": 0,
+  "rejectionReasonAvailable": false,
+  "ageAvailable": false,
+  "messageIdAvailable": false
+}

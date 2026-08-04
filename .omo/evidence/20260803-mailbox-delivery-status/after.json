@@ -1,0 +1,36 @@
+{
+  "sentOk": true,
+  "messageId": "daa44688-93fb-4aba-9e4a-06484e738d85",
+  "beforeReject": {
+    "summary": {
+      "processed": 0,
+      "rejected": 0,
+      "pending": 1,
+      "stale": 0,
+      "unresolvedTarget": 0
+    },
+    "needsAttention": []
+  },
+  "afterReject": {
+    "summary": {
+      "processed": 0,
+      "rejected": 1,
+      "pending": 0,
+      "stale": 0,
+      "unresolvedTarget": 0
+    },
+    "needsAttention": [
+      {
+        "messageId": "daa44688-93fb-4aba-9e4a-06484e738d85",
+        "toProjectId": "omo-qa-status-target-rflwrs-ed4dd1fe",
+        "intent": "question",
+        "sentAt": 1785801301426,
+        "ageHours": 0,
+        "bodyPreview": "does this land?",
+        "outcome": "rejected",
+        "rejectionReason": "over-budget",
+        "rejectionDetail": "intent question above ceiling for this sender"
+      }
+    ]
+  }
+}

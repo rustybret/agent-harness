@@ -131,7 +131,8 @@ This tool is used in external sessions to send asynchronous, presence-aware coor
     "targetProjectId": "abc12345", // Target project to send note to
     "intent": "impl", // "question" | "impl" | "plan" (optional if category is provided)
     "category": "quick", // Optional category to route the task
-    "mode": "list", // Optional mode: "list" for budget probe, or omit for normal message delivery
+    "mode": "list", // Optional mode: "list" for budget probe, "status" for delivery status, or omit for normal message delivery
+    "staleAfterHours": 4, // mode="status" only: hours without acknowledgement before a send counts as stale (default 4)
     "requested_mode": "subagent", // Optional advisory delivery mode: "answer" | "todo-append" | "todo-next" | "subagent" | "worker-pr" | "interrupt". See Requested Delivery Modes.
     "body": "Markdown text describing the task or coordination request.",
     "priority": 0, // Higher numbers are drained first
@@ -147,6 +148,24 @@ This tool is used in external sessions to send asynchronous, presence-aware coor
 `project_message` sends from both internal (plain TUI) and external (served) sessions. Internal sessions have no reachable HTTP port, so a live handoff is not attempted; the note is written to the target's `coordination_notes/` directory and drains on the receiver's next idle sweep. External sessions additionally probe target presence and may launch the target per `launch_policy`.
 
 Calling `project_message` with `mode: "list"` (advisory outbound-budget read) is allowed in both modes.
+
+##### Checking Whether Notes Landed (`mode: "status"`)
+
+A hard reject quarantines the note entirely on the receiver side (`coordination_notes/<sender>/rejected/<id>.md` plus an `<id>.reason.json` recording the reason and detail) and writes nothing back toward the sender. Without a status read, a rejected note looks identical to one still waiting for the target to idle.
+
+`mode: "status"` is a read-only report over the sender's own outbox log, resolving each recent send against the target's acknowledgement directories:
+
+| Outcome | Meaning |
+| --- | --- |
+| `processed` | The target drained and acknowledged the note. |
+| `rejected` | The target quarantined it. `rejectionReason` and `rejectionDetail` carry the receiver's own recorded reason (for example `unauthorized`, `over-budget`, `hop-exceeded`, `duplicate-loop`). |
+| `pending` | Sent, not yet acknowledged, still inside the wait window. |
+| `stale` | Sent, not yet acknowledged, older than `staleAfterHours`. |
+| `unresolved-target` | The target's repo root is not resolvable from this machine, so no outcome can be determined. |
+
+The response carries a `summary` count per outcome, a `needsAttention` list (rejected, stale, and unresolved-target rows only, newest first), and the full `rows` window. Rate-limited notes are *not* reported as rejected: the receiver unreserves rather than quarantining them, so they remain deliverable and stay `pending`/`stale`.
+
+This mode never sends, never writes a note, and never appends to the outbox log.
 
 #### The `project_note` Tool (deprecated)
 

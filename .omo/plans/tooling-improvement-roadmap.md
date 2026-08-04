@@ -50,7 +50,7 @@ the remainder and pick again. Items are only added here when a real session prod
 
 ## P1 — trust gaps
 
-### 2. No sender-side delivery-failure feedback
+### 3. No sender-side delivery-failure feedback — DONE
 
 - **Source:** cloudhome `25406036-…`, explicitly bumped to top in `621af36b-…` ("the one that
   actually erodes trust in the channel — we've had real 'did this ever land' uncertainty with ORW
@@ -63,10 +63,16 @@ the remainder and pick again. Items are only added here when a real session prod
   `outboundFailed` from `coordination_notes/<sender>/{processed,rejected}/` markers, and
   `.omo/mailbox-outbox.jsonl` already records every send with `sentAt`. An age-based
   "unresolved for > N hours" read is mostly assembly, not new plumbing.
-- **Open question:** does a hard reject currently write a `rejected/` marker in every path, or do some
-  rejects drop the note with no artifact? Needs verification before designing the receipt.
+- **Answered:** every hard reject goes through `MailboxStore.quarantine()`, which moves the note to
+  `rejected/<id>.md` AND writes `<id>.reason.json` with the reason and detail. The artifact always
+  exists — it was just never readable from the sender side. Rate-limiting is the one exception: it
+  unreserves rather than quarantining, so it stays visible as `pending`/`stale` rather than as a
+  rejection, which is the honest reading since the note is still deliverable.
+- **Fix:** `project_message mode=status` reads the sender's outbox log, resolves each entry against
+  the target's acknowledgement dirs, and reports processed / rejected (with the receiver's reason) /
+  pending / stale (`staleAfterHours`, default 4) / unresolved-target. Read-only.
 
-### 3. Auto-drain silently no-ops when primary agent is not intake-eligible
+### 4. Auto-drain silently no-ops when primary agent is not intake-eligible
 
 - **Source:** cloudhome `25406036-…` (explains their "manual drain finds notes auto-drain skipped").
 - **Observed:** `shouldSkipDrain()` returns without draining and without any log/user-visible signal
@@ -77,7 +83,7 @@ the remainder and pick again. Items are only added here when a real session prod
 
 ## P2 — feature gaps with stand-ins
 
-### 4. Cross-batch supersession
+### 5. Cross-batch supersession
 
 - **Source:** art3d-pipeline `3cf4fe37-650a-4c9d-839e-3eb6032f20c6`, and cloudhome independently.
 - **Observed:** `supersedes` only dedupes within a single drain batch. A correction sent after the
@@ -85,14 +91,14 @@ the remainder and pick again. Items are only added here when a real session prod
 - **Stand-in:** `requested_mode: "interrupt"` queue-jumps and nudges a drain, which covers the urgent
   case but does not mark the superseded note as invalid.
 
-### 5. Per-message tier escalation
+### 6. Per-message tier escalation
 
 - **Source:** cloudhome `25406036-…`.
 - **Observed:** intent ceiling is fixed per sender in config; a sender cannot request a one-off
   escalation for a single message.
 - **Stand-in:** ask the receiving project to raise the grant, which is a config edit + restart.
 
-### 6. Structured `deliverable` field / notify-on-drain callback
+### 7. Structured `deliverable` field / notify-on-drain callback
 
 - **Source:** cloudhome `25406036-…`, art3d-pipeline `3cf4fe37-…`.
 - **Status:** cloudhome explicitly said in `621af36b-…` these are **fine staying unscheduled** —
@@ -102,7 +108,7 @@ the remainder and pick again. Items are only added here when a real session prod
 
 ## P3 — needs an explicit ask before building
 
-### 7. Restricted low-budget subagent tier (Gemma-class models)
+### 8. Restricted low-budget subagent tier (Gemma-class models)
 
 - **Source:** opencode-gemini `e2b93506-51f7-4d62-b39c-1d247da26980`.
 - **Ask:** a subagent category that fits a ~16k input-tokens/min free-tier budget.
@@ -120,3 +126,5 @@ the remainder and pick again. Items are only added here when a real session prod
   delivery path's definition of a note.
 - **P0-2** migrated `agents.*.models` silently dropped — canonical chain now unpacked before
   validation; preprocessed schemas no longer blind the unknown-key diagnostics.
+- **P1-3** sender-side delivery-failure feedback — `project_message mode=status` surfaces the
+  receiver's rejection reason and ages unacknowledged sends into `stale`.
