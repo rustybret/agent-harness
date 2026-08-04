@@ -32,6 +32,7 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P0-15 | `bash` was not truncatable - a real `git log` returned 4.29MB (~1.07M tokens), larger than any context window | session-database mining | `c35d99ba8` |
 | P1-6 | `lsp_diagnostics` doubled the package path, reporting present files as missing - 39 cases across 14 sessions | hit live, then session-database mining | `813ab74fb` |
 | P1-7 | `Tool not found` named no alternative - 89 failures across 63 distinct guessed names on one server | error-RATE mining (skill_mcp worst at 22.3%) | `385623c77` |
+| P1-8 | `not a participant of team X` blamed membership for a 2-character id typo - the caller was the team's lead | active-error mining (last 14d) | `5081b15cf` |
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real
