@@ -25,6 +25,7 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P0-9 | Reclaimed notes quarantined as duplicates of their own failed attempt - 18 of 38 real sends (47%) rejected | dogfooding P1-1 | `ecb8a51cc` |
 | P0-10 | Presence probes ran serially and uncached on every chat turn - 26s worst case on the chat path | log mining (238 timeout lines) | `7e1481b97` |
 | P0-11 | `normalizeSDKResponse` returned values contradicting the caller's declared type, crashing todo continuation in 24 sessions | log mining (`[event] hook execution failed`) | `73d28ce00` |
+| P0-12 | A busy peer was reported the same as a dead one - 267 real-session probe timeouts, all against servers that were alive | log mining (`[presence-reader] health probe failed`) | `a35eb1b4a` |
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real
