@@ -216,6 +216,30 @@ This read-only receive-side tool lists unread inbound notes across registered se
 }
 ```
 
+##### The `autoDrain` Field
+
+Alongside `pending`, the response carries `autoDrain`, reporting whether the automatic idle drain would deliver anything right now. Without it, pending notes are ambiguous: they look the same whether the receiver simply has not idled yet or intake is gated shut and they will never arrive on their own.
+
+```json
+{
+  "pending": [ /* … */ ],
+  "autoDrain": {
+    "enabled": false,
+    "reason": "primary-not-eligible",
+    "activePrimary": "prometheus",
+    "detail": "The active primary agent is 'prometheus', which is not in intake_eligible_agents (sisyphus). Switch to an eligible agent or drain manually with project_mailbox_drain."
+  }
+}
+```
+
+| `reason` | Meaning |
+| --- | --- |
+| `disabled` | `cross_project_mailbox.enabled` is false. |
+| `permissionless-config` | `default_sender_access` is `allow-none` and no entry in `senders` has `access: allow`, so every inbound note would be rejected. |
+| `primary-not-eligible` | The session's active primary agent is not in `intake_eligible_agents`, or no primary is recorded yet (intake fails closed). |
+
+This is evaluated by the same gate the idle-drain hook uses, so the reason reported here is the reason the drain actually applied. When the gate blocks an idle drain it also writes one `drain-skipped` record to `.omo/mailbox-trace.jsonl` carrying the reason and, for `primary-not-eligible`, a `waiting` count of how many notes are being held.
+
 #### The `project_mailbox_drain` Tool
 
 This receive-side tool explicitly consumes unread notes without waiting for `session.idle`. It applies the same inbound validation, same-pair rate limit, and duplicate-loop digest checks as the idle-drain hook, archives delivered notes under `processed/`, and returns each delivered envelope plus full body in the tool result. It is denied for Prometheus sessions; `project_mailbox_peek` remains available to every agent.

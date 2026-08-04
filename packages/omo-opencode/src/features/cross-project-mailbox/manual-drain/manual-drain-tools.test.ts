@@ -156,6 +156,68 @@ describe("project_mailbox_peek", () => {
       expect(result.pending).toEqual([])
     })
   })
+
+  describe("#given the active primary is eligible for intake", () => {
+    it("#then it reports automatic drain as enabled", async () => {
+      // given
+      const env = await createToolEnv()
+      const toolDef = createProjectMailboxPeekTool({
+        ...toolDeps(env),
+        resolveActivePrimaryAgent: () => "sisyphus",
+      })
+
+      // when
+      const result = JSON.parse((await toolDef.execute({}, { sessionID: "ses_1" })) as string) as {
+        autoDrain: { enabled: boolean; reason?: string }
+      }
+
+      // then
+      expect(result.autoDrain.enabled).toBe(true)
+      expect(result.autoDrain.reason).toBeUndefined()
+    })
+  })
+
+  describe("#given notes are pending but the active primary is not intake-eligible", () => {
+    it("#then it reports the notes AND why they will never drain on their own", async () => {
+      // given a note waiting behind an ineligible primary
+      const env = await createToolEnv()
+      await env.writeNote(env.makeEnvelope(), "stuck behind the gate")
+      const toolDef = createProjectMailboxPeekTool({
+        ...toolDeps(env),
+        resolveActivePrimaryAgent: () => "prometheus",
+      })
+
+      // when
+      const result = JSON.parse((await toolDef.execute({}, { sessionID: "ses_1" })) as string) as {
+        pending: unknown[]
+        autoDrain: { enabled: boolean; reason?: string; detail?: string; activePrimary?: string }
+      }
+
+      // then
+      expect(result.pending).toHaveLength(1)
+      expect(result.autoDrain.enabled).toBe(false)
+      expect(result.autoDrain.reason).toBe("primary-not-eligible")
+      expect(result.autoDrain.activePrimary).toBe("prometheus")
+      expect(result.autoDrain.detail).toContain("project_mailbox_drain")
+    })
+  })
+
+  describe("#given no resolver is wired in", () => {
+    it("#then it fails closed and reports intake as gated, matching the drain hook", async () => {
+      // given
+      const env = await createToolEnv()
+      const toolDef = createProjectMailboxPeekTool(toolDeps(env))
+
+      // when
+      const result = JSON.parse((await toolDef.execute({}, { sessionID: "ses_1" })) as string) as {
+        autoDrain: { enabled: boolean; reason?: string }
+      }
+
+      // then
+      expect(result.autoDrain.enabled).toBe(false)
+      expect(result.autoDrain.reason).toBe("primary-not-eligible")
+    })
+  })
 })
 
 describe("project_mailbox_drain", () => {

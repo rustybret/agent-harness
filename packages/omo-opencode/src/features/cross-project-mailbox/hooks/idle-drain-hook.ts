@@ -12,6 +12,8 @@ import {
   type DispatchClient,
   type IdleDrainProcessorDeps,
 } from "./idle-drain-processor"
+import { evaluateConfigDrainGate, evaluateDrainGate } from "../drain-gate"
+import { DRAIN_SKIP_TRACE_ID } from "../trace"
 import type {
   DigestStorePort,
   MailboxStorePort,
@@ -20,15 +22,6 @@ import type {
 
 export { IDLE_DRAIN_SOURCE }
 export type { DigestStorePort, MailboxStorePort, RateLimiterPort } from "../manual-drain/delivery-pipeline"
-
-function isEligiblePrimary(config: CrossProjectMailboxConfig, primary: string): boolean {
-  return (config.intake_eligible_agents as readonly string[]).includes(primary)
-}
-
-function isPermissionlessConfig(config: CrossProjectMailboxConfig): boolean {
-  if (config.default_sender_access !== "allow-none") return false
-  return !Object.values(config.senders ?? {}).some((sender) => sender.access === "allow")
-}
 
 export interface PendingStorePort {
   addDispatchSent(entry: Omit<PendingEntry, "state">): Promise<void>
@@ -65,26 +58,60 @@ export interface IdleDrainHook {
   runMailboxDrainNow: (sessionId: string) => Promise<{ triggered: boolean }>
 }
 
+// Count what the gate is holding back, so a skip is reported as "3 notes waiting" rather than as
+// silence. Best-effort by construction: this runs on a blocked path, so a store failure must
+// degrade the trace record, never the drain.
+//
+// Only called for primary-not-eligible. A disabled or permissionless mailbox must stay COMPLETELY
+// inert - it touches no registry and no store - so those skips report no count rather than break
+// that contract. That is also the honest split: an operator who turned the mailbox off is not
+// surprised that nothing drains, whereas an enabled-but-gated mailbox silently holding notes is
+// exactly the case worth quantifying.
+async function countWaitingNotes(deps: IdleDrainHookDeps): Promise<number> {
+  let waiting = 0
+  for (const sender of deps.getRegisteredProjects()) {
+    const store = deps.makeMailboxStore(deps.repoRoot, sender.projectId)
+    const notes = await store.drainUnread(Number.MAX_SAFE_INTEGER).catch(() => [])
+    waiting += notes.length
+  }
+  return waiting
+}
+
+// Returns the gate verdict AND, when blocked, emits one trace record naming the cause and how many
+// notes it is holding. Previously a blocked drain wrote only a tmpdir log line, so notes sat unread
+// with no signal anywhere an operator or agent looks.
 async function shouldSkipDrain(input: {
   readonly deps: IdleDrainHookDeps
   readonly freshConfig: CrossProjectMailboxConfig
   readonly sessionId: string
 }): Promise<boolean> {
-  if (input.freshConfig.enabled === false) {
-    log("[mailbox-idle-drain] skipped: disabled", { sessionId: input.sessionId })
-    return true
-  }
-  if (isPermissionlessConfig(input.freshConfig)) {
-    log("[mailbox-idle-drain] skipped: permissionless config", { sessionId: input.sessionId })
-    return true
-  }
+  // Config-only blocks are settled first, without resolving the primary, so a disabled or
+  // permissionless mailbox performs zero session lookups and zero store access.
+  const configVerdict = evaluateConfigDrainGate(input.freshConfig)
+  const verdict = configVerdict.allowed
+    ? evaluateDrainGate(input.freshConfig, await input.deps.resolveActivePrimaryAgent(input.sessionId))
+    : configVerdict
+  if (verdict.allowed) return false
 
-  const primary = await input.deps.resolveActivePrimaryAgent(input.sessionId)
-  if (primary !== undefined && isEligiblePrimary(input.freshConfig, primary)) return false
-  log("[mailbox-idle-drain] skipped: primary not eligible", {
+  const waiting =
+    verdict.reason === "primary-not-eligible"
+      ? await countWaitingNotes(input.deps).catch(() => 0)
+      : undefined
+  log(`[mailbox-idle-drain] skipped: ${verdict.reason}`, {
     sessionId: input.sessionId,
-    primary: primary ?? null,
-    eligible: input.freshConfig.intake_eligible_agents,
+    detail: verdict.detail,
+    ...(waiting === undefined ? {} : { waiting }),
+    ...(verdict.reason === "primary-not-eligible"
+      ? { primary: verdict.activePrimary ?? null, eligible: input.freshConfig.intake_eligible_agents }
+      : {}),
+  })
+  input.deps.emitTrace?.({
+    phase: "drain-skipped",
+    messageId: DRAIN_SKIP_TRACE_ID,
+    correlationId: DRAIN_SKIP_TRACE_ID,
+    detail: `${verdict.reason}: ${verdict.detail}`,
+    ...(waiting === undefined ? {} : { waiting }),
+    at: Date.now(),
   })
   return true
 }

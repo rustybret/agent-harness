@@ -72,7 +72,7 @@ the remainder and pick again. Items are only added here when a real session prod
   the target's acknowledgement dirs, and reports processed / rejected (with the receiver's reason) /
   pending / stale (`staleAfterHours`, default 4) / unresolved-target. Read-only.
 
-### 4. Auto-drain silently no-ops when primary agent is not intake-eligible
+### 4. Auto-drain silently no-ops when primary agent is not intake-eligible — DONE
 
 - **Source:** cloudhome `25406036-…` (explains their "manual drain finds notes auto-drain skipped").
 - **Observed:** `shouldSkipDrain()` returns without draining and without any log/user-visible signal
@@ -128,3 +128,5 @@ the remainder and pick again. Items are only added here when a real session prod
   validation; preprocessed schemas no longer blind the unknown-key diagnostics.
 - **P1-3** sender-side delivery-failure feedback — `project_message mode=status` surfaces the
   receiver's rejection reason and ages unacknowledged sends into `stale`.
+- **P1-4** silent drain gate — shared `drain-gate` evaluator; a blocked idle drain now emits a
+  `drain-skipped` trace with a `waiting` count, and `project_mailbox_peek` reports `autoDrain`.

@@ -1,0 +1,21 @@
+{
+  "peek": {
+    "pendingCount": 2,
+    "autoDrain": {
+      "enabled": false,
+      "reason": "primary-not-eligible",
+      "detail": "The active primary agent is 'prometheus', which is not in intake_eligible_agents (sisyphus). Switch to an eligible agent or drain manually with project_mailbox_drain.",
+      "activePrimary": "prometheus"
+    }
+  },
+  "idleDrain": {
+    "notesDispatched": 0,
+    "traceRecords": [
+      {
+        "phase": "drain-skipped",
+        "waiting": 2,
+        "detail": "primary-not-eligible: The active primary agent is 'prometheus', which is not in intake_eligible_agen"
+      }
+    ]
+  }
+}

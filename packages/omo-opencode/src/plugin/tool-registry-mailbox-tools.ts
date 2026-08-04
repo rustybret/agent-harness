@@ -18,6 +18,11 @@ import type { PluginContext } from "./types"
 import type { ToolRegistryFactories } from "./tool-registry-factories"
 import type { BackgroundManager } from "../features/background-agent"
 import { buildClassifyNote } from "../features/cross-project-mailbox/hooks/create-mailbox-hooks"
+import {
+  normalizePrimaryAgent,
+  resolveActivePrimaryAgent,
+} from "../features/cross-project-mailbox/primary-resolver"
+import { resolveSessionAgent } from "./session-agent-resolver"
 
 // Both tools register whenever config.enabled. project_message sends from either session mode;
 // project_note is deprecated and kept only so existing callers keep working.
@@ -59,6 +64,12 @@ export function createMailboxToolsRecord(args: {
     repoRoot,
     projectDisplayName: path.basename(repoRoot),
     getRegisteredProjects: async () => (await registry.listProjects()).filter((entry) => entry.repoRoot !== repoRoot),
+    // Same resolver the idle-drain hook uses, so peek's auto-drain verdict matches the drain's.
+    resolveActivePrimaryAgent: async (sessionId: string) => {
+      const cached = resolveActivePrimaryAgent(sessionId)
+      if (cached !== undefined) return cached
+      return normalizePrimaryAgent(await resolveSessionAgent(ctx.client, sessionId))
+    },
     makeMailboxStore: (targetRoot: string, fromProjectId: string) =>
       new MailboxStore(targetRoot, fromProjectId, {
         reservation_ttl_ms: config.bounds.reservation_ttl_ms,

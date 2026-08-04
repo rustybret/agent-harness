@@ -235,6 +235,62 @@ describe("createIdleDrainHook", () => {
       expect(spies.dispatchInternalPrompt).not.toHaveBeenCalled()
       expect(spies.reserve).not.toHaveBeenCalled()
     })
+
+    it("#then it emits one drain-skipped trace naming the cause and how many notes are held", async () => {
+      // given two notes sitting behind an ineligible primary
+      const traced: { phase: string; detail?: string; waiting?: number }[] = []
+      const { deps } = makeHarness({
+        primary: "prometheus",
+        notes: [makeNote(), makeNote({ messageId: "33333333-3333-3333-3333-333333333333" })],
+      })
+      deps.emitTrace = (event) => void traced.push(event)
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      const skips = traced.filter((event) => event.phase === "drain-skipped")
+      expect(skips).toHaveLength(1)
+      expect(skips[0]?.waiting).toBe(2)
+      expect(skips[0]?.detail).toContain("primary-not-eligible")
+      expect(skips[0]?.detail).toContain("prometheus")
+    })
+
+    it("#then a store failure while counting still emits the skip, reporting zero waiting", async () => {
+      // given the unread listing throws while the gate is blocked
+      const traced: { phase: string; waiting?: number }[] = []
+      const { deps, spies } = makeHarness({ primary: "prometheus" })
+      spies.drainUnread.mockImplementation(async () => {
+        throw new Error("disk gone")
+      })
+      deps.emitTrace = (event) => void traced.push(event)
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      const skips = traced.filter((event) => event.phase === "drain-skipped")
+      expect(skips).toHaveLength(1)
+      expect(skips[0]?.waiting).toBe(0)
+    })
+  })
+
+  describe("#given an eligible primary", () => {
+    it("#then no drain-skipped trace is emitted", async () => {
+      // given
+      const traced: { phase: string }[] = []
+      const { deps } = makeHarness({ primary: "sisyphus" })
+      deps.emitTrace = (event) => void traced.push(event)
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(traced.filter((event) => event.phase === "drain-skipped")).toHaveLength(0)
+    })
   })
 
   describe("#given reserve() returns undefined (already reserved by another drain)", () => {

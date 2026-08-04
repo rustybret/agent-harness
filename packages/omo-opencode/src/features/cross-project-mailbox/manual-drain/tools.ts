@@ -6,9 +6,13 @@ import type { ManualMailboxToolDeps } from "./types"
 
 export function createProjectMailboxPeekTool(deps: ManualMailboxToolDeps): ToolDefinition {
   return tool({
-    description: "List unread inbound cross-project mailbox notes without reserving or consuming them",
+    description:
+      "List unread inbound cross-project mailbox notes without reserving or consuming them, and report whether automatic idle drain is currently gated shut",
     args: {},
-    execute: async () => JSON.stringify(await runProjectMailboxPeek(deps)),
+    execute: async (_rawArgs, toolContext) => {
+      const sessionId = (toolContext as { sessionID?: string }).sessionID ?? "manual-peek"
+      return JSON.stringify(await runProjectMailboxPeek(deps, sessionId))
+    },
   })
 }
 

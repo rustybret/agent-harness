@@ -61,6 +61,7 @@ function buildRecord(event: MailboxTraceEvent, repoRoot: string): Record<string,
     ...(event.effectiveMode === undefined ? {} : { effectiveMode: event.effectiveMode }),
     ...(event.lane === undefined ? {} : { lane: event.lane }),
     ...(event.downgradeReason === undefined ? {} : { downgradeReason: event.downgradeReason }),
+    ...(event.waiting === undefined ? {} : { waiting: event.waiting }),
     ...(event.detail === undefined ? {} : { detail: sanitizeDetail(event.detail, repoRoot) }),
   }
 }
