@@ -1,0 +1,36 @@
+{
+  "configuredModel": "anthropic/claude-opus-5",
+  "registration": {
+    "agentRegistered": false,
+    "registeredModel": null
+  },
+  "doctor": {
+    "reportsEffectiveModel": "anthropic/claude-opus-5",
+    "reportsUserOverride": "anthropic/claude-opus-5",
+    "issuesMentioningHephaestus": 0
+  }
+}
+{
+  "configuredModel": "openai/gpt-5.6-sol",
+  "registration": {
+    "agentRegistered": true,
+    "registeredModel": "openai/gpt-5.6-sol"
+  },
+  "doctor": {
+    "reportsEffectiveModel": "openai/gpt-5.6-sol",
+    "reportsUserOverride": "openai/gpt-5.6-sol",
+    "issuesMentioningHephaestus": 0
+  }
+}
+{
+  "configuredModel": "openai/gpt-4o",
+  "registration": {
+    "agentRegistered": false,
+    "registeredModel": null
+  },
+  "doctor": {
+    "reportsEffectiveModel": "openai/gpt-4o",
+    "reportsUserOverride": "openai/gpt-4o",
+    "issuesMentioningHephaestus": 0
+  }
+}

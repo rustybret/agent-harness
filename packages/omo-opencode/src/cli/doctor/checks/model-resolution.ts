@@ -1,3 +1,4 @@
+import { findUnsupportedAgentModel } from "../../../agents/agent-model-constraints"
 import { AGENT_MODEL_REQUIREMENTS, CATEGORY_MODEL_REQUIREMENTS } from "../../../shared/model-requirements"
 import { getModelCapabilities } from "../../../shared/model-capabilities"
 import { CHECK_IDS, CHECK_NAMES } from "../framework/constants"
@@ -90,6 +91,31 @@ export function getModelResolutionInfoWithOverrides(config: OmoConfig): ModelRes
   return { agents, categories }
 }
 
+/**
+ * Reports agents that a configured model would silently remove from the session.
+ *
+ * An agent with a hard model constraint does not fall back when the configured model fails it - it
+ * is dropped, leaving one line in a tmpdir log and no signal anywhere a user looks. Surfacing it as
+ * an error keeps a lost agent from being mistaken for an agent that was never installed.
+ */
+export function collectUnsupportedAgentModelIssues(info: ModelResolutionInfo): DoctorIssue[] {
+  const issues: DoctorIssue[] = []
+
+  for (const agent of info.agents) {
+    const constraint = findUnsupportedAgentModel({ agent: agent.name, model: agent.effectiveModel })
+    if (constraint === undefined) continue
+    issues.push({
+      title: "Agent will not load with the configured model",
+      description: `${agent.name} requires ${constraint.requirement}; configured ${agent.effectiveModel}. The agent is dropped from every session.`,
+      fix: `Set agents.${agent.name}.model to a supported model, or remove the override to use the default chain.`,
+      severity: "error",
+      affects: [agent.name],
+    })
+  }
+
+  return issues
+}
+
 export function collectCapabilityResolutionIssues(info: ModelResolutionInfo): DoctorIssue[] {
   const issues: DoctorIssue[] = []
   const allEntries = [...info.agents, ...info.categories]
@@ -132,6 +158,7 @@ export async function checkModels(): Promise<CheckResult> {
     })
   }
 
+  issues.push(...collectUnsupportedAgentModelIssues(info))
   issues.push(...collectCapabilityResolutionIssues(info))
 
   const overrideCount =
@@ -140,7 +167,7 @@ export async function checkModels(): Promise<CheckResult> {
 
   return {
     name: CHECK_NAMES[CHECK_IDS.MODELS],
-    status: issues.length > 0 ? "warn" : "pass",
+    status: issues.some((issue) => issue.severity === "error") ? "fail" : issues.length > 0 ? "warn" : "pass",
     message: `${info.agents.length} agents, ${info.categories.length} categories, ${overrideCount} override${overrideCount === 1 ? "" : "s"}`,
     details: buildModelResolutionDetails({ info, available, config }),
     issues,

@@ -1,0 +1,6 @@
+{
+  "status": "warn",
+  "errorIssues": 0,
+  "hephaestusDetailLine": "  ● hephaestus: anthropic/claude-opus-5 (medium) [capabilities: snapshot-backed]",
+  "exitCode": 1
+}

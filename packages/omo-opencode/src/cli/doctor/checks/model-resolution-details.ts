@@ -1,5 +1,6 @@
 import { join } from "node:path"
 
+import { findUnsupportedAgentModel } from "../../../agents/agent-model-constraints"
 import { getOpenCodeCacheDir } from "../../../shared"
 import type { AvailableModelsInfo, ModelResolutionInfo, OmoConfig } from "./model-resolution-types"
 import { formatModelWithVariant, getCategoryEffectiveVariant, getEffectiveVariant } from "./model-resolution-variant"
@@ -41,7 +42,9 @@ export function buildModelResolutionDetails(options: {
       agent.effectiveModel,
       getEffectiveVariant(agent.name, agent.requirement, options.config)
     )
-    details.push(`  ${marker} ${agent.name}: ${display} [capabilities: ${formatCapabilityResolutionLabel(agent.capabilityDiagnostics?.resolutionMode)}]`)
+    const unsupported = findUnsupportedAgentModel({ agent: agent.name, model: agent.effectiveModel })
+    const dropped = unsupported === undefined ? "" : ` ✗ NOT LOADED (requires ${unsupported.requirement})`
+    details.push(`  ${marker} ${agent.name}: ${display} [capabilities: ${formatCapabilityResolutionLabel(agent.capabilityDiagnostics?.resolutionMode)}]${dropped}`)
   }
   details.push("")
   details.push("Categories:")

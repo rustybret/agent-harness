@@ -1,0 +1,12 @@
+{
+  "status": "fail",
+  "errorIssues": [
+    {
+      "title": "Agent will not load with the configured model",
+      "description": "hephaestus requires GPT-5.3 Codex, GPT-5.4, GPT-5.5, or GPT-5.6; configured anthropic/claude-opus-5. The agent is dropped from every session.",
+      "fix": "Set agents.hephaestus.model to a supported model, or remove the override to use the default chain."
+    }
+  ],
+  "hephaestusDetailLine": "  ● hephaestus: anthropic/claude-opus-5 (medium) [capabilities: snapshot-backed] ✗ NOT LOADED (requires GPT-5.3 Codex, GPT-5.4, GPT-5.5, or GPT-5.6)",
+  "exitCode": 1
+}

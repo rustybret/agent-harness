@@ -9,6 +9,80 @@ function expectDefined<T>(value: T | null | undefined, label: string): T {
 }
 
 describe("model-resolution check", () => {
+  describe("collectUnsupportedAgentModelIssues", () => {
+    it("reports an agent that the configured model silently removes from the session", async () => {
+      const { collectUnsupportedAgentModelIssues, getModelResolutionInfoWithOverrides } = await import(
+        "./model-resolution"
+      )
+
+      // #given hephaestus configured with a model it refuses to run on
+      const info = getModelResolutionInfoWithOverrides({
+        agents: { hephaestus: { model: "anthropic/claude-opus-5" } },
+        categories: {},
+      })
+
+      // #when collecting unsupported-model issues
+      const issues = collectUnsupportedAgentModelIssues(info)
+      const hephaestusIssue = issues.find((issue) => (issue.affects ?? []).includes("hephaestus"))
+
+      // #then the dropped agent is reported as an error rather than left silent
+      expect(hephaestusIssue).toBeDefined()
+      expect(hephaestusIssue?.severity).toBe("error")
+      expect(hephaestusIssue?.description).toContain("anthropic/claude-opus-5")
+    })
+
+    it("stays silent when the configured model satisfies the agent constraint", async () => {
+      const { collectUnsupportedAgentModelIssues, getModelResolutionInfoWithOverrides } = await import(
+        "./model-resolution"
+      )
+
+      // #given hephaestus configured with a supported model
+      const info = getModelResolutionInfoWithOverrides({
+        agents: { hephaestus: { model: "openai/gpt-5.6-sol" } },
+        categories: {},
+      })
+
+      // #when collecting unsupported-model issues
+      const issues = collectUnsupportedAgentModelIssues(info)
+
+      // #then no agent is reported as dropped
+      expect(issues.filter((issue) => (issue.affects ?? []).includes("hephaestus"))).toEqual([])
+    })
+
+    it("matches the registration path, so doctor cannot claim an agent the session drops", async () => {
+      const { collectUnsupportedAgentModelIssues, getModelResolutionInfoWithOverrides } = await import(
+        "./model-resolution"
+      )
+      const { maybeCreateHephaestusConfig } = await import(
+        "../../../agents/builtin-agents/hephaestus-agent"
+      )
+
+      // #given a model that the real registration path refuses
+      const model = "openai/gpt-4o"
+      const registered = maybeCreateHephaestusConfig({
+        disabledAgents: [],
+        agentOverrides: { hephaestus: { model } },
+        availableModels: new Set([model]),
+        systemDefaultModel: model,
+        isFirstRunNoCache: false,
+        availableAgents: [],
+        availableSkills: [],
+        availableCategories: [],
+        mergedCategories: {},
+        useTaskSystem: false,
+      })
+
+      // #when doctor inspects the same configuration
+      const issues = collectUnsupportedAgentModelIssues(
+        getModelResolutionInfoWithOverrides({ agents: { hephaestus: { model } }, categories: {} })
+      )
+
+      // #then both agree the agent is gone
+      expect(registered).toBeUndefined()
+      expect(issues.some((issue) => (issue.affects ?? []).includes("hephaestus"))).toBe(true)
+    })
+  })
+
   describe("parseProviderModel", () => {
     it("splits chutes model IDs at the provider separator", async () => {
       const { parseProviderModel } = await import("./model-resolution")
