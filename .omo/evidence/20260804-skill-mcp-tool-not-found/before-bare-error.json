@@ -1,0 +1,27 @@
+{
+  "server": "real stdio MCP (fake-mcp-server.mjs)",
+  "results": [
+    {
+      "tool_name": "bridge_status",
+      "outcome": "succeeded"
+    },
+    {
+      "tool_name": "oa_find",
+      "namesAvailableTools": false,
+      "errorChars": 32,
+      "error": "MCP error -32603: Tool not found"
+    },
+    {
+      "tool_name": "scene_get_open",
+      "namesAvailableTools": false,
+      "errorChars": 32,
+      "error": "MCP error -32603: Tool not found"
+    },
+    {
+      "tool_name": "read_console",
+      "namesAvailableTools": false,
+      "errorChars": 32,
+      "error": "MCP error -32603: Tool not found"
+    }
+  ]
+}

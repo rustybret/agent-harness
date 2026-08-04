@@ -3,7 +3,12 @@ import type { ToolContext } from "@opencode-ai/plugin/tool"
 import { BUILTIN_MCP_TOOL_HINTS, SKILL_MCP_DESCRIPTION } from "./constants"
 import { parseSkillMcpArguments } from "./parse-skill-mcp-arguments"
 import type { SkillMcpArgs } from "./types"
-import type { SkillMcpManager, SkillMcpClientInfo, SkillMcpServerContext } from "../../features/skill-mcp-manager"
+import type {
+  SkillMcpClientInfo,
+  SkillMcpClientOptions,
+  SkillMcpManager,
+  SkillMcpServerContext,
+} from "../../features/skill-mcp-manager"
 import type { LoadedSkill } from "../../features/opencode-skill-loader/types"
 
 interface SkillMcpToolOptions {
@@ -81,6 +86,71 @@ function formatBuiltinMcpHint(mcpName: string): string | null {
     `skill_mcp can only call MCP servers declared by loaded skills; do not retry this builtin through skill_mcp.\n` +
     `Use the native builtin tool names when OpenCode exposes them:\n` +
     nativeTools.map((toolName) => `  - ${toolName}`).join("\n")
+  )
+}
+
+const NOT_FOUND_PATTERN = /(tool|resource|prompt|method)\s+not\s+found|unknown\s+(tool|resource|prompt)/i
+
+const MAX_LISTED_NAMES = 60
+
+function formatNameList(names: readonly string[]): string {
+  if (names.length === 0) return "  (the server reports none)"
+  const shown = names.slice(0, MAX_LISTED_NAMES).map((name) => `  - ${name}`)
+  if (names.length > MAX_LISTED_NAMES) {
+    shown.push(`  ... and ${names.length - MAX_LISTED_NAMES} more`)
+  }
+  return shown.join("\n")
+}
+
+async function listNamesForOperation(input: {
+  readonly manager: SkillMcpManager
+  readonly info: SkillMcpClientInfo
+  readonly context: SkillMcpServerContext
+  readonly operation: OperationType
+  readonly options: SkillMcpClientOptions | undefined
+}): Promise<string[]> {
+  const { manager, info, context, options } = input
+  switch (input.operation.type) {
+    case "tool":
+      return (await manager.listTools(info, context, options)).map((entry) => entry.name)
+    case "resource":
+      return (await manager.listResources(info, context, options)).map((entry) => entry.uri)
+    case "prompt":
+      return (await manager.listPrompts(info, context, options)).map((entry) => entry.name)
+  }
+}
+
+/**
+ * Turns a bare "Tool not found" into one that names what the server actually offers.
+ *
+ * An unknown SERVER already gets a list of the available ones, but an unknown tool ON a known
+ * server does not - the caller is told the name is wrong and nothing else, so the only way forward
+ * is to guess again. Observed across 89 failures spanning 63 distinct guessed names against a
+ * single server.
+ *
+ * The list is fetched only after a failure, so the success path is unchanged. If listing also fails
+ * the original error is preserved: a diagnostic must never replace the fault it is describing.
+ */
+async function enrichNotFoundError(input: {
+  readonly error: unknown
+  readonly manager: SkillMcpManager
+  readonly info: SkillMcpClientInfo
+  readonly context: SkillMcpServerContext
+  readonly operation: OperationType
+  readonly options: SkillMcpClientOptions | undefined
+}): Promise<never> {
+  const error = input.error
+  if (!(error instanceof Error) || !NOT_FOUND_PATTERN.test(error.message)) throw error
+
+  const names = await listNamesForOperation(input).catch(() => undefined)
+  if (names === undefined) throw error
+
+  const label = input.operation.type === "resource" ? "resources" : `${input.operation.type}s`
+  throw new Error(
+    `${error.message}\n\n` +
+      `"${input.operation.name}" is not exposed by MCP server "${input.info.serverName}".\n` +
+      `Available ${label} on this server:\n` +
+      formatNameList(names),
   )
 }
 
@@ -164,15 +234,21 @@ export function createSkillMcpTool(options: SkillMcpToolOptions): ToolDefinition
 
       let output: string
       const cdpOptions = args.cdp_url ? { cdpUrl: args.cdp_url } : undefined
+      const onFailure = (error: unknown): Promise<never> =>
+        enrichNotFoundError({ error, manager, info, context, operation, options: cdpOptions })
 
       switch (operation.type) {
         case "tool": {
-          const result = await manager.callTool(info, context, operation.name, parsedArgs, cdpOptions)
+          const result = await manager
+            .callTool(info, context, operation.name, parsedArgs, cdpOptions)
+            .catch(onFailure)
           output = JSON.stringify(result, null, 2)
           break
         }
         case "resource": {
-          const result = await manager.readResource(info, context, operation.name, cdpOptions)
+          const result = await manager
+            .readResource(info, context, operation.name, cdpOptions)
+            .catch(onFailure)
           output = JSON.stringify(result, null, 2)
           break
         }
@@ -181,7 +257,9 @@ export function createSkillMcpTool(options: SkillMcpToolOptions): ToolDefinition
           for (const [key, value] of Object.entries(parsedArgs)) {
             stringArgs[key] = String(value)
           }
-          const result = await manager.getPrompt(info, context, operation.name, stringArgs, cdpOptions)
+          const result = await manager
+            .getPrompt(info, context, operation.name, stringArgs, cdpOptions)
+            .catch(onFailure)
           output = JSON.stringify(result, null, 2)
           break
         }

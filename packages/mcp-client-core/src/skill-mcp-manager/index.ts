@@ -1,2 +1,2 @@
 export * from "./types"
-export { SkillMcpManager } from "./manager"
+export { SkillMcpManager, type SkillMcpClientOptions } from "./manager"

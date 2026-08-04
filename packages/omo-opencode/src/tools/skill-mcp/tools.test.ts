@@ -41,6 +41,68 @@ describe("skill_mcp tool", () => {
     sessionID = "test-session-1"
   })
 
+  describe("#given a name the server does not expose", () => {
+    function toolForServer(): ReturnType<typeof createSkillMcpTool> {
+      loadedSkills = [createMockSkillWithMcp("unity", { supermcp: { command: "noop" } })]
+      return createSkillMcpTool({
+        manager,
+        getLoadedSkills: () => loadedSkills,
+        getSessionID: () => sessionID,
+      })
+    }
+
+    it("#when the call fails as not-found #then the error names the tools the server does expose", async () => {
+      // given
+      spyOn(manager, "callTool").mockRejectedValue(new Error("MCP error -32603: Tool not found"))
+      spyOn(manager, "listTools").mockResolvedValue([
+        { name: "unity_bridge_status", inputSchema: { type: "object" } },
+        { name: "unity_scene_open", inputSchema: { type: "object" } },
+      ])
+
+      // when / then
+      const call = toolForServer().execute(
+        { mcp_name: "supermcp", tool_name: "bridge_status" },
+        mockContext,
+      )
+      await expect(call).rejects.toThrow(/unity_bridge_status/)
+      await expect(call).rejects.toThrow(/Available tools on this server/)
+    })
+
+    it("#when the operation is a prompt #then it lists prompts rather than tools", async () => {
+      // given
+      spyOn(manager, "getPrompt").mockRejectedValue(new Error("Prompt not found"))
+      spyOn(manager, "listPrompts").mockResolvedValue([{ name: "summarize" }])
+
+      // when / then
+      await expect(
+        toolForServer().execute({ mcp_name: "supermcp", prompt_name: "nope" }, mockContext),
+      ).rejects.toThrow(/Available prompts on this server:\n  - summarize/)
+    })
+
+    it("#when listing also fails #then the original error is preserved", async () => {
+      // given: a diagnostic must never replace the fault it describes
+      spyOn(manager, "callTool").mockRejectedValue(new Error("MCP error -32603: Tool not found"))
+      spyOn(manager, "listTools").mockRejectedValue(new Error("connection closed"))
+
+      // when / then
+      await expect(
+        toolForServer().execute({ mcp_name: "supermcp", tool_name: "bridge_status" }, mockContext),
+      ).rejects.toThrow(/^MCP error -32603: Tool not found$/)
+    })
+
+    it("#when the failure is unrelated to naming #then no tool list is fetched", async () => {
+      // given
+      spyOn(manager, "callTool").mockRejectedValue(new Error("Unity bridge did not respond before timeout"))
+      const listTools = spyOn(manager, "listTools").mockResolvedValue([])
+
+      // when / then
+      await expect(
+        toolForServer().execute({ mcp_name: "supermcp", tool_name: "bridge_status" }, mockContext),
+      ).rejects.toThrow(/did not respond before timeout/)
+      expect(listTools).not.toHaveBeenCalled()
+    })
+  })
+
   describe("parameter validation", () => {
     it("throws when no operation specified", async () => {
       // given

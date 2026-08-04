@@ -1,0 +1,27 @@
+{
+  "server": "real stdio MCP (fake-mcp-server.mjs)",
+  "results": [
+    {
+      "tool_name": "bridge_status",
+      "outcome": "succeeded"
+    },
+    {
+      "tool_name": "oa_find",
+      "namesAvailableTools": true,
+      "errorChars": 149,
+      "error": "MCP error -32603: Tool not found |  | \"oa_find\" is not exposed by MCP server \"supermcp\". | Available tools on this server: |   - bridge_status |   - scene_open"
+    },
+    {
+      "tool_name": "scene_get_open",
+      "namesAvailableTools": true,
+      "errorChars": 156,
+      "error": "MCP error -32603: Tool not found |  | \"scene_get_open\" is not exposed by MCP server \"supermcp\". | Available tools on this server: |   - bridge_status |   - scene_open"
+    },
+    {
+      "tool_name": "read_console",
+      "namesAvailableTools": true,
+      "errorChars": 154,
+      "error": "MCP error -32603: Tool not found |  | \"read_console\" is not exposed by MCP server \"supermcp\". | Available tools on this server: |   - bridge_status |   - scene_open"
+    }
+  ]
+}
