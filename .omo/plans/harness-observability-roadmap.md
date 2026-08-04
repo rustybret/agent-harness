@@ -23,6 +23,7 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P1-3 | Every successful native `edit` warned about missing omo metadata it never publishes (44 lines, all successes) | log mining | `a77e9f1ec` |
 | P1-4 | A `supersedes` correction arriving after the original was delivered read as an ordinary note | cloudhome + art3d-pipeline | `6ea7dc12b` |
 | P0-9 | Reclaimed notes quarantined as duplicates of their own failed attempt - 18 of 38 real sends (47%) rejected | dogfooding P1-1 | `ecb8a51cc` |
+| P0-10 | Presence probes ran serially and uncached on every chat turn - 26s worst case on the chat path | log mining (238 timeout lines) | `7e1481b97` |
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real
