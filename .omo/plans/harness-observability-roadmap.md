@@ -18,10 +18,15 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P0-4 | `JSON.stringify(Error)` dropped message/stack, so 292 error diagnostics logged `{}` | log mining | `f85776a20` |
 | P0-5 | `bun test` wrote fixture noise into the developer's live plugin log | log mining | `edda8fa97` |
 | P0-6 | An agent dropped by an unsupported model was invisible; doctor reported the refused model as effective with 0 issues | log mining | `9373dd7e4` |
+| P0-7 | `json-error-recovery` appended "you sent invalid JSON, STOP" to SUCCESSFUL calls whose content quoted a parse error: 22 false injections vs 104 real | observed live in this session | `23763f3fc` |
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real
 inputs is what surfaced the highest-severity item of the session.
+
+P0-7 was found the same way, one level up: the harness misbehaved against ME mid-session, appending
+a false "you sent invalid JSON" instruction to a tool call that had succeeded. Treating an odd
+response as a defect report rather than noise is what turned it into a fix.
 
 ## Open
 
@@ -31,6 +36,9 @@ inputs is what surfaced the highest-severity item of the session.
 - Notify-on-drain callback so a sender learns when its note was actually consumed.
 
 ### Known gaps, not yet scheduled
+- **Hardcoded tool-name lists cannot cover MCP tools.** `JSON_ERROR_TOOL_EXCLUDE_LIST` names 19
+  tools against 163 observed in stored sessions. P0-7 removed the dependency on it for correctness,
+  but any other hook gating on a literal tool-name list has the same blind spot.
 - **Cross-batch supersession.** `supersedes` only dedupes within one drain batch, so a correction
   arriving after the original was consumed does not invalidate the work already started.
 - **Only hephaestus declares a model constraint.** `AGENT_MODEL_CONSTRAINTS` is read by both the
