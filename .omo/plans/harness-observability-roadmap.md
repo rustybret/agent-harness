@@ -29,6 +29,7 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P0-13 | The drain gate read the agent a session STARTED with, not its current one - 30 of 40 replayed real sessions decided wrongly | log mining (4939 skips reporting subagents as primary) | `9cdf5dd74` |
 | P0-14 | A gated drain re-reported the same verdict every poll - 1593 lines/hr, ~80% of real-session output (regression from P1-2) | log mining | `1cc9fdf06` |
 | P1-5 | Context injector logged every synthetic turn (157/hr) and stayed silent on the one that actually held context back | log mining | `5b3b9250d` |
+| P0-15 | `bash` was not truncatable - a real `git log` returned 4.29MB (~1.07M tokens), larger than any context window | session-database mining | `c35d99ba8` |
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real
@@ -46,6 +47,12 @@ response as a defect report rather than noise is what turned it into a fix.
 - Notify-on-drain callback so a sender learns when its note was actually consumed.
 
 ### Known gaps, not yet scheduled
+- **`task` outputs reached 674k chars** (7 calls over 200k). Subagent results are a summary the
+  parent asked for rather than an unbounded dump, so capping them needs its own judgment about what
+  to keep - not folded into the bash fix.
+- **39 `lsp_diagnostics` ENOENT errors from a doubled path** (`packages/omo-opencode/packages/omo-opencode/...`).
+  Hit live in this session. The path is resolved against a request cwd that is already inside the
+  package, so a package-relative path doubles. Not yet root-caused.
 - **552 `String(error)` occurrences remain**, mostly outside logging (message construction,
   user-facing text). Only the 17 sites that produced observed `[object Object]` log lines were
   converted. All 10 no-op `instanceof Error ? String(error) : String(error)` ternaries are gone.
@@ -73,7 +80,9 @@ response as a defect report rather than noise is what turned it into a fix.
    P1-1 against this repo's own outbox: 18 of 38 sends had been silently rejected. A tool that
    reports on the system is also a probe of it.
 
-1. Mine the live plugin log for the highest-frequency lines, not the scariest-looking ones.
+1. Mine the live plugin log for the highest-frequency lines, not the scariest-looking ones. When
+   the log goes quiet, switch corpus: the stored session database answers different questions
+   (which tools error, which outputs are oversized) and found P0-15 after the log had nothing left.
 2. Before trusting a log-derived finding, confirm the sessions are real (`opencode.db`) and the
    payloads are production, not test fixtures. Two candidate items died at this step.
 3. QA every fix by driving the real code path against real inputs, capturing before AND after.
