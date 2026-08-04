@@ -322,7 +322,7 @@ describe("defaultProbeSession", () => {
     })
   })
 
-  describe("#given the fetch rejects with a connect error", () => {
+  describe("#given the fetch rejects and nothing is bound to the port", () => {
     it("#then it returns false", async () => {
       // given
       const record = makeRecord({ serverUrl: "http://127.0.0.1:4096" })
@@ -331,7 +331,42 @@ describe("defaultProbeSession", () => {
       })
 
       // when
-      const live = await defaultProbeSession(record)
+      const live = await defaultProbeSession(record, async () => "refused")
+
+      // then
+      expect(live).toBe(false)
+    })
+  })
+
+  describe("#given the health probe times out but the port still accepts connections", () => {
+    it("#then it returns live, because a busy peer is not a dead peer", async () => {
+      // given: the exact shape observed in production - a mid-turn session whose HTTP reply is
+      // queued past the probe deadline while its listener is perfectly healthy
+      const record = makeRecord({ serverUrl: "http://127.0.0.1:4096" })
+      stubFetch(async () => {
+        throw new Error("The operation timed out.")
+      })
+      const probeTcp = jest.fn(async () => "accepted" as const)
+
+      // when
+      const live = await defaultProbeSession(record, probeTcp)
+
+      // then
+      expect(live).toBe(true)
+      expect(probeTcp).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe("#given the health probe fails and the TCP result is inconclusive", () => {
+    it("#then it returns false rather than assuming the peer is alive", async () => {
+      // given
+      const record = makeRecord({ serverUrl: "http://127.0.0.1:4096" })
+      stubFetch(async () => {
+        throw new Error("The operation timed out.")
+      })
+
+      // when
+      const live = await defaultProbeSession(record, async () => "unknown")
 
       // then
       expect(live).toBe(false)

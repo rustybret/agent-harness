@@ -21,6 +21,11 @@ export {
   type PresenceCache,
 } from "./presence-cache"
 export {
+  probeTcpLiveness,
+  TCP_LIVENESS_TIMEOUT_MS,
+  type TcpLiveness,
+} from "./tcp-liveness"
+export {
   MAX_LAST_SEEN_AGE_MS,
   lastSeenLabel,
 } from "./last-seen-label"

@@ -1,0 +1,14 @@
+{
+  "healthy-peer": {
+    "status": "live",
+    "elapsedMs": 17
+  },
+  "busy-peer": {
+    "status": "stale",
+    "elapsedMs": 2001
+  },
+  "dead-peer": {
+    "status": "stale",
+    "elapsedMs": 1
+  }
+}

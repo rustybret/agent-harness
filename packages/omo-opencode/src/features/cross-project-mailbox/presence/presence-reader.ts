@@ -2,7 +2,8 @@ import { readFile } from "node:fs/promises"
 import os from "node:os"
 
 
-import { log } from "../../../shared/logger"
+import { describeErrorForLog, log } from "../../../shared/logger"
+import { probeTcpLiveness, TCP_LIVENESS_TIMEOUT_MS, type TcpLiveness } from "./tcp-liveness"
 import { getServerBasicAuthHeader } from "../../../shared/opencode-server-auth"
 import {
   PRESENCE_TTL_MS,
@@ -18,6 +19,11 @@ export interface PresenceDetail {
 }
 
 const DEFAULT_PROBE_TIMEOUT_MS = 2_000
+
+// The HTTP attempt must finish early enough to leave room for the TCP fallback inside the caller's
+// overall probe deadline. Spending the whole budget on the fetch would make the fallback dead code:
+// the outer race resolves "not live" at the same instant the fetch gives up.
+const HTTP_PROBE_TIMEOUT_MS = DEFAULT_PROBE_TIMEOUT_MS - TCP_LIVENESS_TIMEOUT_MS - 200
 
 export interface ReadPresenceStatusDeps {
   probeSession: (record: PresenceRecord) => Promise<boolean>
@@ -62,7 +68,10 @@ function buildHealthUrl(serverUrl: string): string {
 // carried by heartbeat freshness in readPresenceStatus (the process that beats every 10s is
 // alive), NOT by activity endpoints like /session/status, which the host evicts on idle — an
 // idle session is the NORMAL resting state of an attended external session, never "gone".
-export async function defaultProbeSession(record: PresenceRecord): Promise<boolean> {
+export async function defaultProbeSession(
+  record: PresenceRecord,
+  probeTcp: (serverUrl: string) => Promise<TcpLiveness> = probeTcpLiveness,
+): Promise<boolean> {
   if (record.serverUrl === null) return false
   const auth = getServerBasicAuthHeader()
   const headers: Record<string, string> = { "x-opencode-directory": record.repoRoot }
@@ -71,12 +80,19 @@ export async function defaultProbeSession(record: PresenceRecord): Promise<boole
     await fetch(buildHealthUrl(record.serverUrl), {
       method: "GET",
       headers,
-      signal: AbortSignal.timeout(DEFAULT_PROBE_TIMEOUT_MS),
+      signal: AbortSignal.timeout(HTTP_PROBE_TIMEOUT_MS),
     })
     return true
   } catch (error) {
+    // A busy peer and a dead peer both fail this fetch, and the busy case is the common one: a
+    // session mid-turn leaves the request queued past the deadline. Falling back to a TCP connect
+    // asks the kernel instead of the application, so "still bound" is answered even when the server
+    // is too loaded to reply. Only a refused connection is treated as genuinely gone.
+    const liveness = await probeTcp(record.serverUrl)
+    if (liveness === "accepted") return true
     log("[presence-reader] health probe failed", {
-      error: error instanceof Error ? error.message : String(error),
+      error: describeErrorForLog(error),
+      tcp: liveness,
       sessionId: record.sessionId,
     })
     return false
