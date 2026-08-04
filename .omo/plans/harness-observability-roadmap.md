@@ -19,6 +19,7 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P0-5 | `bun test` wrote fixture noise into the developer's live plugin log | log mining | `edda8fa97` |
 | P0-6 | An agent dropped by an unsupported model was invisible; doctor reported the refused model as effective with 0 issues | log mining | `9373dd7e4` |
 | P0-7 | `json-error-recovery` appended "you sent invalid JSON, STOP" to SUCCESSFUL calls whose content quoted a parse error: 22 false injections vs 104 real | observed live in this session | `23763f3fc` |
+| P0-8 | Caller-side `String(error)` logged 74 failures as `[object Object]`, incl. ralph-loop retries and promptAsync failures | log mining | `cb1e1e10c` |
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real
@@ -36,6 +37,9 @@ response as a defect report rather than noise is what turned it into a fix.
 - Notify-on-drain callback so a sender learns when its note was actually consumed.
 
 ### Known gaps, not yet scheduled
+- **552 `String(error)` occurrences remain**, mostly outside logging (message construction,
+  user-facing text). Only the 17 sites that produced observed `[object Object]` log lines were
+  converted. All 10 no-op `instanceof Error ? String(error) : String(error)` ternaries are gone.
 - **Hardcoded tool-name lists cannot cover MCP tools.** `JSON_ERROR_TOOL_EXCLUDE_LIST` names 19
   tools against 163 observed in stored sessions. P0-7 removed the dependency on it for correctness,
   but any other hook gating on a literal tool-name list has the same blind spot.
@@ -59,3 +63,9 @@ response as a defect report rather than noise is what turned it into a fix.
    payloads are production, not test fixtures. Two candidate items died at this step.
 3. QA every fix by driving the real code path against real inputs, capturing before AND after.
    The before-capture is what makes the delta evidence rather than assertion.
+4. Replay stored session data through a hook to measure it in production conditions. P0-7's
+   false-positive rate came from running the real hook over 268k stored tool outputs; no synthetic
+   fixture would have found it, and the same replay proved the fix kept every true positive.
+5. Verify a claim before writing it down. Two claims died in QA this session: a "the patterns miss
+   89% of real errors" figure that a recall check disproved (they matched 104 of 105), and three
+   log clusters that turned out to be test fixtures rather than production failures.
