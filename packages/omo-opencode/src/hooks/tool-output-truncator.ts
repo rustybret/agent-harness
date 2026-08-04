@@ -5,7 +5,13 @@ import { createDynamicTruncator } from "../shared/dynamic-truncator"
 const DEFAULT_MAX_TOKENS = 50_000 // ~200k chars
 const WEBFETCH_MAX_TOKENS = 10_000 // ~40k chars - web pages need aggressive truncation
 
+// Tools whose output size is bounded by what they are pointed at rather than by anything the caller
+// controls. `bash` belongs here for the same reason `grep` does: a single command can emit more than
+// the entire context window - the largest observed real call returned 4.29 MB, roughly a million
+// tokens - and the session cannot recover from ingesting it.
 const TRUNCATABLE_TOOLS = [
+  "bash",
+  "Bash",
   "grep",
   "Grep",
   "safe_grep",

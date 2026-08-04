@@ -1,0 +1,21 @@
+{
+  "results": [
+    {
+      "label": "largest real bash output",
+      "command": "git log",
+      "beforeChars": 4287531,
+      "afterChars": 4287531,
+      "approxBeforeTokens": 1071883,
+      "approxAfterTokens": 1071883,
+      "changed": false
+    },
+    {
+      "label": "typical bash output",
+      "beforeChars": 507,
+      "afterChars": 507,
+      "approxBeforeTokens": 127,
+      "approxAfterTokens": 127,
+      "changed": false
+    }
+  ]
+}
