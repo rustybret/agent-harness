@@ -1,0 +1,11 @@
+{
+  "note": "Captured by reverting mailbox-store.ts via git stash, running the same driver, then restoring (RESTORED-OK verified by cmp).",
+  "reservationTtlMs": 120000,
+  "digestTtlMs": 3600000,
+  "drain1Delivered": 1,
+  "firstCheckIsDuplicate": false,
+  "reclaimReturnedIds": "not-returned",
+  "reclaimedBackToInbox": true,
+  "secondCheckIsDuplicate": true,
+  "verdict": "FALSE DUPLICATE - reclaimed note would be quarantined as duplicate-loop"
+}

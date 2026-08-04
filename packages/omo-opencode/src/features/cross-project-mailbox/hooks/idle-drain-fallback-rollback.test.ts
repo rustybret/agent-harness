@@ -55,7 +55,7 @@ function makeDeps(): {
   const markDispatched = jest.fn(async () => undefined)
   const checkAndRecord = jest.fn(async () => ({ isDuplicate: false }))
   const store = {
-    reclaimStale: jest.fn(async () => undefined),
+    reclaimStale: jest.fn(async () => [] as string[]),
     drainUnread: jest.fn(async () => [note]),
     reserve: jest.fn(async () => "/inbox/.delivering-msg-rolled-back.md"),
     unreserve,

@@ -92,6 +92,7 @@ function makeHarness(opts: {
   projects?: ProjectEntry[]
   primary?: string | undefined
   reserveResult?: string | undefined
+  reclaimed?: string[]
   duplicate?: boolean
   rateLimited?: boolean
   validation?: ValidationResult
@@ -100,7 +101,7 @@ function makeHarness(opts: {
   const config = opts.config ?? makeConfig()
   const notes = opts.notes ?? [makeNote()]
 
-  const reclaimStale = jest.fn(async () => undefined)
+  const reclaimStale = jest.fn(async () => opts.reclaimed ?? ([] as string[]))
   const drainUnread = jest.fn(async () => notes)
   const reserveResult = "reserveResult" in opts ? opts.reserveResult : "/inbox/.delivering-id.md"
   const reserve = jest.fn(async () => reserveResult)
@@ -199,6 +200,32 @@ describe("createIdleDrainHook", () => {
       expect(spies.dispatchInternalPrompt).toHaveBeenCalledTimes(1)
       expect(spies.markDispatched).toHaveBeenCalledTimes(1)
       expect(spies.markDispatched.mock.calls[0][0].messageId).toBe(makeNote().messageId)
+    })
+
+    it("#then a reclaimed note has its stale body digest released before the duplicate check", async () => {
+      // given a note that reclaim just returned to the inbox after an unconfirmed attempt
+      const { deps, spies } = makeHarness({ primary: "sisyphus", reclaimed: [makeNote().messageId] })
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then the digest recorded by the failed attempt is dropped, so the retry is not a duplicate
+      expect(spies.rollback).toHaveBeenCalledTimes(1)
+      expect(spies.rollback.mock.calls[0][0].correlationId).toBe(makeNote().envelope.correlationId)
+      expect(spies.dispatchInternalPrompt).toHaveBeenCalledTimes(1)
+    })
+
+    it("#then a note that was NOT reclaimed keeps its digest, so a genuine resend is still suppressed", async () => {
+      // given
+      const { deps, spies } = makeHarness({ primary: "sisyphus" })
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(spies.rollback).not.toHaveBeenCalled()
     })
 
     it("#then a note superseding an already-delivered message reaches the prompt builder flagged", async () => {

@@ -52,7 +52,7 @@ function makeDeps(): {
   const markDispatched = jest.fn(async () => undefined)
   const resolveActivePrimaryAgent = jest.fn(async () => "sisyphus")
   const store = {
-    reclaimStale: jest.fn(async () => undefined),
+    reclaimStale: jest.fn(async () => [] as string[]),
     drainUnread: jest.fn(async () => [note]),
     reserve: jest.fn(async () => "/inbox/.delivering-msg-async-primary.md"),
     unreserve: jest.fn(async () => undefined),

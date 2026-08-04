@@ -205,17 +205,26 @@ export class MailboxStore {
     )
   }
 
-  async reclaimStale(sessionMessageIds: Set<string>): Promise<void> {
+  /**
+   * Returns the ids of notes that were put BACK into the inbox for another attempt, as opposed to
+   * the ones reclaim acked because delivery turned out to have succeeded.
+   *
+   * The caller needs this distinction: a returned note already recorded a body digest on its failed
+   * attempt, and that digest outlives the reservation by a wide margin (60 min vs 2 min by default),
+   * so unless the digest is released too the retry is quarantined as a duplicate of itself.
+   */
+  async reclaimStale(sessionMessageIds: Set<string>): Promise<string[]> {
     const { inbox } = this.dirs()
     const cutoff = Date.now() - this.config.reservation_ttl_ms
     let entries: Dirent[]
     try {
       entries = await readdir(inbox, { withFileTypes: true })
     } catch (error) {
-      if (isMissingPathError(error)) return
+      if (isMissingPathError(error)) return []
       throw error
     }
 
+    const returnedToUnread: string[] = []
     for (const entry of entries) {
       if (!entry.isFile()) continue
       if (!entry.name.startsWith(RESERVED_PREFIX) || !entry.name.endsWith(NOTE_SUFFIX)) continue
@@ -223,29 +232,34 @@ export class MailboxStore {
       const fileStat = await stat(filePath)
       if (fileStat.mtimeMs > cutoff) continue
       const messageId = entry.name.slice(RESERVED_PREFIX.length, -NOTE_SUFFIX.length)
-      await this.reclaimOne(messageId, this.pendingStore, sessionMessageIds)
+      if (await this.reclaimOne(messageId, this.pendingStore, sessionMessageIds)) {
+        returnedToUnread.push(messageId)
+      }
     }
+    return returnedToUnread
   }
 
+  /** Resolves true when the note was returned to the inbox for a retry rather than acked. */
   private async reclaimOne(
     messageId: string,
     pending: PendingDeliveryStore,
     sessionMessageIds: Set<string>,
-  ): Promise<void> {
+  ): Promise<boolean> {
     const entry = await pending.getEntry(messageId)
     if (entry?.state === "history_confirmed") {
       await this.ack(messageId)
-      return
+      return false
     }
     if (entry?.state === "dispatch_sent" && sessionMessageIds.has(messageId)) {
       await pending.markHistoryConfirmed(messageId)
       await this.ack(messageId)
-      return
+      return false
     }
     await this.returnToUnread(messageId)
     if (entry !== undefined) {
       await pending.removeEntry(messageId)
     }
+    return true
   }
 
   async unreserve(messageId: string): Promise<void> {

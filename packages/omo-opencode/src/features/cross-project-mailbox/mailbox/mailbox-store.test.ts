@@ -219,11 +219,12 @@ describe("MailboxStore#reclaimStale", () => {
         })
         await pending.markHistoryConfirmed(envelope.messageId)
 
-        await store.reclaimStale(new Set<string>())
+        const reclaimed = await store.reclaimStale(new Set<string>())
 
         const processedPath = path.join(inboxDir(), "processed", `${envelope.messageId}.md`)
         expect(await exists(processedPath)).toBe(true)
         expect(await store.listUnread()).toHaveLength(0)
+        expect(reclaimed).toEqual([])
       })
     })
   })
@@ -242,12 +243,13 @@ describe("MailboxStore#reclaimStale", () => {
           dispatchedAt: Date.now() - RESERVATION_TTL_MS * 4,
         })
 
-        await store.reclaimStale(new Set<string>([envelope.messageId]))
+        const reclaimed = await store.reclaimStale(new Set<string>([envelope.messageId]))
 
         const processedPath = path.join(inboxDir(), "processed", `${envelope.messageId}.md`)
         expect(await exists(processedPath)).toBe(true)
         expect((await pending.getEntry(envelope.messageId))?.state).toBe("history_confirmed")
         expect(await store.listUnread()).toHaveLength(0)
+        expect(reclaimed).toEqual([])
       })
     })
   })
@@ -266,11 +268,12 @@ describe("MailboxStore#reclaimStale", () => {
           dispatchedAt: Date.now() - RESERVATION_TTL_MS * 4,
         })
 
-        await store.reclaimStale(new Set<string>())
+        const reclaimed = await store.reclaimStale(new Set<string>())
 
         const unread = await store.listUnread()
         expect(unread.some((message) => message.messageId === envelope.messageId)).toBe(true)
         expect(await pending.getEntry(envelope.messageId)).toBeUndefined()
+        expect(reclaimed).toEqual([envelope.messageId])
       })
     })
   })
@@ -282,10 +285,11 @@ describe("MailboxStore#reclaimStale", () => {
         const envelope = makeEnvelope()
         await makeStaleReservation(store, envelope)
 
-        await store.reclaimStale(new Set<string>())
+        const reclaimed = await store.reclaimStale(new Set<string>())
 
         const unread = await store.listUnread()
         expect(unread.some((message) => message.messageId === envelope.messageId)).toBe(true)
+        expect(reclaimed).toEqual([envelope.messageId])
       })
     })
   })

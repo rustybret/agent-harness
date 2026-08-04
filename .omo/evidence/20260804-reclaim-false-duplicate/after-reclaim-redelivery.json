@@ -1,0 +1,10 @@
+{
+  "reservationTtlMs": 120000,
+  "digestTtlMs": 3600000,
+  "drain1Delivered": 1,
+  "firstCheckIsDuplicate": false,
+  "reclaimReturnedIds": 1,
+  "reclaimedBackToInbox": true,
+  "secondCheckIsDuplicate": false,
+  "verdict": "ok - reclaimed note can be redelivered"
+}

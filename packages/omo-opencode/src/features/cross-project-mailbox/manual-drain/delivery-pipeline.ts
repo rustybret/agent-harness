@@ -4,7 +4,8 @@ import type { PendingEntry, QuarantineReason, UnreadMessage } from "../mailbox/t
 import type { validateInbound } from "../validation/validate-inbound"
 
 export interface MailboxStorePort {
-  reclaimStale(sessionMessageIds: Set<string>): Promise<void>
+  /** Resolves the ids returned to the inbox for a retry; see `MailboxStore.reclaimStale`. */
+  reclaimStale(sessionMessageIds: Set<string>): Promise<string[]>
   drainUnread(maxNotes: number): Promise<UnreadMessage[]>
   reserve(messageId: string): Promise<string | undefined>
   ack(messageId: string): Promise<void>

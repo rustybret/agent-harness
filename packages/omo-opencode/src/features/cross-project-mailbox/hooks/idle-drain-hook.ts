@@ -2,7 +2,7 @@ import { isSessionActive } from "../../../shared/session-idle-settle"
 import { log } from "../../../shared/logger"
 import type { CrossProjectMailboxConfig } from "../config"
 import { createLiveMailboxConfigResolver } from "../config/live-config"
-import type { PendingEntry } from "../mailbox/types"
+import type { PendingEntry, UnreadMessage } from "../mailbox/types"
 import type { ProjectEntry } from "../registry/types"
 import type { buildTriagePrompt } from "../triage/template"
 import type { validateInbound } from "../validation/validate-inbound"
@@ -14,10 +14,11 @@ import {
 } from "./idle-drain-processor"
 import { evaluateConfigDrainGate, evaluateDrainGate } from "../drain-gate"
 import { DRAIN_SKIP_TRACE_ID } from "../trace"
-import type {
-  DigestStorePort,
-  MailboxStorePort,
-  RateLimiterPort,
+import {
+  digestNoteFor,
+  type DigestStorePort,
+  type MailboxStorePort,
+  type RateLimiterPort,
 } from "../manual-drain/delivery-pipeline"
 
 export { IDLE_DRAIN_SOURCE }
@@ -67,6 +68,36 @@ export interface IdleDrainHook {
 // that contract. That is also the honest split: an operator who turned the mailbox off is not
 // surprised that nothing drains, whereas an enabled-but-gated mailbox silently holding notes is
 // exactly the case worth quantifying.
+/**
+ * Releases the body digest of every note that reclaim just returned to the inbox.
+ *
+ * A note records its digest when a delivery attempt begins. If that attempt never confirms, reclaim
+ * puts the note back for a retry - but the digest survives, and it outlives the reservation by a
+ * wide margin (60 min vs 2 min by default). Without this the retry hashes to the same key and is
+ * quarantined as `duplicate-loop`: the note is rejected as a duplicate of its own failed attempt,
+ * and the sender is told its message was a loop.
+ *
+ * Only ids reclaim actually returned are released, so a genuine resend of identical content inside
+ * the TTL is still suppressed.
+ */
+async function releaseReclaimedDigests(input: {
+  readonly digestStore: DigestStorePort
+  readonly candidates: readonly UnreadMessage[]
+  readonly reclaimed: readonly string[]
+}): Promise<void> {
+  if (input.reclaimed.length === 0) return
+  const reclaimedIds = new Set(input.reclaimed)
+  for (const note of input.candidates) {
+    if (!reclaimedIds.has(note.messageId)) continue
+    await input.digestStore.rollback(digestNoteFor(note)).catch((error) => {
+      log("[mailbox-idle-drain] failed to release digest for reclaimed note", {
+        error,
+        messageId: note.messageId,
+      })
+    })
+  }
+}
+
 async function countWaitingNotes(deps: IdleDrainHookDeps): Promise<number> {
   let waiting = 0
   for (const sender of deps.getRegisteredProjects()) {
@@ -147,8 +178,9 @@ export function createIdleDrainHook(deps: IdleDrainHookDeps): IdleDrainHook {
     for (const sender of projects) {
       if (injected >= maxNotes) break
       const store = deps.makeMailboxStore(deps.repoRoot, sender.projectId)
-      await store.reclaimStale(sessionMessageIds)
+      const reclaimed = await store.reclaimStale(sessionMessageIds)
       const candidates = await store.drainUnread(maxNotes)
+      await releaseReclaimedDigests({ digestStore, candidates, reclaimed })
       if (candidates.length > 0) {
         log("[mailbox-idle-drain] candidates found", { sessionId, sender: sender.projectId, count: candidates.length })
       }
