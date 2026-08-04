@@ -32,6 +32,41 @@ function registryOf(projects: ProjectEntry[]): { listProjects: () => Promise<Pro
 }
 
 describe("readOutboundBudget", () => {
+  it("probes every target concurrently so one unresponsive target does not delay the rest", async () => {
+    // given four targets, each probe held open until every probe has started
+    const config = CrossProjectMailboxConfigSchema.parse({
+      enabled: true,
+      senders: {
+        "proj-a": { access: "allow", intent_budget: "quick" },
+        "proj-b": { access: "allow", intent_budget: "quick" },
+        "proj-c": { access: "allow", intent_budget: "quick" },
+        "proj-d": { access: "allow", intent_budget: "quick" },
+      },
+    })
+    let inFlight = 0
+    let peakInFlight = 0
+    let releaseAll: () => void = () => {}
+    const allStarted = new Promise<void>((resolve) => {
+      releaseAll = resolve
+    })
+
+    // when
+    const rows = await readOutboundBudget(config, registryOf([]), {
+      readPresence: async () => {
+        inFlight += 1
+        peakInFlight = Math.max(peakInFlight, inFlight)
+        if (inFlight === 4) releaseAll()
+        await allStarted
+        inFlight -= 1
+        return "live"
+      },
+    })
+
+    // then all four were open at once; serial resolution would deadlock waiting for the fourth
+    expect(rows).toHaveLength(4)
+    expect(peakInFlight).toBe(4)
+  })
+
   it("yields one row per allow-listed target with resolved display name and granted ceiling", async () => {
     // given
     const presenceById: Record<string, PresenceStatus> = { "proj-b": "live", "proj-a": "stale" }

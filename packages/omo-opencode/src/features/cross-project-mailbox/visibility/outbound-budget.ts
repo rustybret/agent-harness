@@ -58,19 +58,21 @@ export async function readOutboundBudget(
   const projects = await registry.listProjects()
   const displayNameById = new Map(projects.map((entry) => [entry.projectId, entry.displayName]))
 
-  const rows: OutboundBudgetRow[] = []
-  for (const projectId of senderIds) {
+  // Presence resolution is a per-target network probe with its own timeout, so these MUST run
+  // concurrently: serially, one unresponsive target delays every target behind it, and the cost is
+  // the SUM of the timeouts rather than the worst single one. This runs on the chat turn path.
+  const targets = senderIds.flatMap((projectId) => {
     const sender = config.senders?.[projectId]
-    if (sender === undefined) continue
-    const presence = await resolvePresence(projectId, deps.readPresence)
-    rows.push({
+    return sender === undefined ? [] : [{ projectId, sender }]
+  })
+  return await Promise.all(
+    targets.map(async ({ projectId, sender }) => ({
       targetProjectId: projectId,
       displayName: displayNameById.get(projectId) ?? projectId,
       grantedCeiling: sender.intent_budget,
-      presence,
-    })
-  }
-  return rows
+      presence: await resolvePresence(projectId, deps.readPresence),
+    })),
+  )
 }
 
 export function renderOutboundBudgetTable(rows: readonly OutboundBudgetRow[]): string {

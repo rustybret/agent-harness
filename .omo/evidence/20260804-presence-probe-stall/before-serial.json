@@ -1,0 +1,11 @@
+{
+  "note": "Captured by reverting only outbound-budget.ts via git stash, running the same driver, then restoring (RESTORED-OK verified by cmp).",
+  "targets": 13,
+  "realMachineState": { "elapsedMs": 897, "byStatus": { "live": 4, "offline": 9 } },
+  "allTargetsHung": {
+    "elapsedMs": 26023,
+    "rows": 13,
+    "serialWorstCaseMs": 26000,
+    "singleProbeTimeoutMs": 2000
+  }
+}

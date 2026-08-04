@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test"
 
 import { CrossProjectMailboxConfigSchema, type CrossProjectMailboxConfig } from "../config"
-import type { PresenceStatus } from "../presence"
+import { createPresenceCache, PRESENCE_INTERVAL_MS, type PresenceStatus } from "../presence"
 import type { ProjectEntry } from "../registry/types"
 import { createOutboundBudgetInjector } from "./outbound-budget-injector"
 import type { OutboundBudgetRegistryPort } from "./outbound-budget"
@@ -79,5 +79,33 @@ describe("createOutboundBudgetInjector", () => {
     expect(texts).toHaveLength(1)
     expect(texts[0]).toContain("| Project A | proj-a | plan | offline |")
     expect(texts[0]).not.toContain("doc-drop")
+  })
+
+  it("#given repeat chat turns #when the transform runs #then presence is probed once, not once per turn", async () => {
+    // given an injector using its real cached presence path (no readPresence override)
+    let probes = 0
+    const presenceCache = createPresenceCache(PRESENCE_INTERVAL_MS, {
+      readDetail: async () => {
+        probes += 1
+        return { status: "live", heartbeatTs: Date.now() }
+      },
+    })
+    const injector = createOutboundBudgetInjector({
+      config: cfg(),
+      directory: "/tmp/self",
+      registry: registryOf(PROJECTS),
+      presenceCache,
+    })
+
+    // when three turns run inside the cache window
+    for (const session of ["ses-a", "ses-b", "ses-c"]) {
+      await injector["experimental.chat.messages.transform"]?.(
+        { sessionID: session },
+        { messages: [userMessage(session)] },
+      )
+    }
+
+    // then the target was probed once - a network probe per turn is what stalled the chat path
+    expect(probes).toBe(1)
   })
 })

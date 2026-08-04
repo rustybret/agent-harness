@@ -1,6 +1,11 @@
 import { log } from "../../../shared/logger"
 import type { CrossProjectMailboxConfig } from "../config"
-import { readPresenceStatus } from "../presence"
+import {
+  createPresenceCache,
+  PRESENCE_INTERVAL_MS,
+  readPresenceStatus,
+  type PresenceCache,
+} from "../presence"
 import { createProjectRegistry } from "../registry"
 import {
   OUTBOUND_BUDGET_MAX_TARGETS,
@@ -48,6 +53,8 @@ export interface OutboundBudgetInjectorDeps {
   directory: string
   registry?: OutboundBudgetRegistryPort
   readPresence?: (projectId: string) => Promise<import("../presence").PresenceStatus>
+  /** Overrides the per-hook presence cache; supplying one lets a test observe probe counts. */
+  presenceCache?: PresenceCache
 }
 
 function resolveSessionID(
@@ -87,8 +94,16 @@ export function createOutboundBudgetInjector(
 ): OutboundBudgetInjectorHook {
   const lastInjectedHashBySession = new Map<string, string>()
   const registry = deps.registry ?? createProjectRegistry()
+  // This hook fires on EVERY chat turn, and each uncached target costs a network probe. The cache
+  // TTL is aligned to the presence heartbeat interval, so a target's status is still at most one
+  // beat stale while repeat turns inside that window cost nothing.
+  const presenceCache = deps.presenceCache ?? createPresenceCache(PRESENCE_INTERVAL_MS)
   const readPresence =
-    deps.readPresence ?? ((projectId: string) => readPresenceStatus(projectId))
+    deps.readPresence ??
+    (async (projectId: string) => {
+      const detail = await presenceCache.get(projectId)
+      return detail.status === "missing" ? "offline" : detail.status
+    })
 
   return {
     "experimental.chat.messages.transform": async (input, output) => {

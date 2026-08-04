@@ -1,0 +1,16 @@
+{
+  "targets": 13,
+  "realMachineState": {
+    "elapsedMs": 18,
+    "byStatus": {
+      "live": 4,
+      "offline": 9
+    }
+  },
+  "allTargetsHung": {
+    "elapsedMs": 2001,
+    "rows": 13,
+    "serialWorstCaseMs": 26000,
+    "singleProbeTimeoutMs": 2000
+  }
+}
