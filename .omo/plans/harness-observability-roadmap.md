@@ -20,6 +20,7 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P0-6 | An agent dropped by an unsupported model was invisible; doctor reported the refused model as effective with 0 issues | log mining | `9373dd7e4` |
 | P0-7 | `json-error-recovery` appended "you sent invalid JSON, STOP" to SUCCESSFUL calls whose content quoted a parse error: 22 false injections vs 104 real | observed live in this session | `23763f3fc` |
 | P0-8 | Caller-side `String(error)` logged 74 failures as `[object Object]`, incl. ralph-loop retries and promptAsync failures | log mining | `cb1e1e10c` |
+| P1-3 | Every successful native `edit` warned about missing omo metadata it never publishes (44 lines, all successes) | log mining | `a77e9f1ec` |
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real
@@ -66,6 +67,8 @@ response as a defect report rather than noise is what turned it into a fix.
 4. Replay stored session data through a hook to measure it in production conditions. P0-7's
    false-positive rate came from running the real hook over 268k stored tool outputs; no synthetic
    fixture would have found it, and the same replay proved the fix kept every true positive.
-5. Verify a claim before writing it down. Two claims died in QA this session: a "the patterns miss
-   89% of real errors" figure that a recall check disproved (they matched 104 of 105), and three
-   log clusters that turned out to be test fixtures rather than production failures.
+5. Verify a claim before writing it down. Three claims died in QA this session: a "the patterns
+   miss 89% of real errors" figure that a recall check disproved (they matched 104 of 105), three
+   log clusters that turned out to be test fixtures rather than production failures, and a
+   hypothesis that P1-3's warnings came from failed edits - the database showed all 44 succeeded,
+   which redirected the fix from error handling to a config gate.
