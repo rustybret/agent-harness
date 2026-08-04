@@ -17,6 +17,7 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P0-3 | `readdir` on absent optional dirs logged as failure: 47.7% of a 50MB log, evicting real diagnostics | log mining | `30d0ed443` |
 | P0-4 | `JSON.stringify(Error)` dropped message/stack, so 292 error diagnostics logged `{}` | log mining | `f85776a20` |
 | P0-5 | `bun test` wrote fixture noise into the developer's live plugin log | log mining | `edda8fa97` |
+| P0-6 | An agent dropped by an unsupported model was invisible; doctor reported the refused model as effective with 0 issues | log mining | `9373dd7e4` |
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real
@@ -32,10 +33,9 @@ inputs is what surfaced the highest-severity item of the session.
 ### Known gaps, not yet scheduled
 - **Cross-batch supersession.** `supersedes` only dedupes within one drain batch, so a correction
   arriving after the original was consumed does not invalidate the work already started.
-- **Hephaestus disappears silently on an unsupported model** (constraint #1984). The model
-  allowlist rejection writes one tmpdir log line and the agent vanishes from the session with no
-  user-visible signal. Same class as P1-2 and P0-2: a silent drop of user configuration.
-  Fix shape: surface it through `doctor` and the config diagnostics path, not just the log.
+- **Only hephaestus declares a model constraint.** `AGENT_MODEL_CONSTRAINTS` is read by both the
+  registration path and doctor, but an agent that starts refusing models without adding a registry
+  entry will drop silently the same way P0-6 did. The registry test cannot detect a missing entry.
 
 ### Investigated and dropped
 - **`primary: null` drain skips (654 lines).** The three affected session ids exist in NO database
