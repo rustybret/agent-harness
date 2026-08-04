@@ -28,6 +28,7 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P0-12 | A busy peer was reported the same as a dead one - 267 real-session probe timeouts, all against servers that were alive | log mining (`[presence-reader] health probe failed`) | `a35eb1b4a` |
 | P0-13 | The drain gate read the agent a session STARTED with, not its current one - 30 of 40 replayed real sessions decided wrongly | log mining (4939 skips reporting subagents as primary) | `9cdf5dd74` |
 | P0-14 | A gated drain re-reported the same verdict every poll - 1593 lines/hr, ~80% of real-session output (regression from P1-2) | log mining | `1cc9fdf06` |
+| P1-5 | Context injector logged every synthetic turn (157/hr) and stayed silent on the one that actually held context back | log mining | `5b3b9250d` |
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real
