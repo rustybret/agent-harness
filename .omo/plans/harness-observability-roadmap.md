@@ -21,7 +21,7 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P0-7 | `json-error-recovery` appended "you sent invalid JSON, STOP" to SUCCESSFUL calls whose content quoted a parse error: 22 false injections vs 104 real | observed live in this session | `23763f3fc` |
 | P0-8 | Caller-side `String(error)` logged 74 failures as `[object Object]`, incl. ralph-loop retries and promptAsync failures | log mining | `cb1e1e10c` |
 | P1-3 | Every successful native `edit` warned about missing omo metadata it never publishes (44 lines, all successes) | log mining | `a77e9f1ec` |
-| P1-4 | A `supersedes` correction arriving after the original was delivered read as an ordinary note | cloudhome + art3d-pipeline | pending |
+| P1-4 | A `supersedes` correction arriving after the original was delivered read as an ordinary note | cloudhome + art3d-pipeline | `6ea7dc12b` |
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real
