@@ -178,12 +178,12 @@ describe("createToolExecuteBeforeHandler", () => {
       expect(output.args.subagent_type).toBe("sisyphus-junior")
     })
 
-    test("resolves subagent_type from session first message when task_id is provided without subagent_type", async () => {
-      //#given
+    test("resolves subagent_type from the resumed session's agent when task_id is provided without subagent_type", async () => {
+      //#given: a subagent session runs as one agent throughout, and messages arrive oldest-first
       const ctx = createCtxWithSessionMessages([
         { info: { role: "user" } },
         { info: { role: "assistant", agent: "explore" } },
-        { info: { role: "assistant", agent: "oracle" } },
+        { info: { role: "assistant", agent: "explore" } },
       ])
       const handler = createToolExecuteBeforeHandler({ ctx, hooks: emptyHooks })
       const input = { tool: "task", sessionID: "ses_123", callID: "call_1" }

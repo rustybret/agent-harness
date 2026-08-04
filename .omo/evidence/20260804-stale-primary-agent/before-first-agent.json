@@ -1,0 +1,53 @@
+{
+  "sessionsReplayed": 40,
+  "wrongGateDecisions": 30,
+  "gatedShutWrongly": 29,
+  "drainedWrongly": 1,
+  "samples": [
+    {
+      "sessionId": "ses_349fb1fa6ffeJpYCvfz1",
+      "startedAs": "plan",
+      "runningAs": "build",
+      "resolvedAs": "plan",
+      "gateAllows": false,
+      "shouldAllow": false,
+      "correct": true
+    },
+    {
+      "sessionId": "ses_345aa570affetUE82mRp",
+      "startedAs": "build",
+      "runningAs": "Sisyphus - Ultraworker",
+      "resolvedAs": "build",
+      "gateAllows": false,
+      "shouldAllow": true,
+      "correct": false
+    },
+    {
+      "sessionId": "ses_345a93ed2ffedpJJIuoK",
+      "startedAs": "build",
+      "runningAs": "Sisyphus - ultraworker",
+      "resolvedAs": "build",
+      "gateAllows": false,
+      "shouldAllow": true,
+      "correct": false
+    },
+    {
+      "sessionId": "ses_343ba628bffeyzWRNUdu",
+      "startedAs": "Sisyphus (Ultraworker)",
+      "runningAs": "Atlas - Plan Executor",
+      "resolvedAs": "sisyphus",
+      "gateAllows": true,
+      "shouldAllow": true,
+      "correct": true
+    },
+    {
+      "sessionId": "ses_3409dc2ecffeQ6FuZPz5",
+      "startedAs": "Sisyphus (Ultraworker)",
+      "runningAs": "Hephaestus (Deep Agent)",
+      "resolvedAs": "sisyphus",
+      "gateAllows": true,
+      "shouldAllow": true,
+      "correct": true
+    }
+  ]
+}

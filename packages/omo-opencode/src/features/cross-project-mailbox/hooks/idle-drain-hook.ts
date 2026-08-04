@@ -59,15 +59,6 @@ export interface IdleDrainHook {
   runMailboxDrainNow: (sessionId: string) => Promise<{ triggered: boolean }>
 }
 
-// Count what the gate is holding back, so a skip is reported as "3 notes waiting" rather than as
-// silence. Best-effort by construction: this runs on a blocked path, so a store failure must
-// degrade the trace record, never the drain.
-//
-// Only called for primary-not-eligible. A disabled or permissionless mailbox must stay COMPLETELY
-// inert - it touches no registry and no store - so those skips report no count rather than break
-// that contract. That is also the honest split: an operator who turned the mailbox off is not
-// surprised that nothing drains, whereas an enabled-but-gated mailbox silently holding notes is
-// exactly the case worth quantifying.
 /**
  * Releases the body digest of every note that reclaim just returned to the inbox.
  *
@@ -98,6 +89,15 @@ async function releaseReclaimedDigests(input: {
   }
 }
 
+// Counts what the gate is holding back, so a skip is reported as "3 notes waiting" rather than as
+// silence. Best-effort by construction: this runs on a blocked path, so a store failure must
+// degrade the trace record, never the drain.
+//
+// Only called for primary-not-eligible. A disabled or permissionless mailbox must stay COMPLETELY
+// inert - it touches no registry and no store - so those skips report no count rather than break
+// that contract. That is also the honest split: an operator who turned the mailbox off is not
+// surprised that nothing drains, whereas an enabled-but-gated mailbox silently holding notes is
+// exactly the case worth quantifying.
 async function countWaitingNotes(deps: IdleDrainHookDeps): Promise<number> {
   let waiting = 0
   for (const sender of deps.getRegisteredProjects()) {
