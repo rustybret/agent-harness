@@ -34,6 +34,13 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P1-7 | `Tool not found` named no alternative - 89 failures across 63 distinct guessed names on one server | error-RATE mining (skill_mcp worst at 22.3%) | `385623c77` |
 | P1-8 | `not a participant of team X` blamed membership for a 2-character id typo - the caller was the team's lead | active-error mining (last 14d) | `5081b15cf` |
 | P1-9 | `write` blocked with "Use edit tool instead", naming neither exit that lifts it - 21 of 30 write failures across 10 sessions | error-RATE mining + self-observed | `d7b74b44b` |
+| P0-16 | An unreadable config rendered every project `Disabled`, identical to a deliberate deny-all, from a bare `catch {}` - re-enabling then appeared to do nothing | art3d-pipeline live report | _this commit_ |
+
+P0-16 arrived as a user-visible symptom ("all projects disabled, can't re-enable") that a restart
+already cleared, so the tempting close was "stale process, no defect". The defect was that the state
+was unobservable: the fallback carries no `senders`, a missing sender renders `Disabled`, and
+nothing was logged - so "config unreadable" and "every sender denied" were indistinguishable at
+every consumer. A symptom that a restart fixes still names a real gap.
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real

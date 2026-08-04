@@ -45,9 +45,20 @@ let readConfig: (directory: string) => ConfigRead = () => ({
 })
 const validatePluginConfig = mock((directory: string): ConfigRead => readConfig(directory))
 
+let logged: string[] = []
+
+/**
+ * Captures reports through the injected reporter rather than the shared logger singleton, which
+ * other suites replace at module scope — an observation channel the resolver's own tests must not
+ * depend on.
+ */
+const report = (message: string, data: Record<string, unknown>): void =>
+  void logged.push(`${message} ${JSON.stringify(data)}`)
+
 beforeEach(() => {
   validatePluginConfig.mockClear()
   readConfig = () => ({ valid: true, config: { cross_project_mailbox: CONFIG_V1 } })
+  logged = []
 })
 
 describe("createLiveMailboxConfigResolver", () => {
@@ -148,5 +159,94 @@ describe("createLiveMailboxConfigResolver", () => {
     // then
     expect(result).toEqual(CONFIG_V2)
     expect(validatePluginConfig).toHaveBeenCalledTimes(2)
+  })
+
+  describe("#given the config cannot be read", () => {
+    it("#when validation reports it invalid #then the fallback is reported, not silent", async () => {
+      // given
+      readConfig = () => ({ valid: false, config: {} })
+      const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG, {
+        validate: validatePluginConfig,
+        report,
+      })
+
+      // when
+      const result = await resolver.resolve()
+
+      // then
+      expect(result).toEqual(FALLBACK_CONFIG)
+      expect(logged.filter((line) => line.includes("[mailbox-live-config]"))).toHaveLength(1)
+      expect(logged.join("\n")).toContain("sender permissions unavailable")
+      expect(logged.join("\n")).toContain("/repo")
+    })
+
+    it("#when the read throws #then the cause is named rather than swallowed", async () => {
+      // given
+      readConfig = () => {
+        throw new Error("EACCES: permission denied")
+      }
+      const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG, {
+        validate: validatePluginConfig,
+        report,
+      })
+
+      // when
+      const result = await resolver.resolve()
+
+      // then
+      expect(result).toEqual(FALLBACK_CONFIG)
+      expect(logged.join("\n")).toContain("EACCES: permission denied")
+    })
+
+    it("#when the same failure repeats across renders #then it is reported once, not per render", async () => {
+      // given
+      let now = 0
+      const nowSpy = spyOn(Date, "now").mockImplementation(() => now)
+      readConfig = () => ({ valid: false, config: {} })
+      const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG, {
+        validate: validatePluginConfig,
+        report,
+      })
+
+      // when
+      for (let render = 0; render < 5; render += 1) {
+        now += 3_000
+        await resolver.resolve()
+      }
+
+      // then
+      expect(validatePluginConfig).toHaveBeenCalledTimes(5)
+      expect(logged.filter((line) => line.includes("[mailbox-live-config]"))).toHaveLength(1)
+      nowSpy.mockRestore()
+    })
+
+    it("#when the config recovers and breaks again #then the second failure is reported too", async () => {
+      // given
+      let now = 0
+      const nowSpy = spyOn(Date, "now").mockImplementation(() => now)
+      let broken = true
+      readConfig = () =>
+        broken
+          ? { valid: false, config: {} }
+          : { valid: true, config: { cross_project_mailbox: CONFIG_V1 } }
+      const resolver = createLiveMailboxConfigResolver("/repo", FALLBACK_CONFIG, {
+        validate: validatePluginConfig,
+        report,
+      })
+
+      // when
+      await resolver.resolve()
+      broken = false
+      now += 3_000
+      const recovered = await resolver.resolve()
+      broken = true
+      now += 3_000
+      await resolver.resolve()
+
+      // then
+      expect(recovered).toEqual(CONFIG_V1)
+      expect(logged.filter((line) => line.includes("[mailbox-live-config]"))).toHaveLength(2)
+      nowSpy.mockRestore()
+    })
   })
 })

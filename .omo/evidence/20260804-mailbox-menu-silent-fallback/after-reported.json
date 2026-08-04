@@ -1,0 +1,14 @@
+{
+  "symptom": {
+    "rows": [
+      "agent-harness=Disabled",
+      "atlas=Disabled",
+      "cloudhome=Disabled"
+    ],
+    "allDisabled": true
+  },
+  "operatorIsTold": true,
+  "logLines": [
+    "[mailbox-live-config] falling back to defaults, sender permissions unavailable {\"repoRoot\":\"/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/mailbox-menu-qa-GjRYwz\",\"cause\":\"config did not validate\"}"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "symptom": {
+    "rows": [
+      "agent-harness=Disabled",
+      "atlas=Disabled",
+      "cloudhome=Disabled"
+    ],
+    "allDisabled": true
+  },
+  "operatorIsTold": false,
+  "logLines": []
+}
