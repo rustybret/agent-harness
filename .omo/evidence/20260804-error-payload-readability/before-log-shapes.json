@@ -1,0 +1,20 @@
+{
+  "results": [
+    {
+      "shape": "plain object (SDK rejection)",
+      "loggedError": "[object Object]"
+    },
+    {
+      "shape": "Error instance",
+      "loggedError": "TypeError: session.messages is not a function"
+    },
+    {
+      "shape": "string rejection",
+      "loggedError": "network rejected promptAsync"
+    },
+    {
+      "shape": "object with toString",
+      "loggedError": "ProviderError: quota exhausted"
+    }
+  ]
+}

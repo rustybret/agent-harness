@@ -1,3 +1,4 @@
+import { describeErrorForLog } from "../logging/describe-error"
 import { log } from "../logger"
 import { isSessionActive, settleAfterSessionIdle } from "../session-idle-settle"
 import { sessionLatestAssistantBlocksInternalPrompt } from "./pending-tool-turn"
@@ -131,8 +132,11 @@ export async function dispatchAfterSessionIdle<TInput>(args: {
         holdMs: semanticDedupeHoldMs,
       })
     }
-    const errorText = error instanceof Error ? `${error.name}: ${error.message}` : String(error)
-    log(`[prompt-async-gate] ${sessionName} failed`, { sessionID, source, error: errorText })
+    log(`[prompt-async-gate] ${sessionName} failed`, {
+      sessionID,
+      source,
+      error: describeErrorForLog(error),
+    })
     return { status: "failed", error, dispatchAttempted }
   } finally {
     finishPromptReservation(sessionID, reservation, dispatchAttempted, postDispatchHoldMs)

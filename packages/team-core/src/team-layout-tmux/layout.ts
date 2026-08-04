@@ -1,4 +1,5 @@
 import { isServerRunning, runTmuxCommand, type TmuxCommandResult } from "@oh-my-opencode/tmux-core"
+import { describeErrorForLog } from "@oh-my-opencode/utils"
 import { log } from "../logger"
 import { shellSingleQuote } from "../shell-quote"
 import { resolveCallerTmuxSession } from "./resolve-caller-tmux-session"
@@ -185,7 +186,7 @@ export async function createTeamLayout(teamRunId: string, members: Array<TeamLay
       ownedSession: false,
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? String(error) : String(error)
+    const errorMessage = describeErrorForLog(error)
     deps.log("tmux visualization unavailable, skipping", { error: errorMessage })
     return null
   }
@@ -237,7 +238,7 @@ export async function removeTeamLayout(
       }
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? String(error) : String(error)
+    const errorMessage = describeErrorForLog(error)
     resolvedDeps.log("tmux team layout cleanup failed", { teamRunId, error: errorMessage })
   }
 }

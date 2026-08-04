@@ -1,5 +1,5 @@
 import type { PluginInput } from "@opencode-ai/plugin"
-import { log } from "../../shared/logger"
+import { describeErrorForLog, log } from "../../shared/logger"
 import { findNearestMessageWithFields } from "../../features/hook-message-injector"
 import { getMessageDir } from "./message-storage-directory"
 import { withTimeout } from "./with-timeout"
@@ -190,7 +190,7 @@ export async function injectContinuationPrompt(
 		const error = createPromptAsyncError("promptAsync returned error", promptError)
 		log("[ralph-loop] continuation prompt rejected", {
 			sessionID: options.sessionID,
-			error: String(error),
+			error: describeErrorForLog(error),
 		})
 		return { status: "rejected", error }
 	}

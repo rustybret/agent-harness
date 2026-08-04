@@ -1,5 +1,7 @@
 import { configureSharedSubunitLogger, createLogger, type LoggerTestOverrides } from "@oh-my-opencode/utils"
 
+export { describeErrorForLog } from "@oh-my-opencode/utils"
+
 import { LOG_FILENAME } from "./plugin-identity"
 
 const logger = createLogger({ logFileName: LOG_FILENAME })

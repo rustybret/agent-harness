@@ -1,5 +1,5 @@
 import type { PluginInput } from "@opencode-ai/plugin"
-import { log } from "../../shared/logger"
+import { describeErrorForLog, log } from "../../shared/logger"
 import { releasePromptAsyncReservation } from "../shared/prompt-async-gate"
 import { buildVerificationFailurePrompt } from "./continuation-prompt-builder"
 import { HOOK_NAME } from "./constants"
@@ -77,7 +77,7 @@ export async function handleFailedVerification(
 	try {
 		messageCountAtStart = await getSessionMessageCount(ctx, parentSessionID, directory)
 	} catch (error) {
-		const errorText = error instanceof Error ? String(error) : String(error)
+		const errorText = describeErrorForLog(error)
 		log(`[${HOOK_NAME}] Failed to read parent session before verification retry`, {
 			parentSessionID,
 			error: errorText,
@@ -125,7 +125,7 @@ export async function handleFailedVerification(
 			return false
 		}
 	} catch (error) {
-		const errorText = error instanceof Error ? String(error) : String(error)
+		const errorText = describeErrorForLog(error)
 		log(`[${HOOK_NAME}] Failed to inject verification failure prompt`, {
 			parentSessionID,
 			error: errorText,

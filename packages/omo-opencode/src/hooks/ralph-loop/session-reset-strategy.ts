@@ -1,6 +1,6 @@
 import type { PluginInput } from "@opencode-ai/plugin"
 import { isRecord } from "../../shared/record-type-guard"
-import { log } from "../../shared/logger"
+import { describeErrorForLog, log } from "../../shared/logger"
 
 export async function createIterationSession(
   ctx: PluginInput,
@@ -26,7 +26,7 @@ export async function createIterationSession(
 
     return createResult.data.id
   } catch (error: unknown) {
-    const errorText = error instanceof Error ? String(error) : String(error)
+    const errorText = describeErrorForLog(error)
     log("[ralph-loop] session.create threw during iteration session creation", {
       parentSessionID,
       error: errorText,
@@ -48,7 +48,7 @@ export async function selectSessionInTui(
     await selectSession({ body: { sessionID } })
     return true
   } catch (error: unknown) {
-    const errorText = error instanceof Error ? String(error) : String(error)
+    const errorText = describeErrorForLog(error)
     log("[ralph-loop] Failed to select session in TUI", {
       sessionID,
       error: errorText,

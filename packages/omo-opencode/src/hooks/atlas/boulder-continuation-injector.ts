@@ -4,7 +4,7 @@ import {
   resolveRegisteredAgentName,
 } from "../../features/claude-code-session-state"
 import { stripAgentListSortPrefix } from "../../shared/agent-display-names"
-import { log } from "../../shared/logger"
+import { describeErrorForLog, log } from "../../shared/logger"
 import { createInternalAgentContinuationTextPart, resolveInheritedPromptTools } from "../../shared"
 import { isAmbiguousPostDispatchPromptFailure } from "../../shared/prompt-failure-classifier"
 import { dispatchInternalPrompt, isInternalPromptDispatchAccepted } from "../shared/prompt-async-gate"
@@ -140,7 +140,7 @@ export async function injectBoulderContinuation(input: {
     log(`[${HOOK_NAME}] Boulder continuation injected`, { sessionID })
     return "injected"
   } catch (err) {
-    const errorText = err instanceof Error ? String(err) : String(err)
+    const errorText = describeErrorForLog(err)
     sessionState.promptFailureCount += 1
     sessionState.lastFailureAt = Date.now()
     log(`[${HOOK_NAME}] Boulder continuation failed`, {

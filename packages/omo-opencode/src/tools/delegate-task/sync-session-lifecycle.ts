@@ -3,7 +3,7 @@ import {
   clearDelegatedChildSessionBootstrap,
   registerDelegatedChildSessionBootstrap,
 } from "../../shared/delegated-child-session-bootstrap"
-import { log } from "../../shared/logger"
+import { describeErrorForLog, log } from "../../shared/logger"
 import { SessionCategoryRegistry } from "../../shared/session-category-registry"
 import type { ExecutorContext, ParentContext } from "./executor-types"
 import { buildTaskPrompt } from "./prompt-builder"
@@ -48,7 +48,7 @@ export async function registerSyncSessionSideEffects(input: {
       parentID: input.parentContext.sessionID,
       title: input.args.description,
     }).catch((error: unknown) => {
-      const message = error instanceof Error ? String(error) : String(error)
+      const message = describeErrorForLog(error)
       log("[task] onSyncSessionCreated callback failed", { error: message })
     })
   }

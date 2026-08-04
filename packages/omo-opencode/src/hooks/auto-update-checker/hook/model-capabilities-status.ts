@@ -1,6 +1,6 @@
 import type { ModelCapabilitiesConfig } from "../../../config/schema/model-capabilities"
 import { refreshModelCapabilitiesCache } from "../../../shared/model-capabilities-cache"
-import { log } from "../../../shared/logger"
+import { describeErrorForLog, log } from "../../../shared/logger"
 
 const DEFAULT_REFRESH_TIMEOUT_MS = 5000
 
@@ -28,7 +28,7 @@ export async function refreshModelCapabilitiesOnStartup(
       }),
     ])
   } catch (error) {
-    const message = error instanceof Error ? String(error) : String(error)
+    const message = describeErrorForLog(error)
     log("[auto-update-checker] Model capabilities refresh failed", { error: message })
   } finally {
     if (timeoutId) {

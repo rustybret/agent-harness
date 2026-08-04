@@ -1,6 +1,6 @@
 import type { PluginInput } from "@opencode-ai/plugin"
 import type { RalphLoopOptions, RalphLoopState } from "./types"
-import { log } from "../../shared/logger"
+import { describeErrorForLog, log } from "../../shared/logger"
 import { getTranscriptPath as getDefaultTranscriptPath } from "../claude-code-hooks/transcript"
 import { releasePromptAsyncReservation } from "../shared/prompt-async-gate"
 import { HOOK_NAME } from "./constants"
@@ -99,7 +99,7 @@ export function createRalphLoopHook(
 				.catch((error: unknown) => {
 					log(`[${HOOK_NAME}] Failed to record loop start message count`, {
 						sessionID,
-						error: String(error),
+						error: describeErrorForLog(error),
 					})
 				})
 

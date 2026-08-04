@@ -1,5 +1,5 @@
 import type { PluginInput } from "@opencode-ai/plugin"
-import { isRecord, log, normalizeSDKResponse } from "../../shared"
+import { describeErrorForLog, isRecord, log, normalizeSDKResponse } from "../../shared"
 import { withTimeout } from "./with-timeout"
 
 type SessionMessage = {
@@ -109,7 +109,7 @@ export async function latestAssistantTurnMadeNoProgress(
 		}
 		return false
 	} catch (error) {
-		const errorText = error instanceof Error ? String(error) : String(error)
+		const errorText = describeErrorForLog(error)
 		log("[ralph-loop] Failed to detect no-progress assistant turn", {
 			sessionID: input.sessionID,
 			error: errorText,

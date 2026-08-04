@@ -1,0 +1,15 @@
+{
+  "unreadableErrorPayloadLines": 74,
+  "byMessage": {
+    "[ralph-loop] Retrying after runtime session error": 24,
+    "[prompt-async-gate] promptAsync failed": 22,
+    "[ralph-loop] Failed to read parent session before verification retry": 6,
+    "[prompt-async-gate] prompt failed": 4,
+    "[ralph-loop] session.create threw during iteration session creation": 3,
+    "[ralph-loop] Failed to show ulw completion toast": 3,
+    "[ralph-loop] Failed to select session in TUI": 3,
+    "[ralph-loop] Failed to scan parent session for oracle verification evidence": 3,
+    "[ralph-loop] Failed to detect no-progress assistant turn": 3,
+    "[atlas] Boulder continuation failed": 3
+  }
+}

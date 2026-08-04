@@ -1,5 +1,5 @@
 import type { PluginInput } from "@opencode-ai/plugin"
-import { log } from "../../shared/logger"
+import { describeErrorForLog, log } from "../../shared/logger"
 import { HOOK_NAME, ULTRAWORK_VERIFICATION_PROMISE } from "./constants"
 import { extractOracleSessionID, isOracleVerified } from "./oracle-verification-detector"
 import type { RalphLoopState } from "./types"
@@ -73,7 +73,7 @@ async function detectOracleVerificationFromParentSession(
 
 		return undefined
 	} catch (error) {
-		const errorText = error instanceof Error ? String(error) : String(error)
+		const errorText = describeErrorForLog(error)
 		log(`[${HOOK_NAME}] Failed to scan parent session for oracle verification evidence`, {
 			parentSessionID,
 			error: errorText,
@@ -106,7 +106,7 @@ function showCompletionToastBestEffort(ctx: PluginInput, state: RalphLoopState):
 	}
 	const logToastError = (error: unknown) => {
 		log(`[${HOOK_NAME}] Failed to show ulw completion toast`, {
-			error: String(error),
+			error: describeErrorForLog(error),
 		})
 	}
 

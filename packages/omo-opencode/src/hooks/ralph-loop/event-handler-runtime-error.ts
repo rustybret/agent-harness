@@ -1,5 +1,5 @@
 import type { PluginInput } from "@opencode-ai/plugin"
-import { log } from "../../shared/logger"
+import { describeErrorForLog, log } from "../../shared/logger"
 import { HOOK_NAME } from "./constants"
 import {
 	hasActiveBackgroundTasks,
@@ -46,7 +46,7 @@ export async function handleRuntimeErrorEvent(
 	log(`[${HOOK_NAME}] Retrying after runtime session error`, {
 		sessionID,
 		iteration: state.iteration,
-		error: String(props?.error),
+		error: describeErrorForLog(props?.error),
 	})
 
 	if (state.verification_pending) {
