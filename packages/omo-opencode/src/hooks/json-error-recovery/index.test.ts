@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "bun:test"
 import type { PluginInput } from "@opencode-ai/plugin"
 
 import {
+  ARGUMENT_PARSE_FAILURE_PREAMBLE,
   createJsonErrorRecoveryHook,
   JSON_ERROR_PATTERNS,
   JSON_ERROR_REMINDER,
@@ -47,10 +48,13 @@ describe("createJsonErrorRecoveryHook", () => {
       metadata: {},
     })
 
-    it("appends reminder when output includes JSON parse error", async () => {
+    it("appends reminder when the call's own arguments failed to parse", async () => {
       // given
+      // Verbatim shape from opencode, captured from stored sessions.
       const input = createInput()
-      const output = createOutput("JSON parse error: expected '}' in JSON body")
+      const output = createOutput(
+        `${ARGUMENT_PARSE_FAILURE_PREAMBLE} Invalid input for tool read: JSON parsing failed: Text: {"filePath": "a.ts", 260}.\nError message: JSON Parse error: Property name must be a string literal`,
+      )
 
       // when
       await hook["tool.execute.after"](input, output)
@@ -59,16 +63,73 @@ describe("createJsonErrorRecoveryHook", () => {
       expect(output.output).toContain(JSON_ERROR_REMINDER)
     })
 
-    it("appends reminder when output includes SyntaxError", async () => {
+    it("appends reminder for an argument parse failure reported as SyntaxError", async () => {
       // given
       const input = createInput()
-      const output = createOutput("SyntaxError: Unexpected token in JSON at position 10")
+      const output = createOutput(
+        `${ARGUMENT_PARSE_FAILURE_PREAMBLE} Invalid input for tool write: SyntaxError: Unexpected token in JSON at position 10`,
+      )
 
       // when
       await hook["tool.execute.after"](input, output)
 
       // then
       expect(output.output).toContain(JSON_ERROR_REMINDER)
+    })
+
+    it("does not append reminder to a successful result whose CONTENT mentions a JSON parse error", async () => {
+      // given
+      // Observed live: aft_zoom returned source code containing the literal words "json parse
+      // error", and the reminder was appended to a call that had succeeded, instructing the caller
+      // to abandon a correct tool call.
+      const input = createInput("aft_zoom")
+      const sourceListing = [
+        "packages/omo-opencode/src/tools/delegate-task/sync-prompt-sender.ts:47-51",
+        "function isUnexpectedEofError(error: unknown): boolean {",
+        '  return lowered.includes("unexpected eof") || lowered.includes("json parse error")',
+        "}",
+      ].join("\n")
+      const output = createOutput(sourceListing)
+
+      // when
+      await hook["tool.execute.after"](input, output)
+
+      // then
+      expect(output.output).toBe(sourceListing)
+    })
+
+    it("does not append reminder when a tool reports a REMOTE json failure it did not cause", async () => {
+      // given
+      // A page returned HTML where JSON was expected. The arguments were fine, so telling the
+      // caller to fix its JSON syntax and retry is wrong advice.
+      const input = createInput("playwright_evaluate")
+      const remoteFailure =
+        "Error: page.evaluate: SyntaxError: Unexpected token '<', \"<br />\" is not valid JSON"
+      const output = createOutput(remoteFailure)
+
+      // when
+      await hook["tool.execute.after"](input, output)
+
+      // then
+      expect(output.output).toBe(remoteFailure)
+    })
+
+    it("does not depend on the exclude list to suppress content false positives", async () => {
+      // given
+      // The exclude list names tools by hardcoded string and cannot cover MCP tools registered at
+      // runtime, so gating must hold for a tool the list has never heard of.
+      const unknownTools = ["codegraph_codegraph_explore", "comfyui_get_logs", "some_future_mcp_tool"]
+      const prose = "The handler logs 'JSON parse error' when the upstream payload is truncated."
+
+      for (const tool of unknownTools) {
+        const output = createOutput(prose)
+
+        // when
+        await hook["tool.execute.after"](createInput(tool), output)
+
+        // then
+        expect(output.output).toBe(prose)
+      }
     })
 
     it("does not append reminder for normal output", async () => {
@@ -110,13 +171,14 @@ describe("createJsonErrorRecoveryHook", () => {
     it("does not append reminder for excluded tools", async () => {
       // given
       const input = createInput("Read")
-      const output = createOutput("JSON parse error: unexpected end of JSON input")
+      const argumentError = `${ARGUMENT_PARSE_FAILURE_PREAMBLE} Invalid input for tool read: JSON Parse error: Unexpected EOF`
+      const output = createOutput(argumentError)
 
       // when
       await hook["tool.execute.after"](input, output)
 
       // then
-      expect(output.output).toBe("JSON parse error: unexpected end of JSON input")
+      expect(output.output).toBe(argumentError)
     })
 
     it("does not append reminder for subagent and session-content tools", async () => {
@@ -148,7 +210,9 @@ describe("createJsonErrorRecoveryHook", () => {
     it("does not append reminder when reminder already exists", async () => {
       // given
       const input = createInput()
-      const output = createOutput(`JSON parse error: invalid JSON\n${JSON_ERROR_REMINDER}`)
+      const output = createOutput(
+        `${ARGUMENT_PARSE_FAILURE_PREAMBLE} Invalid input for tool edit: JSON Parse error: Unexpected EOF\n${JSON_ERROR_REMINDER}`,
+      )
 
       // when
       await hook["tool.execute.after"](input, output)
@@ -161,7 +225,9 @@ describe("createJsonErrorRecoveryHook", () => {
     it("does not append duplicate reminder on repeated execution", async () => {
       // given
       const input = createInput()
-      const output = createOutput("JSON parse error: invalid JSON arguments")
+      const output = createOutput(
+        `${ARGUMENT_PARSE_FAILURE_PREAMBLE} Invalid input for tool edit: JSON Parse error: Unexpected EOF`,
+      )
 
       // when
       await hook["tool.execute.after"](input, output)
@@ -192,6 +258,22 @@ describe("createJsonErrorRecoveryHook", () => {
     it("contains known parse error patterns", () => {
       // given
       const output = "JSON parse error: unexpected end of JSON input"
+
+      // when
+      const isMatched = JSON_ERROR_PATTERNS.some((pattern) => pattern.test(output))
+
+      // then
+      expect(isMatched).toBe(true)
+    })
+
+    it("matches the parser message opencode embeds in a malformed argument payload", () => {
+      // given
+      // Verbatim shape from stored sessions: the outer wrapper says "JSON parsing failed" and the
+      // underlying parser message is echoed further in, which is the part these patterns match.
+      const output = [
+        "Invalid input for tool read: JSON parsing failed: Text: {\"filePath\": \"a.ts\", 260}.",
+        "Error message: JSON Parse error: Property name must be a string literal",
+      ].join("\n")
 
       // when
       const isMatched = JSON_ERROR_PATTERNS.some((pattern) => pattern.test(output))

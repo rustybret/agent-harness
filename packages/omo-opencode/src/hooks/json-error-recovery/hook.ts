@@ -36,6 +36,21 @@ export const JSON_ERROR_PATTERNS = [
 const JSON_ERROR_REMINDER_MARKER = "[JSON PARSE ERROR - IMMEDIATE ACTION REQUIRED]"
 const JSON_ERROR_EXCLUDED_TOOLS = new Set<string>(JSON_ERROR_TOOL_EXCLUDE_LIST)
 
+/**
+ * Exact opening of the message opencode produces when a tool call's arguments fail to parse.
+ *
+ * The reminder below is an imperative addressed to the caller - "you sent invalid JSON, STOP" - so
+ * it is only ever correct on output that IS such an error. Matching any output that merely mentions
+ * a JSON parse failure fires it on successful calls too: reading a file that discusses parse errors,
+ * or a search result quoting one. That turns a normal result into a demand to abandon the call.
+ */
+export const ARGUMENT_PARSE_FAILURE_PREAMBLE = "The arguments provided to the tool are invalid:"
+
+function isArgumentParseFailure(output: string): boolean {
+  if (!output.trimStart().startsWith(ARGUMENT_PARSE_FAILURE_PREAMBLE)) return false
+  return JSON_ERROR_PATTERNS.some((pattern) => pattern.test(output))
+}
+
 export const JSON_ERROR_REMINDER = `
 [JSON PARSE ERROR - IMMEDIATE ACTION REQUIRED]
 
@@ -59,9 +74,7 @@ export function createJsonErrorRecoveryHook(_ctx: PluginInput) {
       if (typeof output.output !== "string") return
       if (output.output.includes(JSON_ERROR_REMINDER_MARKER)) return
 
-      const hasJsonError = JSON_ERROR_PATTERNS.some((pattern) => pattern.test(output.output))
-
-      if (hasJsonError) {
+      if (isArgumentParseFailure(output.output)) {
         output.output += `\n${JSON_ERROR_REMINDER}`
       }
     },

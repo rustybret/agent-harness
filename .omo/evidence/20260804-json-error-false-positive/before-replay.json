@@ -1,0 +1,15 @@
+{
+  "scanned": 268191,
+  "injectedTrue": 104,
+  "injectedFalse": 22,
+  "falseByTool": {
+    "websearch_tavily_search": 2,
+    "edit": 1,
+    "ctx_expand": 1,
+    "aft_zoom": 10,
+    "codegraph_codegraph_node": 4,
+    "aft_search": 2,
+    "aft_outline": 1,
+    "codegraph_codegraph_explore": 1
+  }
+}
