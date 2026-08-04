@@ -201,6 +201,35 @@ describe("createIdleDrainHook", () => {
       expect(spies.markDispatched.mock.calls[0][0].messageId).toBe(makeNote().messageId)
     })
 
+    it("#then a note superseding an already-delivered message reaches the prompt builder flagged", async () => {
+      // given
+      const corrected: UnreadMessage = {
+        ...makeNote({ supersedes: "33333333-3333-3333-3333-333333333333" }),
+        supersedesDelivered: true,
+      }
+      const { deps, spies } = makeHarness({ primary: "sisyphus", notes: [corrected] })
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(spies.buildTriagePrompt).toHaveBeenCalledTimes(1)
+      expect(spies.buildTriagePrompt.mock.calls[0][0].supersedesDelivered).toBe(true)
+    })
+
+    it("#then an ordinary note reaches the prompt builder without the correction flag", async () => {
+      // given
+      const { deps, spies } = makeHarness({ primary: "sisyphus" })
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(spies.buildTriagePrompt.mock.calls[0][0].supersedesDelivered).toBeUndefined()
+    })
+
     it("#then SAFETY-A: dispatched prompt input carries no agent/model/variant key", async () => {
       // given
       const { deps, spies } = makeHarness({ primary: "sisyphus" })

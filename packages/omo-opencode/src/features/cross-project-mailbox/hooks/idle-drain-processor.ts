@@ -82,7 +82,11 @@ async function dispatchLegacyTriage(input: {
   readonly metadata?: DispatchMetadata
 }): Promise<boolean> {
   const triageText = input.deps.buildTriagePrompt(
-    { ...input.note.envelope, body: input.note.body },
+    {
+      ...input.note.envelope,
+      body: input.note.body,
+      ...(input.note.supersedesDelivered === true ? { supersedesDelivered: true } : {}),
+    },
     { projectDisplayName: input.deps.projectDisplayName },
   )
   const dispatchResult = await input.deps.dispatchInternalPrompt({

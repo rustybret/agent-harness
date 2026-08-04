@@ -127,6 +127,47 @@ describe("buildTriagePrompt — plan intent", () => {
   })
 })
 
+describe("buildTriagePrompt — cross-batch supersession", () => {
+  const SUPERSEDED = "33333333-3333-4333-8333-333333333333"
+
+  test("#given a note superseding an ALREADY DELIVERED message #when buildTriagePrompt #then it opens with a correction naming the superseded id", () => {
+    // given
+    const note = { ...makeNote("impl", { supersedes: SUPERSEDED }), supersedesDelivered: true }
+
+    // when
+    const prompt = buildTriagePrompt(note, CONFIG)
+
+    // then
+    expect(prompt).toContain("CORRECTION")
+    expect(prompt).toContain(SUPERSEDED)
+    expect(prompt.toLowerCase()).toContain("withdrawn")
+    expect(prompt.indexOf("CORRECTION")).toBeLessThan(prompt.indexOf("--- inbound note ---"))
+    expect(prompt).toContain(NOTE_BODY.trim())
+  })
+
+  test("#given a note superseding a message still unread #when buildTriagePrompt #then no correction banner appears", () => {
+    // given
+    const note = makeNote("impl", { supersedes: SUPERSEDED })
+
+    // when
+    const prompt = buildTriagePrompt(note, CONFIG)
+
+    // then
+    expect(prompt).not.toContain("CORRECTION")
+  })
+
+  test("#given an ordinary note #when buildTriagePrompt #then no correction banner appears", () => {
+    // given
+    const note = makeNote("quick")
+
+    // when
+    const prompt = buildTriagePrompt(note, CONFIG)
+
+    // then
+    expect(prompt).not.toContain("CORRECTION")
+  })
+})
+
 describe("buildTriagePrompt — universal footer for every intent", () => {
   const intents: MailboxMessage["intent"][] = ["question", "quick", "impl", "review", "work-loop", "plan"]
 

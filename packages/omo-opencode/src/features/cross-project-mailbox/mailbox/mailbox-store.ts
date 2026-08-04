@@ -160,6 +160,26 @@ export class MailboxStore {
     await writeFile(reasonPath, `${JSON.stringify({ reason, detail, at: new Date().toISOString() }, null, 2)}\n`)
   }
 
+  /**
+   * Whether a message has already been handed to the receiver, i.e. acked into `processed/`.
+   *
+   * Used to tell the two supersession cases apart: superseding a note still sitting unread is a
+   * silent replacement, while superseding one already consumed is a correction the receiver has to
+   * be told about.
+   */
+  private async wasDelivered(messageId: string): Promise<boolean> {
+    const { processed } = this.dirs()
+    const candidate = path.join(processed, safeMessageIdFilename(messageId))
+    this.guard(candidate)
+    try {
+      await stat(candidate)
+      return true
+    } catch (error) {
+      if (isMissingPathError(error)) return false
+      throw error
+    }
+  }
+
   async drainUnread(maxNotes: number): Promise<UnreadMessage[]> {
     const unread = await this.listUnread()
     const supersededIds = new Set(
@@ -173,7 +193,16 @@ export class MailboxStore {
         right.envelope.priority - left.envelope.priority ||
         left.envelope.timestamp - right.envelope.timestamp,
     )
-    return latest.slice(0, maxNotes)
+    const selected = latest.slice(0, maxNotes)
+    const stillUnread = new Set(unread.map((message) => message.messageId))
+    return Promise.all(
+      selected.map(async (message) => {
+        const supersedes = message.envelope.supersedes
+        if (supersedes === null || stillUnread.has(supersedes)) return message
+        if (!(await this.wasDelivered(supersedes))) return message
+        return { ...message, supersedesDelivered: true }
+      }),
+    )
   }
 
   async reclaimStale(sessionMessageIds: Set<string>): Promise<void> {

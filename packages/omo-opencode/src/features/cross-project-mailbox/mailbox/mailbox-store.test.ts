@@ -312,6 +312,73 @@ describe("MailboxStore#drainUnread", () => {
     })
   })
 
+  describe("#given B supersedes A and A is still sitting unread", () => {
+    describe("#when drainUnread runs", () => {
+      it("#then B is not flagged as a correction, because A was never delivered", async () => {
+        const store = makeStore()
+        const noteA = makeEnvelope({ timestamp: 1_000 })
+        const noteB = makeEnvelope({ timestamp: 2_000, supersedes: noteA.messageId })
+        await store.writeNote(noteA, "first")
+        await store.writeNote(noteB, "second")
+
+        const drained = await store.drainUnread(5)
+
+        expect(drained).toHaveLength(1)
+        expect(drained[0]?.messageId).toBe(noteB.messageId)
+        expect(drained[0]?.supersedesDelivered).toBeUndefined()
+      })
+    })
+  })
+
+  describe("#given B supersedes A in a LATER batch, after A was already delivered", () => {
+    describe("#when drainUnread runs", () => {
+      it("#then B is flagged as superseding a delivered note", async () => {
+        const store = makeStore()
+        const noteA = makeEnvelope({ timestamp: 1_000 })
+        await store.writeNote(noteA, "first")
+        await store.reserve(noteA.messageId)
+        await store.ack(noteA.messageId)
+
+        const noteB = makeEnvelope({ timestamp: 2_000, supersedes: noteA.messageId })
+        await store.writeNote(noteB, "correction")
+        const drained = await store.drainUnread(5)
+
+        expect(drained).toHaveLength(1)
+        expect(drained[0]?.messageId).toBe(noteB.messageId)
+        expect(drained[0]?.supersedesDelivered).toBe(true)
+      })
+    })
+  })
+
+  describe("#given B supersedes a messageId that was never seen at all", () => {
+    describe("#when drainUnread runs", () => {
+      it("#then B is delivered without a correction flag", async () => {
+        const store = makeStore()
+        const noteB = makeEnvelope({ timestamp: 2_000, supersedes: randomUUID() })
+        await store.writeNote(noteB, "correction for a ghost")
+
+        const drained = await store.drainUnread(5)
+
+        expect(drained).toHaveLength(1)
+        expect(drained[0]?.supersedesDelivered).toBeUndefined()
+      })
+    })
+  })
+
+  describe("#given a note that supersedes nothing", () => {
+    describe("#when drainUnread runs", () => {
+      it("#then no correction flag is set and no processed lookup is implied", async () => {
+        const store = makeStore()
+        await store.writeNote(makeEnvelope({ timestamp: 1_000 }), "plain")
+
+        const drained = await store.drainUnread(5)
+
+        expect(drained).toHaveLength(1)
+        expect(drained[0]?.supersedesDelivered).toBeUndefined()
+      })
+    })
+  })
+
   describe("#given notes with mixed priorities", () => {
     describe("#when drainUnread runs", () => {
       it("#then it orders priority-desc then timestamp-asc", async () => {

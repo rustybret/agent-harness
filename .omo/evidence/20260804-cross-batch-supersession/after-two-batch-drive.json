@@ -1,0 +1,18 @@
+{
+  "batch1Delivered": [
+    "37a795f1-066b-499d-900f-9b97f7265c32"
+  ],
+  "batch2Delivered": [
+    "354c7ce4-8500-4f7c-b7fe-3492fe1d1ad2"
+  ],
+  "supersedesDelivered": true,
+  "promptOpensWithCorrection": [
+    "Cross-project note from cloudhome (received by agent-harness) — intent=impl, priority=0",
+    "[mailbox-message-id: 354c7ce4-8500-4f7c-b7fe-3492fe1d1ad2]",
+    "",
+    "CORRECTION: this note supersedes message 37a795f1-066b-499d-900f-9b97f7265c32, which was already delivered to you.",
+    "Treat the earlier note's instructions as withdrawn. If you started work based on it, stop and reconcile against this note before continuing.",
+    ""
+  ],
+  "namesSupersededId": true
+}

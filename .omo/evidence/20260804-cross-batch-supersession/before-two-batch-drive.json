@@ -1,0 +1,13 @@
+{
+  "note": "Captured by reverting mailbox-store.ts + triage/template.ts via git stash, running the same driver, then restoring (RESTORED-OK verified by cmp).",
+  "supersedesDelivered": null,
+  "namesSupersededId": false,
+  "promptOpensWith": [
+    "Cross-project note from cloudhome (received by agent-harness) — intent=impl, priority=0",
+    "[mailbox-message-id: <correction-id>]",
+    "",
+    "--- inbound note ---",
+    "Hold the v3 deploy - it has a bad migration.",
+    "--- end note ---"
+  ]
+}

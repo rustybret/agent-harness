@@ -20,6 +20,13 @@ export interface UnreadMessage {
   filePath: string
   envelope: MailboxMessage
   body: string
+  /**
+   * True when this note supersedes a message that was ALREADY consumed, rather than one still
+   * sitting unread beside it. Same-batch supersession is invisible to the receiver by design - the
+   * superseded note is simply never delivered. Once the original has been acted on, silence is
+   * wrong: the receiver needs to know the work it started is being corrected.
+   */
+  supersedesDelivered?: boolean
 }
 
 export interface MailboxDir {
