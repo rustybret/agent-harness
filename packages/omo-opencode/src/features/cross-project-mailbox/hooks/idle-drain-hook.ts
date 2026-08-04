@@ -108,13 +108,34 @@ async function countWaitingNotes(deps: IdleDrainHookDeps): Promise<number> {
   return waiting
 }
 
-// Returns the gate verdict AND, when blocked, emits one trace record naming the cause and how many
-// notes it is holding. Previously a blocked drain wrote only a tmpdir log line, so notes sat unread
-// with no signal anywhere an operator or agent looks.
+// A skip is worth reporting when the SITUATION changes, not every time the gate is consulted. An
+// idle session is polled continuously, so a steady gated state re-reports the same verdict every
+// few seconds: 1593 identical lines an hour, ~80% of all real-session log output, drowning the
+// diagnostics an operator is actually reading and aging the log toward its rotation cap.
+//
+// The signature covers everything a reader would act on - the cause, its detail, and how many notes
+// are being held - so a first skip, a changed cause, and a newly arrived note all still report. A
+// bounded map keeps a long-lived process from accumulating one entry per session forever.
+const MAX_TRACKED_SKIP_SESSIONS = 500
+
+function rememberSkipSignature(seen: Map<string, string>, sessionId: string, signature: string): boolean {
+  if (seen.get(sessionId) === signature) return false
+  if (seen.size >= MAX_TRACKED_SKIP_SESSIONS && !seen.has(sessionId)) {
+    const oldest = seen.keys().next()
+    if (!oldest.done) seen.delete(oldest.value)
+  }
+  seen.set(sessionId, signature)
+  return true
+}
+
+// Returns the gate verdict AND, when the verdict is newly blocked or has changed, emits one trace
+// record naming the cause and how many notes it is holding. Previously a blocked drain wrote only a
+// tmpdir log line, so notes sat unread with no signal anywhere an operator or agent looks.
 async function shouldSkipDrain(input: {
   readonly deps: IdleDrainHookDeps
   readonly freshConfig: CrossProjectMailboxConfig
   readonly sessionId: string
+  readonly reportedSkips: Map<string, string>
 }): Promise<boolean> {
   // Config-only blocks are settled first, without resolving the primary, so a disabled or
   // permissionless mailbox performs zero session lookups and zero store access.
@@ -122,12 +143,20 @@ async function shouldSkipDrain(input: {
   const verdict = configVerdict.allowed
     ? evaluateDrainGate(input.freshConfig, await input.deps.resolveActivePrimaryAgent(input.sessionId))
     : configVerdict
-  if (verdict.allowed) return false
+  if (verdict.allowed) {
+    // Clearing on success means the NEXT time this session is gated it reports again, rather than
+    // being suppressed by a signature from before the situation changed.
+    input.reportedSkips.delete(input.sessionId)
+    return false
+  }
 
   const waiting =
     verdict.reason === "primary-not-eligible"
       ? await countWaitingNotes(input.deps).catch(() => 0)
       : undefined
+  const signature = `${verdict.reason}:${verdict.detail}:${waiting ?? "-"}`
+  if (!rememberSkipSignature(input.reportedSkips, input.sessionId, signature)) return true
+
   log(`[mailbox-idle-drain] skipped: ${verdict.reason}`, {
     sessionId: input.sessionId,
     detail: verdict.detail,
@@ -154,6 +183,7 @@ export function createIdleDrainHook(deps: IdleDrainHookDeps): IdleDrainHook {
       validate: deps.validatePluginConfig,
     })
   const fallbackIds = new Set<string>()
+  const reportedSkips = new Map<string, string>()
 
   const runDrain = async (input: { readonly sessionId: string; readonly skipActiveCheck: boolean }): Promise<{ triggered: boolean }> => {
     const { sessionId, skipActiveCheck } = input
@@ -166,7 +196,7 @@ export function createIdleDrainHook(deps: IdleDrainHookDeps): IdleDrainHook {
     }
 
     const freshConfig = await liveConfigResolver.resolve()
-    if (await shouldSkipDrain({ deps, freshConfig, sessionId })) return { triggered: false }
+    if (await shouldSkipDrain({ deps, freshConfig, sessionId, reportedSkips })) return { triggered: false }
 
     const maxNotes = freshConfig.bounds.max_notes_per_drain
     const projects = deps.getRegisteredProjects()

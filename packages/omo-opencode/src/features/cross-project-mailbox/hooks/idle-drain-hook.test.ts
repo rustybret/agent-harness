@@ -333,6 +333,79 @@ describe("createIdleDrainHook", () => {
     })
   })
 
+  describe("#given the same session stays gated across repeated idle polls", () => {
+    it("#then the unchanged verdict is reported once, not on every poll", async () => {
+      // given: an idle session is polled continuously, so an unchanged gated state would otherwise
+      // re-report the identical verdict every few seconds
+      const traced: { phase: string }[] = []
+      const { deps } = makeHarness({ primary: "prometheus" })
+      deps.emitTrace = (event) => void traced.push(event)
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+      await hook["session.idle"]({ sessionId: "ses_1" })
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(traced.filter((event) => event.phase === "drain-skipped")).toHaveLength(1)
+    })
+
+    it("#then a newly arrived note reports again, because the situation changed", async () => {
+      // given
+      const traced: { phase: string; waiting?: number }[] = []
+      const { deps, spies } = makeHarness({ primary: "prometheus", notes: [makeNote()] })
+      deps.emitTrace = (event) => void traced.push(event)
+      const hook = createIdleDrainHook(deps)
+
+      // when: first poll holds one note, second holds two
+      await hook["session.idle"]({ sessionId: "ses_1" })
+      spies.drainUnread.mockImplementation(async () => [
+        makeNote(),
+        makeNote({ messageId: "44444444-4444-4444-4444-444444444444" }),
+      ])
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      const skips = traced.filter((event) => event.phase === "drain-skipped")
+      expect(skips).toHaveLength(2)
+      expect(skips[1]?.waiting).toBe(2)
+    })
+
+    it("#then a session that drains and is later gated again reports the new skip", async () => {
+      // given: suppression must not outlive the state it describes
+      const traced: { phase: string }[] = []
+      const { deps, spies } = makeHarness({ primary: "prometheus" })
+      deps.emitTrace = (event) => void traced.push(event)
+      const hook = createIdleDrainHook(deps)
+
+      // when: gated, then eligible, then gated again
+      await hook["session.idle"]({ sessionId: "ses_1" })
+      spies.resolveActivePrimaryAgent.mockImplementation(() => "sisyphus")
+      await hook["session.idle"]({ sessionId: "ses_1" })
+      spies.resolveActivePrimaryAgent.mockImplementation(() => "prometheus")
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then
+      expect(traced.filter((event) => event.phase === "drain-skipped")).toHaveLength(2)
+    })
+
+    it("#then a different session still reports its own first skip", async () => {
+      // given
+      const traced: { phase: string }[] = []
+      const { deps } = makeHarness({ primary: "prometheus" })
+      deps.emitTrace = (event) => void traced.push(event)
+      const hook = createIdleDrainHook(deps)
+
+      // when
+      await hook["session.idle"]({ sessionId: "ses_1" })
+      await hook["session.idle"]({ sessionId: "ses_2" })
+
+      // then
+      expect(traced.filter((event) => event.phase === "drain-skipped")).toHaveLength(2)
+    })
+  })
+
   describe("#given an eligible primary", () => {
     it("#then no drain-skipped trace is emitted", async () => {
       // given

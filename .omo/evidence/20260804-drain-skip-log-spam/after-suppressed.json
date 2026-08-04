@@ -1,0 +1,6 @@
+{
+  "pollsPerPhase": 30,
+  "totalPolls": 90,
+  "skipLogLines": 3,
+  "distinctSignatures": 3
+}
