@@ -27,6 +27,7 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P0-11 | `normalizeSDKResponse` returned values contradicting the caller's declared type, crashing todo continuation in 24 sessions | log mining (`[event] hook execution failed`) | `73d28ce00` |
 | P0-12 | A busy peer was reported the same as a dead one - 267 real-session probe timeouts, all against servers that were alive | log mining (`[presence-reader] health probe failed`) | `a35eb1b4a` |
 | P0-13 | The drain gate read the agent a session STARTED with, not its current one - 30 of 40 replayed real sessions decided wrongly | log mining (4939 skips reporting subagents as primary) | `9cdf5dd74` |
+| P0-14 | A gated drain re-reported the same verdict every poll - 1593 lines/hr, ~80% of real-session output (regression from P1-2) | log mining | `1cc9fdf06` |
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real
@@ -79,7 +80,10 @@ response as a defect report rather than noise is what turned it into a fix.
 4. Replay stored session data through a hook to measure it in production conditions. P0-7's
    false-positive rate came from running the real hook over 268k stored tool outputs; no synthetic
    fixture would have found it, and the same replay proved the fix kept every true positive.
-5. Verify a claim before writing it down. Three claims died in QA this session: a "the patterns
+5. Re-mine after each fix. Clearing the loudest cluster exposes the next one, and twice the newly
+   exposed cluster was a regression from an earlier fix in the same session (P0-14 from P1-2).
+   Observability work is iterative by nature: what you add to see with also becomes noise.
+6. Verify a claim before writing it down. Three claims died in QA this session: a "the patterns
    miss 89% of real errors" figure that a recall check disproved (they matched 104 of 105), three
    log clusters that turned out to be test fixtures rather than production failures, and a
    hypothesis that P1-3's warnings came from failed edits - the database showed all 44 succeeded,
