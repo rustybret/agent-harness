@@ -13,6 +13,7 @@ import { getOmoOpenCodeCacheDir } from "./packages/omo-opencode/src/shared/data-
 import { releaseAllPromptAsyncReservationsForTesting } from "./packages/omo-opencode/src/shared/prompt-async-gate"
 import { resetLiveServerRouteForTesting } from "./packages/omo-opencode/src/shared/live-server-route"
 import { installModuleMockLifecycle } from "./packages/omo-opencode/src/testing/module-mock-lifecycle"
+import { LOG_DIR_ENV_VAR } from "./packages/utils/src/logging/logger"
 
 // Installer/doctor integration tests need the vendored lsp-daemon dist that CI builds
 // out-of-band before `bun test`; mirror that here so fresh clones/worktrees pass too.
@@ -56,6 +57,13 @@ ensureVendoredLspDaemonBuilt()
 const HERMETIC_HOME = mkdtempSync(join(tmpdir(), "omo-test-home-"))
 process.env.HOME = HERMETIC_HOME
 process.env.USERPROFILE = HERMETIC_HOME
+
+// The plugin logger defaults to <tmpdir>/oh-my-opencode.log, which is the SAME file a developer
+// reads when diagnosing a real session. Without this, `bun test` appends thousands of fixture lines
+// (session ids like "parent-session", deliberately-triggered failures) into that log and evicts real
+// diagnostics through its 50 MB rotation. Redirect test output to a per-process temp dir. Set before
+// the beforeEach snapshot so the afterEach env restore preserves it.
+process.env[LOG_DIR_ENV_VAR] = mkdtempSync(join(tmpdir(), "omo-test-logs-"))
 
 let isGlobalMockCleanup = false
 const { restoreModuleMocks } = installModuleMockLifecycle(mock, {

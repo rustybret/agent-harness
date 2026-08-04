@@ -1,0 +1,3 @@
+1744 mailbox sidebar readdir failed
+  31 [mailbox-idle-drain] skipped: primary not eligible
+  16 [mailbox-idle-drain] skipped: permissionless config

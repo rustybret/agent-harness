@@ -3,7 +3,7 @@ import * as fs from "fs"
 import * as os from "os"
 import * as path from "path"
 
-import { createLogger } from "./logger"
+import { createLogger, LOG_DIR_ENV_VAR } from "./logger"
 
 const TEST_PREFIX = "omo-utils-logger"
 
@@ -84,6 +84,57 @@ describe("#given a bound utils logger", () => {
 
     expect(captured).toEqual([{ message: "SINK-CAPTURED", data: { qa: true } }])
     expect(fs.readFileSync(logFilePath, "utf8")).toMatch(/FILE-RESTORED \{"qa":true\}\n$/)
+  })
+
+  test("#when the log dir override env var is set #then the default path follows it", () => {
+    const overrideDir = fs.mkdtempSync(path.join(tempDir, "override-"))
+    const previous = process.env[LOG_DIR_ENV_VAR]
+    process.env[LOG_DIR_ENV_VAR] = overrideDir
+
+    try {
+      const logger = createLogger({ logFileName: "redirected.log" })
+      logger.log("REDIRECTED", { qa: true })
+      logger._flushForTesting()
+
+      expect(logger.getLogFilePath()).toBe(path.join(overrideDir, "redirected.log"))
+      expect(fs.readFileSync(path.join(overrideDir, "redirected.log"), "utf8")).toContain("REDIRECTED")
+    } finally {
+      if (previous === undefined) delete process.env[LOG_DIR_ENV_VAR]
+      else process.env[LOG_DIR_ENV_VAR] = previous
+    }
+  })
+
+  test("#when the override env var is set after the logger is constructed #then the new path is still honoured", () => {
+    // given loggers are created at module scope, so a startup-time override lands after construction
+    const previous = process.env[LOG_DIR_ENV_VAR]
+    delete process.env[LOG_DIR_ENV_VAR]
+    const logger = createLogger({ logFileName: "late.log" })
+    const lateDir = fs.mkdtempSync(path.join(tempDir, "late-"))
+
+    try {
+      process.env[LOG_DIR_ENV_VAR] = lateDir
+      logger.log("LATE-BOUND", { qa: true })
+      logger._flushForTesting()
+
+      expect(fs.readFileSync(path.join(lateDir, "late.log"), "utf8")).toContain("LATE-BOUND")
+    } finally {
+      if (previous === undefined) delete process.env[LOG_DIR_ENV_VAR]
+      else process.env[LOG_DIR_ENV_VAR] = previous
+    }
+  })
+
+  test("#when no override is set #then the log resolves under the system temp dir", () => {
+    const previous = process.env[LOG_DIR_ENV_VAR]
+    delete process.env[LOG_DIR_ENV_VAR]
+
+    try {
+      const logger = createLogger({ logFileName: "default-path.log" })
+
+      expect(logger.getLogFilePath()).toBe(path.join(os.tmpdir(), "default-path.log"))
+    } finally {
+      if (previous === undefined) delete process.env[LOG_DIR_ENV_VAR]
+      else process.env[LOG_DIR_ENV_VAR] = previous
+    }
   })
 
   test("#when reset follows a test override #then the default resolved path is restored", () => {

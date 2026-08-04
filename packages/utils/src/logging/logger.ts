@@ -35,8 +35,19 @@ export type BoundLogger = {
   readonly _flushForTesting: () => void
 }
 
+export const LOG_DIR_ENV_VAR = "OMO_LOG_DIR"
+
+/**
+ * Resolves where a product log is written, honouring an explicit directory override.
+ *
+ * The override exists so a process that must not touch the developer's live log - the test suite
+ * above all - can redirect its output without every call site threading a path. Test runs otherwise
+ * append fixture noise to the same file an operator reads when diagnosing a real session.
+ */
 function defaultLogFilePath(logFileName: string): string {
-  return path.join(os.tmpdir(), logFileName)
+  const overrideDir = process.env[LOG_DIR_ENV_VAR]
+  const directory = overrideDir !== undefined && overrideDir.length > 0 ? overrideDir : os.tmpdir()
+  return path.join(directory, logFileName)
 }
 
 export function createLogger(options: LoggerOptions): BoundLogger {
@@ -45,9 +56,11 @@ export function createLogger(options: LoggerOptions): BoundLogger {
   const flushIntervalMs = options.flushIntervalMs ?? DEFAULT_LOG_FLUSH_INTERVAL_MS
   const bufferSizeLimit = options.bufferSizeLimit ?? DEFAULT_LOG_BUFFER_SIZE_LIMIT
   const resolveLogFilePath = options.resolveLogFilePath ?? defaultLogFilePath
-  const initialLogFile = resolveLogFilePath(options.logFileName)
-
-  let logFile = initialLogFile
+  // Resolved lazily rather than at construction: loggers are created at module scope, so a process
+  // that sets the directory override during startup (the test preload) would otherwise be too late,
+  // its env assignment running after hoisted imports already fixed the path.
+  let logFileOverride: string | null = null
+  const currentLogFile = (): string => logFileOverride ?? resolveLogFilePath(options.logFileName)
   let maxLogFileSizeBytes = maxLogFileSizeDefault
   let maxLogFileBackups = maxLogFileBackupsDefault
   let buffer: string[] = []
@@ -56,6 +69,7 @@ export function createLogger(options: LoggerOptions): BoundLogger {
 
   function rotateLogFileIfNeeded(): void {
     try {
+      const logFile = currentLogFile()
       if (!fs.existsSync(logFile)) return
       const stats = fs.statSync(logFile)
       if (stats.size <= maxLogFileSizeBytes) return
@@ -82,7 +96,7 @@ export function createLogger(options: LoggerOptions): BoundLogger {
     const data = buffer.join("")
     buffer = []
     try {
-      fs.appendFileSync(logFile, data)
+      fs.appendFileSync(currentLogFile(), data)
       rotateLogFileIfNeeded()
     } catch (error) {
       if (error instanceof Error) return
@@ -122,7 +136,7 @@ export function createLogger(options: LoggerOptions): BoundLogger {
   }
 
   function getLogFilePath(): string {
-    return logFile
+    return currentLogFile()
   }
 
   function _setLoggerForTesting(overrides: LoggerTestOverrides): void {
@@ -131,14 +145,14 @@ export function createLogger(options: LoggerOptions): BoundLogger {
       clearTimeout(flushTimer)
       flushTimer = null
     }
-    if (overrides.filePath !== undefined) logFile = overrides.filePath
+    if (overrides.filePath !== undefined) logFileOverride = overrides.filePath
     if (overrides.maxSizeBytes !== undefined) maxLogFileSizeBytes = overrides.maxSizeBytes
     if (overrides.maxBackups !== undefined) maxLogFileBackups = overrides.maxBackups
     if (overrides.sink !== undefined) sink = overrides.sink
   }
 
   function _resetLoggerForTesting(): void {
-    logFile = initialLogFile
+    logFileOverride = null
     maxLogFileSizeBytes = maxLogFileSizeDefault
     maxLogFileBackups = maxLogFileBackupsDefault
     sink = null
