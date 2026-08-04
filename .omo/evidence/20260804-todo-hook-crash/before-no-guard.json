@@ -1,0 +1,12 @@
+{
+  "note": "Captured by reverting only normalize-sdk-response.ts via git stash, running the same driver, then restoring (RESTORED-OK verified by cmp).",
+  "hookCrashes": 4,
+  "results": [
+    { "shape": "error envelope (data null + error)", "outcome": "THREW", "error": "TypeError: todos.filter is not a function" },
+    { "shape": "bare error object", "outcome": "THREW", "error": "TypeError: todos.filter is not a function" },
+    { "shape": "bare object body", "outcome": "THREW", "error": "TypeError: todos.filter is not a function" },
+    { "shape": "string body", "outcome": "THREW", "error": "TypeError: todos.filter is not a function" },
+    { "shape": "proper envelope", "outcome": "completed" },
+    { "shape": "proper bare array", "outcome": "completed" }
+  ]
+}

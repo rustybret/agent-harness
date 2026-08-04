@@ -85,6 +85,33 @@ describe("handleSessionIdle", () => {
     expect(resetCalls).toEqual([sessionID])
   })
 
+  it("survives an error envelope from session.todo instead of throwing out of the hook", async () => {
+    // given the host answers with an error envelope rather than a todo list - observed in the live
+    // plugin log as "TypeError: todos.filter is not a function" killing the hook on session.idle
+    const sessionID = "ses_todo_error_envelope"
+    const { store, resetCalls } = createStateStore()
+    const ctx = {
+      client: {
+        session: {
+          messages: async () => ({ data: [] }),
+          todo: async () => ({ data: null, error: { message: "session not found" } }),
+        },
+      },
+      directory: "/tmp/test",
+    }
+
+    // when
+    const run = handleSessionIdle({
+      ctx: ctx as never,
+      sessionID,
+      sessionStateStore: store,
+    })
+
+    // then it completes and takes the no-todos path rather than throwing
+    await expect(run).resolves.toBeUndefined()
+    expect(resetCalls).toEqual([sessionID])
+  })
+
   it("resets continuation progress once when every todo is complete", async () => {
     // given
     const sessionID = "ses_completed_todos"

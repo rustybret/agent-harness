@@ -1,0 +1,29 @@
+{
+  "hookCrashes": 0,
+  "results": [
+    {
+      "shape": "error envelope (data null + error)",
+      "outcome": "completed"
+    },
+    {
+      "shape": "bare error object",
+      "outcome": "completed"
+    },
+    {
+      "shape": "bare object body",
+      "outcome": "completed"
+    },
+    {
+      "shape": "string body",
+      "outcome": "completed"
+    },
+    {
+      "shape": "proper envelope",
+      "outcome": "completed"
+    },
+    {
+      "shape": "proper bare array",
+      "outcome": "completed"
+    }
+  ]
+}
