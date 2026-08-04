@@ -86,4 +86,44 @@ describe("createToolExecuteAfterHandler metadata recovery", () => {
     expect(hookRan).toBe(true)
     expect(hasLogMessageContaining("Unable to recover stored metadata and no native session linkage was present")).toBe(true)
   })
+
+  it("#given hashline_edit is off so edit is opencode's own tool #when tool.execute.after runs #then no missing-metadata warning is emitted", async () => {
+    // given
+    // Observed live: 44 successful native edits each logged a missing metadata store, because the
+    // native tool never publishes omo metadata and cannot.
+    const handler = createToolExecuteAfterHandler({
+      ctx: { directory: "/repo" } as never,
+      hooks: {} as never,
+      pluginConfig: {},
+      log: logForTesting,
+    })
+
+    // when
+    await handler(
+      { tool: "edit", sessionID: "ses_parent", callID: "call_native_edit" },
+      { title: "file.ts", output: "Edited (+3/-1).", metadata: { diff: "...", filediff: "..." } },
+    )
+
+    // then
+    expect(hasLogMessageContaining("Unable to recover stored metadata")).toBe(false)
+  })
+
+  it("#given hashline_edit is on so edit is ours #when its metadata is missing #then the warning still fires", async () => {
+    // given
+    const handler = createToolExecuteAfterHandler({
+      ctx: { directory: "/repo" } as never,
+      hooks: {} as never,
+      pluginConfig: { hashline_edit: true },
+      log: logForTesting,
+    })
+
+    // when
+    await handler(
+      { tool: "edit", sessionID: "ses_parent", callID: "call_hashline_edit" },
+      { title: "file.ts", output: "Updated file.ts", metadata: {} },
+    )
+
+    // then
+    expect(hasLogMessageContaining("Unable to recover stored metadata and no native session linkage was present")).toBe(true)
+  })
 })

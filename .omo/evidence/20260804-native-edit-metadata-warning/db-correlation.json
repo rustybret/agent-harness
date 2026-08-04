@@ -1,0 +1,9 @@
+{
+  "warnedCallIds": 44,
+  "foundInDb": 44,
+  "outputStartsWithError": 0,
+  "successfulOutput": 44,
+  "metadataKeyShapes": {
+    "diagnostics,diff,filediff,truncated": 44
+  }
+}

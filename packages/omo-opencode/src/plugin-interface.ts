@@ -106,6 +106,7 @@ export function createPluginInterface(args: {
     "tool.execute.after": createToolExecuteAfterHandler({
       ctx,
       hooks,
+      pluginConfig,
     }),
   }
 }

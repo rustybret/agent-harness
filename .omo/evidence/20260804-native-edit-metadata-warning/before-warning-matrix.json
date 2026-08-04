@@ -1,0 +1,20 @@
+{
+  "results": [
+    {
+      "case": "native edit, hashline_edit off (the live config)",
+      "warned": true
+    },
+    {
+      "case": "hashline edit, hashline_edit on, metadata missing",
+      "warned": true
+    },
+    {
+      "case": "task with no stored metadata",
+      "warned": true
+    },
+    {
+      "case": "read (never metadata-linked)",
+      "warned": false
+    }
+  ]
+}

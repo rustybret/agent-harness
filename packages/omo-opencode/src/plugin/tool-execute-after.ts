@@ -6,9 +6,22 @@ import type { PluginContext } from "./types"
 
 const METADATA_LINKED_TOOLS = new Set([
   "background_output",
-  "edit",
   "task",
 ])
+
+/**
+ * Tools that only publish recoverable metadata when the config flag registering them is on.
+ *
+ * `edit` is opencode's own tool unless `hashline_edit` replaces it. The native one never stores omo
+ * metadata, so expecting it unconditionally reports a missing store on every successful edit.
+ */
+const CONFIG_GATED_METADATA_TOOLS: Readonly<Record<string, (config: MetadataToolConfig) => boolean>> = {
+  edit: (config) => config.hashline_edit === true,
+}
+
+type MetadataToolConfig = {
+  readonly hashline_edit?: boolean
+}
 
 type ToolExecuteAfterInput = {
   readonly tool: string
@@ -44,8 +57,9 @@ function getPluginDirectory(ctx: PluginContext): string | null {
   return null
 }
 
-function expectsRecoverableMetadata(tool: string): boolean {
-  return METADATA_LINKED_TOOLS.has(tool)
+function expectsRecoverableMetadata(tool: string, config: MetadataToolConfig): boolean {
+  if (METADATA_LINKED_TOOLS.has(tool)) return true
+  return CONFIG_GATED_METADATA_TOOLS[tool]?.(config) === true
 }
 
 function appendCodegraphInitGuidance(
@@ -65,6 +79,7 @@ function appendCodegraphInitGuidance(
 export function createToolExecuteAfterHandler(args: {
   ctx: PluginContext
   hooks: CreatedHooks
+  pluginConfig?: MetadataToolConfig
   log?: typeof defaultLog
 }): (
   input: ToolExecuteAfterInput,
@@ -72,6 +87,7 @@ export function createToolExecuteAfterHandler(args: {
 ) => Promise<void> {
   const { ctx, hooks } = args
   const log = args.log ?? defaultLog
+  const pluginConfig = args.pluginConfig ?? {}
 
   // OpenCode injects tool call ids into execute() context and after-hook input via undocumented runtime fields.
   // We must treat their identity as a best-effort correlation key, not a guaranteed public contract.
@@ -110,7 +126,7 @@ export function createToolExecuteAfterHandler(args: {
           output.metadata = { ...output.metadata, ...stored.metadata }
         }
       }
-    } else if (!nativeSessionId && expectsRecoverableMetadata(input.tool)) {
+    } else if (!nativeSessionId && expectsRecoverableMetadata(input.tool, pluginConfig)) {
       log("[tool-execute-after] Unable to recover stored metadata and no native session linkage was present", {
         tool: input.tool,
         sessionID: input.sessionID,
