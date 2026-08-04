@@ -56,7 +56,7 @@ describe("createWriteExistingFileGuardHook", () => {
         } as never,
         { args: { filePath: existingFile, content: "updated" } } as never,
       ),
-    ).rejects.toThrow("File already exists. Use edit tool instead.")
+    ).rejects.toThrow("because this session has not read it")
 
     // then
     expect(existsSyncMock).toHaveBeenCalledTimes(3)

@@ -1,0 +1,14 @@
+{
+  "blockedMessage": "Refusing to overwrite /var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/write-guard-qa-D5cmAJ/config.ts because this session has not read it. This guards against replacing content you have not seen; the file is unchanged. To proceed: read /var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/write-guard-qa-D5cmAJ/config.ts first, then write (a read grants one overwrite), or pass overwrite: true to skip the read. To change part of the file instead, use edit.",
+  "messageChars": 455,
+  "namesFile": true,
+  "saysFileUnchanged": true,
+  "namesReadRecovery": true,
+  "namesOverwriteFlag": true,
+  "fileStillOriginal": true,
+  "recoveryPathsWork": {
+    "readThenWrite": true,
+    "overwriteFlag": true,
+    "overwriteStrippedFromArgs": true
+  }
+}

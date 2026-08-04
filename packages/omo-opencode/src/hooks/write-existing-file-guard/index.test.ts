@@ -6,7 +6,9 @@ import { dirname, join, resolve } from "node:path"
 import { createWriteExistingFileGuardHook } from "./index"
 import { isOmoWorkspacePath } from "./tool-execute-before-handler"
 
-const BLOCK_MESSAGE = "File already exists. Use edit tool instead."
+// The message names the specific file, so tests match the invariant sentence rather than the
+// whole string; buildBlockedWriteMessage is asserted directly in block-message.test.ts.
+const BLOCK_MESSAGE = "because this session has not read it"
 
 type Hook = ReturnType<typeof createWriteExistingFileGuardHook>
 

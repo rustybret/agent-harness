@@ -17,6 +17,24 @@ import {
   trimSessionReadSet,
 } from "./session-read-permissions"
 
+/**
+ * Explains the block in terms of the two things that actually lift it.
+ *
+ * The guard is a read-before-overwrite rule, not a ban on `write`. "Use edit tool instead" names
+ * neither exit: `edit` is the wrong advice when the intent IS to replace the whole file, and the
+ * `overwrite` escape hatch appears in no tool schema, so it cannot be discovered from the tool
+ * surface at all. Observed recovery after a block is split between reading, retrying `write`
+ * unchanged, and switching to `edit` - and 3 of 5 immediate retries failed again.
+ */
+export function buildBlockedWriteMessage(filePath: string): string {
+  return [
+    `Refusing to overwrite ${filePath} because this session has not read it.`,
+    `This guards against replacing content you have not seen; the file is unchanged.`,
+    `To proceed: read ${filePath} first, then write (a read grants one overwrite), or pass overwrite: true to skip the read.`,
+    `To change part of the file instead, use edit.`,
+  ].join(" ")
+}
+
 function ensureSessionReadSet(params: {
   sessionID: string
   readPermissionsBySession: Map<string, Set<string>>
@@ -189,5 +207,5 @@ export async function handleWriteExistingFileGuardToolExecuteBefore(params: {
     resolvedPath,
   })
 
-  throw new Error("File already exists. Use edit tool instead.")
+  throw new Error(buildBlockedWriteMessage(filePath))
 }

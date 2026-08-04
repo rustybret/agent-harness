@@ -1,0 +1,14 @@
+{
+  "blockedMessage": "File already exists. Use edit tool instead.",
+  "messageChars": 43,
+  "namesFile": false,
+  "saysFileUnchanged": false,
+  "namesReadRecovery": false,
+  "namesOverwriteFlag": false,
+  "fileStillOriginal": true,
+  "recoveryPathsWork": {
+    "readThenWrite": true,
+    "overwriteFlag": true,
+    "overwriteStrippedFromArgs": true
+  }
+}
