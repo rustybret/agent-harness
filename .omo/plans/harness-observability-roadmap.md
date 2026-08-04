@@ -31,6 +31,7 @@ that HIDES other defects outranks both (fixing it makes the next round of mining
 | P1-5 | Context injector logged every synthetic turn (157/hr) and stayed silent on the one that actually held context back | log mining | `5b3b9250d` |
 | P0-15 | `bash` was not truncatable - a real `git log` returned 4.29MB (~1.07M tokens), larger than any context window | session-database mining | `c35d99ba8` |
 | P1-6 | `lsp_diagnostics` doubled the package path, reporting present files as missing - 39 cases across 14 sessions | hit live, then session-database mining | `813ab74fb` |
+| P1-7 | `Tool not found` named no alternative - 89 failures across 63 distinct guessed names on one server | error-RATE mining (skill_mcp worst at 22.3%) | `385623c77` |
 
 P0-2 was not on any list. It was found only because the P0-1 QA driver ran the real config path
 against the real user config and the sidebar came back `kind: "broken"`. Manual QA against real
@@ -48,9 +49,6 @@ response as a defect report rather than noise is what turned it into a fix.
 - Notify-on-drain callback so a sender learns when its note was actually consumed.
 
 ### Known gaps, not yet scheduled
-- **`task` outputs reached 674k chars** (7 calls over 200k). Subagent results are a summary the
-  parent asked for rather than an unbounded dump, so capping them needs its own judgment about what
-  to keep - not folded into the bash fix.
 
 - **552 `String(error)` occurrences remain**, mostly outside logging (message construction,
   user-facing text). Only the 17 sites that produced observed `[object Object]` log lines were
@@ -63,6 +61,15 @@ response as a defect report rather than noise is what turned it into a fix.
   entry will drop silently the same way P0-6 did. The registry test cannot detect a missing entry.
 
 ### Investigated and dropped
+- **`task` outputs reaching 674k chars.** All 7 calls over 200k are from 2026-03-09 and none recur:
+  in the last 30 days the largest of 1110 `task` calls is 51k, and only ONE exceeds 50k. Already
+  bounded in practice, so a cap would be speculative.
+- **`edit:` schema-confusion errors (41 across 30 sessions).** Real and current - I hit two myself
+  this session - but the strings (`no edit mode resolved from arguments`, `'startLine'/'endLine' are
+  not top-level parameters`) exist nowhere in this workspace. They come from AFT's edit tool, a
+  different product. Out of scope for this repo.
+- **`lsp_diagnostics` "Not connected" (201).** Stopped on 2026-06-27 and has not recurred in the 38
+  days since; already fixed upstream of this session.
 - **`null` primary on 4418 drain skips.** Same conclusion as the earlier `primary: null` item: the
   affected session ids exist in no database on this machine and the plugin log is machine-wide, so
   they originate in other repos' opencode instances. P0-13 fixed the *wrong-agent* half of this
