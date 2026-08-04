@@ -1,0 +1,15 @@
+{
+  "session": "ses_04bbceb75ffe3GgV2gzHEdaS0D",
+  "results": [
+    {
+      "teamRunId": "2daf76b6-acce-4fd9-bc23-9a9eab4818d8",
+      "outcome": "allowed"
+    },
+    {
+      "teamRunId": "2daf76b6-acce-4fd9-bc23-9a9eab4818d8f8",
+      "outcome": "denied",
+      "namesOwnTeam": false,
+      "error": "team-mode tool team_send_message denied: not a participant of team 2daf76b6-acce-4fd9-bc23-9a9eab4818d8f8"
+    }
+  ]
+}

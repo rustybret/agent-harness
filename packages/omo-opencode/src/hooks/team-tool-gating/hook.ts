@@ -68,6 +68,22 @@ async function resolveParticipant(sessionID: string, config: TeamModeConfig): Pr
   return { role: "neither" }
 }
 
+/**
+ * Names the team the caller IS in, when it is not the one they asked for.
+ *
+ * "not a participant of team X" reads as a permission or membership problem, so the natural response
+ * is to try to join - but the caller is often already a participant and simply passed the wrong id.
+ * Observed live: a session that had used its own teamRunId successfully 39 times hit this 5 times
+ * with an id carrying two stray trailing characters, and the message gave no hint that the id was
+ * the problem. Naming the caller's actual team makes a mistyped id self-evident.
+ */
+function describeOwnTeam(participant: TeamParticipant): string {
+  if (participant.role === "neither") {
+    return " This session is not a participant of any active team."
+  }
+  return ` This session is the ${participant.role} of team ${participant.teamRunId} - pass that teamRunId instead.`
+}
+
 function isLeadOfTargetTeam(participant: TeamParticipant, teamRunId: string | undefined): boolean {
   return participant.role === "lead" && participant.teamRunId === teamRunId
 }
@@ -141,7 +157,7 @@ export function createTeamToolGating(_ctx: PluginInput, config: TeamModeConfig |
         throw new Error(
           teamRunId === undefined
             ? `team-mode tool ${toolName} requires teamRunId argument`
-            : `team-mode tool ${toolName} denied: not a participant of team ${teamRunId}`,
+            : `team-mode tool ${toolName} denied: not a participant of team ${teamRunId}.${describeOwnTeam(participant)}`,
         )
       }
     },

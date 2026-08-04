@@ -286,4 +286,36 @@ describe("createTeamToolGating", () => {
     // then
     await expect(result).rejects.toThrow("denied: not a participant of team 11111111-1111-4111-8111-111111111111")
   })
+
+  test("names the caller's own team when the requested teamRunId is wrong", async () => {
+    // given: a member of one team asking about another - the common shape is a mistyped id, not a
+    // membership problem
+    const baseDir = await mkdtemp(path.join(tmpdir(), "team-tool-gating-"))
+    temporaryDirectories.push(baseDir)
+    await seedTeams(baseDir, { ...createRuntimeState(), members: [] })
+    registerTeamSession("own-team-session", {
+      teamRunId: "22222222-2222-4222-8222-222222222222",
+      memberName: "worker",
+      role: "member",
+    })
+
+    // when
+    const result = runHook("team_send_message", "own-team-session", { teamRunId: "11111111-1111-4111-8111-111111111111" }, undefined, baseDir)
+
+    // then
+    await expect(result).rejects.toThrow("This session is the member of team 22222222-2222-4222-8222-222222222222 - pass that teamRunId instead.")
+  })
+
+  test("says so plainly when the caller is in no team at all", async () => {
+    // given
+    const baseDir = await mkdtemp(path.join(tmpdir(), "team-tool-gating-"))
+    temporaryDirectories.push(baseDir)
+    await seedTeams(baseDir, createRuntimeState())
+
+    // when
+    const result = runHook("team_send_message", "unknown-session", { teamRunId: "11111111-1111-4111-8111-111111111111" }, undefined, baseDir)
+
+    // then
+    await expect(result).rejects.toThrow("This session is not a participant of any active team.")
+  })
 })
