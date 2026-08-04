@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it } from "bun:test"
+import { afterEach, beforeEach, describe, expect, it } from "bun:test"
 import { unsafeTestValue } from "../../../../../test-support/unsafe-test-value"
 import { OMO_INTERNAL_INITIATOR_MARKER } from "../../shared/internal-initiator-marker"
+import { _resetLoggerForTesting, _setLoggerForTesting } from "../../shared/logger"
 import { ContextCollector } from "./collector"
 import {
   createContextInjectorHook,
@@ -9,9 +10,16 @@ import {
 
 describe("createContextInjectorMessagesTransformHook", () => {
   let collector: ContextCollector
+  let logged: string[]
 
   beforeEach(() => {
     collector = new ContextCollector()
+    logged = []
+    _setLoggerForTesting({ sink: (message) => void logged.push(message) })
+  })
+
+  afterEach(() => {
+    _resetLoggerForTesting()
   })
 
   const createMockMessage = (
@@ -224,6 +232,46 @@ describe("createContextInjectorMessagesTransformHook", () => {
     // then
     expect(output.messages).toEqual(originalMessages)
     expect(collector.hasPending(sessionID)).toBe(true)
+  })
+
+  it("stays silent when a synthetic latest message arrives with nothing pending", async () => {
+    // given: an internally driven turn with no context waiting - the normal shape, and the one that
+    // produced 157 log lines an hour in production
+    const hook = createContextInjectorMessagesTransformHook(collector)
+    const sessionID = "ses_transform_synthetic_no_pending"
+    const messages = [
+      createMockMessage("user", "Real user message", sessionID),
+      createMockMessage("user", "Synthetic hook message", sessionID, { synthetic: true }),
+    ]
+    const output = unsafeTestValue({ messages })
+
+    // when
+    await hook["experimental.chat.messages.transform"]!({}, output)
+
+    // then
+    expect(logged.filter((line) => line.includes("[context-injector]"))).toEqual([])
+  })
+
+  it("reports a synthetic latest message when context was actually held back", async () => {
+    // given
+    const hook = createContextInjectorMessagesTransformHook(collector)
+    const sessionID = "ses_transform_synthetic_with_pending"
+    collector.register(sessionID, {
+      id: "ctx",
+      source: "keyword-detector",
+      content: "Context",
+    })
+    const messages = [
+      createMockMessage("user", "Real user message", sessionID),
+      createMockMessage("user", "Synthetic hook message", sessionID, { synthetic: true }),
+    ]
+    const output = unsafeTestValue({ messages })
+
+    // when
+    await hook["experimental.chat.messages.transform"]!({}, output)
+
+    // then
+    expect(logged.some((line) => line.includes("Pending context held back"))).toBe(true)
   })
 
   it("consumes context after injection", async () => {

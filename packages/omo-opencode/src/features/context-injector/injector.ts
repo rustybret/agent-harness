@@ -114,10 +114,17 @@ export function createContextInjectorMessagesTransformHook(
       if (lastUserMessage === undefined) {
         return
       }
+      // A synthetic tail is the NORMAL shape of an internally driven turn, and this hook runs on
+      // every transform, so reporting it unconditionally logs a non-event at message rate. It only
+      // matters when context was actually waiting: that is the case where a reader wants to know
+      // something was held back rather than delivered.
       if (!isRealUserMessage(lastUserMessage)) {
-        log("[context-injector] Latest user message is synthetic/internal, skipping injection", {
-          sessionID: getSessionIDFromMessageInfo(lastUserMessage.info) ?? getMainSessionID(),
-        })
+        const skippedSessionID = getSessionIDFromMessageInfo(lastUserMessage.info) ?? getMainSessionID()
+        if (skippedSessionID !== undefined && collector.hasPending(skippedSessionID)) {
+          log("[context-injector] Pending context held back: latest user message is synthetic/internal", {
+            sessionID: skippedSessionID,
+          })
+        }
         return
       }
       const messageSessionID = getSessionIDFromMessageInfo(lastUserMessage.info)
