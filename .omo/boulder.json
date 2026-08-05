@@ -1,133 +1,58 @@
 {
-  "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.omo/plans/mailbox-granular-injection.md",
-  "started_at": "2026-08-02T18:47:13.410Z",
+  "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.omo/plans/unity-supermcp-subagents.md",
+  "started_at": "2026-08-05T00:51:56.936Z",
   "session_ids": [
-    "opencode:ses_03ccae641ffeZ0NloW3uZnBjbZ"
+    "opencode:ses_03098296affeQrzOv3gRUYPM57"
   ],
   "session_origins": {
-    "opencode:ses_03ccae641ffeZ0NloW3uZnBjbZ": "direct"
+    "opencode:ses_03098296affeQrzOv3gRUYPM57": "direct"
   },
-  "plan_name": "mailbox-granular-injection",
+  "plan_name": "unity-supermcp-subagents",
   "agent": "atlas",
   "task_sessions": {
     "todo:1": {
       "task_key": "todo:1",
       "task_label": "1",
-      "task_title": "**Barrel `index.ts` contains business logic**: `packages/omo-opencode/src/features/cross-project-mailbox/manual-drain/index.ts` contains dumped business logic (`runProjectMailboxPeek`, `runProjectMailboxDrain`, `drainedNote`, `guidanceFor`, etc.). Barrel files must only contain exports.",
-      "session_id": "opencode:ses_039cd58e6ffeGIb1eCikXMdTiW",
+      "task_title": "packages/supermcp-skills/: vendor the six unitySuperMCP domain skills with provenance manifest + sync script",
+      "session_id": "opencode:ses_03096e698ffeIPAriYCGrPBkn5",
       "agent": "Sisyphus-Junior",
       "category": "unspecified-high",
-      "started_at": "2026-08-02T18:56:53.795Z",
-      "ended_at": "2026-08-03T06:06:03.799Z",
-      "elapsed_ms": 40150004,
+      "updated_at": "2026-08-05T01:11:45.301Z",
+      "started_at": "2026-08-05T00:59:13.594Z",
       "status": "completed",
-      "updated_at": "2026-08-03T06:06:03.799Z"
+      "ended_at": "2026-08-05T01:11:45.301Z",
+      "elapsed_ms": 751707
     },
     "todo:3": {
       "task_key": "todo:3",
       "task_label": "3",
-      "task_title": "Send tools: requested_mode arg + outbox audit fields",
-      "session_id": "opencode:ses_03c10870bffeo8GBHgGEblCuyO",
-      "agent": "Sisyphus-Junior",
-      "category": "unspecified-high",
-      "updated_at": "2026-08-02T19:33:13.229Z",
-      "started_at": "2026-08-02T19:30:36.429Z",
-      "status": "completed",
-      "ended_at": "2026-08-02T19:33:13.229Z",
-      "elapsed_ms": 156800
-    },
-    "todo:6": {
-      "task_key": "todo:6",
-      "task_label": "6",
-      "task_title": "Lane: side-session Q&A (answer-local)",
-      "session_id": "opencode:ses_03c053268ffedfB7LYSKMvE3nS",
-      "agent": "Sisyphus-Junior",
-      "category": "ultrabrain",
-      "updated_at": "2026-08-02T19:58:32.227Z",
-      "started_at": "2026-08-02T19:51:09.471Z",
-      "status": "completed",
-      "ended_at": "2026-08-02T19:58:32.227Z",
-      "elapsed_ms": 442756
-    },
-    "todo:12": {
-      "task_key": "todo:12",
-      "task_label": "12",
-      "task_title": "Router integration: idle-drain + manual drain + heartbeat poller",
-      "session_id": "opencode:ses_03befdce7ffeAfq4J3xWcX5FRH",
-      "agent": "Sisyphus-Junior",
-      "category": "ultrabrain",
-      "updated_at": "2026-08-02T20:43:51.817Z",
-      "started_at": "2026-08-02T20:27:06.785Z",
-      "status": "completed",
-      "ended_at": "2026-08-02T20:43:51.817Z",
-      "elapsed_ms": 1005032
-    },
-    "todo:15": {
-      "task_key": "todo:15",
-      "task_label": "15",
-      "task_title": "Cipher-relay e2e harness (C8)",
-      "session_id": "opencode:ses_03bd462edffe3j1lFsF11FpR45",
+      "task_title": "Wire vendored skills via skills.sources in project .omo/omo.jsonc",
+      "session_id": "opencode:ses_0308575b0ffehyUXj0qLl9CO8o",
       "agent": "Sisyphus-Junior",
       "category": "quick",
-      "started_at": "2026-08-02T21:15:40.865Z",
+      "updated_at": "2026-08-05T01:18:25.820Z",
+      "started_at": "2026-08-05T01:17:28.401Z",
       "status": "completed",
-      "updated_at": "2026-08-02T21:16:50.379Z",
-      "ended_at": "2026-08-02T21:16:50.379Z",
-      "elapsed_ms": 69514
+      "ended_at": "2026-08-05T01:18:25.820Z",
+      "elapsed_ms": 57419
     },
-    "todo:16": {
-      "task_key": "todo:16",
-      "task_label": "16",
-      "task_title": "Live e2e run + full-suite QA evidence (model source: anthropic/claude-sonnet-4-6, ample capacity confirmed by user)",
-      "session_id": "opencode:ses_03ba8cffbffeaw3GCitv5Oz5eG",
-      "agent": "Sisyphus-Junior",
-      "started_at": "2026-08-02T21:33:03.802Z",
-      "status": "completed",
-      "updated_at": "2026-08-03T05:55:54.422Z",
-      "ended_at": "2026-08-03T05:55:54.422Z",
-      "elapsed_ms": 30170620
-    },
-    "final-wave:f1": {
-      "task_key": "final-wave:f1",
-      "task_label": "F1",
-      "task_title": "Plan compliance audit — every todo's acceptance criteria re-verified against the diff; dependency matrix honored; no scope-out item present (no orchestrator/intake-agent code, no mid-turn abort, no raw prompt calls).",
-      "session_id": "opencode:ses_039d8e0bdffegYnk2Whso5Z9cw",
-      "agent": "Sisyphus-Junior",
-      "category": "ultrabrain",
-      "updated_at": "2026-08-03T05:48:12.567Z",
-      "started_at": "2026-08-03T05:47:47.841Z",
-      "status": "completed",
-      "ended_at": "2026-08-03T05:48:12.567Z",
-      "elapsed_ms": 24726
-    },
-    "todo:17": {
-      "task_key": "todo:17",
-      "task_label": "17",
-      "task_title": "Mailbox trace observability layer (replaces the e2e proof path)",
-      "session_id": "opencode:ses_039cc9d51ffeYWl2od444yT1yK",
+    "todo:5": {
+      "task_key": "todo:5",
+      "task_label": "5",
+      "task_title": "Option A: .opencode/agents/unity-editor.md restricted agent",
+      "session_id": "opencode:ses_0307f1323ffe2CKOdM8vTihjfM",
       "agent": "Sisyphus-Junior",
       "category": "unspecified-high",
-      "updated_at": "2026-08-03T06:28:52.732Z",
-      "started_at": "2026-08-03T06:27:25.181Z",
+      "updated_at": "2026-08-05T01:26:24.845Z",
+      "started_at": "2026-08-05T01:21:43.457Z",
       "status": "completed",
-      "ended_at": "2026-08-03T06:28:52.732Z",
-      "elapsed_ms": 87551
-    },
-    "final-wave:f3": {
-      "task_key": "final-wave:f3",
-      "task_label": "F3",
-      "task_title": "Real manual QA — **REDEFINED per user directive**: no cipher-relay e2e. Instead (a) full non-e2e gates: `bun test`, `bun run typecheck`, prompt-async route audit, mock-module lifecycle audit — all green; (b) LIVE-SESSION OBSERVATION: with todo 17's trace layer in place, send real notes between this project and a live sibling project and read the resulting `.omo/mailbox-trace.jsonl` on both sides to confirm each lane's per-message timeline; (c) record the observed timelines as evidence. NO sandbox spawning, NO process-management commands, NO `pkill`.",
-      "session_id": "opencode:ses_039744ac1ffeDXwoWnlHhk4rQ8",
-      "agent": "Sisyphus-Junior",
-      "category": "unspecified-high",
-      "updated_at": "2026-08-03T07:37:11.787Z",
-      "started_at": "2026-08-03T07:37:11.787Z",
-      "status": "running"
+      "ended_at": "2026-08-05T01:26:24.845Z",
+      "elapsed_ms": 281388
     }
   },
-  "active_work_id": "mailbox-granular-injection-53fe07f1",
-  "status": "completed",
-  "updated_at": "2026-08-03T07:40:58.317Z",
+  "active_work_id": "unity-supermcp-subagents-f053ec81",
+  "status": "active",
+  "updated_at": "2026-08-05T01:26:24.845Z",
   "schema_version": 2,
   "works": {
     "provider-quirks-normalizer-legacy": {
@@ -763,8 +688,62 @@
       },
       "ended_at": "2026-08-03T07:40:58.317Z",
       "elapsed_ms": 46424907
+    },
+    "unity-supermcp-subagents-f053ec81": {
+      "work_id": "unity-supermcp-subagents-f053ec81",
+      "active_plan": "/Volumes/Topper2TB/Git/agent-harness/.omo/plans/unity-supermcp-subagents.md",
+      "plan_name": "unity-supermcp-subagents",
+      "status": "active",
+      "started_at": "2026-08-05T00:51:56.936Z",
+      "updated_at": "2026-08-05T01:26:24.845Z",
+      "session_ids": [
+        "opencode:ses_03098296affeQrzOv3gRUYPM57"
+      ],
+      "session_origins": {
+        "opencode:ses_03098296affeQrzOv3gRUYPM57": "direct"
+      },
+      "agent": "atlas",
+      "task_sessions": {
+        "todo:1": {
+          "task_key": "todo:1",
+          "task_label": "1",
+          "task_title": "packages/supermcp-skills/: vendor the six unitySuperMCP domain skills with provenance manifest + sync script",
+          "session_id": "opencode:ses_03096e698ffeIPAriYCGrPBkn5",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-08-05T01:11:45.301Z",
+          "started_at": "2026-08-05T00:59:13.594Z",
+          "status": "completed",
+          "ended_at": "2026-08-05T01:11:45.301Z",
+          "elapsed_ms": 751707
+        },
+        "todo:3": {
+          "task_key": "todo:3",
+          "task_label": "3",
+          "task_title": "Wire vendored skills via skills.sources in project .omo/omo.jsonc",
+          "session_id": "opencode:ses_0308575b0ffehyUXj0qLl9CO8o",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "updated_at": "2026-08-05T01:18:25.820Z",
+          "started_at": "2026-08-05T01:17:28.401Z",
+          "status": "completed",
+          "ended_at": "2026-08-05T01:18:25.820Z",
+          "elapsed_ms": 57419
+        },
+        "todo:5": {
+          "task_key": "todo:5",
+          "task_label": "5",
+          "task_title": "Option A: .opencode/agents/unity-editor.md restricted agent",
+          "session_id": "opencode:ses_0307f1323ffe2CKOdM8vTihjfM",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-08-05T01:26:24.845Z",
+          "started_at": "2026-08-05T01:21:43.457Z",
+          "status": "completed",
+          "ended_at": "2026-08-05T01:26:24.845Z",
+          "elapsed_ms": 281388
+        }
+      }
     }
-  },
-  "ended_at": "2026-08-03T07:40:58.317Z",
-  "elapsed_ms": 46424907
+  }
 }
