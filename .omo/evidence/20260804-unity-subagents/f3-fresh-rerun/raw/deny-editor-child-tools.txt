@@ -1,0 +1,1 @@
+[deny] --- editor child TOOL parts (expect NO bash) ---

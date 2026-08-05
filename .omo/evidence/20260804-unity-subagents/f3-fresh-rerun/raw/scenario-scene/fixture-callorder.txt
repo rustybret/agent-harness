@@ -1,0 +1,4 @@
+[scenario-scene] --- fixture tools/call order ---
+14 bridge_status
+16 get_relevant_tools
+18 scene_list

@@ -1,0 +1,6 @@
+[scenario-ambiguous] --- fixture tools/call order ---
+14 bridge_status
+16 scene_list
+25 get_relevant_tools
+27 get_relevant_tools
+31 bridge_status

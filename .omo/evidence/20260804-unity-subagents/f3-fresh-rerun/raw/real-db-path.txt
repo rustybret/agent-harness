@@ -1,0 +1,1 @@
+/Users/brethoffman/.local/share/opencode/opencode.db

@@ -1,0 +1,17 @@
+List the scenes in the project
+<!-- OMO_INTERNAL_INITIATOR -->
+## Unity Scene Result
+
+Status: done
+
+Summary: Listed all scenes in the Unity project via the SuperMCP bridge. Two scenes were found: `Assets/Scenes/Main.unity` (currently loaded) and `Assets/Scenes/Menu.unity` (not loaded).
+
+Changes:
+- None (read-only query)
+
+Verification:
+- Scene/hierarchy state: Confirmed via `scene_list` query against the bridge.
+- Prefab-stage context: Scene context verified (no prefab isolation stage active).
+
+Blockers / Decisions Needed:
+- None

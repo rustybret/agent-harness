@@ -1,0 +1,4 @@
+ses_03027e81affeXNyR93p0OPAp2L||Unity editor bash command test|Sisyphus - ultraworker
+ses_030278f6effeROCbhBSocG9es1|ses_03027e81affeXNyR93p0OPAp2L|Marker f3fresh-20260804-195145-32494. You have (@unity-editor subagent)|unity-editor
+ses_03027584efferDdWU75rzYszd4||Unity gamedev subagent setup|Sisyphus - ultraworker
+ses_030271eb0ffec26s6gQOBOS6p0|ses_03027584efferDdWU75rzYszd4|Marker f3fresh dispatch test (@unity-gamedev subagent)|unity-gamedev

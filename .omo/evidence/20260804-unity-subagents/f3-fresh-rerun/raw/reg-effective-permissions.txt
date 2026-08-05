@@ -1,0 +1,113 @@
+
+=== unity-editor (mode=subagent model=[object Object]) ===
+  *           eff=deny    exp=deny  OK
+  skill       eff=allow   exp=allow OK
+  skill_mcp   eff=allow   exp=allow OK
+  read        eff=allow   exp=allow OK
+  question    eff=allow   exp=allow OK
+  todowrite   eff=allow   exp=allow OK
+  bash        eff=deny    exp=deny  OK
+  edit        eff=deny    exp=deny  OK
+  write       eff=deny    exp=deny  OK
+  task        eff=deny    exp=deny  OK
+  webfetch    eff=deny    exp=deny  OK
+  websearch   eff=deny    exp=deny  OK
+  --> MATCHES SPEC
+
+=== unity-scene (mode=subagent model=[object Object]) ===
+  *           eff=deny    exp=deny  OK
+  skill       eff=allow   exp=allow OK
+  skill_mcp   eff=allow   exp=allow OK
+  read        eff=allow   exp=allow OK
+  question    eff=allow   exp=allow OK
+  todowrite   eff=allow   exp=allow OK
+  bash        eff=deny    exp=deny  OK
+  edit        eff=deny    exp=deny  OK
+  write       eff=deny    exp=deny  OK
+  task        eff=deny    exp=deny  OK
+  webfetch    eff=deny    exp=deny  OK
+  websearch   eff=deny    exp=deny  OK
+  --> MATCHES SPEC
+
+=== unity-script-roslyn (mode=subagent model=[object Object]) ===
+  *           eff=deny    exp=deny  OK
+  skill       eff=allow   exp=allow OK
+  skill_mcp   eff=allow   exp=allow OK
+  read        eff=allow   exp=allow OK
+  question    eff=allow   exp=allow OK
+  todowrite   eff=allow   exp=allow OK
+  bash        eff=deny    exp=deny  OK
+  edit        eff=deny    exp=deny  OK
+  write       eff=deny    exp=deny  OK
+  task        eff=deny    exp=deny  OK
+  webfetch    eff=deny    exp=deny  OK
+  websearch   eff=deny    exp=deny  OK
+  --> MATCHES SPEC
+
+=== unity-asset (mode=subagent model=[object Object]) ===
+  *           eff=deny    exp=deny  OK
+  skill       eff=allow   exp=allow OK
+  skill_mcp   eff=allow   exp=allow OK
+  read        eff=allow   exp=allow OK
+  question    eff=allow   exp=allow OK
+  todowrite   eff=allow   exp=allow OK
+  bash        eff=deny    exp=deny  OK
+  edit        eff=deny    exp=deny  OK
+  write       eff=deny    exp=deny  OK
+  task        eff=deny    exp=deny  OK
+  webfetch    eff=deny    exp=deny  OK
+  websearch   eff=deny    exp=deny  OK
+  --> MATCHES SPEC
+
+=== unity-build (mode=subagent model=[object Object]) ===
+  *           eff=deny    exp=deny  OK
+  skill       eff=allow   exp=allow OK
+  skill_mcp   eff=allow   exp=allow OK
+  read        eff=allow   exp=allow OK
+  question    eff=allow   exp=allow OK
+  todowrite   eff=allow   exp=allow OK
+  bash        eff=deny    exp=deny  OK
+  edit        eff=deny    exp=deny  OK
+  write       eff=deny    exp=deny  OK
+  task        eff=deny    exp=deny  OK
+  webfetch    eff=deny    exp=deny  OK
+  websearch   eff=deny    exp=deny  OK
+  --> MATCHES SPEC
+
+=== unity-runtime (mode=subagent model=[object Object]) ===
+  *           eff=deny    exp=deny  OK
+  skill       eff=allow   exp=allow OK
+  skill_mcp   eff=allow   exp=allow OK
+  read        eff=allow   exp=allow OK
+  question    eff=allow   exp=allow OK
+  todowrite   eff=allow   exp=allow OK
+  bash        eff=deny    exp=deny  OK
+  edit        eff=deny    exp=deny  OK
+  write       eff=deny    exp=deny  OK
+  task        eff=deny    exp=deny  OK
+  webfetch    eff=deny    exp=deny  OK
+  websearch   eff=deny    exp=deny  OK
+  --> MATCHES SPEC
+
+=== unity-bridge-bootstrap (mode=subagent model=[object Object]) ===
+  *           eff=deny    exp=deny  OK
+  skill       eff=allow   exp=allow OK
+  skill_mcp   eff=allow   exp=allow OK
+  read        eff=allow   exp=allow OK
+  question    eff=allow   exp=allow OK
+  todowrite   eff=allow   exp=allow OK
+  bash        eff=deny    exp=deny  OK
+  edit        eff=deny    exp=deny  OK
+  write       eff=deny    exp=deny  OK
+  task        eff=deny    exp=deny  OK
+  webfetch    eff=deny    exp=deny  OK
+  websearch   eff=deny    exp=deny  OK
+  --> MATCHES SPEC
+
+=== unity-gamedev (CONTROL, mode=subagent model=[object Object]) ===
+  *      eff=allow
+  bash   eff=allow
+  edit   eff=allow
+  write  eff=allow
+
+OVERALL: ALL 7 RESTRICTED AGENTS MATCH SPEC

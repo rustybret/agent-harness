@@ -1,0 +1,11 @@
+=== marker/directory negative query ===
+real db rows matching f3fresh marker/dir = 0 (expect 0)
+real db rows with directory under omo-f3fresh-* sandbox = 0 (expect 0)
+=== per-sandbox-session-id negative query ===
+sandbox session ids collected: 8
+sandbox session ids leaked into real db = 0 (expect 0)
+=== explicit spot-checks ===
+  real db count for ses_030278f6effeROCbhBSocG9es1 = 0 (expect 0)
+  real db count for ses_030260d1fffe3OG6X3STIqQo2F = 0 (expect 0)
+  real db count for ses_030259f40ffe0RhAuq6IohSrYX = 0 (expect 0)
+ISOLATION: PROVEN — zero fresh-run sessions leaked into the real db

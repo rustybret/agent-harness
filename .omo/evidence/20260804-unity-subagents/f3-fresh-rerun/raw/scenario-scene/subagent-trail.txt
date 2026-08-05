@@ -1,0 +1,7 @@
+[scenario-scene] --- subagent skill loads ---
+unity-scene
+[scenario-scene] --- subagent skill_mcp calls ---
+{"mcp":"supermcp","tool":"bridge_status","status":"completed"}
+{"mcp":"supermcp","tool":"get_relevant_tools","status":"completed"}
+{"mcp":"supermcp","tool":"scene_list","status":"completed"}
+{"mcp":"supermcp","tool":"session_changes","status":"completed"}

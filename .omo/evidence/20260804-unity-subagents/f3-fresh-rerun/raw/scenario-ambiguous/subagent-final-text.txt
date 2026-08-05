@@ -1,0 +1,17 @@
+Better"
+
+1. **Scene Structure & Navigation:**
+   - Integrate `Menu.unity` with `Main.unity` by setting up a robust scene-management flow (Main Menu UI -> Gameplay -> Game Over / Victory screens).
+   - Add persistent managers (Audio, Game State, Score tracking) across scene transitions using `DontDestroyOnLoad`.
+
+2. **Gameplay & Mechanics Enhancements:**
+   - Author or expand C# gameplay scripts via Roslyn validation (`unity-script-roslyn`) to add responsive player controls, satisfying feedback (particle effects, screen shake, audio cues), and win/loss conditions.
+   - Use spatial queries (`raycast`, `camera_visibility`, `navmesh_query_path`) to improve enemy AI line-of-sight and pathfinding navigation.
+
+3. **User Interface (UI) Polish:**
+   - Author uGUI or UI Toolkit elements (`Assets/` UXML/USS) for a clean HUD (health bar, score counter, pause menu).
+   - Ensure proper scaling, anchor setup, and visibility states (`CanvasGroup`) across screen resolutions.
+
+4. **Performance & Build Preparation:**
+   - Profile runtime performance using Unity Profiler frame data (`unity-runtime`).
+   - Configure build targets (`unity-build`) to produce clean standalone builds for target platforms.

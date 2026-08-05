@@ -1,0 +1,4 @@
+ses_03026295dffeJTwKFM06kr38tv||Unity scene listing via subagent|Sisyphus - ultraworker
+ses_030260d1fffe3OG6X3STIqQo2F|ses_03026295dffeJTwKFM06kr38tv|List the scenes in (@unity-scene subagent)|unity-scene
+ses_03025c62bffeHx9lgd74nBFnNe||Delegating Unity work to subagent|Sisyphus - ultraworker
+ses_030259f40ffe0RhAuq6IohSrYX|ses_03025c62bffeHx9lgd74nBFnNe|make the game better (@unity-editor subagent)|unity-editor

@@ -194,13 +194,13 @@ Your next move: dual high-accuracy review runs automatically (you asked for it),
 
 ## Final verification wave
 > Runs in parallel after ALL todos. ALL must APPROVE. Surface results and wait for the user's explicit okay before declaring complete.
-- [ ] F1. Plan compliance audit — every todo's acceptance criteria re-verified against the actual files/config/evidence; dependency matrix honored; all 12 evidence folders present with tested/observed/why-enough/omitted READMEs.
+- [x] F1. Plan compliance audit — every todo's acceptance criteria re-verified against the actual files/config/evidence; dependency matrix honored; all 12 evidence folders present with tested/observed/why-enough/omitted READMEs.
   Recommended task executor category: unspecified-high
-- [ ] F2. Code quality review — the seven restricted agent files share one consistent template (frontmatter permission blocks byte-identical); no fabricated config keys anywhere; vendored package byte-identical to MANIFEST hashes; no AI-slop comments; JSONC files parse.
+- [x] F2. Code quality review — the seven restricted agent files share one consistent template (frontmatter permission blocks byte-identical); no fabricated config keys anywhere; vendored package byte-identical to MANIFEST hashes; no AI-slop comments; JSONC files parse.
   Recommended task executor category: unspecified-high
-- [ ] F3. Real manual QA — independent re-run of the task-9 and task-10 sandbox probes from scratch (fresh sandbox, fresh fixture port): registration, permission denial, single-skill discipline, ambiguous-domain block. NOT a re-read of existing evidence — a fresh execution.
+- [x] F3. Real manual QA — independent re-run of the task-9 and task-10 sandbox probes from scratch (fresh sandbox, fresh fixture port): registration, permission denial, single-skill discipline, ambiguous-domain block. NOT a re-read of existing evidence — a fresh execution.
   Recommended task executor category: unspecified-high
-- [ ] F4. Scope fidelity — confirm every Must-NOT-Have held: no model-core edits, no tier-1 MCP registration, no hidden agents, no 27182 binding in QA artifacts, no webgameECS mutations, no extra vendored skills beyond the six.
+- [x] F4. Scope fidelity — confirm every Must-NOT-Have held: no model-core edits, no tier-1 MCP registration, no hidden agents, no 27182 binding in QA artifacts, no webgameECS mutations, no extra vendored skills beyond the six.
   Recommended task executor category: unspecified-high
 
 > After F1-F4 APPROVE: surface results and wait for the user's explicit okay. The live A-vs-B benchmark (docs/reference/unity-subagent-benchmark.md, on webgameECS + unity-windows-vm) is a separate user-gated phase — offer it, never auto-run it.
