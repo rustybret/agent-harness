@@ -202,6 +202,31 @@ When OpenCode runs locally on macOS (Apple Silicon arm64) while the Unity Editor
    - `console_get_logs` for runtime error verification post-domain-reload.
 3. **Evidence of Correctness**: Returning `Verification: Validate: script_validate passed, Compile: compile_status succeeded` in the subagent output provides 100% complete evidence of correctness for parent agents.
 
+### Project-Local AFT LSP Configuration
+
+Do **NOT** globally disable C# LSP in `~/.config/cortexkit/aft.jsonc`, as local macOS projects running a local Unity Editor need local C# LSP.
+
+For remote-driven Unity projects (e.g. `salvage`, `webgameECS`), configure C# LSP **per project repository** in `.cortexkit/aft.jsonc` at the project root:
+
+```jsonc
+// <project-root>/.cortexkit/aft.jsonc (Project-Local Scoping)
+{
+  "lsp": {
+    // Option A: Remote SSH tunnel to Windows instance
+    "servers": {
+      "csharp": {
+        "binary": "ssh",
+        "args": ["user@altos-worker-02", "csharp-ls"]
+      }
+    }
+    // Option B: Disable host C# LSP for this remote-only project root
+    // "disabled": ["csharp"]
+  }
+}
+```
+
+This ensures local Mac Unity projects retain native local C# LSP, while remote-hosted Unity projects suppress or tunnel host LSP requests cleanly per repository.
+
 ---
 
 ## QA Evidence & Benchmarks
