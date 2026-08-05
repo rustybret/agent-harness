@@ -22,6 +22,7 @@
 | CLI command reference | [docs/reference/cli.md](reference/cli.md) |
 | Known issues & workarounds | [docs/reference/known-issues.md](reference/known-issues.md) |
 | `prompt_async_gate` deep-dive | [docs/reference/prompt-async-gate-rfc.md](reference/prompt-async-gate-rfc.md) |
+| Unity subagent benchmark procedure | [docs/reference/unity-subagent-benchmark.md](reference/unity-subagent-benchmark.md) |
 | Shared core multi-PR extraction QA | [docs/reference/shared-core-multi-pr.md](reference/shared-core-multi-pr.md) |
 | Re-export shim inventory | [docs/reference/re-export-shim-inventory.md](reference/re-export-shim-inventory.md) |
 | Release process | [docs/reference/release-process.md](reference/release-process.md) |
@@ -31,6 +32,7 @@
 | Codex telemetry internals | [docs/reference/codex-telemetry.md](reference/codex-telemetry.md) |
 | Monitor tool reference | [docs/reference/monitor.md](reference/monitor.md) |
 | Web-terminal visual QA helper | [docs/reference/web-terminal-visual-qa.md](reference/web-terminal-visual-qa.md) |
+| Document-to-Markdown conversion tooling survey | [docs/reference/document-conversion-tooling.md](reference/document-conversion-tooling.md) |
 | Sample configs | [docs/examples/](examples) (default, coding-focused, planning-focused) |
 | Privacy & ToS | [docs/legal/](legal) |
 | Manifesto | [docs/manifesto.md](manifesto.md) |
