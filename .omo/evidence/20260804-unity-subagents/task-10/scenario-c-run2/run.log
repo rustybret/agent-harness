@@ -1,0 +1,12 @@
+[scenario-c2] starting fixture...
+[scenario-c2] fixture pid=85495 port=51957 (never 27182: ok)
+rewrote unity-asset: url: "http://127.0.0.1:51957/mcp"
+rewrote unity-bridge-bootstrap: url: "http://127.0.0.1:51957/mcp"
+rewrote unity-build: url: "http://127.0.0.1:51957/mcp"
+rewrote unity-runtime: url: "http://127.0.0.1:51957/mcp"
+rewrote unity-scene: url: "http://127.0.0.1:51957/mcp"
+rewrote unity-script-roslyn: url: "http://127.0.0.1:51957/mcp"
+total skills rewritten: 6
+[scenario-c2] driving opencode via task(subagent_type=unity-editor)...
+[scenario-c2] opencode rc=0
+[scenario-c2] done. transcript=.omo/evidence/20260804-unity-subagents/task-10/scenario-c-run2/transcript.jsonl fixture-log=.omo/evidence/20260804-unity-subagents/task-10/scenario-c-run2/fixture-requests.jsonl

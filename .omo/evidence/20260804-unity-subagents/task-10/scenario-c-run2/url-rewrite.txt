@@ -1,0 +1,7 @@
+rewrote unity-asset: url: "http://127.0.0.1:51957/mcp"
+rewrote unity-bridge-bootstrap: url: "http://127.0.0.1:51957/mcp"
+rewrote unity-build: url: "http://127.0.0.1:51957/mcp"
+rewrote unity-runtime: url: "http://127.0.0.1:51957/mcp"
+rewrote unity-scene: url: "http://127.0.0.1:51957/mcp"
+rewrote unity-script-roslyn: url: "http://127.0.0.1:51957/mcp"
+total skills rewritten: 6

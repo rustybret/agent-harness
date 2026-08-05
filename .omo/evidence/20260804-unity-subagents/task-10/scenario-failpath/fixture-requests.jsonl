@@ -1,0 +1,2 @@
+{"seq":1,"ts":"2026-08-05T02:19:35.066Z","kind":"listen","port":52581}
+{"seq":2,"ts":"2026-08-05T02:19:35.162Z","kind":"shutdown","signal":"SIGTERM"}

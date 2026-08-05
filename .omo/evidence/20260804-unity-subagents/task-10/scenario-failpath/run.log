@@ -1,0 +1,13 @@
+[failpath] starting fixture...
+[failpath] fixture pid=87842 port=52581 (never 27182: ok)
+rewrote unity-asset: url: "http://127.0.0.1:52581/mcp"
+rewrote unity-bridge-bootstrap: url: "http://127.0.0.1:52581/mcp"
+rewrote unity-build: url: "http://127.0.0.1:52581/mcp"
+rewrote unity-runtime: url: "http://127.0.0.1:52581/mcp"
+rewrote unity-scene: url: "http://127.0.0.1:52581/mcp"
+rewrote unity-script-roslyn: url: "http://127.0.0.1:52581/mcp"
+total skills rewritten: 6
+[failpath] failure-path: killing fixture BEFORE the run to force a connection error
+[failpath] driving opencode via task(subagent_type=unity-scene)...
+[failpath] opencode rc=0
+[failpath] done. transcript=.omo/evidence/20260804-unity-subagents/task-10/scenario-failpath/transcript.jsonl fixture-log=.omo/evidence/20260804-unity-subagents/task-10/scenario-failpath/fixture-requests.jsonl

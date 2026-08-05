@@ -1,0 +1,7 @@
+subagent_session=ses_0304b672dffeoPORreVytoozcT
+TEXT: Domain: scene — List the scenes in the project <!-- OMO_INTERNAL_INITIATOR -->
+1. skill | {"name":"unity-scene"} | completed
+2. skill_mcp | {"tool_name":"bridge_status","mcp_name":"supermcp"} | completed
+3. skill_mcp | {"mcp_name":"supermcp","tool_name":"scene_list"} | completed
+TEXT: ## Unity Editor Result  Status: done  Summary: Listed the scenes in the Unity project via the bridge `scene_list` tool. Verified two scenes in the project: `Assets/Scenes/Main.unity` (currently loaded) and `Assets/Scenes/Menu.unity` (not lo
+skill_loads=["unity-scene"]

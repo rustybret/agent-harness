@@ -1,0 +1,17 @@
+{"seq":1,"ts":"2026-08-05T02:15:39.239Z","kind":"listen","port":51061}
+{"seq":2,"ts":"2026-08-05T02:15:51.086Z","kind":"http","httpMethod":"POST","rpcMethod":"initialize","sessionId":null}
+{"seq":3,"ts":"2026-08-05T02:15:51.153Z","kind":"session_init","sessionId":"461bd728-124f-4feb-9f94-d3dec7ae85f8"}
+{"seq":4,"ts":"2026-08-05T02:15:51.187Z","kind":"http","httpMethod":"POST","rpcMethod":"notifications/initialized","sessionId":"461bd728-124f-4feb-9f94-d3dec7ae85f8"}
+{"seq":5,"ts":"2026-08-05T02:15:51.198Z","kind":"http","httpMethod":"GET","rpcMethod":null,"sessionId":"461bd728-124f-4feb-9f94-d3dec7ae85f8"}
+{"seq":6,"ts":"2026-08-05T02:15:51.205Z","kind":"http","httpMethod":"POST","rpcMethod":"tools/list","sessionId":"461bd728-124f-4feb-9f94-d3dec7ae85f8"}
+{"seq":7,"ts":"2026-08-05T02:15:51.207Z","kind":"http","httpMethod":"POST","rpcMethod":"resources/list","sessionId":"461bd728-124f-4feb-9f94-d3dec7ae85f8"}
+{"seq":8,"ts":"2026-08-05T02:15:51.209Z","kind":"http","httpMethod":"POST","rpcMethod":"prompts/list","sessionId":"461bd728-124f-4feb-9f94-d3dec7ae85f8"}
+{"seq":9,"ts":"2026-08-05T02:15:56.714Z","kind":"http","httpMethod":"POST","rpcMethod":"initialize","sessionId":null}
+{"seq":10,"ts":"2026-08-05T02:15:56.728Z","kind":"session_init","sessionId":"a81d50f1-6961-4d4a-9cb7-a19a0804e142"}
+{"seq":11,"ts":"2026-08-05T02:15:56.749Z","kind":"http","httpMethod":"POST","rpcMethod":"notifications/initialized","sessionId":"a81d50f1-6961-4d4a-9cb7-a19a0804e142"}
+{"seq":12,"ts":"2026-08-05T02:15:56.753Z","kind":"http","httpMethod":"GET","rpcMethod":null,"sessionId":"a81d50f1-6961-4d4a-9cb7-a19a0804e142"}
+{"seq":13,"ts":"2026-08-05T02:15:56.754Z","kind":"http","httpMethod":"POST","rpcMethod":"tools/call","sessionId":"a81d50f1-6961-4d4a-9cb7-a19a0804e142"}
+{"seq":14,"ts":"2026-08-05T02:15:56.760Z","kind":"tools/call","tool":"bridge_status","args":{}}
+{"seq":15,"ts":"2026-08-05T02:15:58.437Z","kind":"http","httpMethod":"POST","rpcMethod":"tools/call","sessionId":"a81d50f1-6961-4d4a-9cb7-a19a0804e142"}
+{"seq":16,"ts":"2026-08-05T02:15:58.438Z","kind":"tools/call","tool":"scene_list","args":{}}
+{"seq":17,"ts":"2026-08-05T02:16:05.224Z","kind":"shutdown","signal":"SIGTERM"}
