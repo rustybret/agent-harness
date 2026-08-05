@@ -57,6 +57,11 @@ skill in `supermcp-skills/Samples~/AgentSkills/unity-bridge-bootstrap/`. Do not 
 this skill loaded as a substitute for the focused domain skills once the loop is
 running.
 
+## Code Intelligence vs. Engine Mutation
+
+- **Code Intelligence & Inspection**: Use harness-native AFT tools (`aft_search`, `aft_outline`, `aft_zoom`, `aft_callgraph`, `ast_grep_search`) for high-speed, AST-aware code search, reading existing C# scripts, mapping class outlines, and tracing call graphs across the codebase.
+- **Engine & File Mutation**: All Unity engine mutations (editing C# scripts for compilation, creating GameObjects, mutating scenes/materials) MUST go through SuperMCP bridge tools (`script_create`, `script_edit`, `scene_create`, etc.) to trigger Unity's compilation gate and asset database refresh.
+
 ## Core Workflow: Edit → Compile → Verify
 
 1. **Bootstrap / health.** `bridge_status` — confirm the bridge is alive and read

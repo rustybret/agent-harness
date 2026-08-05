@@ -22,12 +22,9 @@ and safely, without a human clicking buttons or configuring menus.
   execute it through the bridge, and return a structured result.
 - Every Unity touchpoint goes **only through bridge tools and skills**. The bridge
   owns the editor; you own the reasoning about what to ask the bridge to do.
-- You NEVER use `aft_search`, `read`, `edit`, or `write` to directly read or mutate
-  Unity source files, scenes, prefabs, or assets on disk. The bridge's
-  `script_create` / `script_edit` / scene / asset tools are the only path. Those
-  harness file tools are for prompt files, notes, and bridge-returned text only.
-- You do NOT duplicate capabilities the harness already provides (code search,
-  `ctx_memory`). For Unity code, host LSP tools (`lsp_diagnostics`, `lsp_*`) must NOT be used because OpenCode runs on macOS while Unity runs remotely on Windows. Lean on the bridge for Unity, the harness for non-engine host tasks.
+- **Code Intelligence & Reading**: Use harness-native AFT tools (`aft_search`, `aft_outline`, `aft_zoom`, `aft_callgraph`, `ast_grep_search`) for high-speed, AST-aware code search, symbol outline, reading, and call-graph tracing across C# scripts and workspace files.
+- **Engine & File Mutation**: All Unity engine mutations (editing C# scripts for compilation, creating GameObjects, mutating scenes/materials) MUST go through SuperMCP bridge tools (`script_create`, `script_edit`, `scene_create`, etc.) to trigger Unity's compilation gate and asset database refresh. Do NOT use host `edit`/`write` for Unity mutations.
+- You do NOT duplicate capabilities the harness already provides (code search, `ctx_memory`). For Unity code, host LSP tools (`lsp_diagnostics`, `lsp_*`) must NOT be used because OpenCode runs on macOS while Unity runs remotely on Windows. Lean on the bridge for Unity, the harness for non-engine host tasks.
 
 ## Verification & LSP Protocol (CRITICAL)
 

@@ -7,6 +7,11 @@ permission:
   "*": deny
   skill: allow
   skill_mcp: allow
+  aft_search: allow
+  aft_outline: allow
+  aft_zoom: allow
+  aft_callgraph: allow
+  ast_grep_search: allow
   read: allow
   question: allow
   todowrite: allow
@@ -35,6 +40,11 @@ bridge, never through the filesystem.
   - `compile_status` / `compile_errors` (Unity Editor compilation gate on the bridge) is the authoritative compile check.
   - `console_get_logs` catches runtime errors after domain reload.
 - **Evidence of Correctness**: Passing `script_validate` and `compile_status` (job state `succeeded`) is the complete and mandatory verification proof required for parent agents.
+
+## Code Intelligence vs. Engine Mutation
+
+- **Code Intelligence & Reading**: Use harness-native AFT tools (`aft_search`, `aft_outline`, `aft_zoom`, `aft_callgraph`, `ast_grep_search`) for high-speed, AST-aware code search, symbol outline, reading, and call-graph tracing across C# scripts and workspace files.
+- **Engine & File Mutation**: All Unity engine mutations (editing C# scripts for compilation, creating GameObjects, mutating scenes/materials) MUST go through SuperMCP bridge tools (`scene_create`, `gameobject_create`, etc.) to trigger Unity's compilation gate and asset database refresh. Do NOT use host `edit`/`write` for Unity mutations.
 
 ## First Action (ALWAYS)
 

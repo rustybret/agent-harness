@@ -7,6 +7,11 @@ permission:
   "*": deny
   skill: allow
   skill_mcp: allow
+  aft_search: allow
+  aft_outline: allow
+  aft_zoom: allow
+  aft_callgraph: allow
+  ast_grep_search: allow
   read: allow
   question: allow
   todowrite: allow
@@ -31,6 +36,11 @@ through it, and return a structured result.
   `play_mode_*` / `profiler_*` / `vfx_*` / `game_invoke_action` tools are the
   only path. Do not attempt any operation outside your allowed tools; it will be
   rejected by permission.
+
+## Code Intelligence vs. Engine Mutation
+
+- **Code Intelligence & Reading**: Use harness-native AFT tools (`aft_search`, `aft_outline`, `aft_zoom`, `aft_callgraph`, `ast_grep_search`) for high-speed, AST-aware code search, symbol outline, reading, and call-graph tracing across C# scripts and workspace files.
+- **Engine & File Mutation**: All Unity engine mutations (editing C# scripts for compilation, creating GameObjects, mutating scenes/materials) MUST go through SuperMCP bridge tools (`play_mode_start`, `profiler_capture_frame`, etc.) to trigger Unity's compilation gate and asset database refresh. Do NOT use host `edit`/`write` for Unity mutations.
 
 ## Verification & LSP Protocol (CRITICAL)
 

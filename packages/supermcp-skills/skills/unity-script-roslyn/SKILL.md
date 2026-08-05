@@ -23,6 +23,11 @@ For GameObject creation, prefab instantiation, or hierarchy traversal, use `unit
 
 Domain to tool family map: Script Validation & Mutation: supermcp (`script_validate`, `script_create`, `script_edit`, `script_delete`).
 
+## Code Intelligence vs. Engine Mutation
+
+- **Code Intelligence & Inspection**: Use harness-native AFT tools (`aft_search`, `aft_outline`, `aft_zoom`, `aft_callgraph`, `ast_grep_search`) for high-speed, AST-aware code search, reading existing C# scripts, mapping class outlines, and tracing call graphs across the codebase.
+- **Engine & File Mutation**: All C# script mutations MUST go through `script_create`, `script_edit`, `script_delete` via the SuperMCP bridge to trigger Roslyn pre-flight validation, Unity domain reload, and asset database refresh.
+
 ## Verification & LSP Protocol (CRITICAL)
 
 - **Do NOT run host LSP tools** (`lsp_diagnostics`, `lsp_*`) or local filesystem diagnostics. OpenCode runs locally on macOS (Apple Silicon) while the Unity Editor and project code live remotely on a Windows x86_64 instance. Local host LSP tools will fail or misreport missing assemblies ("local C# LSP (no Unity on Mac)").

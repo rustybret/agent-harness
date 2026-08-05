@@ -168,6 +168,27 @@ OpenCode loads and registers custom agent definitions from `.opencode/agents/` a
 
 ---
 
+## Code Intelligence Strategy: AFT Read-Only Tools vs. SuperMCP Engine Mutations
+
+A critical architectural distinction for Unity subagents is separating **Code Intelligence (Reading & Search)** from **Engine & Asset Mutation**:
+
+### 1. Code Intelligence & Search (AFT Tools)
+Dedicated Unity subagents (`unity-script-roslyn`, `unity-scene`, `unity-gamedev`, etc.) are empowered with read-only AFT tools (`aft_search`, `aft_outline`, `aft_zoom`, `aft_callgraph`, `ast_grep_search`) to:
+- Perform high-speed, AST-aware searches across C# scripts and workspace files.
+- Generate structural symbol outlines (`aft_outline`) and zoom into C# classes/methods with call-graph context (`aft_zoom`).
+- Trace callers, callees, and refactoring blast radius (`aft_callgraph`) before modifying C# APIs.
+- Execute structural AST pattern matching (`ast_grep_search`) across `.cs` files.
+
+### 2. Engine & Asset Mutation (SuperMCP Bridge Tools)
+All Unity engine modifications (editing C# scripts for compilation, creating GameObjects, mutating scenes/materials, setting up prefabs, building targets) MUST go through SuperMCP bridge tools (`script_create`, `script_edit`, `scene_create`, `material_create`, etc.):
+- Ensures Roslyn pre-flight validation runs before writes.
+- Triggers Unity's native compilation loop and domain reload.
+- Forces AssetDatabase updates and serializes Unity meta files correctly.
+
+This split guarantees subagents have complete code vision without compromising Unity engine state integrity.
+
+---
+
 ## Cross-Platform Remote Verification Protocol (macOS Host vs. Windows Instance)
 
 When OpenCode runs locally on macOS (Apple Silicon arm64) while the Unity Editor and project code live remotely on a cloud-hosted Windows instance (x86_64), local host LSP tools (`lsp_diagnostics`, `csharp-ls`) cannot validate Unity code because the Mac host lacks Unity C# assemblies ("local C# LSP (no Unity on Mac)").

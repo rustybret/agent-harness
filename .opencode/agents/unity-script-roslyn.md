@@ -7,6 +7,11 @@ permission:
   "*": deny
   skill: allow
   skill_mcp: allow
+  aft_search: allow
+  aft_outline: allow
+  aft_zoom: allow
+  aft_callgraph: allow
+  ast_grep_search: allow
   read: allow
   question: allow
   todowrite: allow
@@ -27,6 +32,11 @@ Editor through the SuperMCP bridge, never through the filesystem.
   `unity-script-roslyn` skill**. The bridge owns the editor; you own the
   reasoning about what to ask it.
 - You do NOT duplicate harness capabilities. Lean on the bridge for Unity.
+
+## Code Intelligence vs. Engine Mutation
+
+- **Code Intelligence & Reading**: Use harness-native AFT tools (`aft_search`, `aft_outline`, `aft_zoom`, `aft_callgraph`, `ast_grep_search`) for high-speed, AST-aware code search, symbol outline, reading, and call-graph tracing across C# scripts and workspace files.
+- **Engine & File Mutation**: All Unity engine mutations (editing C# scripts for compilation, creating GameObjects, mutating scenes/materials) MUST go through SuperMCP bridge tools (`script_create`, `script_edit`, `script_validate`) to trigger Unity's compilation gate and asset database refresh. Do NOT use host `edit`/`write` for Unity mutations.
 
 ## First Action (ALWAYS)
 
