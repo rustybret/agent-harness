@@ -114,3 +114,9 @@ _Auto-scaffolded by /start-work. Append new entries below - never overwrite._
 - **Isolated sandbox DB inspection**: `$OMO_QA_ROOT/data/opencode/opencode.db`; V2 schema uses `session` (cols `id`, `parent_id`, `directory`, `title`) + `part` (cols `session_id`, `data` JSON). Subagent sessions have `parent_id NOT NULL`; tool calls are `part.data` JSON `{type:"tool", tool, state:{input,status,error}}`; text is `{type:"text", text}`. Match a scenario's subagent by its first `part` text prefix (`"text":"<prompt-prefix>`), since needles like "List the scenes" collide across scenarios.
 - **Evidence**: `.omo/evidence/20260804-unity-subagents/task-10/` — per-scenario `fixture-requests.jsonl` (ordered) + `transcript.jsonl` + `subagent-trail*.txt` + assertion table in README; `fixture-scripts/` holds byte copies of the gitignored harness so evidence is self-contained. `.local-ignore/` is gitignored (verified `git check-ignore`).
 - **Rule #2598 honored**: fixture PID tracked and killed individually on teardown; never bound 27182 (fixture + rewrite both hard-refuse 27182).
+
+## Task 12: Documentation, Roadmap, and Coordination
+- Created `docs/reference/unity-editor-subagents.md` detailing Option A and Option B subagents, permission model, fallback chains, and sync workflows.
+- Added `unity-editor-subagents.md` to `docs/AGENTS.md` index table.
+- Updated `.omo/plans/tooling-improvement-roadmap.md` to record the restricted-subagent work as landed and amended P3-9 to revisit after live A/B bench runs.
+- Sent coordination `project_message` to `unitysupermcp-7b6c0482` and saved the response receipt to `.omo/evidence/20260804-unity-subagents/task-12/project-message-response.json`.

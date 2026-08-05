@@ -46,10 +46,19 @@ Configure the mailbox by adding the `cross_project_mailbox` block to your user c
     "interrupt_policy": "idle-drain", // Inbound notes are queued and delivered during idle transitions.
 
     // 3. Sender Trust Settings
+    // IMPORTANT: `senders` is DUAL-PURPOSE. The same map, read on the SAME config file, gates both
+    // directions by different lookup keys:
+    //   - Inbound:  validateInbound looks up senders[note.fromProjectId]   -> who may send TO you.
+    //   - Outbound: runSendPreflight looks up senders[targetProjectId] on YOUR OWN config
+    //               -> who YOU may send TO.
+    // There is no separate "targets"/"grants" block for outbound. A peer granting you inbound access
+    // on THEIR config only controls whether THEY accept notes from you -- it has no effect on whether
+    // YOU are authorized to send to THEM. To send to a project, you must add an entry for it in your
+    // OWN senders map, even if that project already allows you.
     "default_sender_access": "allow-none", // "allow-all" or "allow-none". Gated default for unconfigured projects.
     "senders": {
       "abc12345": {
-        "access": "allow", // "allow" or "deny" access to deliver to this mailbox
+        "access": "allow", // "allow" or "deny" access to deliver to this mailbox, AND (same entry) to send to this project
         "intent_budget": "impl", // Maximum intent permitted: "question" | "impl" | "plan"
         "allowed_modes": ["todo-append", "subagent"], // Optional. Allowlist of requested_mode lanes this sender may use. Absent = every mode whose tier fits intent_budget is implicitly allowed.
         "worker_pr_variant": "local" // Optional. Substrate for this sender's worker-pr notes: "local" (default, headless worktree worker) | "cloudhome" (delegate execution to cloudhome).
@@ -112,6 +121,23 @@ By default, the mailbox rejects deliveries from unconfigured sources. You must a
   }
 }
 ```
+
+**This same `senders` block also authorizes YOUR outbound sends.** `senders` is not a one-directional
+inbound allowlist -- `project_message` preflight checks a send by looking up the *target*
+projectId in *your own* `senders` map, exactly the same field and lookup shape shown above.
+Granting a peer inbound access on your config does not grant you permission to send to that peer, and
+vice versa: two entries are required for two-way traffic, one on each project's own config.
+
+**Concretely, for two projects A and B to exchange notes in both directions:**
+- A's config needs `senders.<B's projectId>` (lets A receive from B, AND lets A send to B).
+- B's config needs `senders.<A's projectId>` (lets B receive from A, AND lets B send to A).
+
+If A sends to B without B appearing in A's own `senders` map, the send preflight rejects it with
+`{"blocked": true, "reason": "unauthorized"}` -- even if B's config already grants A inbound access.
+The `project_message` `mode: "list"` probe only enumerates targets with an explicit `senders` entry on
+your own config; it does not fall back to `default_sender_access: "allow-all"`, so an
+implicitly-allowed target may still be absent from that advisory table even though a send to it would
+succeed.
 
 ---
 

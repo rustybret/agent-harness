@@ -23,6 +23,7 @@
 | Known issues & workarounds | [docs/reference/known-issues.md](reference/known-issues.md) |
 | `prompt_async_gate` deep-dive | [docs/reference/prompt-async-gate-rfc.md](reference/prompt-async-gate-rfc.md) |
 | Unity subagent benchmark procedure | [docs/reference/unity-subagent-benchmark.md](reference/unity-subagent-benchmark.md) |
+| Unity editor subagents usage | [docs/reference/unity-editor-subagents.md](reference/unity-editor-subagents.md) |
 | Shared core multi-PR extraction QA | [docs/reference/shared-core-multi-pr.md](reference/shared-core-multi-pr.md) |
 | Re-export shim inventory | [docs/reference/re-export-shim-inventory.md](reference/re-export-shim-inventory.md) |
 | Release process | [docs/reference/release-process.md](reference/release-process.md) |
