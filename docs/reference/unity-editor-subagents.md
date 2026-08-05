@@ -202,14 +202,23 @@ When OpenCode runs locally on macOS (Apple Silicon arm64) while the Unity Editor
    - `console_get_logs` for runtime error verification post-domain-reload.
 3. **Evidence of Correctness**: Returning `Verification: Validate: script_validate passed, Compile: compile_status succeeded` in the subagent output provides 100% complete evidence of correctness for parent agents.
 
-### Project-Local AFT LSP Configuration
+### Project-Local AFT LSP Configuration (via scoped `XDG_CONFIG_HOME`)
 
 Do **NOT** globally disable C# LSP in `~/.config/cortexkit/aft.jsonc`, as local macOS projects running a local Unity Editor need local C# LSP.
 
-For remote-driven Unity projects (e.g. `salvage`, `webgameECS`), configure C# LSP **per project repository** in `.cortexkit/aft.jsonc` at the project root:
+**AFT deliberately strips `lsp.servers` / `lsp.disabled` / `lsp.versions` / `lsp.auto_install` / `lsp.grace_days` from project-root config** (`packages/opencode-plugin/src/config.ts` `getProjectLspStrippedKeys`) — only the global `~/.config/cortexkit/aft.jsonc` (resolved via `resolveCortexKitUserConfigPath()`, which reads `$XDG_CONFIG_HOME/cortexkit/aft.jsonc` first) honors these keys. This is a hard security boundary: it stops an untrusted downloaded repository from weaponizing project-level config into spawning arbitrary binaries via a fake "LSP server" definition (`binary: "curl", args: [...]`). Do not ask AFT to weaken this.
+
+**Correct approach — scope LSP config per project via `XDG_CONFIG_HOME` at session-launch time**, not via project-root config:
+
+```bash
+# Launching an OpenCode session for a remote-Unity repo (salvage, webgameECS → altos-worker-02):
+XDG_CONFIG_HOME="$HOME/.config/cortexkit-remote-unity" opencode ...
+```
+
+Then `~/.config/cortexkit-remote-unity/cortexkit/aft.jsonc` carries the remote/disabled C# LSP config:
 
 ```jsonc
-// <project-root>/.cortexkit/aft.jsonc (Project-Local Scoping)
+// ~/.config/cortexkit-remote-unity/cortexkit/aft.jsonc
 {
   "lsp": {
     // Option A: Remote SSH tunnel to Windows instance
@@ -219,13 +228,13 @@ For remote-driven Unity projects (e.g. `salvage`, `webgameECS`), configure C# LS
         "args": ["user@altos-worker-02", "csharp-ls"]
       }
     }
-    // Option B: Disable host C# LSP for this remote-only project root
+    // Option B: Disable host C# LSP entirely for this remote-only launch profile
     // "disabled": ["csharp"]
   }
 }
 ```
 
-This ensures local Mac Unity projects retain native local C# LSP, while remote-hosted Unity projects suppress or tunnel host LSP requests cleanly per repository.
+Local Mac Unity project sessions launch with the default (unset) `XDG_CONFIG_HOME`, keeping native local `csharp-ls` untouched. This gives true per-project LSP precedence today, driven by how the session process is invoked — no AFT code change or release required. AFT is tracking a possible opt-in, trust-gated project LSP override (mirroring `aft doctor filters trust`) as a future enhancement, but that requires a code change/release cycle and is not a near-term guarantee.
 
 ---
 
