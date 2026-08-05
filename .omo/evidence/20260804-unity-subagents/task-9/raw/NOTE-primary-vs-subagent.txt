@@ -1,0 +1,16 @@
+FINDING (primary vs subagent permission enforcement):
+`opencode run --agent unity-editor` runs unity-editor as the PRIMARY session.
+In primary mode opencode does NOT apply the subagent `permission` map — bash
+executed (status=completed, ran `ls -la`) for BOTH unity-editor (restricted)
+and unity-gamedev (unrestricted).
+
+This is EXPECTED and not a defect: the restricted `permission` map is a
+SUBAGENT-dispatch-time control. It is enforced when the agent is spawned via
+`task(subagent_type=...)`, which routes through the plugin delegate-task
+executor (tools.ts:196-222 -> executeSyncTask) and creates a child session whose
+agent = unity-editor, at which point opencode enforces bash:deny.
+
+Therefore the todo-9(b) denial probe MUST use the task() subagent path, NOT
+`opencode run --agent`. The two denial-unity-editor.jsonl / differential files
+from the --agent runs are retained as the primary-mode control showing the
+distinction.

@@ -1,0 +1,20 @@
+(c) DISPATCH MODE — SYNC confirmed (flash-lite gemini NOT forced to background)
+
+OBSERVED (runtime): every task(subagent_type="unity-editor" | "unity-gamedev") dispatch
+returned an in-band SYNCHRONOUS result header "Task completed in <N>s" with the subagent's
+full output inline — NOT "Background task launched. Background Task ID: ...". The parent
+`opencode run` completed only after the child finished. Model routing line confirms the
+subagent ran on opencode/gemini-3.5-flash-lite.
+
+CODE-PATH PROOF (why flash-lite does NOT force background on subagent_type dispatch):
+delegate-task tools.ts:156-222 — the forced-background (unstable-agent) branch is gated on
+`if (delegateTaskArgs.category)` (line 156) and only fires when isUnstableAgent &&
+isRunInBackgroundExplicitlyFalse (line 182 -> executeUnstableAgentTask). The subagent_type
+path is the `else` at line 196 (resolveSubagentExecution) and falls through to
+executeSyncTask at line 222 with NO unstable-agent detection. isUnstableTask()
+(task-message-analyzer.ts:107-111) flags gemini models, but that flag is only consulted on
+the CATEGORY path, never the subagent_type path.
+
+CONCLUSION: `task(subagent_type="unity-editor")` with the gemini-3.5-flash-lite frontmatter
+model completes in SYNC mode. The unstable-gemini forced-background flag does NOT apply to
+subagent_type dispatch. This is the accepted behavior for task-12 docs; model-core untouched.

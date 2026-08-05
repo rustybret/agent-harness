@@ -1,0 +1,15 @@
+Frontmatter permission maps cross-checked from .opencode/agents/*.md (static read, before sandbox):
+All seven restricted agents (unity-editor, unity-scene, unity-script-roslyn, unity-asset,
+unity-build, unity-runtime, unity-bridge-bootstrap) carry byte-identical:
+  mode: subagent
+  model: opencode/gemini-3.5-flash-lite
+  temperature: 0.1
+  permission:
+    "*": deny
+    skill: allow
+    skill_mcp: allow
+    read: allow
+    question: allow
+    todowrite: allow
+unity-gamedev (control): mode subagent, model anthropic/claude-sonnet-4-6, variant high,
+  temperature 0.1, NO permission block (unrestricted).

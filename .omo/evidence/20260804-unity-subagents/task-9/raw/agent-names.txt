@@ -1,0 +1,37 @@
+Atlas - Plan Executor
+build
+compaction
+dreamer
+dreamer-classifier
+dreamer-docs
+dreamer-memory-mapper
+dreamer-primer-investigator
+dreamer-retrospective
+dreamer-reviewer
+explore
+general
+Hephaestus - Deep Agent
+historian
+historian-editor
+historian-recomp
+librarian
+Metis - Plan Consultant
+Momus - Plan Critic
+multimodal-looker
+oracle
+plan
+Prometheus - Plan Builder
+sidekick
+Sisyphus - ultraworker
+Sisyphus-Junior
+smart-note-compiler
+summary
+title
+unity-asset
+unity-bridge-bootstrap
+unity-build
+unity-editor
+unity-gamedev
+unity-runtime
+unity-scene
+unity-script-roslyn

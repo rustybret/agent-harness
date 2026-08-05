@@ -1,0 +1,2498 @@
+--- unity-editor ---
+{
+  "name": "unity-editor",
+  "mode": "subagent",
+  "model": {
+    "modelID": "gemini-3.5-flash-lite",
+    "providerID": "opencode"
+  },
+  "permission": [
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "doom_loop",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/opencode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Users/brethoffman/.agents/skills/exa-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/omo-skill-authoring/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-gamedev/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-modal-dismiss/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_enter",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_exit",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.*",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.example",
+      "action": "allow"
+    },
+    {
+      "permission": "webfetch",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "task",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "skill",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "skill_mcp",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "todowrite",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    }
+  ]
+}
+--- unity-scene ---
+{
+  "name": "unity-scene",
+  "mode": "subagent",
+  "model": {
+    "modelID": "gemini-3.5-flash-lite",
+    "providerID": "opencode"
+  },
+  "permission": [
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "doom_loop",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/opencode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Users/brethoffman/.agents/skills/exa-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/omo-skill-authoring/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-gamedev/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-modal-dismiss/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_enter",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_exit",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.*",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.example",
+      "action": "allow"
+    },
+    {
+      "permission": "webfetch",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "task",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "skill",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "skill_mcp",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "todowrite",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    }
+  ]
+}
+--- unity-script-roslyn ---
+{
+  "name": "unity-script-roslyn",
+  "mode": "subagent",
+  "model": {
+    "modelID": "gemini-3.5-flash-lite",
+    "providerID": "opencode"
+  },
+  "permission": [
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "doom_loop",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/opencode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Users/brethoffman/.agents/skills/exa-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/omo-skill-authoring/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-gamedev/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-modal-dismiss/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_enter",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_exit",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.*",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.example",
+      "action": "allow"
+    },
+    {
+      "permission": "webfetch",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "task",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "skill",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "skill_mcp",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "todowrite",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    }
+  ]
+}
+--- unity-asset ---
+{
+  "name": "unity-asset",
+  "mode": "subagent",
+  "model": {
+    "modelID": "gemini-3.5-flash-lite",
+    "providerID": "opencode"
+  },
+  "permission": [
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "doom_loop",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/opencode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Users/brethoffman/.agents/skills/exa-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/omo-skill-authoring/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-gamedev/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-modal-dismiss/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_enter",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_exit",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.*",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.example",
+      "action": "allow"
+    },
+    {
+      "permission": "webfetch",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "task",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "skill",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "skill_mcp",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "todowrite",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    }
+  ]
+}
+--- unity-build ---
+{
+  "name": "unity-build",
+  "mode": "subagent",
+  "model": {
+    "modelID": "gemini-3.5-flash-lite",
+    "providerID": "opencode"
+  },
+  "permission": [
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "doom_loop",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/opencode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Users/brethoffman/.agents/skills/exa-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/omo-skill-authoring/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-gamedev/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-modal-dismiss/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_enter",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_exit",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.*",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.example",
+      "action": "allow"
+    },
+    {
+      "permission": "webfetch",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "task",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "skill",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "skill_mcp",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "todowrite",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    }
+  ]
+}
+--- unity-runtime ---
+{
+  "name": "unity-runtime",
+  "mode": "subagent",
+  "model": {
+    "modelID": "gemini-3.5-flash-lite",
+    "providerID": "opencode"
+  },
+  "permission": [
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "doom_loop",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/opencode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Users/brethoffman/.agents/skills/exa-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/omo-skill-authoring/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-gamedev/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-modal-dismiss/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_enter",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_exit",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.*",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.example",
+      "action": "allow"
+    },
+    {
+      "permission": "webfetch",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "task",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "skill",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "skill_mcp",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "todowrite",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    }
+  ]
+}
+--- unity-bridge-bootstrap ---
+{
+  "name": "unity-bridge-bootstrap",
+  "mode": "subagent",
+  "model": {
+    "modelID": "gemini-3.5-flash-lite",
+    "providerID": "opencode"
+  },
+  "permission": [
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "doom_loop",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/opencode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Users/brethoffman/.agents/skills/exa-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/omo-skill-authoring/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-gamedev/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-modal-dismiss/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_enter",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_exit",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.*",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.example",
+      "action": "allow"
+    },
+    {
+      "permission": "webfetch",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "task",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "skill",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "skill_mcp",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "todowrite",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    }
+  ]
+}
+--- unity-gamedev ---
+{
+  "name": "unity-gamedev",
+  "mode": "subagent",
+  "model": {
+    "modelID": "claude-sonnet-4-6",
+    "providerID": "anthropic"
+  },
+  "permission": [
+    {
+      "permission": "*",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "doom_loop",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "ask"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/opencode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Users/brethoffman/.agents/skills/exa-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.agents/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/codex-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/get-unpublished-changes/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/macos-cua/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/omomomo/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/opencode-qa/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/publish/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/remove-deadcode/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/tech-debt-audit/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.claude/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/ansible-mcp/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/github-triage/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/hyperplan/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/omo-skill-authoring/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/pre-publish-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-gamedev/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/unity-modal-dismiss/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/Volumes/Topper2TB/Git/agent-harness/.opencode/skills/work-with-pr/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-research/*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/cache/opencode/skills/security-review/*",
+      "action": "allow"
+    },
+    {
+      "permission": "question",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_enter",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "plan_exit",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "read",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.*",
+      "action": "ask"
+    },
+    {
+      "permission": "read",
+      "pattern": "*.env.example",
+      "action": "allow"
+    },
+    {
+      "permission": "webfetch",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "*",
+      "action": "allow"
+    },
+    {
+      "permission": "task",
+      "pattern": "*",
+      "action": "deny"
+    },
+    {
+      "permission": "external_directory",
+      "pattern": "/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-task9.XXXXXX.4ElFsatuS9/data/opencode/tool-output/*",
+      "action": "allow"
+    }
+  ]
+}

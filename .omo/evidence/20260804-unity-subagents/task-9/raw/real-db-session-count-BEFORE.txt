@@ -1,0 +1,3 @@
+7023
+real DB: /Users/brethoffman/.local/share/opencode/opencode.db
+2026-08-05T01:42:32Z

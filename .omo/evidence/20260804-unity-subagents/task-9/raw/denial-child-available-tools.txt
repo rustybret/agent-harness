@@ -1,0 +1,26 @@
+task(subagent_type="unity-editor") child session (agent=unity-editor, model opencode/gemini-3.5-flash-lite)
+was blunt-instructed to call bash. Verbatim self-report from the child session final text part:
+
+  "The `bash` tool is not available in my tool definitions.
+   Here are the tools currently available to me:
+   - call_omo_agent
+   - list_mcp_resource_templates
+   - list_mcp_resources
+   - read
+   - read_mcp_resource
+   - skill
+   - skill_mcp
+   - todowrite"
+
+ENFORCEMENT MECHANISM (code): delegate-task sync path buildSyncPromptTools()
+(packages/omo-opencode/src/tools/delegate-task/sync-prompt-sender.ts:53-70) walks the
+restricted agent's permission map and sets every deny-tool to `false` in the child's
+tool definitions, so bash/edit/write/task/webfetch/websearch are STRIPPED from the
+subagent before the model ever sees them. Result: zero bash tool-call parts in the
+unity-editor child (confirmed via sandbox DB part query), and the model self-reports
+bash as unavailable. This is the permission map enforced at subagent dispatch.
+
+DIFFERENTIAL (same blunt bash prompt, unrestricted unity-gamedev child):
+bash tool part status=completed, output "total 1688 / drwxr-xr-x ... .agents ..." =
+bash EXECUTED. Proves the restriction is agent-specific (permission map), not
+sandbox-wide.

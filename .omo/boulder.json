@@ -61,11 +61,24 @@
       "status": "completed",
       "ended_at": "2026-08-05T01:34:16.022Z",
       "elapsed_ms": 46244
+    },
+    "todo:9": {
+      "task_key": "todo:9",
+      "task_label": "9",
+      "task_title": "Sandbox QA: registration, permission enforcement, dispatch behavior (all 8 agents)",
+      "session_id": "opencode:ses_0306ae520ffewq2QmNmfWu957R",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "started_at": "2026-08-05T01:34:50.603Z",
+      "status": "completed",
+      "updated_at": "2026-08-05T02:27:01.594Z",
+      "ended_at": "2026-08-05T02:27:01.594Z",
+      "elapsed_ms": 3130991
     }
   },
   "active_work_id": "unity-supermcp-subagents-f053ec81",
   "status": "active",
-  "updated_at": "2026-08-05T01:34:16.023Z",
+  "updated_at": "2026-08-05T02:27:01.594Z",
   "schema_version": 2,
   "works": {
     "provider-quirks-normalizer-legacy": {
@@ -708,7 +721,7 @@
       "plan_name": "unity-supermcp-subagents",
       "status": "active",
       "started_at": "2026-08-05T00:51:56.936Z",
-      "updated_at": "2026-08-05T01:34:16.023Z",
+      "updated_at": "2026-08-05T02:27:01.594Z",
       "session_ids": [
         "opencode:ses_03098296affeQrzOv3gRUYPM57"
       ],
@@ -768,6 +781,19 @@
           "status": "completed",
           "ended_at": "2026-08-05T01:34:16.022Z",
           "elapsed_ms": 46244
+        },
+        "todo:9": {
+          "task_key": "todo:9",
+          "task_label": "9",
+          "task_title": "Sandbox QA: registration, permission enforcement, dispatch behavior (all 8 agents)",
+          "session_id": "opencode:ses_0306ae520ffewq2QmNmfWu957R",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "started_at": "2026-08-05T01:34:50.603Z",
+          "status": "completed",
+          "updated_at": "2026-08-05T02:27:01.594Z",
+          "ended_at": "2026-08-05T02:27:01.594Z",
+          "elapsed_ms": 3130991
         }
       }
     }
