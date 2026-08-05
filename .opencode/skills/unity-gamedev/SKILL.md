@@ -43,15 +43,27 @@ Load this skill when an agent needs to:
 - Drive Unity headless/unattended where the compile gate and modal handling must be
   respected, not assumed
 
-If the bridge is not installed or the Unity Editor is unreachable, load
-`unity-bridge-bootstrap` first and run its health checks. Do not keep this skill
-loaded as a substitute for the focused domain skills once the loop is running.
+If the bridge is not installed or the Unity Editor is unreachable, the common
+unblock is to start the BEAM server first — the Editor auto-attaches to a running
+server, so start BEAM before (or independently of) opening Unity:
+
+```bash
+unity-bridge/Editor~/server/supermcp start   # listens on 127.0.0.1:27182
+```
+
+Then re-run `bridge_status`. For deeper recovery (safe mode, modal dialogs,
+package/config repair), load `unity-bridge-bootstrap`, which ships alongside this
+skill in `supermcp-skills/Samples~/AgentSkills/unity-bridge-bootstrap/`. Do not keep
+this skill loaded as a substitute for the focused domain skills once the loop is
+running.
 
 ## Core Workflow: Edit → Compile → Verify
 
 1. **Bootstrap / health.** `bridge_status` — confirm the bridge is alive and read
    `editor_focused`, `last_pump_tick_age_ms`, `run_in_background`,
-   `pending_modal_count`. If unhealthy, load `unity-bridge-bootstrap`.
+   `pending_modal_count`. If unhealthy, start BEAM first
+   (`unity-bridge/Editor~/server/supermcp start`, port 27182) so the Editor can
+   auto-attach; load `unity-bridge-bootstrap` for deeper recovery.
 2. **Discover the tool subset.** `get_relevant_tools` with your task description.
    Whole-surface clients hit the 128-tool cap; this meta-tool returns only the
    tools the task needs so the client stays under the limit.
@@ -67,8 +79,11 @@ loaded as a substitute for the focused domain skills once the loop is running.
    capture the `job_id`, poll `compile_status` until `succeeded`/`failed`, and read
    `compile_errors` on failure. The change is NOT live until `compile_status`
    reports `succeeded`.
-7. **Verify.** Confirm with safe reads and the `session_changes` mutation log — do
-   not assert success from the write call alone.
+7. **Verify.** Confirm with safe reads and the `session_changes` mutation log, and don't assert success from the write call alone. If the response envelope's `console.errors` count jumps after a mutation, call `console_get_logs` with `types: ["error"]` to inspect the failure.
+8. **Run the tests (when the project has them).** `test_run_start` queues a run and
+   returns immediately; poll `test_run_result` until `status` leaves `running`. A run
+   holds the main thread, so poll that tool rather than any other while one is in
+   flight. Narrow long suites with `assembly`, `filter`, or `category`.
 
 ```typescript
 skill_mcp(mcp_name="supermcp", tool_name="bridge_status", arguments={})
@@ -77,6 +92,8 @@ skill_mcp(mcp_name="supermcp", tool_name="script_validate", arguments={"path":"A
 skill_mcp(mcp_name="supermcp", tool_name="script_create", arguments={"path":"Assets/Scripts/PlayerSpawner.cs","contents":"<csharp>"})
 skill_mcp(mcp_name="supermcp", tool_name="compile_status", arguments={"job_id":"<job_id>"})
 skill_mcp(mcp_name="supermcp", tool_name="session_changes", arguments={})
+skill_mcp(mcp_name="supermcp", tool_name="test_run_start", arguments={"mode":"edit"})
+skill_mcp(mcp_name="supermcp", tool_name="test_run_result", arguments={})
 ```
 
 ## Tool Discovery (128-tool clients)
@@ -105,6 +122,14 @@ work that silently strands.
   `EditorApplication.update`. App Nap is auto-disabled by the bridge bootstrap, but
   responsive compilation may still require the user to foreground Unity — handle the
   timeout path with `request_user_decision`, do not spin.
+- **Test runs need the test framework, and hold the main thread.** `test_run_start` /
+  `test_run_result` require `com.unity.test-framework` in the target project; without
+  it the bridge answers `unknown_tool` (the tools stay advertised because one server
+  can serve several editors). A run occupies the main thread for its duration, so
+  poll `test_run_result` and expect other tools to be slow until it finishes. An
+  EditMode run reloads the domain at the end, and a PlayMode run reloads several
+  times — `status` stays `running` across a PlayMode reload and `domainReloads`
+  counts them, but an EditMode run cut short by a recompile reports `interrupted`.
 - **Touchpoints only via the bridge.** All Unity reads and mutations go through
   bridge tools and skills. Never use harness file tools (`read`/`edit`/`write`/
   `aft_search`) to touch Unity scenes, scripts, prefabs, or assets directly.
