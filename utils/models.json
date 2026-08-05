@@ -87,10 +87,25 @@
       "key": "google/antigravity-gpt-oss-120b-medium"
     },
     {
+      "key": "google/gemma-26b"
+    },
+    {
+      "key": "google/gemma-31b"
+    },
+    {
+      "key": "google/gemma-4-26b"
+    },
+    {
       "key": "google/gemma-4-26b-a4b-it"
     },
     {
+      "key": "google/gemma-4-31b"
+    },
+    {
       "key": "google/gemma-4-31b-it"
+    },
+    {
+      "key": "groq/allam-2-7b"
     },
     {
       "key": "groq/canopylabs/orpheus-arabic-saudi"
@@ -111,9 +126,6 @@
       "key": "groq/llama-3.3-70b-versatile"
     },
     {
-      "key": "groq/meta-llama/llama-4-scout-17b-16e-instruct"
-    },
-    {
       "key": "groq/meta-llama/llama-prompt-guard-2-22m"
     },
     {
@@ -129,7 +141,7 @@
       "key": "groq/openai/gpt-oss-safeguard-20b"
     },
     {
-      "key": "groq/qwen/qwen3-32b"
+      "key": "groq/qwen/qwen3.6-27b"
     },
     {
       "key": "groq/whisper-large-v3"
@@ -1534,6 +1546,9 @@
     },
     {
       "key": "openrouter/qwen/qwen3.7-plus"
+    },
+    {
+      "key": "openrouter/qwen/qwen3.8-max"
     },
     {
       "key": "openrouter/rekaai/reka-edge"

@@ -1,10 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft-04/schema#",
-  "version": "2025.05.13",
   "models": [
-    {
-      "key": "anthropic/claude-fable-5",
-      "variants": [
+    { "key": "anthropic/claude-fable-5", "variants": [
         "high",
         "low",
         "max",
@@ -12,23 +9,17 @@
         "xhigh"
       ]
     },
-    {
-      "key": "anthropic/claude-haiku-4-5",
-      "variants": [
+    { "key": "anthropic/claude-haiku-4-5", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "anthropic/claude-haiku-4-5-20251001",
-      "variants": [
+    { "key": "anthropic/claude-haiku-4-5-20251001", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "anthropic/claude-mythos-5",
-      "variants": [
+    { "key": "anthropic/claude-mythos-5", "variants": [
         "high",
         "low",
         "max",
@@ -36,43 +27,33 @@
         "xhigh"
       ]
     },
-    {
-      "key": "anthropic/claude-opus-4-5",
-      "variants": [
+    { "key": "anthropic/claude-opus-4-5", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "anthropic/claude-opus-4-5-20251101",
-      "variants": [
+    { "key": "anthropic/claude-opus-4-5-20251101", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "anthropic/claude-opus-4-6",
-      "variants": [
+    { "key": "anthropic/claude-opus-4-6", "variants": [
         "high",
         "low",
         "max",
         "medium"
       ]
     },
-    {
-      "key": "anthropic/claude-opus-4-6-fast",
-      "variants": [
+    { "key": "anthropic/claude-opus-4-6-fast", "variants": [
         "high",
         "low",
         "max",
         "medium"
       ]
     },
-    {
-      "key": "anthropic/claude-opus-4-7",
-      "variants": [
+    { "key": "anthropic/claude-opus-4-7", "variants": [
         "high",
         "low",
         "max",
@@ -80,9 +61,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "anthropic/claude-opus-4-7-fast",
-      "variants": [
+    { "key": "anthropic/claude-opus-4-7-fast", "variants": [
         "high",
         "low",
         "max",
@@ -90,9 +69,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "anthropic/claude-opus-4-8",
-      "variants": [
+    { "key": "anthropic/claude-opus-4-8", "variants": [
         "high",
         "low",
         "max",
@@ -100,9 +77,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "anthropic/claude-opus-4-8-fast",
-      "variants": [
+    { "key": "anthropic/claude-opus-4-8-fast", "variants": [
         "high",
         "low",
         "max",
@@ -110,9 +85,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "anthropic/claude-opus-5",
-      "variants": [
+    { "key": "anthropic/claude-opus-5", "variants": [
         "high",
         "low",
         "max",
@@ -120,9 +93,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "anthropic/claude-opus-5-fast",
-      "variants": [
+    { "key": "anthropic/claude-opus-5-fast", "variants": [
         "high",
         "low",
         "max",
@@ -130,32 +101,24 @@
         "xhigh"
       ]
     },
-    {
-      "key": "anthropic/claude-sonnet-4-5",
-      "variants": [
+    { "key": "anthropic/claude-sonnet-4-5", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "anthropic/claude-sonnet-4-5-20250929",
-      "variants": [
+    { "key": "anthropic/claude-sonnet-4-5-20250929", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "anthropic/claude-sonnet-4-6",
-      "variants": [
+    { "key": "anthropic/claude-sonnet-4-6", "variants": [
         "high",
         "low",
         "max",
         "medium"
       ]
     },
-    {
-      "key": "anthropic/claude-sonnet-5",
-      "variants": [
+    { "key": "anthropic/claude-sonnet-5", "variants": [
         "high",
         "low",
         "max",
@@ -163,663 +126,417 @@
         "xhigh"
       ]
     },
-    {
-      "key": "cerebras/gemma-4-31b",
-      "variants": [
+    { "key": "cerebras/gemma-4-31b", "variants": [
         "high",
         "low",
         "medium",
         "none"
       ]
     },
-    {
-      "key": "cerebras/gpt-oss-120b",
-      "variants": [
+    { "key": "cerebras/gpt-oss-120b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "cerebras/zai-glm-4.7",
-      "variants": [
+    { "key": "cerebras/zai-glm-4.7", "variants": [
         "none"
       ]
     },
-    {
-      "key": "google/antigravity-claude-opus-4-6-thinking",
-      "variants": []
+    { "key": "google/antigravity-claude-opus-4-6-thinking", "variants": []
     },
-    {
-      "key": "google/antigravity-claude-sonnet-4-6-thinking",
-      "variants": []
+    { "key": "google/antigravity-claude-sonnet-4-6-thinking", "variants": []
     },
-    {
-      "key": "google/antigravity-gemini-3.1-flash-image",
-      "variants": []
+    { "key": "google/antigravity-gemini-3.1-flash-image", "variants": []
     },
-    {
-      "key": "google/antigravity-gemini-3.1-pro",
-      "variants": [
+    { "key": "google/antigravity-gemini-3.1-pro", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "google/antigravity-gemini-3.5-flash",
-      "variants": [
+    { "key": "google/antigravity-gemini-3.5-flash", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "google/antigravity-gemini-3.6-flash",
-      "variants": [
+    { "key": "google/antigravity-gemini-3.6-flash", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "google/antigravity-gpt-oss-120b-medium",
-      "variants": [
+    { "key": "google/antigravity-gpt-oss-120b-medium", "variants": [
         "high",
         "low"
       ]
     },
-    {
-      "key": "google/gemma-4-26b-a4b-it",
-      "variants": [
+    { "key": "google/gemma-26b", "variants": [
         "high",
         "low"
       ]
     },
-    {
-      "key": "google/gemma-4-31b-it",
-      "variants": [
+    { "key": "google/gemma-31b", "variants": [
         "high",
         "low"
       ]
     },
-    {
-      "key": "groq/canopylabs/orpheus-arabic-saudi",
-      "variants": []
+    { "key": "google/gemma-4-26b", "variants": [
+        "high",
+        "low"
+      ]
     },
-    {
-      "key": "groq/canopylabs/orpheus-v1-english",
-      "variants": []
+    { "key": "google/gemma-4-26b-a4b-it", "variants": [
+        "high",
+        "low"
+      ]
     },
-    {
-      "key": "groq/groq/compound",
-      "variants": []
+    { "key": "google/gemma-4-31b", "variants": [
+        "high",
+        "low"
+      ]
     },
-    {
-      "key": "groq/groq/compound-mini",
-      "variants": []
+    { "key": "google/gemma-4-31b-it", "variants": [
+        "high",
+        "low"
+      ]
     },
-    {
-      "key": "groq/llama-3.1-8b-instant",
-      "variants": []
+    { "key": "groq/allam-2-7b", "variants": []
     },
-    {
-      "key": "groq/llama-3.3-70b-versatile",
-      "variants": []
+    { "key": "groq/canopylabs/orpheus-arabic-saudi", "variants": []
     },
-    {
-      "key": "groq/meta-llama/llama-4-scout-17b-16e-instruct",
-      "variants": []
+    { "key": "groq/canopylabs/orpheus-v1-english", "variants": []
     },
-    {
-      "key": "groq/meta-llama/llama-prompt-guard-2-22m",
-      "variants": []
+    { "key": "groq/groq/compound", "variants": []
     },
-    {
-      "key": "groq/meta-llama/llama-prompt-guard-2-86m",
-      "variants": []
+    { "key": "groq/groq/compound-mini", "variants": []
     },
-    {
-      "key": "groq/openai/gpt-oss-120b",
-      "variants": [
+    { "key": "groq/llama-3.1-8b-instant", "variants": []
+    },
+    { "key": "groq/llama-3.3-70b-versatile", "variants": []
+    },
+    { "key": "groq/meta-llama/llama-prompt-guard-2-22m", "variants": []
+    },
+    { "key": "groq/meta-llama/llama-prompt-guard-2-86m", "variants": []
+    },
+    { "key": "groq/openai/gpt-oss-120b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "groq/openai/gpt-oss-20b",
-      "variants": [
+    { "key": "groq/openai/gpt-oss-20b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "groq/openai/gpt-oss-safeguard-20b",
-      "variants": [
+    { "key": "groq/openai/gpt-oss-safeguard-20b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "groq/qwen/qwen3-32b",
-      "variants": [
+    { "key": "groq/qwen/qwen3.6-27b", "variants": [
         "default",
         "none"
       ]
     },
-    {
-      "key": "groq/whisper-large-v3",
-      "variants": []
+    { "key": "groq/whisper-large-v3", "variants": []
     },
-    {
-      "key": "groq/whisper-large-v3-turbo",
-      "variants": []
+    { "key": "groq/whisper-large-v3-turbo", "variants": []
     },
-    {
-      "key": "lmstudio/openai/gpt-oss-20b",
-      "variants": [
+    { "key": "lmstudio/openai/gpt-oss-20b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "lmstudio/qwen/qwen3-30b-a3b-2507",
-      "variants": []
+    { "key": "lmstudio/qwen/qwen3-30b-a3b-2507", "variants": []
     },
-    {
-      "key": "lmstudio/qwen/qwen3-coder-30b",
-      "variants": []
+    { "key": "lmstudio/qwen/qwen3-coder-30b", "variants": []
     },
-    {
-      "key": "moonshotai/kimi-k2-0711-preview",
-      "variants": []
+    { "key": "moonshotai/kimi-k2-0711-preview", "variants": []
     },
-    {
-      "key": "moonshotai/kimi-k2-0905-preview",
-      "variants": []
+    { "key": "moonshotai/kimi-k2-0905-preview", "variants": []
     },
-    {
-      "key": "moonshotai/kimi-k2-thinking",
-      "variants": []
+    { "key": "moonshotai/kimi-k2-thinking", "variants": []
     },
-    {
-      "key": "moonshotai/kimi-k2-thinking-turbo",
-      "variants": []
+    { "key": "moonshotai/kimi-k2-thinking-turbo", "variants": []
     },
-    {
-      "key": "moonshotai/kimi-k2-turbo-preview",
-      "variants": []
+    { "key": "moonshotai/kimi-k2-turbo-preview", "variants": []
     },
-    {
-      "key": "moonshotai/kimi-k2.5",
-      "variants": []
+    { "key": "moonshotai/kimi-k2.5", "variants": []
     },
-    {
-      "key": "moonshotai/kimi-k2.6",
-      "variants": []
+    { "key": "moonshotai/kimi-k2.6", "variants": []
     },
-    {
-      "key": "moonshotai/kimi-k2.7-code",
-      "variants": []
+    { "key": "moonshotai/kimi-k2.7-code", "variants": []
     },
-    {
-      "key": "moonshotai/kimi-k2.7-code-highspeed",
-      "variants": []
+    { "key": "moonshotai/kimi-k2.7-code-highspeed", "variants": []
     },
-    {
-      "key": "moonshotai/kimi-k3",
-      "variants": [
+    { "key": "moonshotai/kimi-k3", "variants": [
         "high",
         "low",
         "max"
       ]
     },
-    {
-      "key": "nvidia/abacusai/dracarys-llama-3.1-70b-instruct",
-      "variants": []
+    { "key": "nvidia/abacusai/dracarys-llama-3.1-70b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/baai/bge-m3",
-      "variants": []
+    { "key": "nvidia/baai/bge-m3", "variants": []
     },
-    {
-      "key": "nvidia/black-forest-labs/flux.1-dev",
-      "variants": []
+    { "key": "nvidia/black-forest-labs/flux.1-dev", "variants": []
     },
-    {
-      "key": "nvidia/black-forest-labs/flux_1-kontext-dev",
-      "variants": []
+    { "key": "nvidia/black-forest-labs/flux_1-kontext-dev", "variants": []
     },
-    {
-      "key": "nvidia/black-forest-labs/flux_1-schnell",
-      "variants": []
+    { "key": "nvidia/black-forest-labs/flux_1-schnell", "variants": []
     },
-    {
-      "key": "nvidia/black-forest-labs/flux_2-klein-4b",
-      "variants": []
+    { "key": "nvidia/black-forest-labs/flux_2-klein-4b", "variants": []
     },
-    {
-      "key": "nvidia/bytedance/seed-oss-36b-instruct",
-      "variants": []
+    { "key": "nvidia/bytedance/seed-oss-36b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/deepseek-ai/deepseek-v4-flash",
-      "variants": [
+    { "key": "nvidia/deepseek-ai/deepseek-v4-flash", "variants": [
         "high",
         "max",
         "none"
       ]
     },
-    {
-      "key": "nvidia/deepseek-ai/deepseek-v4-pro",
-      "variants": [
+    { "key": "nvidia/deepseek-ai/deepseek-v4-pro", "variants": [
         "high",
         "max",
         "none"
       ]
     },
-    {
-      "key": "nvidia/google/gemma-2-2b-it",
-      "variants": []
+    { "key": "nvidia/google/gemma-2-2b-it", "variants": []
     },
-    {
-      "key": "nvidia/google/gemma-3-12b-it",
-      "variants": []
+    { "key": "nvidia/google/gemma-3-12b-it", "variants": []
     },
-    {
-      "key": "nvidia/google/gemma-3-4b-it",
-      "variants": []
+    { "key": "nvidia/google/gemma-3-4b-it", "variants": []
     },
-    {
-      "key": "nvidia/google/gemma-3n-e2b-it",
-      "variants": []
+    { "key": "nvidia/google/gemma-3n-e2b-it", "variants": []
     },
-    {
-      "key": "nvidia/google/gemma-3n-e4b-it",
-      "variants": []
+    { "key": "nvidia/google/gemma-3n-e4b-it", "variants": []
     },
-    {
-      "key": "nvidia/google/gemma-4-31b-it",
-      "variants": [
+    { "key": "nvidia/google/gemma-4-31b-it", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "nvidia/google/google-paligemma",
-      "variants": []
+    { "key": "nvidia/google/google-paligemma", "variants": []
     },
-    {
-      "key": "nvidia/meta/esm2-650m",
-      "variants": []
+    { "key": "nvidia/meta/esm2-650m", "variants": []
     },
-    {
-      "key": "nvidia/meta/esmfold",
-      "variants": []
+    { "key": "nvidia/meta/esmfold", "variants": []
     },
-    {
-      "key": "nvidia/meta/llama-3.1-70b-instruct",
-      "variants": []
+    { "key": "nvidia/meta/llama-3.1-70b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/meta/llama-3.1-8b-instruct",
-      "variants": []
+    { "key": "nvidia/meta/llama-3.1-8b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/meta/llama-3.2-11b-vision-instruct",
-      "variants": []
+    { "key": "nvidia/meta/llama-3.2-11b-vision-instruct", "variants": []
     },
-    {
-      "key": "nvidia/meta/llama-3.2-1b-instruct",
-      "variants": []
+    { "key": "nvidia/meta/llama-3.2-1b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/meta/llama-3.2-3b-instruct",
-      "variants": []
+    { "key": "nvidia/meta/llama-3.2-3b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/meta/llama-3.2-90b-vision-instruct",
-      "variants": []
+    { "key": "nvidia/meta/llama-3.2-90b-vision-instruct", "variants": []
     },
-    {
-      "key": "nvidia/meta/llama-3.3-70b-instruct",
-      "variants": []
+    { "key": "nvidia/meta/llama-3.3-70b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/meta/llama-4-maverick-17b-128e-instruct",
-      "variants": []
+    { "key": "nvidia/meta/llama-4-maverick-17b-128e-instruct", "variants": []
     },
-    {
-      "key": "nvidia/meta/llama-guard-4-12b",
-      "variants": []
+    { "key": "nvidia/meta/llama-guard-4-12b", "variants": []
     },
-    {
-      "key": "nvidia/microsoft/phi-4-mini-instruct",
-      "variants": []
+    { "key": "nvidia/microsoft/phi-4-mini-instruct", "variants": []
     },
-    {
-      "key": "nvidia/microsoft/phi-4-multimodal-instruct",
-      "variants": []
+    { "key": "nvidia/microsoft/phi-4-multimodal-instruct", "variants": []
     },
-    {
-      "key": "nvidia/minimaxai/minimax-m2.7",
-      "variants": []
+    { "key": "nvidia/minimaxai/minimax-m2.7", "variants": []
     },
-    {
-      "key": "nvidia/minimaxai/minimax-m3",
-      "variants": [
+    { "key": "nvidia/minimaxai/minimax-m3", "variants": [
         "none",
         "thinking"
       ]
     },
-    {
-      "key": "nvidia/mistralai/magistral-small-2506",
-      "variants": []
+    { "key": "nvidia/mistralai/magistral-small-2506", "variants": []
     },
-    {
-      "key": "nvidia/mistralai/ministral-14b-instruct-2512",
-      "variants": []
+    { "key": "nvidia/mistralai/ministral-14b-instruct-2512", "variants": []
     },
-    {
-      "key": "nvidia/mistralai/mistral-7b-instruct-v0.3",
-      "variants": []
+    { "key": "nvidia/mistralai/mistral-7b-instruct-v0.3", "variants": []
     },
-    {
-      "key": "nvidia/mistralai/mistral-large-3-675b-instruct-2512",
-      "variants": []
+    { "key": "nvidia/mistralai/mistral-large-3-675b-instruct-2512", "variants": []
     },
-    {
-      "key": "nvidia/mistralai/mistral-medium-3-instruct",
-      "variants": []
+    { "key": "nvidia/mistralai/mistral-medium-3-instruct", "variants": []
     },
-    {
-      "key": "nvidia/mistralai/mistral-medium-3.5-128b",
-      "variants": [
+    { "key": "nvidia/mistralai/mistral-medium-3.5-128b", "variants": [
         "high",
         "none"
       ]
     },
-    {
-      "key": "nvidia/mistralai/mistral-nemotron",
-      "variants": []
+    { "key": "nvidia/mistralai/mistral-nemotron", "variants": []
     },
-    {
-      "key": "nvidia/mistralai/mistral-small-4-119b-2603",
-      "variants": [
+    { "key": "nvidia/mistralai/mistral-small-4-119b-2603", "variants": [
         "high",
         "none"
       ]
     },
-    {
-      "key": "nvidia/mistralai/mixtral-8x22b-instruct",
-      "variants": []
+    { "key": "nvidia/mistralai/mixtral-8x22b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/mistralai/mixtral-8x7b-instruct",
-      "variants": []
+    { "key": "nvidia/mistralai/mixtral-8x7b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/active-speaker-detection",
-      "variants": []
+    { "key": "nvidia/nvidia/active-speaker-detection", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/bevformer",
-      "variants": []
+    { "key": "nvidia/nvidia/bevformer", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/cosmos-predict1-5b",
-      "variants": []
+    { "key": "nvidia/nvidia/cosmos-predict1-5b", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/cosmos-reason2-8b",
-      "variants": []
+    { "key": "nvidia/nvidia/cosmos-reason2-8b", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/cosmos-transfer1-7b",
-      "variants": []
+    { "key": "nvidia/nvidia/cosmos-transfer1-7b", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/cosmos-transfer2_5-2b",
-      "variants": []
+    { "key": "nvidia/nvidia/cosmos-transfer2_5-2b", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/gliner-pii",
-      "variants": []
+    { "key": "nvidia/nvidia/gliner-pii", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/llama-3.1-nemotron-70b-instruct",
-      "variants": []
+    { "key": "nvidia/nvidia/llama-3.1-nemotron-70b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/llama-3.1-nemotron-nano-8b-v1",
-      "variants": [
+    { "key": "nvidia/nvidia/llama-3.1-nemotron-nano-8b-v1", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "nvidia/nvidia/llama-3.1-nemotron-nano-vl-8b-v1",
-      "variants": []
+    { "key": "nvidia/nvidia/llama-3.1-nemotron-nano-vl-8b-v1", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/llama-3.1-nemotron-safety-guard-8b-v3",
-      "variants": []
+    { "key": "nvidia/nvidia/llama-3.1-nemotron-safety-guard-8b-v3", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/llama-3.1-nemotron-ultra-253b-v1",
-      "variants": [
+    { "key": "nvidia/nvidia/llama-3.1-nemotron-ultra-253b-v1", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "nvidia/nvidia/llama-3.3-nemotron-super-49b-v1",
-      "variants": [
+    { "key": "nvidia/nvidia/llama-3.3-nemotron-super-49b-v1", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "nvidia/nvidia/llama-3.3-nemotron-super-49b-v1.5",
-      "variants": [
+    { "key": "nvidia/nvidia/llama-3.3-nemotron-super-49b-v1.5", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "nvidia/nvidia/llama-3_2-nemoretriever-300m-embed-v1",
-      "variants": []
+    { "key": "nvidia/nvidia/llama-3_2-nemoretriever-300m-embed-v1", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/llama-nemotron-embed-vl-1b-v2",
-      "variants": []
+    { "key": "nvidia/nvidia/llama-nemotron-embed-vl-1b-v2", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/llama-nemotron-rerank-vl-1b-v2",
-      "variants": []
+    { "key": "nvidia/nvidia/llama-nemotron-rerank-vl-1b-v2", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/magpie-tts-zeroshot",
-      "variants": []
+    { "key": "nvidia/nvidia/magpie-tts-zeroshot", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/nemotron-3-content-safety",
-      "variants": []
+    { "key": "nvidia/nvidia/nemotron-3-content-safety", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/nemotron-3-nano-30b-a3b",
-      "variants": [
+    { "key": "nvidia/nvidia/nemotron-3-nano-30b-a3b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "nvidia/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
-      "variants": [
+    { "key": "nvidia/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "nvidia/nvidia/nemotron-3-super-120b-a12b",
-      "variants": [
+    { "key": "nvidia/nvidia/nemotron-3-super-120b-a12b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "nvidia/nvidia/nemotron-3-ultra-550b-a55b",
-      "variants": [
+    { "key": "nvidia/nvidia/nemotron-3-ultra-550b-a55b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "nvidia/nvidia/nemotron-content-safety-reasoning-4b",
-      "variants": []
+    { "key": "nvidia/nvidia/nemotron-content-safety-reasoning-4b", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/nemotron-mini-4b-instruct",
-      "variants": []
+    { "key": "nvidia/nvidia/nemotron-mini-4b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/nemotron-nano-12b-v2-vl",
-      "variants": []
+    { "key": "nvidia/nvidia/nemotron-nano-12b-v2-vl", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/nemotron-voicechat",
-      "variants": []
+    { "key": "nvidia/nvidia/nemotron-voicechat", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/nv-embed-v1",
-      "variants": []
+    { "key": "nvidia/nvidia/nv-embed-v1", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/nv-embedcode-7b-v1",
-      "variants": []
+    { "key": "nvidia/nvidia/nv-embedcode-7b-v1", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/nvidia-nemotron-nano-9b-v2",
-      "variants": [
+    { "key": "nvidia/nvidia/nvidia-nemotron-nano-9b-v2", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "nvidia/nvidia/rerank-qa-mistral-4b",
-      "variants": []
+    { "key": "nvidia/nvidia/rerank-qa-mistral-4b", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/riva-translate-4b-instruct-v1.1",
-      "variants": []
+    { "key": "nvidia/nvidia/riva-translate-4b-instruct-v1.1", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/sparsedrive",
-      "variants": []
+    { "key": "nvidia/nvidia/sparsedrive", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/streampetr",
-      "variants": []
+    { "key": "nvidia/nvidia/streampetr", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/studiovoice",
-      "variants": []
+    { "key": "nvidia/nvidia/studiovoice", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/synthetic-video-detector",
-      "variants": []
+    { "key": "nvidia/nvidia/synthetic-video-detector", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/usdcode",
-      "variants": []
+    { "key": "nvidia/nvidia/usdcode", "variants": []
     },
-    {
-      "key": "nvidia/nvidia/usdvalidate",
-      "variants": []
+    { "key": "nvidia/nvidia/usdvalidate", "variants": []
     },
-    {
-      "key": "nvidia/openai/gpt-oss-120b",
-      "variants": [
+    { "key": "nvidia/openai/gpt-oss-120b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "nvidia/openai/gpt-oss-20b",
-      "variants": [
+    { "key": "nvidia/openai/gpt-oss-20b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "nvidia/openai/whisper-large-v3",
-      "variants": []
+    { "key": "nvidia/openai/whisper-large-v3", "variants": []
     },
-    {
-      "key": "nvidia/poolside/laguna-xs-2.1",
-      "variants": []
+    { "key": "nvidia/poolside/laguna-xs-2.1", "variants": []
     },
-    {
-      "key": "nvidia/qwen/qwen-image",
-      "variants": []
+    { "key": "nvidia/qwen/qwen-image", "variants": []
     },
-    {
-      "key": "nvidia/qwen/qwen-image-edit",
-      "variants": []
+    { "key": "nvidia/qwen/qwen-image-edit", "variants": []
     },
-    {
-      "key": "nvidia/qwen/qwen2.5-coder-32b-instruct",
-      "variants": []
+    { "key": "nvidia/qwen/qwen2.5-coder-32b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/qwen/qwen3-coder-480b-a35b-instruct",
-      "variants": []
+    { "key": "nvidia/qwen/qwen3-coder-480b-a35b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/qwen/qwen3-next-80b-a3b-instruct",
-      "variants": []
+    { "key": "nvidia/qwen/qwen3-next-80b-a3b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/qwen/qwen3.5-122b-a10b",
-      "variants": []
+    { "key": "nvidia/qwen/qwen3.5-122b-a10b", "variants": []
     },
-    {
-      "key": "nvidia/qwen/qwen3.5-397b-a17b",
-      "variants": []
+    { "key": "nvidia/qwen/qwen3.5-397b-a17b", "variants": []
     },
-    {
-      "key": "nvidia/sarvamai/sarvam-m",
-      "variants": []
+    { "key": "nvidia/sarvamai/sarvam-m", "variants": []
     },
-    {
-      "key": "nvidia/stepfun-ai/step-3.5-flash",
-      "variants": [
+    { "key": "nvidia/stepfun-ai/step-3.5-flash", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "nvidia/stepfun-ai/step-3.7-flash",
-      "variants": [
+    { "key": "nvidia/stepfun-ai/step-3.7-flash", "variants": [
         "high",
         "low",
         "max",
@@ -828,24 +545,16 @@
         "xhigh"
       ]
     },
-    {
-      "key": "nvidia/thinkingmachines/inkling",
-      "variants": []
+    { "key": "nvidia/thinkingmachines/inkling", "variants": []
     },
-    {
-      "key": "nvidia/upstage/solar-10.7b-instruct",
-      "variants": []
+    { "key": "nvidia/upstage/solar-10.7b-instruct", "variants": []
     },
-    {
-      "key": "nvidia/z-ai/glm-5.2",
-      "variants": [
+    { "key": "nvidia/z-ai/glm-5.2", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openai/gpt-5.3-codex-spark",
-      "variants": [
+    { "key": "openai/gpt-5.3-codex-spark", "variants": [
         "high",
         "low",
         "medium",
@@ -853,9 +562,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openai/gpt-5.4",
-      "variants": [
+    { "key": "openai/gpt-5.4", "variants": [
         "high",
         "low",
         "medium",
@@ -863,9 +570,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openai/gpt-5.4-fast",
-      "variants": [
+    { "key": "openai/gpt-5.4-fast", "variants": [
         "high",
         "low",
         "medium",
@@ -873,9 +578,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openai/gpt-5.4-mini",
-      "variants": [
+    { "key": "openai/gpt-5.4-mini", "variants": [
         "high",
         "low",
         "medium",
@@ -883,9 +586,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openai/gpt-5.4-mini-fast",
-      "variants": [
+    { "key": "openai/gpt-5.4-mini-fast", "variants": [
         "high",
         "low",
         "medium",
@@ -893,9 +594,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openai/gpt-5.5",
-      "variants": [
+    { "key": "openai/gpt-5.5", "variants": [
         "high",
         "low",
         "medium",
@@ -903,9 +602,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openai/gpt-5.5-fast",
-      "variants": [
+    { "key": "openai/gpt-5.5-fast", "variants": [
         "high",
         "low",
         "medium",
@@ -913,9 +610,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openai/gpt-5.6-luna",
-      "variants": [
+    { "key": "openai/gpt-5.6-luna", "variants": [
         "high",
         "low",
         "max",
@@ -924,9 +619,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openai/gpt-5.6-luna-fast",
-      "variants": [
+    { "key": "openai/gpt-5.6-luna-fast", "variants": [
         "high",
         "low",
         "max",
@@ -935,9 +628,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openai/gpt-5.6-sol",
-      "variants": [
+    { "key": "openai/gpt-5.6-sol", "variants": [
         "high",
         "low",
         "max",
@@ -946,9 +637,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openai/gpt-5.6-sol-fast",
-      "variants": [
+    { "key": "openai/gpt-5.6-sol-fast", "variants": [
         "high",
         "low",
         "max",
@@ -957,9 +646,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openai/gpt-5.6-terra",
-      "variants": [
+    { "key": "openai/gpt-5.6-terra", "variants": [
         "high",
         "low",
         "max",
@@ -968,9 +655,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openai/gpt-5.6-terra-fast",
-      "variants": [
+    { "key": "openai/gpt-5.6-terra-fast", "variants": [
         "high",
         "low",
         "max",
@@ -979,13 +664,9 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/big-pickle",
-      "variants": []
+    { "key": "opencode/big-pickle", "variants": []
     },
-    {
-      "key": "opencode/claude-fable-5",
-      "variants": [
+    { "key": "opencode/claude-fable-5", "variants": [
         "high",
         "low",
         "max",
@@ -993,40 +674,30 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/claude-haiku-4-5",
-      "variants": [
+    { "key": "opencode/claude-haiku-4-5", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "opencode/claude-opus-4-1",
-      "variants": [
+    { "key": "opencode/claude-opus-4-1", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "opencode/claude-opus-4-5",
-      "variants": [
+    { "key": "opencode/claude-opus-4-5", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "opencode/claude-opus-4-6",
-      "variants": [
+    { "key": "opencode/claude-opus-4-6", "variants": [
         "high",
         "low",
         "max",
         "medium"
       ]
     },
-    {
-      "key": "opencode/claude-opus-4-7",
-      "variants": [
+    { "key": "opencode/claude-opus-4-7", "variants": [
         "high",
         "low",
         "max",
@@ -1034,9 +705,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/claude-opus-4-8",
-      "variants": [
+    { "key": "opencode/claude-opus-4-8", "variants": [
         "high",
         "low",
         "max",
@@ -1044,9 +713,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/claude-opus-5",
-      "variants": [
+    { "key": "opencode/claude-opus-5", "variants": [
         "high",
         "low",
         "max",
@@ -1054,32 +721,24 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/claude-sonnet-4",
-      "variants": [
+    { "key": "opencode/claude-sonnet-4", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "opencode/claude-sonnet-4-5",
-      "variants": [
+    { "key": "opencode/claude-sonnet-4-5", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "opencode/claude-sonnet-4-6",
-      "variants": [
+    { "key": "opencode/claude-sonnet-4-6", "variants": [
         "high",
         "low",
         "max",
         "medium"
       ]
     },
-    {
-      "key": "opencode/claude-sonnet-5",
-      "variants": [
+    { "key": "opencode/claude-sonnet-5", "variants": [
         "high",
         "low",
         "max",
@@ -1087,149 +746,113 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/deepseek-v4-flash",
-      "variants": [
+    { "key": "opencode/deepseek-v4-flash", "variants": [
+        "high",
+        "low",
+        "max"
+      ]
+    },
+    { "key": "opencode/deepseek-v4-flash-free", "variants": [
+        "high",
+        "low",
+        "max"
+      ]
+    },
+    { "key": "opencode/deepseek-v4-pro", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "opencode/deepseek-v4-flash-free",
-      "variants": [
-        "high",
-        "max"
-      ]
-    },
-    {
-      "key": "opencode/deepseek-v4-pro",
-      "variants": [
-        "high",
-        "max"
-      ]
-    },
-    {
-      "key": "opencode/gemini-3-flash",
-      "variants": [
+    { "key": "opencode/gemini-3-flash", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "opencode/gemini-3.1-pro",
-      "variants": [
+    { "key": "opencode/gemini-3.1-pro", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "opencode/gemini-3.5-flash",
-      "variants": [
+    { "key": "opencode/gemini-3.5-flash", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "opencode/gemini-3.5-flash-lite",
-      "variants": [
+    { "key": "opencode/gemini-3.5-flash-lite", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "opencode/gemini-3.6-flash",
-      "variants": [
+    { "key": "opencode/gemini-3.6-flash", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "opencode/glm-5",
-      "variants": []
+    { "key": "opencode/glm-5", "variants": []
     },
-    {
-      "key": "opencode/glm-5.1",
-      "variants": []
+    { "key": "opencode/glm-5.1", "variants": []
     },
-    {
-      "key": "opencode/glm-5.2",
-      "variants": [
+    { "key": "opencode/glm-5.2", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "opencode/gpt-5",
-      "variants": [
+    { "key": "opencode/gpt-5", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "opencode/gpt-5-codex",
-      "variants": [
+    { "key": "opencode/gpt-5-codex", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "opencode/gpt-5-nano",
-      "variants": [
+    { "key": "opencode/gpt-5-nano", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "opencode/gpt-5.1",
-      "variants": [
+    { "key": "opencode/gpt-5.1", "variants": [
         "high",
         "low",
         "medium",
         "none"
       ]
     },
-    {
-      "key": "opencode/gpt-5.1-codex",
-      "variants": [
+    { "key": "opencode/gpt-5.1-codex", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "opencode/gpt-5.1-codex-max",
-      "variants": [
+    { "key": "opencode/gpt-5.1-codex-max", "variants": [
         "high",
         "low",
         "medium",
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/gpt-5.1-codex-mini",
-      "variants": [
+    { "key": "opencode/gpt-5.1-codex-mini", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "opencode/gpt-5.2",
-      "variants": [
+    { "key": "opencode/gpt-5.2", "variants": [
         "high",
         "low",
         "medium",
@@ -1237,18 +860,14 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/gpt-5.2-codex",
-      "variants": [
+    { "key": "opencode/gpt-5.2-codex", "variants": [
         "high",
         "low",
         "medium",
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/gpt-5.3-codex",
-      "variants": [
+    { "key": "opencode/gpt-5.3-codex", "variants": [
         "high",
         "low",
         "medium",
@@ -1256,18 +875,14 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/gpt-5.3-codex-spark",
-      "variants": [
+    { "key": "opencode/gpt-5.3-codex-spark", "variants": [
         "high",
         "low",
         "medium",
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/gpt-5.4",
-      "variants": [
+    { "key": "opencode/gpt-5.4", "variants": [
         "high",
         "low",
         "medium",
@@ -1275,9 +890,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/gpt-5.4-mini",
-      "variants": [
+    { "key": "opencode/gpt-5.4-mini", "variants": [
         "high",
         "low",
         "medium",
@@ -1285,9 +898,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/gpt-5.4-nano",
-      "variants": [
+    { "key": "opencode/gpt-5.4-nano", "variants": [
         "high",
         "low",
         "medium",
@@ -1295,17 +906,13 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/gpt-5.4-pro",
-      "variants": [
+    { "key": "opencode/gpt-5.4-pro", "variants": [
         "high",
         "medium",
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/gpt-5.5",
-      "variants": [
+    { "key": "opencode/gpt-5.5", "variants": [
         "high",
         "low",
         "medium",
@@ -1313,17 +920,13 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/gpt-5.5-pro",
-      "variants": [
+    { "key": "opencode/gpt-5.5-pro", "variants": [
         "high",
         "medium",
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/gpt-5.6-luna",
-      "variants": [
+    { "key": "opencode/gpt-5.6-luna", "variants": [
         "high",
         "low",
         "max",
@@ -1332,9 +935,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/gpt-5.6-sol",
-      "variants": [
+    { "key": "opencode/gpt-5.6-sol", "variants": [
         "high",
         "low",
         "max",
@@ -1343,9 +944,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/gpt-5.6-terra",
-      "variants": [
+    { "key": "opencode/gpt-5.6-terra", "variants": [
         "high",
         "low",
         "max",
@@ -1354,148 +953,88 @@
         "xhigh"
       ]
     },
-    {
-      "key": "opencode/grok-4.5",
-      "variants": [
+    { "key": "opencode/grok-4.5", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "opencode/grok-build-0.1",
-      "variants": []
+    { "key": "opencode/grok-build-0.1", "variants": []
     },
-    {
-      "key": "opencode/kimi-k2.5",
-      "variants": []
+    { "key": "opencode/kimi-k2.5", "variants": []
     },
-    {
-      "key": "opencode/kimi-k2.6",
-      "variants": []
+    { "key": "opencode/kimi-k2.6", "variants": []
     },
-    {
-      "key": "opencode/kimi-k2.7-code",
-      "variants": []
+    { "key": "opencode/kimi-k2.7-code", "variants": []
     },
-    {
-      "key": "opencode/kimi-k3",
-      "variants": [
+    { "key": "opencode/kimi-k3", "variants": [
         "max"
       ]
     },
-    {
-      "key": "opencode/laguna-s-2.1-free",
-      "variants": [
+    { "key": "opencode/laguna-s-2.1-free", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "opencode/ling-3.0-flash-free",
-      "variants": [
+    { "key": "opencode/ling-3.0-flash-free", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "opencode/mimo-v2.5-free",
-      "variants": []
+    { "key": "opencode/mimo-v2.5-free", "variants": []
     },
-    {
-      "key": "opencode/minimax-m2.5",
-      "variants": []
+    { "key": "opencode/minimax-m2.5", "variants": []
     },
-    {
-      "key": "opencode/minimax-m2.7",
-      "variants": []
+    { "key": "opencode/minimax-m2.7", "variants": []
     },
-    {
-      "key": "opencode/minimax-m3",
-      "variants": []
+    { "key": "opencode/minimax-m3", "variants": []
     },
-    {
-      "key": "opencode/nemotron-3-ultra-free",
-      "variants": []
+    { "key": "opencode/nemotron-3-ultra-free", "variants": []
     },
-    {
-      "key": "opencode/north-mini-code-free",
-      "variants": [
+    { "key": "opencode/north-mini-code-free", "variants": [
         "high",
         "none"
       ]
     },
-    {
-      "key": "opencode/qwen3.5-plus",
-      "variants": [
+    { "key": "opencode/qwen3.5-plus", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "opencode/qwen3.6-plus",
-      "variants": [
+    { "key": "opencode/qwen3.6-plus", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/ai21/jamba-large-1.7",
-      "variants": []
+    { "key": "openrouter/ai21/jamba-large-1.7", "variants": []
     },
-    {
-      "key": "openrouter/aion-labs/aion-2.0",
-      "variants": []
+    { "key": "openrouter/aion-labs/aion-2.0", "variants": []
     },
-    {
-      "key": "openrouter/aion-labs/aion-3.0",
-      "variants": []
+    { "key": "openrouter/aion-labs/aion-3.0", "variants": []
     },
-    {
-      "key": "openrouter/aion-labs/aion-3.0-mini",
-      "variants": []
+    { "key": "openrouter/aion-labs/aion-3.0-mini", "variants": []
     },
-    {
-      "key": "openrouter/aion-labs/aion-rp-llama-3.1-8b",
-      "variants": []
+    { "key": "openrouter/aion-labs/aion-rp-llama-3.1-8b", "variants": []
     },
-    {
-      "key": "openrouter/allenai/olmo-3-32b-think",
-      "variants": []
+    { "key": "openrouter/allenai/olmo-3-32b-think", "variants": []
     },
-    {
-      "key": "openrouter/amazon/nova-2-lite-v1",
-      "variants": []
+    { "key": "openrouter/amazon/nova-2-lite-v1", "variants": []
     },
-    {
-      "key": "openrouter/amazon/nova-lite-v1",
-      "variants": []
+    { "key": "openrouter/amazon/nova-lite-v1", "variants": []
     },
-    {
-      "key": "openrouter/amazon/nova-micro-v1",
-      "variants": []
+    { "key": "openrouter/amazon/nova-micro-v1", "variants": []
     },
-    {
-      "key": "openrouter/amazon/nova-premier-v1",
-      "variants": []
+    { "key": "openrouter/amazon/nova-premier-v1", "variants": []
     },
-    {
-      "key": "openrouter/amazon/nova-pro-v1",
-      "variants": []
+    { "key": "openrouter/amazon/nova-pro-v1", "variants": []
     },
-    {
-      "key": "openrouter/anthracite-org/magnum-v4-72b",
-      "variants": []
+    { "key": "openrouter/anthracite-org/magnum-v4-72b", "variants": []
     },
-    {
-      "key": "openrouter/anthropic/claude-3-haiku",
-      "variants": []
+    { "key": "openrouter/anthropic/claude-3-haiku", "variants": []
     },
-    {
-      "key": "openrouter/anthropic/claude-fable-5",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-fable-5", "variants": [
         "high",
         "low",
         "max",
@@ -1503,47 +1042,35 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-haiku-4.5",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-haiku-4.5", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-opus-4",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-opus-4", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-opus-4.1",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-opus-4.1", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-opus-4.5",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-opus-4.5", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-opus-4.6",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-opus-4.6", "variants": [
         "high",
         "low",
         "max",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-opus-4.7",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-opus-4.7", "variants": [
         "high",
         "low",
         "max",
@@ -1551,9 +1078,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-opus-4.7-fast",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-opus-4.7-fast", "variants": [
         "high",
         "low",
         "max",
@@ -1561,9 +1086,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-opus-4.8",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-opus-4.8", "variants": [
         "high",
         "low",
         "max",
@@ -1571,9 +1094,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-opus-4.8-fast",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-opus-4.8-fast", "variants": [
         "high",
         "low",
         "max",
@@ -1581,9 +1102,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-opus-5",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-opus-5", "variants": [
         "high",
         "low",
         "max",
@@ -1591,9 +1110,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-opus-5-fast",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-opus-5-fast", "variants": [
         "high",
         "low",
         "max",
@@ -1601,32 +1118,24 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-sonnet-4",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-sonnet-4", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-sonnet-4.5",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-sonnet-4.5", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-sonnet-4.6",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-sonnet-4.6", "variants": [
         "high",
         "low",
         "max",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/anthropic/claude-sonnet-5",
-      "variants": [
+    { "key": "openrouter/anthropic/claude-sonnet-5", "variants": [
         "high",
         "low",
         "max",
@@ -1634,434 +1143,276 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/arcee-ai/trinity-large-thinking",
-      "variants": []
+    { "key": "openrouter/arcee-ai/trinity-large-thinking", "variants": []
     },
-    {
-      "key": "openrouter/arcee-ai/virtuoso-large",
-      "variants": []
+    { "key": "openrouter/arcee-ai/virtuoso-large", "variants": []
     },
-    {
-      "key": "openrouter/baidu/ernie-4.5-vl-424b-a47b",
-      "variants": []
+    { "key": "openrouter/baidu/ernie-4.5-vl-424b-a47b", "variants": []
     },
-    {
-      "key": "openrouter/bytedance-seed/seed-1.6",
-      "variants": []
+    { "key": "openrouter/bytedance-seed/seed-1.6", "variants": []
     },
-    {
-      "key": "openrouter/bytedance-seed/seed-1.6-flash",
-      "variants": []
+    { "key": "openrouter/bytedance-seed/seed-1.6-flash", "variants": []
     },
-    {
-      "key": "openrouter/bytedance-seed/seed-2.0-lite",
-      "variants": [
+    { "key": "openrouter/bytedance-seed/seed-2.0-lite", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "openrouter/bytedance-seed/seed-2.0-mini",
-      "variants": [
+    { "key": "openrouter/bytedance-seed/seed-2.0-mini", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "openrouter/bytedance/ui-tars-1.5-7b",
-      "variants": []
+    { "key": "openrouter/bytedance/ui-tars-1.5-7b", "variants": []
     },
-    {
-      "key": "openrouter/cognitivecomputations/dolphin-mistral-24b-venice-edition",
-      "variants": []
+    { "key": "openrouter/cognitivecomputations/dolphin-mistral-24b-venice-edition", "variants": []
     },
-    {
-      "key": "openrouter/cohere/command-a",
-      "variants": []
+    { "key": "openrouter/cohere/command-a", "variants": []
     },
-    {
-      "key": "openrouter/cohere/command-r-08-2024",
-      "variants": []
+    { "key": "openrouter/cohere/command-r-08-2024", "variants": []
     },
-    {
-      "key": "openrouter/cohere/command-r-plus-08-2024",
-      "variants": []
+    { "key": "openrouter/cohere/command-r-plus-08-2024", "variants": []
     },
-    {
-      "key": "openrouter/cohere/command-r7b-12-2024",
-      "variants": []
+    { "key": "openrouter/cohere/command-r7b-12-2024", "variants": []
     },
-    {
-      "key": "openrouter/cohere/north-mini-code:free",
-      "variants": []
+    { "key": "openrouter/cohere/north-mini-code:free", "variants": []
     },
-    {
-      "key": "openrouter/deepcogito/cogito-v2.1-671b",
-      "variants": []
+    { "key": "openrouter/deepcogito/cogito-v2.1-671b", "variants": []
     },
-    {
-      "key": "openrouter/deepseek/deepseek-chat",
-      "variants": []
+    { "key": "openrouter/deepseek/deepseek-chat", "variants": []
     },
-    {
-      "key": "openrouter/deepseek/deepseek-chat-v3-0324",
-      "variants": []
+    { "key": "openrouter/deepseek/deepseek-chat-v3-0324", "variants": []
     },
-    {
-      "key": "openrouter/deepseek/deepseek-chat-v3.1",
-      "variants": []
+    { "key": "openrouter/deepseek/deepseek-chat-v3.1", "variants": []
     },
-    {
-      "key": "openrouter/deepseek/deepseek-r1",
-      "variants": []
+    { "key": "openrouter/deepseek/deepseek-r1", "variants": []
     },
-    {
-      "key": "openrouter/deepseek/deepseek-r1-0528",
-      "variants": []
+    { "key": "openrouter/deepseek/deepseek-r1-0528", "variants": []
     },
-    {
-      "key": "openrouter/deepseek/deepseek-r1-distill-llama-70b",
-      "variants": []
+    { "key": "openrouter/deepseek/deepseek-r1-distill-llama-70b", "variants": []
     },
-    {
-      "key": "openrouter/deepseek/deepseek-v3.1-terminus",
-      "variants": []
+    { "key": "openrouter/deepseek/deepseek-v3.1-terminus", "variants": []
     },
-    {
-      "key": "openrouter/deepseek/deepseek-v3.2",
-      "variants": []
+    { "key": "openrouter/deepseek/deepseek-v3.2", "variants": []
     },
-    {
-      "key": "openrouter/deepseek/deepseek-v3.2-exp",
-      "variants": []
+    { "key": "openrouter/deepseek/deepseek-v3.2-exp", "variants": []
     },
-    {
-      "key": "openrouter/deepseek/deepseek-v4-flash",
-      "variants": [
+    { "key": "openrouter/deepseek/deepseek-v4-flash", "variants": [
         "high",
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/deepseek/deepseek-v4-flash-0731",
-      "variants": [
+    { "key": "openrouter/deepseek/deepseek-v4-flash-0731", "variants": [
         "high",
         "low",
         "max"
       ]
     },
-    {
-      "key": "openrouter/deepseek/deepseek-v4-pro",
-      "variants": [
+    { "key": "openrouter/deepseek/deepseek-v4-pro", "variants": [
         "high",
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-2.5-flash",
-      "variants": [
+    { "key": "openrouter/google/gemini-2.5-flash", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-2.5-flash-image",
-      "variants": []
+    { "key": "openrouter/google/gemini-2.5-flash-image", "variants": []
     },
-    {
-      "key": "openrouter/google/gemini-2.5-flash-lite",
-      "variants": [
+    { "key": "openrouter/google/gemini-2.5-flash-lite", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-2.5-pro",
-      "variants": [
+    { "key": "openrouter/google/gemini-2.5-pro", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-2.5-pro-preview",
-      "variants": [
+    { "key": "openrouter/google/gemini-2.5-pro-preview", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-2.5-pro-preview-05-06",
-      "variants": [
+    { "key": "openrouter/google/gemini-2.5-pro-preview-05-06", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-3-flash-preview",
-      "variants": [
+    { "key": "openrouter/google/gemini-3-flash-preview", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-3-pro-image",
-      "variants": []
+    { "key": "openrouter/google/gemini-3-pro-image", "variants": []
     },
-    {
-      "key": "openrouter/google/gemini-3-pro-image-preview",
-      "variants": []
+    { "key": "openrouter/google/gemini-3-pro-image-preview", "variants": []
     },
-    {
-      "key": "openrouter/google/gemini-3.1-flash-image",
-      "variants": [
+    { "key": "openrouter/google/gemini-3.1-flash-image", "variants": [
         "high",
         "minimal"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-3.1-flash-image-preview",
-      "variants": [
+    { "key": "openrouter/google/gemini-3.1-flash-image-preview", "variants": [
         "high",
         "minimal"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-3.1-flash-lite",
-      "variants": [
+    { "key": "openrouter/google/gemini-3.1-flash-lite", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-3.1-flash-lite-image",
-      "variants": [
+    { "key": "openrouter/google/gemini-3.1-flash-lite-image", "variants": [
         "high",
         "minimal"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-3.1-flash-lite-preview",
-      "variants": [
+    { "key": "openrouter/google/gemini-3.1-flash-lite-preview", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-3.1-pro-preview",
-      "variants": [
+    { "key": "openrouter/google/gemini-3.1-pro-preview", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-3.1-pro-preview-customtools",
-      "variants": [
+    { "key": "openrouter/google/gemini-3.1-pro-preview-customtools", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-3.5-flash",
-      "variants": [
+    { "key": "openrouter/google/gemini-3.5-flash", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-3.5-flash-lite",
-      "variants": [
+    { "key": "openrouter/google/gemini-3.5-flash-lite", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "openrouter/google/gemini-3.6-flash",
-      "variants": [
+    { "key": "openrouter/google/gemini-3.6-flash", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "openrouter/google/gemma-2-27b-it",
-      "variants": []
+    { "key": "openrouter/google/gemma-2-27b-it", "variants": []
     },
-    {
-      "key": "openrouter/google/gemma-3-12b-it",
-      "variants": []
+    { "key": "openrouter/google/gemma-3-12b-it", "variants": []
     },
-    {
-      "key": "openrouter/google/gemma-3-27b-it",
-      "variants": []
+    { "key": "openrouter/google/gemma-3-27b-it", "variants": []
     },
-    {
-      "key": "openrouter/google/gemma-3-4b-it",
-      "variants": []
+    { "key": "openrouter/google/gemma-3-4b-it", "variants": []
     },
-    {
-      "key": "openrouter/google/gemma-3n-e4b-it",
-      "variants": []
+    { "key": "openrouter/google/gemma-3n-e4b-it", "variants": []
     },
-    {
-      "key": "openrouter/google/gemma-4-26b-a4b-it",
-      "variants": [
+    { "key": "openrouter/google/gemma-4-26b-a4b-it", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/google/gemma-4-26b-a4b-it:free",
-      "variants": [
+    { "key": "openrouter/google/gemma-4-26b-a4b-it:free", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/google/gemma-4-31b-it",
-      "variants": [
+    { "key": "openrouter/google/gemma-4-31b-it", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/google/gemma-4-31b-it:free",
-      "variants": [
+    { "key": "openrouter/google/gemma-4-31b-it:free", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/google/lyria-3-clip-preview",
-      "variants": []
+    { "key": "openrouter/google/lyria-3-clip-preview", "variants": []
     },
-    {
-      "key": "openrouter/google/lyria-3-pro-preview",
-      "variants": []
+    { "key": "openrouter/google/lyria-3-pro-preview", "variants": []
     },
-    {
-      "key": "openrouter/gryphe/mythomax-l2-13b",
-      "variants": []
+    { "key": "openrouter/gryphe/mythomax-l2-13b", "variants": []
     },
-    {
-      "key": "openrouter/ibm-granite/granite-4.0-h-micro",
-      "variants": []
+    { "key": "openrouter/ibm-granite/granite-4.0-h-micro", "variants": []
     },
-    {
-      "key": "openrouter/ibm-granite/granite-4.1-8b",
-      "variants": []
+    { "key": "openrouter/ibm-granite/granite-4.1-8b", "variants": []
     },
-    {
-      "key": "openrouter/inception/mercury-2",
-      "variants": [
+    { "key": "openrouter/inception/mercury-2", "variants": [
         "high",
         "low",
         "medium",
         "none"
       ]
     },
-    {
-      "key": "openrouter/inclusionai/ling-2.6-1t",
-      "variants": []
+    { "key": "openrouter/inclusionai/ling-2.6-1t", "variants": []
     },
-    {
-      "key": "openrouter/inclusionai/ling-2.6-flash",
-      "variants": []
+    { "key": "openrouter/inclusionai/ling-2.6-flash", "variants": []
     },
-    {
-      "key": "openrouter/inclusionai/ling-3.0-flash:free",
-      "variants": [
+    { "key": "openrouter/inclusionai/ling-3.0-flash:free", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/inclusionai/ring-2.6-1t",
-      "variants": [
+    { "key": "openrouter/inclusionai/ring-2.6-1t", "variants": [
         "high",
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/kwaipilot/kat-coder-air-v2.5",
-      "variants": []
+    { "key": "openrouter/kwaipilot/kat-coder-air-v2.5", "variants": []
     },
-    {
-      "key": "openrouter/kwaipilot/kat-coder-pro-v2",
-      "variants": []
+    { "key": "openrouter/kwaipilot/kat-coder-pro-v2", "variants": []
     },
-    {
-      "key": "openrouter/kwaipilot/kat-coder-pro-v2.5",
-      "variants": []
+    { "key": "openrouter/kwaipilot/kat-coder-pro-v2.5", "variants": []
     },
-    {
-      "key": "openrouter/mancer/weaver",
-      "variants": []
+    { "key": "openrouter/mancer/weaver", "variants": []
     },
-    {
-      "key": "openrouter/meituan/longcat-2.0",
-      "variants": [
+    { "key": "openrouter/meituan/longcat-2.0", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/meta-llama/llama-3.1-70b-instruct",
-      "variants": []
+    { "key": "openrouter/meta-llama/llama-3.1-70b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/meta-llama/llama-3.1-8b-instruct",
-      "variants": []
+    { "key": "openrouter/meta-llama/llama-3.1-8b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/meta-llama/llama-3.2-1b-instruct",
-      "variants": []
+    { "key": "openrouter/meta-llama/llama-3.2-1b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/meta-llama/llama-3.2-3b-instruct",
-      "variants": []
+    { "key": "openrouter/meta-llama/llama-3.2-3b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/meta-llama/llama-3.3-70b-instruct",
-      "variants": []
+    { "key": "openrouter/meta-llama/llama-3.3-70b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/meta-llama/llama-4-maverick",
-      "variants": []
+    { "key": "openrouter/meta-llama/llama-4-maverick", "variants": []
     },
-    {
-      "key": "openrouter/meta-llama/llama-4-scout",
-      "variants": []
+    { "key": "openrouter/meta-llama/llama-4-scout", "variants": []
     },
-    {
-      "key": "openrouter/meta-llama/llama-guard-4-12b",
-      "variants": []
+    { "key": "openrouter/meta-llama/llama-guard-4-12b", "variants": []
     },
-    {
-      "key": "openrouter/meta/muse-spark-1.1",
-      "variants": [
+    { "key": "openrouter/meta/muse-spark-1.1", "variants": [
         "high",
         "low",
         "medium",
@@ -2069,393 +1420,233 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/microsoft/phi-4",
-      "variants": []
+    { "key": "openrouter/microsoft/phi-4", "variants": []
     },
-    {
-      "key": "openrouter/microsoft/wizardlm-2-8x22b",
-      "variants": []
+    { "key": "openrouter/microsoft/wizardlm-2-8x22b", "variants": []
     },
-    {
-      "key": "openrouter/minimax/minimax-01",
-      "variants": []
+    { "key": "openrouter/minimax/minimax-01", "variants": []
     },
-    {
-      "key": "openrouter/minimax/minimax-m1",
-      "variants": []
+    { "key": "openrouter/minimax/minimax-m1", "variants": []
     },
-    {
-      "key": "openrouter/minimax/minimax-m2",
-      "variants": []
+    { "key": "openrouter/minimax/minimax-m2", "variants": []
     },
-    {
-      "key": "openrouter/minimax/minimax-m2-her",
-      "variants": []
+    { "key": "openrouter/minimax/minimax-m2-her", "variants": []
     },
-    {
-      "key": "openrouter/minimax/minimax-m2.1",
-      "variants": []
+    { "key": "openrouter/minimax/minimax-m2.1", "variants": []
     },
-    {
-      "key": "openrouter/minimax/minimax-m2.5",
-      "variants": []
+    { "key": "openrouter/minimax/minimax-m2.5", "variants": []
     },
-    {
-      "key": "openrouter/minimax/minimax-m2.7",
-      "variants": []
+    { "key": "openrouter/minimax/minimax-m2.7", "variants": []
     },
-    {
-      "key": "openrouter/minimax/minimax-m3",
-      "variants": []
+    { "key": "openrouter/minimax/minimax-m3", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/codestral-2508",
-      "variants": []
+    { "key": "openrouter/mistralai/codestral-2508", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/ministral-14b-2512",
-      "variants": []
+    { "key": "openrouter/mistralai/ministral-14b-2512", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/ministral-3b-2512",
-      "variants": []
+    { "key": "openrouter/mistralai/ministral-3b-2512", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/ministral-8b-2512",
-      "variants": []
+    { "key": "openrouter/mistralai/ministral-8b-2512", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/mistral-large",
-      "variants": []
+    { "key": "openrouter/mistralai/mistral-large", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/mistral-large-2407",
-      "variants": []
+    { "key": "openrouter/mistralai/mistral-large-2407", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/mistral-large-2512",
-      "variants": []
+    { "key": "openrouter/mistralai/mistral-large-2512", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/mistral-medium-3",
-      "variants": []
+    { "key": "openrouter/mistralai/mistral-medium-3", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/mistral-medium-3-5",
-      "variants": [
+    { "key": "openrouter/mistralai/mistral-medium-3-5", "variants": [
         "high",
         "none"
       ]
     },
-    {
-      "key": "openrouter/mistralai/mistral-medium-3.1",
-      "variants": []
+    { "key": "openrouter/mistralai/mistral-medium-3.1", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/mistral-nemo",
-      "variants": []
+    { "key": "openrouter/mistralai/mistral-nemo", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/mistral-saba",
-      "variants": []
+    { "key": "openrouter/mistralai/mistral-saba", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/mistral-small-24b-instruct-2501",
-      "variants": []
+    { "key": "openrouter/mistralai/mistral-small-24b-instruct-2501", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/mistral-small-2603",
-      "variants": [
+    { "key": "openrouter/mistralai/mistral-small-2603", "variants": [
         "high",
         "none"
       ]
     },
-    {
-      "key": "openrouter/mistralai/mistral-small-3.1-24b-instruct",
-      "variants": []
+    { "key": "openrouter/mistralai/mistral-small-3.1-24b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/mistral-small-3.2-24b-instruct",
-      "variants": []
+    { "key": "openrouter/mistralai/mistral-small-3.2-24b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/mixtral-8x22b-instruct",
-      "variants": []
+    { "key": "openrouter/mistralai/mixtral-8x22b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/mistralai/voxtral-small-24b-2507",
-      "variants": []
+    { "key": "openrouter/mistralai/voxtral-small-24b-2507", "variants": []
     },
-    {
-      "key": "openrouter/moonshotai/kimi-k2",
-      "variants": []
+    { "key": "openrouter/moonshotai/kimi-k2", "variants": []
     },
-    {
-      "key": "openrouter/moonshotai/kimi-k2-0905",
-      "variants": []
+    { "key": "openrouter/moonshotai/kimi-k2-0905", "variants": []
     },
-    {
-      "key": "openrouter/moonshotai/kimi-k2-thinking",
-      "variants": []
+    { "key": "openrouter/moonshotai/kimi-k2-thinking", "variants": []
     },
-    {
-      "key": "openrouter/moonshotai/kimi-k2.5",
-      "variants": []
+    { "key": "openrouter/moonshotai/kimi-k2.5", "variants": []
     },
-    {
-      "key": "openrouter/moonshotai/kimi-k2.6",
-      "variants": []
+    { "key": "openrouter/moonshotai/kimi-k2.6", "variants": []
     },
-    {
-      "key": "openrouter/moonshotai/kimi-k2.7-code",
-      "variants": []
+    { "key": "openrouter/moonshotai/kimi-k2.7-code", "variants": []
     },
-    {
-      "key": "openrouter/moonshotai/kimi-k3",
-      "variants": [
+    { "key": "openrouter/moonshotai/kimi-k3", "variants": [
         "high",
         "low",
         "max"
       ]
     },
-    {
-      "key": "openrouter/morph/morph-v3-fast",
-      "variants": []
+    { "key": "openrouter/morph/morph-v3-fast", "variants": []
     },
-    {
-      "key": "openrouter/morph/morph-v3-large",
-      "variants": []
+    { "key": "openrouter/morph/morph-v3-large", "variants": []
     },
-    {
-      "key": "openrouter/nex-agi/nex-n2-mini",
-      "variants": []
+    { "key": "openrouter/nex-agi/nex-n2-mini", "variants": []
     },
-    {
-      "key": "openrouter/nex-agi/nex-n2-pro",
-      "variants": []
+    { "key": "openrouter/nex-agi/nex-n2-pro", "variants": []
     },
-    {
-      "key": "openrouter/nousresearch/hermes-3-llama-3.1-405b",
-      "variants": []
+    { "key": "openrouter/nousresearch/hermes-3-llama-3.1-405b", "variants": []
     },
-    {
-      "key": "openrouter/nousresearch/hermes-3-llama-3.1-70b",
-      "variants": []
+    { "key": "openrouter/nousresearch/hermes-3-llama-3.1-70b", "variants": []
     },
-    {
-      "key": "openrouter/nousresearch/hermes-4-405b",
-      "variants": [
+    { "key": "openrouter/nousresearch/hermes-4-405b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/nousresearch/hermes-4-70b",
-      "variants": [
+    { "key": "openrouter/nousresearch/hermes-4-70b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/nvidia/nemotron-3-nano-30b-a3b",
-      "variants": []
+    { "key": "openrouter/nvidia/nemotron-3-nano-30b-a3b", "variants": []
     },
-    {
-      "key": "openrouter/nvidia/nemotron-3-nano-30b-a3b:free",
-      "variants": []
+    { "key": "openrouter/nvidia/nemotron-3-nano-30b-a3b:free", "variants": []
     },
-    {
-      "key": "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
-      "variants": [
+    { "key": "openrouter/nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/nvidia/nemotron-3-super-120b-a12b",
-      "variants": [
+    { "key": "openrouter/nvidia/nemotron-3-super-120b-a12b", "variants": [
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/nvidia/nemotron-3-super-120b-a12b:free",
-      "variants": [
+    { "key": "openrouter/nvidia/nemotron-3-super-120b-a12b:free", "variants": [
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/nvidia/nemotron-3-ultra-550b-a55b",
-      "variants": [
+    { "key": "openrouter/nvidia/nemotron-3-ultra-550b-a55b", "variants": [
         "high",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free",
-      "variants": [
+    { "key": "openrouter/nvidia/nemotron-3-ultra-550b-a55b:free", "variants": [
         "high",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/nvidia/nemotron-3.5-content-safety:free",
-      "variants": []
+    { "key": "openrouter/nvidia/nemotron-3.5-content-safety:free", "variants": []
     },
-    {
-      "key": "openrouter/nvidia/nemotron-nano-12b-v2-vl:free",
-      "variants": []
+    { "key": "openrouter/nvidia/nemotron-nano-12b-v2-vl:free", "variants": []
     },
-    {
-      "key": "openrouter/nvidia/nemotron-nano-9b-v2:free",
-      "variants": []
+    { "key": "openrouter/nvidia/nemotron-nano-9b-v2:free", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-3.5-turbo",
-      "variants": []
+    { "key": "openrouter/openai/gpt-3.5-turbo", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-3.5-turbo-0613",
-      "variants": []
+    { "key": "openrouter/openai/gpt-3.5-turbo-0613", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-3.5-turbo-16k",
-      "variants": []
+    { "key": "openrouter/openai/gpt-3.5-turbo-16k", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-3.5-turbo-instruct",
-      "variants": []
+    { "key": "openrouter/openai/gpt-3.5-turbo-instruct", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-4",
-      "variants": []
+    { "key": "openrouter/openai/gpt-4", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-4-turbo",
-      "variants": []
+    { "key": "openrouter/openai/gpt-4-turbo", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-4-turbo-preview",
-      "variants": []
+    { "key": "openrouter/openai/gpt-4-turbo-preview", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-4.1",
-      "variants": []
+    { "key": "openrouter/openai/gpt-4.1", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-4.1-mini",
-      "variants": []
+    { "key": "openrouter/openai/gpt-4.1-mini", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-4.1-nano",
-      "variants": []
+    { "key": "openrouter/openai/gpt-4.1-nano", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-4o",
-      "variants": []
+    { "key": "openrouter/openai/gpt-4o", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-4o-2024-05-13",
-      "variants": []
+    { "key": "openrouter/openai/gpt-4o-2024-05-13", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-4o-2024-08-06",
-      "variants": []
+    { "key": "openrouter/openai/gpt-4o-2024-08-06", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-4o-2024-11-20",
-      "variants": []
+    { "key": "openrouter/openai/gpt-4o-2024-11-20", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-4o-mini",
-      "variants": []
+    { "key": "openrouter/openai/gpt-4o-mini", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-4o-mini-2024-07-18",
-      "variants": []
+    { "key": "openrouter/openai/gpt-4o-mini-2024-07-18", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-5",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5-image",
-      "variants": []
+    { "key": "openrouter/openai/gpt-5-image", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-5-image-mini",
-      "variants": []
+    { "key": "openrouter/openai/gpt-5-image-mini", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-5-mini",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5-mini", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5-nano",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5-nano", "variants": [
         "high",
         "low",
         "medium",
         "minimal"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5-pro",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5-pro", "variants": [
         "high"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.1",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.1", "variants": [
         "high",
         "low",
         "medium",
         "none"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.1-codex",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.1-codex", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.1-codex-max",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.1-codex-max", "variants": [
         "high",
         "low",
         "medium",
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.1-codex-mini",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.1-codex-mini", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.2",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.2", "variants": [
         "high",
         "low",
         "medium",
@@ -2463,34 +1654,24 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.2-chat",
-      "variants": []
+    { "key": "openrouter/openai/gpt-5.2-chat", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-5.2-codex",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.2-codex", "variants": [
         "high",
         "low",
         "medium",
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.2-pro",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.2-pro", "variants": [
         "high",
         "medium",
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.3-chat",
-      "variants": []
+    { "key": "openrouter/openai/gpt-5.3-chat", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-5.3-codex",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.3-codex", "variants": [
         "high",
         "low",
         "medium",
@@ -2498,9 +1679,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.4",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.4", "variants": [
         "high",
         "low",
         "medium",
@@ -2508,9 +1687,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.4-image-2",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.4-image-2", "variants": [
         "high",
         "low",
         "medium",
@@ -2518,9 +1695,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.4-mini",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.4-mini", "variants": [
         "high",
         "low",
         "medium",
@@ -2528,9 +1703,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.4-nano",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.4-nano", "variants": [
         "high",
         "low",
         "medium",
@@ -2538,17 +1711,13 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.4-pro",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.4-pro", "variants": [
         "high",
         "medium",
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.5",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.5", "variants": [
         "high",
         "low",
         "medium",
@@ -2556,17 +1725,13 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.5-pro",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.5-pro", "variants": [
         "high",
         "medium",
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.6-luna",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.6-luna", "variants": [
         "high",
         "low",
         "max",
@@ -2575,9 +1740,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.6-luna-pro",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.6-luna-pro", "variants": [
         "high",
         "low",
         "max",
@@ -2586,9 +1749,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.6-sol",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.6-sol", "variants": [
         "high",
         "low",
         "max",
@@ -2597,9 +1758,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.6-sol-pro",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.6-sol-pro", "variants": [
         "high",
         "low",
         "max",
@@ -2608,9 +1767,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.6-terra",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.6-terra", "variants": [
         "high",
         "low",
         "max",
@@ -2619,9 +1776,7 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-5.6-terra-pro",
-      "variants": [
+    { "key": "openrouter/openai/gpt-5.6-terra-pro", "variants": [
         "high",
         "low",
         "max",
@@ -2630,481 +1785,297 @@
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-audio",
-      "variants": []
+    { "key": "openrouter/openai/gpt-audio", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-audio-mini",
-      "variants": []
+    { "key": "openrouter/openai/gpt-audio-mini", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-chat-latest",
-      "variants": []
+    { "key": "openrouter/openai/gpt-chat-latest", "variants": []
     },
-    {
-      "key": "openrouter/openai/gpt-oss-120b",
-      "variants": [
+    { "key": "openrouter/openai/gpt-oss-120b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-oss-20b",
-      "variants": [
+    { "key": "openrouter/openai/gpt-oss-20b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-oss-20b:free",
-      "variants": [
+    { "key": "openrouter/openai/gpt-oss-20b:free", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/openai/gpt-oss-safeguard-20b",
-      "variants": [
+    { "key": "openrouter/openai/gpt-oss-safeguard-20b", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/openai/o1",
-      "variants": [
+    { "key": "openrouter/openai/o1", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/openai/o1-pro",
-      "variants": []
+    { "key": "openrouter/openai/o1-pro", "variants": []
     },
-    {
-      "key": "openrouter/openai/o3",
-      "variants": [
+    { "key": "openrouter/openai/o3", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/openai/o3-mini",
-      "variants": [
+    { "key": "openrouter/openai/o3-mini", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/openai/o3-mini-high",
-      "variants": [
+    { "key": "openrouter/openai/o3-mini-high", "variants": [
         "high"
       ]
     },
-    {
-      "key": "openrouter/openai/o3-pro",
-      "variants": [
+    { "key": "openrouter/openai/o3-pro", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/openai/o4-mini",
-      "variants": [
+    { "key": "openrouter/openai/o4-mini", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/openai/o4-mini-high",
-      "variants": [
+    { "key": "openrouter/openai/o4-mini-high", "variants": [
         "high"
       ]
     },
-    {
-      "key": "openrouter/openrouter/auto",
-      "variants": []
+    { "key": "openrouter/openrouter/auto", "variants": []
     },
-    {
-      "key": "openrouter/openrouter/bodybuilder",
-      "variants": []
+    { "key": "openrouter/openrouter/bodybuilder", "variants": []
     },
-    {
-      "key": "openrouter/openrouter/free",
-      "variants": []
+    { "key": "openrouter/openrouter/free", "variants": []
     },
-    {
-      "key": "openrouter/openrouter/fusion",
-      "variants": []
+    { "key": "openrouter/openrouter/fusion", "variants": []
     },
-    {
-      "key": "openrouter/openrouter/pareto-code",
-      "variants": []
+    { "key": "openrouter/openrouter/pareto-code", "variants": []
     },
-    {
-      "key": "openrouter/perceptron/perceptron-mk1",
-      "variants": []
+    { "key": "openrouter/perceptron/perceptron-mk1", "variants": []
     },
-    {
-      "key": "openrouter/perplexity/sonar",
-      "variants": []
+    { "key": "openrouter/perplexity/sonar", "variants": []
     },
-    {
-      "key": "openrouter/perplexity/sonar-deep-research",
-      "variants": []
+    { "key": "openrouter/perplexity/sonar-deep-research", "variants": []
     },
-    {
-      "key": "openrouter/perplexity/sonar-pro",
-      "variants": []
+    { "key": "openrouter/perplexity/sonar-pro", "variants": []
     },
-    {
-      "key": "openrouter/perplexity/sonar-pro-search",
-      "variants": []
+    { "key": "openrouter/perplexity/sonar-pro-search", "variants": []
     },
-    {
-      "key": "openrouter/perplexity/sonar-reasoning-pro",
-      "variants": []
+    { "key": "openrouter/perplexity/sonar-reasoning-pro", "variants": []
     },
-    {
-      "key": "openrouter/poolside/laguna-s-2.1",
-      "variants": []
+    { "key": "openrouter/poolside/laguna-s-2.1", "variants": []
     },
-    {
-      "key": "openrouter/poolside/laguna-s-2.1:free",
-      "variants": []
+    { "key": "openrouter/poolside/laguna-s-2.1:free", "variants": []
     },
-    {
-      "key": "openrouter/poolside/laguna-xs-2.1",
-      "variants": []
+    { "key": "openrouter/poolside/laguna-xs-2.1", "variants": []
     },
-    {
-      "key": "openrouter/poolside/laguna-xs-2.1:free",
-      "variants": []
+    { "key": "openrouter/poolside/laguna-xs-2.1:free", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen-2.5-72b-instruct",
-      "variants": []
+    { "key": "openrouter/qwen/qwen-2.5-72b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen-2.5-7b-instruct",
-      "variants": []
+    { "key": "openrouter/qwen/qwen-2.5-7b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen-2.5-coder-32b-instruct",
-      "variants": []
+    { "key": "openrouter/qwen/qwen-2.5-coder-32b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen-plus",
-      "variants": []
+    { "key": "openrouter/qwen/qwen-plus", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen-plus-2025-07-28",
-      "variants": []
+    { "key": "openrouter/qwen/qwen-plus-2025-07-28", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen-plus-2025-07-28:thinking",
-      "variants": [
+    { "key": "openrouter/qwen/qwen-plus-2025-07-28:thinking", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/qwen/qwen2.5-vl-72b-instruct",
-      "variants": []
+    { "key": "openrouter/qwen/qwen2.5-vl-72b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-14b",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-14b", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-235b-a22b",
-      "variants": [
+    { "key": "openrouter/qwen/qwen3-235b-a22b", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/qwen/qwen3-235b-a22b-2507",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-235b-a22b-2507", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-235b-a22b-thinking-2507",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-235b-a22b-thinking-2507", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-30b-a3b",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-30b-a3b", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-30b-a3b-instruct-2507",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-30b-a3b-instruct-2507", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-30b-a3b-thinking-2507",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-30b-a3b-thinking-2507", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-32b",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-32b", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-8b",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-8b", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-coder",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-coder", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-coder-30b-a3b-instruct",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-coder-30b-a3b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-coder-flash",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-coder-flash", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-coder-next",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-coder-next", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-coder-plus",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-coder-plus", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-max",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-max", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-max-thinking",
-      "variants": [
+    { "key": "openrouter/qwen/qwen3-max-thinking", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/qwen/qwen3-next-80b-a3b-instruct",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-next-80b-a3b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-next-80b-a3b-thinking",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-next-80b-a3b-thinking", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-vl-235b-a22b-instruct",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-vl-235b-a22b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-vl-235b-a22b-thinking",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-vl-235b-a22b-thinking", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-vl-30b-a3b-instruct",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-vl-30b-a3b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-vl-30b-a3b-thinking",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-vl-30b-a3b-thinking", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-vl-32b-instruct",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-vl-32b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-vl-8b-instruct",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-vl-8b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3-vl-8b-thinking",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3-vl-8b-thinking", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3.5-122b-a10b",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3.5-122b-a10b", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3.5-27b",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3.5-27b", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3.5-35b-a3b",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3.5-35b-a3b", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3.5-397b-a17b",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3.5-397b-a17b", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3.5-9b",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3.5-9b", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3.5-flash-02-23",
-      "variants": [
+    { "key": "openrouter/qwen/qwen3.5-flash-02-23", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/qwen/qwen3.5-plus-02-15",
-      "variants": [
+    { "key": "openrouter/qwen/qwen3.5-plus-02-15", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/qwen/qwen3.5-plus-20260420",
-      "variants": [
+    { "key": "openrouter/qwen/qwen3.5-plus-20260420", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/qwen/qwen3.6-27b",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3.6-27b", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3.6-35b-a3b",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3.6-35b-a3b", "variants": []
     },
-    {
-      "key": "openrouter/qwen/qwen3.6-flash",
-      "variants": [
+    { "key": "openrouter/qwen/qwen3.6-flash", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/qwen/qwen3.6-max-preview",
-      "variants": [
+    { "key": "openrouter/qwen/qwen3.6-max-preview", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/qwen/qwen3.6-plus",
-      "variants": [
+    { "key": "openrouter/qwen/qwen3.6-plus", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/qwen/qwen3.7-flash",
-      "variants": [
+    { "key": "openrouter/qwen/qwen3.7-flash", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/qwen/qwen3.7-max",
-      "variants": [
+    { "key": "openrouter/qwen/qwen3.7-max", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/qwen/qwen3.7-plus",
-      "variants": [
+    { "key": "openrouter/qwen/qwen3.7-plus", "variants": [
         "high",
         "max"
       ]
     },
-    {
-      "key": "openrouter/rekaai/reka-edge",
-      "variants": []
+    { "key": "openrouter/qwen/qwen3.8-max", "variants": [
+        "high",
+        "low",
+        "medium",
+        "minimal",
+        "xhigh"
+      ]
     },
-    {
-      "key": "openrouter/rekaai/reka-flash-3",
-      "variants": []
+    { "key": "openrouter/rekaai/reka-edge", "variants": []
     },
-    {
-      "key": "openrouter/relace/relace-apply-3",
-      "variants": []
+    { "key": "openrouter/rekaai/reka-flash-3", "variants": []
     },
-    {
-      "key": "openrouter/relace/relace-search",
-      "variants": []
+    { "key": "openrouter/relace/relace-apply-3", "variants": []
     },
-    {
-      "key": "openrouter/sakana/fugu-ultra",
-      "variants": [
+    { "key": "openrouter/relace/relace-search", "variants": []
+    },
+    { "key": "openrouter/sakana/fugu-ultra", "variants": [
         "high",
         "max",
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/sao10k/l3-lunaris-8b",
-      "variants": []
+    { "key": "openrouter/sao10k/l3-lunaris-8b", "variants": []
     },
-    {
-      "key": "openrouter/sao10k/l3.1-euryale-70b",
-      "variants": []
+    { "key": "openrouter/sao10k/l3.1-euryale-70b", "variants": []
     },
-    {
-      "key": "openrouter/sao10k/l3.3-euryale-70b",
-      "variants": []
+    { "key": "openrouter/sao10k/l3.3-euryale-70b", "variants": []
     },
-    {
-      "key": "openrouter/stepfun/step-3.5-flash",
-      "variants": []
+    { "key": "openrouter/stepfun/step-3.5-flash", "variants": []
     },
-    {
-      "key": "openrouter/stepfun/step-3.7-flash",
-      "variants": [
+    { "key": "openrouter/stepfun/step-3.7-flash", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/tencent/hunyuan-a13b-instruct",
-      "variants": []
+    { "key": "openrouter/tencent/hunyuan-a13b-instruct", "variants": []
     },
-    {
-      "key": "openrouter/tencent/hy3",
-      "variants": [
+    { "key": "openrouter/tencent/hy3", "variants": [
         "high",
         "low",
         "none"
       ]
     },
-    {
-      "key": "openrouter/tencent/hy3-preview",
-      "variants": [
+    { "key": "openrouter/tencent/hy3-preview", "variants": [
         "high",
         "low",
         "none"
       ]
     },
-    {
-      "key": "openrouter/thedrummer/cydonia-24b-v4.1",
-      "variants": []
+    { "key": "openrouter/thedrummer/cydonia-24b-v4.1", "variants": []
     },
-    {
-      "key": "openrouter/thedrummer/rocinante-12b",
-      "variants": []
+    { "key": "openrouter/thedrummer/rocinante-12b", "variants": []
     },
-    {
-      "key": "openrouter/thedrummer/skyfall-36b-v2",
-      "variants": []
+    { "key": "openrouter/thedrummer/skyfall-36b-v2", "variants": []
     },
-    {
-      "key": "openrouter/thedrummer/unslopnemo-12b",
-      "variants": []
+    { "key": "openrouter/thedrummer/unslopnemo-12b", "variants": []
     },
-    {
-      "key": "openrouter/thinkingmachines/inkling",
-      "variants": [
+    { "key": "openrouter/thinkingmachines/inkling", "variants": [
         "high",
         "low",
         "max",
@@ -3113,9 +2084,7 @@
         "none"
       ]
     },
-    {
-      "key": "openrouter/thinkingmachines/inkling-small",
-      "variants": [
+    { "key": "openrouter/thinkingmachines/inkling-small", "variants": [
         "high",
         "low",
         "max",
@@ -3124,142 +2093,93 @@
         "none"
       ]
     },
-    {
-      "key": "openrouter/undi95/remm-slerp-l2-13b",
-      "variants": []
+    { "key": "openrouter/undi95/remm-slerp-l2-13b", "variants": []
     },
-    {
-      "key": "openrouter/upstage/solar-pro-3",
-      "variants": []
+    { "key": "openrouter/upstage/solar-pro-3", "variants": []
     },
-    {
-      "key": "openrouter/writer/palmyra-x5",
-      "variants": []
+    { "key": "openrouter/writer/palmyra-x5", "variants": []
     },
-    {
-      "key": "openrouter/x-ai/grok-4.20",
-      "variants": []
+    { "key": "openrouter/x-ai/grok-4.20", "variants": []
     },
-    {
-      "key": "openrouter/x-ai/grok-4.20-multi-agent",
-      "variants": [
+    { "key": "openrouter/x-ai/grok-4.20-multi-agent", "variants": [
         "high",
         "low",
         "medium",
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/x-ai/grok-4.3",
-      "variants": [
+    { "key": "openrouter/x-ai/grok-4.3", "variants": [
         "high",
         "low",
         "medium",
         "none"
       ]
     },
-    {
-      "key": "openrouter/x-ai/grok-4.5",
-      "variants": [
+    { "key": "openrouter/x-ai/grok-4.5", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/x-ai/grok-build-0.1",
-      "variants": []
+    { "key": "openrouter/x-ai/grok-build-0.1", "variants": []
     },
-    {
-      "key": "openrouter/xiaomi/mimo-v2.5",
-      "variants": [
+    { "key": "openrouter/xiaomi/mimo-v2.5", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/xiaomi/mimo-v2.5-pro",
-      "variants": [
+    { "key": "openrouter/xiaomi/mimo-v2.5-pro", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "openrouter/z-ai/glm-4.5",
-      "variants": []
+    { "key": "openrouter/z-ai/glm-4.5", "variants": []
     },
-    {
-      "key": "openrouter/z-ai/glm-4.5-air",
-      "variants": []
+    { "key": "openrouter/z-ai/glm-4.5-air", "variants": []
     },
-    {
-      "key": "openrouter/z-ai/glm-4.5v",
-      "variants": []
+    { "key": "openrouter/z-ai/glm-4.5v", "variants": []
     },
-    {
-      "key": "openrouter/z-ai/glm-4.6",
-      "variants": []
+    { "key": "openrouter/z-ai/glm-4.6", "variants": []
     },
-    {
-      "key": "openrouter/z-ai/glm-4.6v",
-      "variants": []
+    { "key": "openrouter/z-ai/glm-4.6v", "variants": []
     },
-    {
-      "key": "openrouter/z-ai/glm-4.7",
-      "variants": []
+    { "key": "openrouter/z-ai/glm-4.7", "variants": []
     },
-    {
-      "key": "openrouter/z-ai/glm-4.7-flash",
-      "variants": []
+    { "key": "openrouter/z-ai/glm-4.7-flash", "variants": []
     },
-    {
-      "key": "openrouter/z-ai/glm-5",
-      "variants": []
+    { "key": "openrouter/z-ai/glm-5", "variants": []
     },
-    {
-      "key": "openrouter/z-ai/glm-5-turbo",
-      "variants": []
+    { "key": "openrouter/z-ai/glm-5-turbo", "variants": []
     },
-    {
-      "key": "openrouter/z-ai/glm-5.1",
-      "variants": []
+    { "key": "openrouter/z-ai/glm-5.1", "variants": []
     },
-    {
-      "key": "openrouter/z-ai/glm-5.2",
-      "variants": [
+    { "key": "openrouter/z-ai/glm-5.2", "variants": [
         "high",
         "xhigh"
       ]
     },
-    {
-      "key": "openrouter/z-ai/glm-5v-turbo",
-      "variants": []
+    { "key": "openrouter/z-ai/glm-5v-turbo", "variants": []
     },
-    {
-      "key": "xiaomi/mimo-v2.5",
-      "variants": [
+    { "key": "xiaomi/mimo-v2.5", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "xiaomi/mimo-v2.5-pro",
-      "variants": [
+    { "key": "xiaomi/mimo-v2.5-pro", "variants": [
         "high",
         "low",
         "medium"
       ]
     },
-    {
-      "key": "xiaomi/mimo-v2.5-pro-ultraspeed",
-      "variants": [
+    { "key": "xiaomi/mimo-v2.5-pro-ultraspeed", "variants": [
         "high",
         "low",
         "medium"
       ]
     }
-  ]
+  ],
+  "version": "2025.05.13"
 }
