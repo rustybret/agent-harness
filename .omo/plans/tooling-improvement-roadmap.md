@@ -103,6 +103,18 @@ the remainder and pick again. Items are only added here when a real session prod
   `default_sender_access: "allow-all"` implicit targets (bounded by registered projects) so `mode=list`
   matches what `runSendPreflight` will actually allow.
 
+### 10. Review salvage's Prometheus plan for Unity subagents & iterate planning guidance
+
+- **Source:** User directive (2026-08-05), following salvage's adoption of the 8 Unity subagents.
+- **Task:** Once salvage writes their Prometheus work plan for utilizing Unity subagents in their prototype work, perform a thorough review of the generated plan structure, task routing, and subagent allocations.
+- **Action:** Based on observed plan quality, update `AGENTS.md` guidance for Unity-related projects and/or update Prometheus planner system instructions (`packages/omo-opencode/src/agents/prometheus.ts` and `ulw-plan` skill references) to explicitly teach Prometheus that task-specific domain subagents (`unity-script-roslyn`, `unity-scene`, `unity-asset`, `unity-build`, `unity-runtime`, `unity-bridge-bootstrap`, `unity-editor`) exist and should be planned for specialized work instead of relying solely on generic OMO agents or `sisyphus-junior` categories.
+
+### 11. Review salvage's Atlas execution session & refine subagent capability instructions
+
+- **Source:** User directive (2026-08-05).
+- **Task:** Once salvage executes the plan via Atlas, review the Atlas execution session logs, tool invocation patterns, handoffs, and evidence.
+- **Action:** Iterate on subagent capability details, prompt instructions, tool schemas, and error boundaries based on empirical execution data to refine subagent coordination. (Enacted alongside the `webgameECS` benchmark once cloudhome completes cluster upgrades).
+
 ---
 
 ## P2 — feature gaps with stand-ins
