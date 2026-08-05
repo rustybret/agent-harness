@@ -133,6 +133,7 @@ work that silently strands.
 - **Touchpoints only via the bridge.** All Unity reads and mutations go through
   bridge tools and skills. Never use harness file tools (`read`/`edit`/`write`/
   `aft_search`) to touch Unity scenes, scripts, prefabs, or assets directly.
+- **Cross-Platform Verification & LSP Protocol.** Do NOT run host LSP tools (`lsp_diagnostics`, `lsp_*`) or local filesystem diagnostics. OpenCode runs locally on macOS (Apple Silicon) while the Unity Editor and project code live remotely on a Windows x86_64 instance. Local host LSP tools will fail or misreport missing assemblies ("local C# LSP (no Unity on Mac)"). `script_validate` (Roslyn pre-flight on the bridge) and `compile_status` (Unity compilation gate) are the mandatory and complete evidence of correctness.
 - **Idempotency.** Safe = read-only, freely retryable. Unsafe = mutating; confirm
   the first call's result before a second issue, and pass an `idempotency_key`
   where supported.

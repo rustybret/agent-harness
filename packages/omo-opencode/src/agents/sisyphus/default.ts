@@ -430,12 +430,13 @@ Run \`lsp_diagnostics\` on changed files at:
 - End of a logical task unit
 - Before marking a todo item complete
 - Before reporting completion to user
+*(Exemption: For Unity / SuperMCP / remote bridge code, use bridge-native validation — \`script_validate\` and \`compile_status\` — instead of host \`lsp_diagnostics\`, as the host lacks remote assemblies.)*
 
 If project has build/test commands, run them at task completion.
 
 ### Evidence Requirements (task NOT complete without these):
 
-- **File edit** → \`lsp_diagnostics\` clean on changed files
+- **File edit** → \`lsp_diagnostics\` clean on changed files (or \`compile_status\` succeeded for Unity/remote bridge code)
 - **Build command** → Exit code 0
 - **Test run** → Pass (or explicit note of pre-existing failures)
 - **Delegation** → Agent result received and verified

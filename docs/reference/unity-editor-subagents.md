@@ -145,6 +145,44 @@ node packages/supermcp-skills/scripts/sync-from-source.mjs
 
 ---
 
+## Installation & Registration Timing
+
+### Installing Agent Definitions in Downstream Repositories
+
+The 8 Unity subagents (`unity-gamedev.md`, `unity-editor.md`, `unity-scene.md`, `unity-script-roslyn.md`, `unity-asset.md`, `unity-build.md`, `unity-runtime.md`, `unity-bridge-bootstrap.md`) are stored under `.opencode/agents/`.
+
+When adopting these subagents in another project repository:
+- **Symlinking (recommended)**: Symlink the agent files from `agent-harness` into your project's `.opencode/agents/`:
+  ```bash
+  ln -sf /path/to/agent-harness/.opencode/agents/unity-*.md .opencode/agents/
+  ```
+- **Copying**: Copy the `.md` files directly into `.opencode/agents/`. Note that if your project gitignores `.opencode/`, newly copied agent files will remain untracked in git.
+
+### Server Restart Requirement
+
+OpenCode loads and registers custom agent definitions from `.opencode/agents/` at **server bootstrap/start time**.
+
+> **Important**: Newly added, copied, or linked agent `.md` files will NOT be recognized by OpenCode until the OpenCode server is restarted. Attempting to invoke a newly added agent before restarting the server will produce an error such as:
+> `Unknown agent: "unity-editor". Available agents: Metis - Plan Consultant, Momus - Plan Critic, ...`
+> To resolve this, simply restart the OpenCode server (`opencode serve` / restart TUI session) after adding agent files.
+
+---
+
+## Cross-Platform Remote Verification Protocol (macOS Host vs. Windows Instance)
+
+When OpenCode runs locally on macOS (Apple Silicon arm64) while the Unity Editor and project code live remotely on a cloud-hosted Windows instance (x86_64), local host LSP tools (`lsp_diagnostics`, `csharp-ls`) cannot validate Unity code because the Mac host lacks Unity C# assemblies ("local C# LSP (no Unity on Mac)").
+
+### Rules & Authoritative Gate
+
+1. **Host LSP Exemption**: Parent agents (Sisyphus, Atlas, Hephaestus) and Unity subagents MUST NOT invoke local host `lsp_diagnostics` for Unity / SuperMCP code verification.
+2. **Authoritative Verification Gate**:
+   - `script_validate` (Roslyn pre-flight validation on the SuperMCP bridge) for pre-write syntax/type checking.
+   - `compile_status` (job_id state `succeeded`) / `compile_errors` for Unity Editor compilation.
+   - `console_get_logs` for runtime error verification post-domain-reload.
+3. **Evidence of Correctness**: Returning `Verification: Validate: script_validate passed, Compile: compile_status succeeded` in the subagent output provides 100% complete evidence of correctness for parent agents.
+
+---
+
 ## QA Evidence & Benchmarks
 
 - **Task 9 QA Evidence**: Proves registration, permission enforcement, and sync dispatch mode. Located at `file://.omo/evidence/20260804-unity-subagents/task-9/README.md`.

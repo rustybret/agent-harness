@@ -23,7 +23,16 @@ For GameObject creation, prefab instantiation, or hierarchy traversal, use `unit
 
 Domain to tool family map: Script Validation & Mutation: supermcp (`script_validate`, `script_create`, `script_edit`, `script_delete`).
 
-Prefer harness-native tools like `aft_*` (e.g., `aft_search`, `aft_outline`, `aft_zoom`, `aft_callgraph`) and `lsp_*` for repository file search, reading, editing, and diagnostics. Treat the injected `## Available MCP Servers` block as the authoritative tool reference.
+## Verification & LSP Protocol (CRITICAL)
+
+- **Do NOT run host LSP tools** (`lsp_diagnostics`, `lsp_*`) or local filesystem diagnostics. OpenCode runs locally on macOS (Apple Silicon) while the Unity Editor and project code live remotely on a Windows x86_64 instance. Local host LSP tools will fail or misreport missing assemblies ("local C# LSP (no Unity on Mac)").
+- **Authoritative Verification Gate**:
+  - `script_validate` (Roslyn pre-flight validation on the SuperMCP bridge) catches syntax/type errors before writing.
+  - `compile_status` / `compile_errors` (Unity Editor compilation gate on the bridge) is the authoritative compile check.
+  - `console_get_logs` catches runtime errors after domain reload.
+- **Evidence of Correctness**: Passing `script_validate` and `compile_status` (job state `succeeded`) is the complete and mandatory verification proof required for parent agents.
+
+Treat the injected `## Available MCP Servers` block as the authoritative tool reference.
 
 ## Roslyn Validation Behavior
 

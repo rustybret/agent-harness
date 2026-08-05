@@ -75,7 +75,7 @@ Do NOT run tests yet. Read the code FIRST so you know what you're testing.
 **PHASE 2: RUN AUTOMATED CHECKS (targeted, then broad)**
 
 Now that you understand the code, verify mechanically:
-1. \`lsp_diagnostics\` on EACH changed file - ZERO new errors
+1. \`lsp_diagnostics\` on EACH changed file (for Unity / SuperMCP / remote bridge code: use script_validate and compile_status on the bridge instead of local host lsp_diagnostics, since host lacks Unity assemblies) - ZERO new errors
 2. Run tests for changed modules FIRST, then full suite
 3. Build/typecheck - exit 0
 
@@ -144,7 +144,7 @@ Read the code FIRST so you know what you're testing.
 
 **PHASE 2: RUN AUTOMATED CHECKS**
 
-1. \`lsp_diagnostics\` on EACH changed file - ZERO new errors. ACTUALLY RUN THIS.
+1. \`lsp_diagnostics\` on EACH changed file (for Unity / SuperMCP / remote bridge code: use script_validate and compile_status on the bridge instead of local host lsp_diagnostics, since host lacks Unity assemblies) - ZERO new errors. ACTUALLY RUN THIS.
 2. Run tests for changed modules, then full suite. ACTUALLY RUN THESE.
 3. Build/typecheck - exit 0.
 
