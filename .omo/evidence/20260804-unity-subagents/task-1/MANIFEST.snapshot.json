@@ -1,0 +1,31 @@
+{
+  "source_repo": "https://github.com/rustybret/unitySuperMCP.git",
+  "source_rev": "21b7c5e1edada80f18868a0e4d41f02c1c31b839",
+  "synced_at": "2026-08-05T00:55:03.205Z",
+  "files": [
+    {
+      "path": "skills/unity-asset/SKILL.md",
+      "sha256": "3bda3687ccaeef3117d78a5f73c4e92d75731beff86c48b3d74c7cd97e00db9b"
+    },
+    {
+      "path": "skills/unity-bridge-bootstrap/SKILL.md",
+      "sha256": "b2dd14f53334f9912cd76bdff10b805a55f64dc7b13a9ee6e671574a2530921a"
+    },
+    {
+      "path": "skills/unity-build/SKILL.md",
+      "sha256": "443073eed9df04c647ab32f2910c216bda975a9fa123075f4341b4916800fcad"
+    },
+    {
+      "path": "skills/unity-runtime/SKILL.md",
+      "sha256": "72dec037cf53b0d8dad2840df9f8f147552301cb4ccea387849dd7c527d812da"
+    },
+    {
+      "path": "skills/unity-scene/SKILL.md",
+      "sha256": "e8f06c28e83660b2aba6d19d897f13617bc3f5c67fbfefe600510629488364b5"
+    },
+    {
+      "path": "skills/unity-script-roslyn/SKILL.md",
+      "sha256": "b6649b1c3de7a22c5e69a93f8d6da7f7c6b4a6a77cbadaac83e38299a8cacb82"
+    }
+  ]
+}

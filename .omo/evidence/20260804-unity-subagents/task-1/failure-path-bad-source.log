@@ -1,0 +1,2 @@
+sync-from-source: error: source is not a directory: /nonexistent-dir-xyz
+failure exit: 1
