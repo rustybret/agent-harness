@@ -41,6 +41,15 @@ If `bridge_status` shows the bridge is down, report `Status: blocked` and name
 `unity-bridge-bootstrap` as the agent that owns bridge recovery — do NOT load a
 second skill yourself.
 
+## Multi-Instance Routing
+
+- Pass `__instance_id` (8-char lowercase hex) in tool call params to target a
+  specific Unity editor when multiple editors are registered with the BEAM hub.
+- Omit `__instance_id` entirely for single-editor sessions.
+- If multiple editors are registered and you omit `__instance_id`, the bridge
+  returns `ambiguous_instance`. Do not guess which editor — surface the error
+  (see Failure Escalation below) rather than retrying blind.
+
 ## Script Discipline
 
 ### Roslyn Pre-flight (do this before every write)
@@ -93,6 +102,28 @@ second skill yourself.
   rather than others while one is in flight. Tests require
   `com.unity.test-framework` in the project; without it the bridge answers
   `unknown_tool`.
+
+## Failure Escalation (CRITICAL)
+
+When a tool call returns a structured `{"error": {"code": "...", "message": "..."}}`
+envelope, do NOT retry blindly and do NOT attempt to self-recover by working
+around it. Return the failure upward with the code and message verbatim. Four
+codes apply across the whole bridge surface, not just this domain:
+
+- `safe_mode` — Editor is in Safe Mode with compile errors blocking the bridge.
+  Hand off to `unity-bridge-bootstrap`; do not attempt content work.
+- `unknown_tool` — the tool is unavailable (satellite package absent, or its
+  env gate is off). Expected in some configurations, not a bridge failure.
+- `ambiguous_instance` — multiple editors are registered; retry with an
+  explicit `__instance_id` (see Multi-Instance Routing above).
+- `timeout` — the bridge did not respond within its window (Editor
+  backgrounded or frozen). Do not blind-retry a mutation on timeout — check
+  `bridge_status` / `last_pump_tick_age_ms` first, or hand off to
+  `unity-bridge-bootstrap`.
+
+Domain-specific error codes documented elsewhere in this file (e.g.
+`roslyn_preflight_failed`, `external_change_detected`) apply in addition to
+these four cross-cutting ones.
 
 ## Out-of-Domain Rule
 

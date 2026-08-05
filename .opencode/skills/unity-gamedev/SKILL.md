@@ -98,7 +98,7 @@ skill_mcp(mcp_name="supermcp", tool_name="test_run_result", arguments={})
 
 ## Tool Discovery (128-tool clients)
 
-The SuperMCP surface is 235+ tools. Clients with a 128-tool cap cannot load it
+The SuperMCP surface is 170+ tools (v0.7.0; grows per release). Clients with a 128-tool cap cannot load it
 whole. Always narrow with `get_relevant_tools` (pass the concrete task), and use
 `manage_tools` only where the bridge supports toggling. Never page through the full
 surface blindly — it wastes context and risks tripping the cap.

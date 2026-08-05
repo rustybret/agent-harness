@@ -55,7 +55,7 @@ run against the runner's foreground Editor.
    `pending_requests`, and `pending_modal_count` before doing anything mutating.
 2. **Use `get_relevant_tools`** with your task description to pull only the tool
    subset you need. Whole-surface clients hit the 128-tool cap; this meta-tool is
-   how you stay under it. Never page through all 153 registered tools (live count; grows per release) blindly.
+   how you stay under it. Never page through all 170 registered tools (live count as of v0.7.0; grows per release) blindly.
 3. **Route through the domain skill that matches the work:**
    - `unity-scene` — scenes, GameObjects, prefab instances, hierarchy, components
    - `unity-script-roslyn` — C# script create/edit/validate/delete
@@ -175,6 +175,19 @@ Every bridge tool declares its idempotency so you can reason about retries.
   decision flow, `dismiss_modal`.
 - Compile `failed` → read `compile_errors`, fix the script through `script_edit`,
   recompile. Never leave the project in a non-compiling state silently.
+- `safe_mode` → Editor is in Safe Mode with compile errors blocking the bridge.
+  Resolve via `unity-bridge-bootstrap`'s Pre-load Compilation-Error Modal
+  Recovery; do not attempt content work while this holds.
+- `unknown_tool` → the tool is unavailable (satellite package absent, or an env
+  gate like `SUPERMCP_FIRSTPARTY`/`SUPERMCP_EXTERNAL_INJECT` is off). Expected in
+  some configurations, not a bridge failure — do not retry.
+- `ambiguous_instance` → multiple Unity editors are registered with the BEAM hub.
+  Pass an explicit `__instance_id` (8-char lowercase hex) in the tool call and
+  retry; never guess which editor.
+
+For any structured `{"error": {"code", "message"}}` response outside this list,
+surface it to the calling agent verbatim rather than retrying blindly or working
+around it silently.
 
 ## Output
 

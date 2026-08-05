@@ -62,11 +62,20 @@ ONE skill, mapped from the domain:
    `editor_focused`, `last_pump_tick_age_ms`, `run_in_background`, and
    `pending_modal_count` before doing anything mutating.
 2. **`get_relevant_tools(role="<domain>")`** to pull only the tool subset this
-   task needs. Whole-surface clients hit the 128-tool client cap (153 live tools,
-   grows per release); this meta-tool is how you stay under it. Never page
-   through the full tool surface blindly.
+   task needs. Whole-surface clients hit the 128-tool client cap (170 live
+   tools as of v0.7.0, grows per release); this meta-tool is how you stay
+   under it. Never page through the full tool surface blindly.
 3. Use safe reads (`scene_list`, `session_changes`, and the domain's inspect
    tools) to ground the change before issuing any mutation.
+
+## Multi-Instance Routing
+
+- Pass `__instance_id` (8-char lowercase hex) in tool call params to target a
+  specific Unity editor when multiple editors are registered with the BEAM hub.
+- Omit `__instance_id` entirely for single-editor sessions.
+- If multiple editors are registered and you omit `__instance_id`, the bridge
+  returns `ambiguous_instance`. Do not guess which editor — surface the error
+  (see Failure Escalation below) rather than retrying blind.
 
 ## Compile Gate (CRITICAL)
 
@@ -103,6 +112,24 @@ them bridge-first:
   mutation. Pass an `idempotency_key` where the tool supports it.
 - When uncertain what you have already changed this session, call
   `session_changes` to read the mutation log before acting again.
+
+## Failure Escalation (CRITICAL)
+
+When a tool call returns a structured `{"error": {"code": "...", "message": "..."}}`
+envelope, do NOT retry blindly and do NOT attempt to self-recover by working
+around it. Return the failure upward with the code and message verbatim. Four
+codes apply across the whole bridge surface, regardless of loaded domain:
+
+- `safe_mode` — Editor is in Safe Mode with compile errors blocking the bridge.
+  Hand off to `unity-bridge-bootstrap`; do not attempt content work.
+- `unknown_tool` — the tool is unavailable (satellite package absent, or its
+  env gate is off). Expected in some configurations, not a bridge failure.
+- `ambiguous_instance` — multiple editors are registered; retry with an
+  explicit `__instance_id` (see Multi-Instance Routing above).
+- `timeout` — the bridge did not respond within its window (Editor
+  backgrounded or frozen). Do not blind-retry a mutation on timeout — check
+  `bridge_status` / `last_pump_tick_age_ms` first, or hand off to
+  `unity-bridge-bootstrap`.
 
 ## Output
 

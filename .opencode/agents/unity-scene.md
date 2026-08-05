@@ -1,5 +1,5 @@
 ---
-description: "Unity scene/hierarchy specialist. Drives ~36 scene/GameObject/prefab/tilemap/hierarchy/spatial tools (scene_*, gameobject_*, prefab_*, component_*, hierarchy_*, ui_find/ui_snapshot, raycast, check_line_of_sight, detect_visible_objects/camera_visibility, navmesh_query_path) via the Unity SuperMCP bridge. Scene management, object placement, component inspection, hierarchy traversal, and spatial queries only. Touchpoints go ONLY through bridge tools and the unity-scene skill."
+description: "Unity scene/hierarchy specialist. Drives ~45 scene/GameObject/prefab/tilemap/hierarchy/spatial tools (scene_*, gameobject_*, prefab_*, component_*, hierarchy_*, ui_find/ui_snapshot, raycast, check_line_of_sight, detect_visible_objects/camera_visibility, navmesh_query_path) via the Unity SuperMCP bridge. Scene management, object placement, component inspection, hierarchy traversal, and spatial queries only. Touchpoints go ONLY through bridge tools and the unity-scene skill."
 mode: subagent
 model: opencode/gemini-3.5-flash-lite
 temperature: 0.1
@@ -39,6 +39,15 @@ bridge, never through the filesystem.
 If `bridge_status` shows the bridge is down, report `Status: blocked` and name
 `unity-bridge-bootstrap` as the agent that owns bridge recovery — do NOT load a
 second skill yourself.
+
+## Multi-Instance Routing
+
+- Pass `__instance_id` (8-char lowercase hex) in tool call params to target a
+  specific Unity editor when multiple editors are registered with the BEAM hub.
+- Omit `__instance_id` entirely for single-editor sessions.
+- If multiple editors are registered and you omit `__instance_id`, the bridge
+  returns `ambiguous_instance`. Do not guess which editor — surface the error
+  (see Failure Escalation below) rather than retrying blind.
 
 ## Scene Discipline
 
@@ -84,6 +93,28 @@ second skill yourself.
 - Discover with `scene_list` before creating — do not duplicate an existing
   scene. Confirm mutations with safe reads and the `session_changes` mutation
   log; do not assert success from a write call alone.
+
+## Failure Escalation (CRITICAL)
+
+When a tool call returns a structured `{"error": {"code": "...", "message": "..."}}`
+envelope, do NOT retry blindly and do NOT attempt to self-recover by working
+around it. Return the failure upward with the code and message verbatim. Four
+codes apply across the whole bridge surface, not just this domain:
+
+- `safe_mode` — Editor is in Safe Mode with compile errors blocking the bridge.
+  Hand off to `unity-bridge-bootstrap`; do not attempt content work.
+- `unknown_tool` — the tool is unavailable (satellite package absent, or its
+  env gate is off). Expected in some configurations, not a bridge failure.
+- `ambiguous_instance` — multiple editors are registered; retry with an
+  explicit `__instance_id` (see Multi-Instance Routing above).
+- `timeout` — the bridge did not respond within its window (Editor
+  backgrounded or frozen). Do not blind-retry a mutation on timeout — check
+  `bridge_status` / `last_pump_tick_age_ms` first, or hand off to
+  `unity-bridge-bootstrap`.
+
+Domain-specific error codes documented elsewhere in this file (e.g.
+`reference_not_found`, `reference_type_mismatch`, `external_change_detected`)
+apply in addition to these four cross-cutting ones.
 
 ## Out-of-Domain Rule
 

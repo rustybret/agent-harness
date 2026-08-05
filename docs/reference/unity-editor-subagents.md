@@ -96,6 +96,37 @@ The `google/gemma-4-31b-it` model has a strict rolling free-tier limit of **16k 
 
 ---
 
+## Multi-Instance Routing
+
+When multiple Unity editors are registered with the BEAM hub, tool calls require
+an `__instance_id` (8-char lowercase hex) to disambiguate the target editor.
+Omit it for single-editor sessions. All seven restricted subagents pass this
+through transparently; if it's omitted while multiple editors are registered,
+the bridge returns `ambiguous_instance` (see Failure Escalation Contract below).
+
+## Failure Escalation Contract
+
+When a bridge tool call fails, it returns a structured
+`{"error": {"code": "...", "message": "..."}}` envelope. All seven restricted
+subagents are instructed to surface this upward verbatim rather than retry
+blindly or attempt self-recovery. Four codes are cross-cutting across the whole
+bridge surface (domain-specific codes, e.g. `roslyn_preflight_failed` or
+`external_change_detected`, layer on top of these):
+
+| Code | Meaning | Expected agent behavior |
+|---|---|---|
+| `safe_mode` | Editor is in Safe Mode; compile errors are blocking the bridge | Hand off to `unity-bridge-bootstrap`; do not attempt content work |
+| `unknown_tool` | Tool unavailable — satellite package absent, or its env gate (`SUPERMCP_FIRSTPARTY`, `SUPERMCP_EXTERNAL_INJECT`) is off | Not a bridge failure; report as expected-unavailable |
+| `ambiguous_instance` | Multiple editors registered, `__instance_id` required | Retry once with an explicit `__instance_id`; never guess |
+| `timeout` | Bridge did not respond within its window (Editor backgrounded or frozen) | Do not blind-retry a mutation; check `bridge_status` / `last_pump_tick_age_ms` first |
+
+Env-gated tool sets (`firstparty_*` behind `SUPERMCP_FIRSTPARTY`,
+`console_watch_*` behind `SUPERMCP_EXTERNAL_INJECT`) require no special agent
+awareness — a gated-off tool simply returns `unknown_tool` like any other
+unavailable tool.
+
+---
+
 ## Dispatch Mode Finding
 
 Empirical testing in Task 9(c) confirmed that `task(subagent_type="unity-editor")` (and the Option B subagents) using the `opencode/gemini-3.5-flash-lite` model completes **synchronously** (inline). The unstable-gemini forced-background behavior only applies to category-routed dispatches (e.g., `task(category="deep")`), not to direct `subagent_type` dispatches.

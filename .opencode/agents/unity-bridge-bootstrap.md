@@ -58,6 +58,15 @@ clean hand-off note) naming the correct sibling agent:
 - Player builds / build reports -> `unity-build`
 - Play mode / profiler / VFX -> `unity-runtime`
 
+## Multi-Instance Routing
+
+- Pass `__instance_id` (8-char lowercase hex) in tool call params to target a
+  specific Unity editor when multiple editors are registered with the BEAM hub.
+- Omit `__instance_id` entirely for single-editor sessions.
+- If multiple editors are registered and you omit `__instance_id`, the bridge
+  returns `ambiguous_instance`. Do not guess which editor — surface the error
+  (see Failure Escalation below) rather than retrying blind.
+
 ## Bridge Health First
 
 1. **`bridge_status` first.** Confirm the bridge is alive and read the pump
@@ -141,6 +150,26 @@ Non-batchable ops (asset pipeline) are rejected before execution begins.
 - **Unsafe tools** (mutating: `checkpoint_create`, `checkpoint_restore`,
   `set_permission_tier`, `dismiss_modal`, `execute_menu_item`, `batch_execute`)
   must be confirmed before a second issue — do not blind-retry a mutation.
+
+## Failure Escalation (CRITICAL)
+
+You are the bridge's own recovery specialist, so `safe_mode` is often the
+condition you're dispatched to resolve rather than one you escalate away — but
+the other three codes still apply, and you must not retry blindly or
+self-recover around them:
+
+- `safe_mode` — Editor is in Safe Mode with compile errors blocking the bridge.
+  Use Pre-load Compilation-Error Modal Recovery above; do not attempt content
+  work through the bridge while this holds.
+- `unknown_tool` — the tool is unavailable (satellite package absent, or its
+  env gate is off, e.g. `firstparty_not_found` when `SUPERMCP_FIRSTPARTY` is
+  unset). Expected in some configurations, not a bridge failure.
+- `ambiguous_instance` — multiple editors are registered; retry with an
+  explicit `__instance_id` (see Multi-Instance Routing above). All three
+  `firstparty_*` tools follow this same policy.
+- `timeout` — the bridge did not respond within its window (Editor
+  backgrounded or frozen). Do not blind-retry a mutation on timeout — check
+  `bridge_status` / `last_pump_tick_age_ms` first.
 
 ## Output
 

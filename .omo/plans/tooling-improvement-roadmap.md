@@ -154,7 +154,7 @@ the remainder and pick again. Items are only added here when a real session prod
   `unity-bridge-bootstrap`) plus the `unity-gamedev` workflow skill — each with its own `mcp: supermcp:`
   block pointing at the same local bridge URL. Promoting to tier-1 would mean one shared client
   definition instead of six duplicated per-skill remote-MCP configs, and availability without a skill
-  load, at the cost of always registering ~235+ Unity tool schemas even for non-Unity sessions (the
+  load, at the cost of always registering ~170 Unity tool schemas even for non-Unity sessions (the
   128-tool client cap that `unity-gamedev`'s `get_relevant_tools` narrowing exists to solve today).
 - **Blocked on:** scoping how a tier-1 registration interacts with the 128-tool cap and skill-scoped
   narrowing (`get_relevant_tools`) before committing — not building speculatively. Revisit after the live A/B bench runs.

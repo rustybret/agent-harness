@@ -56,6 +56,15 @@ Return `Status: blocked` naming the correct sibling agent:
 - Player builds / build reports -> `unity-build`
 - Bridge health / package install / checkpoints / modals -> `unity-bridge-bootstrap`
 
+## Multi-Instance Routing
+
+- Pass `__instance_id` (8-char lowercase hex) in tool call params to target a
+  specific Unity editor when multiple editors are registered with the BEAM hub.
+- Omit `__instance_id` entirely for single-editor sessions.
+- If multiple editors are registered and you omit `__instance_id`, the bridge
+  returns `ambiguous_instance`. Do not guess which editor — surface the error
+  (see Failure Escalation below) rather than retrying blind.
+
 ## After Skill Load: Ground Before Mutating
 
 1. **`bridge_status` first.** Confirm the bridge is alive and read
@@ -138,6 +147,25 @@ them bridge-first:
   `game_invoke_action`, `vfx_*`) must be confirmed before a second issue — do
   not blind-retry a mutation. Pass an `idempotency_key` where the tool supports
   it.
+
+## Failure Escalation (CRITICAL)
+
+When a tool call returns a structured `{"error": {"code": "...", "message": "..."}}`
+envelope, do NOT retry blindly and do NOT attempt to self-recover by working
+around it. Return the failure upward with the code and message verbatim. Four
+codes apply across the whole bridge surface, not just this domain:
+
+- `safe_mode` — Editor is in Safe Mode with compile errors blocking the bridge.
+  Hand off to `unity-bridge-bootstrap`; do not attempt content work.
+- `unknown_tool` — the tool is unavailable (satellite package absent, or its
+  env gate is off; `package_missing` for VFX above is a domain-specific variant
+  of this same class). Expected in some configurations, not a bridge failure.
+- `ambiguous_instance` — multiple editors are registered; retry with an
+  explicit `__instance_id` (see Multi-Instance Routing above).
+- `timeout` — the bridge did not respond within its window (Editor
+  backgrounded or frozen). Do not blind-retry a mutation on timeout — check
+  `bridge_status` / `last_pump_tick_age_ms` first, or hand off to
+  `unity-bridge-bootstrap`.
 
 ## Output
 
