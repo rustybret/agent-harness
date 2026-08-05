@@ -1,0 +1,28 @@
+=== JSONC Parsing Verification ===
+JSONC parsed successfully: true
+
+=== Agents Verification ===
+Agent unity-editor: PRESENT
+fallback_models: [{"model":"openai/gpt-5.5","reasoning":"low"},"opencode/deepseek-v4-flash-free",{"model":"anthropic/claude-opus-5","reasoning":"low"},"opencode/gemini-3.6-flash","opencode/gemini-3.5-flash","opencode/gemini-3-flash","google/gemma-4-31b-it"]
+Agent unity-scene: PRESENT
+fallback_models: [{"model":"openai/gpt-5.5","reasoning":"low"},"opencode/deepseek-v4-flash-free",{"model":"anthropic/claude-opus-5","reasoning":"low"},"opencode/gemini-3.6-flash","opencode/gemini-3.5-flash","opencode/gemini-3-flash","google/gemma-4-31b-it"]
+Agent unity-script-roslyn: PRESENT
+fallback_models: [{"model":"openai/gpt-5.5","reasoning":"low"},"opencode/deepseek-v4-flash-free",{"model":"anthropic/claude-opus-5","reasoning":"low"},"opencode/gemini-3.6-flash","opencode/gemini-3.5-flash","opencode/gemini-3-flash","google/gemma-4-31b-it"]
+Agent unity-asset: PRESENT
+fallback_models: [{"model":"openai/gpt-5.5","reasoning":"low"},"opencode/deepseek-v4-flash-free",{"model":"anthropic/claude-opus-5","reasoning":"low"},"opencode/gemini-3.6-flash","opencode/gemini-3.5-flash","opencode/gemini-3-flash","google/gemma-4-31b-it"]
+Agent unity-build: PRESENT
+fallback_models: [{"model":"openai/gpt-5.5","reasoning":"low"},"opencode/deepseek-v4-flash-free",{"model":"anthropic/claude-opus-5","reasoning":"low"},"opencode/gemini-3.6-flash","opencode/gemini-3.5-flash","opencode/gemini-3-flash","google/gemma-4-31b-it"]
+Agent unity-runtime: PRESENT
+fallback_models: [{"model":"openai/gpt-5.5","reasoning":"low"},"opencode/deepseek-v4-flash-free",{"model":"anthropic/claude-opus-5","reasoning":"low"},"opencode/gemini-3.6-flash","opencode/gemini-3.5-flash","opencode/gemini-3-flash","google/gemma-4-31b-it"]
+Agent unity-bridge-bootstrap: PRESENT
+fallback_models: [{"model":"openai/gpt-5.5","reasoning":"low"},"opencode/deepseek-v4-flash-free",{"model":"anthropic/claude-opus-5","reasoning":"low"},"opencode/gemini-3.6-flash","opencode/gemini-3.5-flash","opencode/gemini-3-flash","google/gemma-4-31b-it"]
+
+=== unity-gamedev Verification ===
+unity-gamedev fallback_models present: false
+
+=== packages/model-core/ Verification ===
+git diff --stat packages/model-core output: ""
+packages/model-core untouched: true
+
+=== Comment Verification ===
+Comment documents Gemma caveat: true

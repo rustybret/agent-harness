@@ -72,3 +72,13 @@ _Auto-scaffolded by /start-work. Append new entries below - never overwrite._
 - `get_relevant_tools(role="<domain>")` role strings used: `build`, `runtime`, `bridge-bootstrap`.
 - Evidence: `.omo/evidence/20260804-unity-subagents/task-7/evidence.md`.
 - Verified via `bun -e` + `yaml` lib that all three frontmatters parse (perm.keys=6 each).
+
+## Task 8: Fast model fallback chains for all seven restricted agents (config-only)
+- Configured identical `fallback_models` arrays for all seven restricted agents (`unity-editor`, `unity-scene`, `unity-script-roslyn`, `unity-asset`, `unity-build`, `unity-runtime`, `unity-bridge-bootstrap`) under the existing `"[opencode]"` block in `.omo/omo.jsonc`.
+- The fallback chain uses the modern `reasoning` field (not the deprecated `variant`) for reasoning-tier models: `openai/gpt-5.5` (reasoning: low) and `anthropic/claude-opus-5` (reasoning: low).
+- The fallback chain consists of: `[{"model": "openai/gpt-5.5", "reasoning": "low"}, "opencode/deepseek-v4-flash-free", {"model": "anthropic/claude-opus-5", "reasoning": "low"}, "opencode/gemini-3.6-flash", "opencode/gemini-3.5-flash", "opencode/gemini-3-flash", "google/gemma-4-31b-it"]`.
+- Added a JSONC comment explaining the chain rationale and the Gemma-4 16k input-tokens/min rolling free-tier caveat (short-prompt last resort only).
+- Verified that `unity-gamedev` has no fallback chain configured (keeps its frontmatter-only model).
+- Verified that `packages/model-core/` remains untouched.
+- Verified that `.omo/omo.jsonc` parses successfully as JSONC.
+- Evidence recorded at `.omo/evidence/20260804-unity-subagents/task-8/`.

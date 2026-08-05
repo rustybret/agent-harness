@@ -1,0 +1,165 @@
+diff --git a/.omo/omo.jsonc b/.omo/omo.jsonc
+index 2f51b9f53..3a6ff2df4 100644
+--- a/.omo/omo.jsonc
++++ b/.omo/omo.jsonc
+@@ -72,11 +72,160 @@
+         "opencode-gemini-ec2cac67": {
+           "access": "allow",
+           "intent_budget": "plan"
++        },
++        "webgameecs-cf2943b8": {
++          "access": "allow",
++          "intent_budget": "plan"
++        },
++        "salvage-4104bb5b": {
++          "access": "allow",
++          "intent_budget": "plan"
++        },
++        "templates-06e1abab": {
++          "access": "allow",
++          "intent_budget": "plan"
++        },
++        "adv-685d7bc1": {
++          "access": "allow",
++          "intent_budget": "impl"
+         }
+       }
+     },
+     "external_inject": {
+       "enabled": true
++    },
++    // vendored unitySuperMCP domain skills, synced manually via packages/supermcp-skills/scripts/sync-from-source.mjs
++    "skills": {
++      "sources": [
++        {
++          "path": "packages/supermcp-skills/skills",
++          "recursive": true
++        }
++      ]
++    },
++    // Fast model fallback chains for the seven restricted Unity subagents.
++    // Rationale: Ensures high availability and graceful degradation by falling back to cheaper/free models.
++    // Caveat: google/gemma-4-31b-it has a 16k input-tokens/min rolling free-tier limit, so it is a short-prompt last resort only.
++    "agents": {
++      "unity-editor": {
++        "fallback_models": [
++          {
++            "model": "openai/gpt-5.5",
++            "reasoning": "low"
++          },
++          "opencode/deepseek-v4-flash-free",
++          {
++            "model": "anthropic/claude-opus-5",
++            "reasoning": "low"
++          },
++          "opencode/gemini-3.6-flash",
++          "opencode/gemini-3.5-flash",
++          "opencode/gemini-3-flash",
++          "google/gemma-4-31b-it"
++        ]
++      },
++      "unity-scene": {
++        "fallback_models": [
++          {
++            "model": "openai/gpt-5.5",
++            "reasoning": "low"
++          },
++          "opencode/deepseek-v4-flash-free",
++          {
++            "model": "anthropic/claude-opus-5",
++            "reasoning": "low"
++          },
++          "opencode/gemini-3.6-flash",
++          "opencode/gemini-3.5-flash",
++          "opencode/gemini-3-flash",
++          "google/gemma-4-31b-it"
++        ]
++      },
++      "unity-script-roslyn": {
++        "fallback_models": [
++          {
++            "model": "openai/gpt-5.5",
++            "reasoning": "low"
++          },
++          "opencode/deepseek-v4-flash-free",
++          {
++            "model": "anthropic/claude-opus-5",
++            "reasoning": "low"
++          },
++          "opencode/gemini-3.6-flash",
++          "opencode/gemini-3.5-flash",
++          "opencode/gemini-3-flash",
++          "google/gemma-4-31b-it"
++        ]
++      },
++      "unity-asset": {
++        "fallback_models": [
++          {
++            "model": "openai/gpt-5.5",
++            "reasoning": "low"
++          },
++          "opencode/deepseek-v4-flash-free",
++          {
++            "model": "anthropic/claude-opus-5",
++            "reasoning": "low"
++          },
++          "opencode/gemini-3.6-flash",
++          "opencode/gemini-3.5-flash",
++          "opencode/gemini-3-flash",
++          "google/gemma-4-31b-it"
++        ]
++      },
++      "unity-build": {
++        "fallback_models": [
++          {
++            "model": "openai/gpt-5.5",
++            "reasoning": "low"
++          },
++          "opencode/deepseek-v4-flash-free",
++          {
++            "model": "anthropic/claude-opus-5",
++            "reasoning": "low"
++          },
++          "opencode/gemini-3.6-flash",
++          "opencode/gemini-3.5-flash",
++          "opencode/gemini-3-flash",
++          "google/gemma-4-31b-it"
++        ]
++      },
++      "unity-runtime": {
++        "fallback_models": [
++          {
++            "model": "openai/gpt-5.5",
++            "reasoning": "low"
++          },
++          "opencode/deepseek-v4-flash-free",
++          {
++            "model": "anthropic/claude-opus-5",
++            "reasoning": "low"
++          },
++          "opencode/gemini-3.6-flash",
++          "opencode/gemini-3.5-flash",
++          "opencode/gemini-3-flash",
++          "google/gemma-4-31b-it"
++        ]
++      },
++      "unity-bridge-bootstrap": {
++        "fallback_models": [
++          {
++            "model": "openai/gpt-5.5",
++            "reasoning": "low"
++          },
++          "opencode/deepseek-v4-flash-free",
++          {
++            "model": "anthropic/claude-opus-5",
++            "reasoning": "low"
++          },
++          "opencode/gemini-3.6-flash",
++          "opencode/gemini-3.5-flash",
++          "opencode/gemini-3-flash",
++          "google/gemma-4-31b-it"
++        ]
++      }
+     }
+   },
+   "_migrations": [

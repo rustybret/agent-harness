@@ -48,11 +48,24 @@
       "status": "completed",
       "ended_at": "2026-08-05T01:26:24.845Z",
       "elapsed_ms": 281388
+    },
+    "todo:8": {
+      "task_key": "todo:8",
+      "task_label": "8",
+      "task_title": "Fast model fallback chains for all seven restricted agents (config-only)",
+      "session_id": "opencode:ses_03077e6a7ffeHkFjEB6K3zzSsL",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-08-05T01:34:16.023Z",
+      "started_at": "2026-08-05T01:33:29.778Z",
+      "status": "completed",
+      "ended_at": "2026-08-05T01:34:16.022Z",
+      "elapsed_ms": 46244
     }
   },
   "active_work_id": "unity-supermcp-subagents-f053ec81",
   "status": "active",
-  "updated_at": "2026-08-05T01:26:24.845Z",
+  "updated_at": "2026-08-05T01:34:16.023Z",
   "schema_version": 2,
   "works": {
     "provider-quirks-normalizer-legacy": {
@@ -695,7 +708,7 @@
       "plan_name": "unity-supermcp-subagents",
       "status": "active",
       "started_at": "2026-08-05T00:51:56.936Z",
-      "updated_at": "2026-08-05T01:26:24.845Z",
+      "updated_at": "2026-08-05T01:34:16.023Z",
       "session_ids": [
         "opencode:ses_03098296affeQrzOv3gRUYPM57"
       ],
@@ -742,6 +755,19 @@
           "status": "completed",
           "ended_at": "2026-08-05T01:26:24.845Z",
           "elapsed_ms": 281388
+        },
+        "todo:8": {
+          "task_key": "todo:8",
+          "task_label": "8",
+          "task_title": "Fast model fallback chains for all seven restricted agents (config-only)",
+          "session_id": "opencode:ses_03077e6a7ffeHkFjEB6K3zzSsL",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "updated_at": "2026-08-05T01:34:16.023Z",
+          "started_at": "2026-08-05T01:33:29.778Z",
+          "status": "completed",
+          "ended_at": "2026-08-05T01:34:16.022Z",
+          "elapsed_ms": 46244
         }
       }
     }
