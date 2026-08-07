@@ -1,0 +1,42 @@
+# Fork sync exclusion manifest — consumed by script/fork-sync.sh.
+#
+# Two directive kinds, one glob per line, `#` starts a comment:
+#
+#   keep-deleted: <glob>   Paths the fork permanently deletes. On every sync,
+#                          upstream modifications to these are resolved as
+#                          deletion, and ANY file matching the glob that the
+#                          merge introduces (including brand-new upstream
+#                          files) is removed from the merge result.
+#
+#   take-theirs: <glob>    Regenerable artifacts the fork does not maintain.
+#                          A both-modified conflict on these is resolved to
+#                          upstream's version (rebuild locally if the fork
+#                          ever changes the sources that produce them).
+#
+# Keep this list explicit and reviewed. Do not widen a glob to cover a
+# path the fork actually keeps (e.g. .opencode/skills/ contains fork-owned
+# skills; only the upstream-deleted ones are listed below).
+
+# --- Upstream ops/workflow machinery: never restored (see commit
+# --- c11449af8 "Delete upstream actions, workflows and operations nonsense").
+# --- The fork runs no GitHub-hosted jobs; CI lives on cloudhome.
+keep-deleted: .github/FUNDING.yml
+keep-deleted: .github/scripts/*
+keep-deleted: .github/workflows/*
+
+# --- Upstream-only dotfile content the fork removed.
+keep-deleted: .omo/frontend-design/state.md
+keep-deleted: .opencode/command/get-unpublished-changes.md
+keep-deleted: .opencode/command/omomomo.md
+keep-deleted: .opencode/command/publish.md
+keep-deleted: .opencode/skills/github-triage/*
+keep-deleted: .opencode/skills/pre-publish-review/*
+keep-deleted: .opencode/skills/work-with-pr-workspace/*
+
+# --- Web package: excluded from the fork entirely (see AGENTS.md fork scope).
+keep-deleted: packages/web/*
+
+# --- Regenerable senpi extension bundles (built from packages/omo-senpi
+# --- sources, which the fork does not customize).
+take-theirs: packages/omo-senpi/plugin/extensions/omo.js
+take-theirs: packages/omo-senpi/plugin/extensions/omo-member.js
