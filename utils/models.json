@@ -24,13 +24,7 @@
       "key": "anthropic/claude-opus-4-6"
     },
     {
-      "key": "anthropic/claude-opus-4-6-fast"
-    },
-    {
       "key": "anthropic/claude-opus-4-7"
-    },
-    {
-      "key": "anthropic/claude-opus-4-7-fast"
     },
     {
       "key": "anthropic/claude-opus-4-8"
@@ -525,9 +519,6 @@
       "key": "opencode/claude-haiku-4-5"
     },
     {
-      "key": "opencode/claude-opus-4-1"
-    },
-    {
       "key": "opencode/claude-opus-4-5"
     },
     {
@@ -670,6 +661,9 @@
     },
     {
       "key": "opencode/ling-3.0-flash-free"
+    },
+    {
+      "key": "opencode/longcat-2.0-free"
     },
     {
       "key": "opencode/mimo-v2.5-free"
@@ -972,7 +966,10 @@
       "key": "openrouter/inclusionai/ling-2.6-flash"
     },
     {
-      "key": "openrouter/inclusionai/ling-3.0-flash:free"
+      "key": "openrouter/inclusionai/ling-3.0-flash"
+    },
+    {
+      "key": "openrouter/inclusionai/ling-3.0-tiny:free"
     },
     {
       "key": "openrouter/inclusionai/ring-2.6-1t"
@@ -1018,6 +1015,9 @@
     },
     {
       "key": "openrouter/meta/muse-spark-1.1"
+    },
+    {
+      "key": "openrouter/meta/muse-spark-1.2"
     },
     {
       "key": "openrouter/microsoft/phi-4"
