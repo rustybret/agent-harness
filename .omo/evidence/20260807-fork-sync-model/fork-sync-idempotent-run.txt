@@ -1,0 +1,6 @@
+== run 2: idempotent no-op ==
+Already up to date (dev)
+fork/local already up to date with dev
+Everything up-to-date (both pushes)
+exit=0
+git status --porcelain: empty

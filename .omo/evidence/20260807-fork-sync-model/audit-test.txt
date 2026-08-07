@@ -1,0 +1,5 @@
+== bun test script/fork-sync-model.test.ts ==
+ 6 pass
+ 0 fail
+ 111 expect() calls
+Ran 6 tests across 1 file. [140.00ms]

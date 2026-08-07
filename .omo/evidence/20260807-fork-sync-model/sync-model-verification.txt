@@ -1,0 +1,4 @@
+== sync-model verification (merge 2ac90c66c) ==
+root AGENTS.md kept fork version: git diff 2991c0e25 2ac90c66c -- AGENTS.md empty (merge=ours, .gitattributes:14)
+keep-deleted resurrection: none (diff = P1 files + upstream 6 files)
+upstream changed tests: bun test auto-update-checker + senpi-task manager -> 280 pass / 0 fail

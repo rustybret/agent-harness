@@ -1,0 +1,3 @@
+== run 1: real sync (upstream moved to fd79bf49b mid-run) ==
+error: working tree is not clean. Commit or stash before syncing.
+exit=2

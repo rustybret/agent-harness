@@ -1,0 +1,4 @@
+== script/ suite baseline vs post-change (same 37 pre-existing failures) ==
+baseline (at 3a9ebdf6d, before P1): 149 pass / 37 fail / 1 error
+post-change (at 2991c0e25):         155 pass / 37 fail / 1 error
+failures: upstream script tests asserting on .github/workflows/* deleted by fork

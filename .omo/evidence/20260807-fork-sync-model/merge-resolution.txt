@@ -1,0 +1,36 @@
+=== unmerged at start (2026-08-07) ===
+.github/workflows/ci.yml                      deleted-by-us
+.github/workflows/lint-workflows.yml          deleted-by-us
+.github/workflows/publish-platform.yml        deleted-by-us
+.github/workflows/web-ci.yml                  deleted-by-us
+.github/workflows/web-deploy.yml              deleted-by-us
+packages/web/package.json                     deleted-by-us
+packages/web/bun.lock                         deleted-by-us
+packages/omo-senpi/plugin/extensions/omo.js           both-modified
+packages/omo-senpi/plugin/extensions/omo-member.js    both-modified
+packages/omo-opencode/src/config/validate.ts          both-modified
+=== resolution: deleted-by-us -> git rm (keep fork deletion per c11449af8) ===
+rm: .github/workflows/ci.yml
+rm: .github/workflows/lint-workflows.yml
+rm: .github/workflows/publish-platform.yml
+rm: .github/workflows/web-ci.yml
+rm: .github/workflows/web-deploy.yml
+rm: packages/web/package.json
+rm: packages/web/bun.lock
+
+=== resolution: both-modified bundles -> theirs ===
+theirs: packages/omo-senpi/plugin/extensions/omo.js
+theirs: packages/omo-senpi/plugin/extensions/omo-member.js
+
+=== resolution: validate.ts combine ===
+ours applyMailboxDefault + theirs materializeAgentModelChains at single call site (line 167-169)
+
+=== post-resolution ===
+unmerged: 0
+conflict markers in worktree: 0 (git diff --check over unmerged set clean)
+
+=== full typecheck ===
+bun run typecheck: exit 0 (tsgo --noEmit root + script + all packages)
+
+=== pushes ===
+3a9ebdf6d merge: sync upstream/dev (aa3a16dea) into fork/local
