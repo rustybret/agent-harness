@@ -57,6 +57,7 @@ ensureVendoredLspDaemonBuilt()
 const HERMETIC_HOME = mkdtempSync(join(tmpdir(), "omo-test-home-"))
 process.env.HOME = HERMETIC_HOME
 process.env.USERPROFILE = HERMETIC_HOME
+delete process.env.OPENCODE_SERVER_PASSWORD
 
 // The plugin logger defaults to <tmpdir>/oh-my-opencode.log, which is the SAME file a developer
 // reads when diagnosing a real session. Without this, `bun test` appends thousands of fixture lines

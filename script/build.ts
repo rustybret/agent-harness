@@ -53,10 +53,11 @@ const OPENTUI_EXTERNALS = ["@opentui/core", "@opentui/keymap", "@opentui/solid",
 
 const nodes: BuildNode[] = [
 	{ id: "git-bash-mcp", command: "bun", args: ["run", "build:git-bash-mcp"], deps: [] },
+	{ id: "ast-grep-mcp", command: "bun", args: ["run", "build:ast-grep-mcp"], deps: [] },
 	{ id: "lsp-tools-mcp", command: "bun", args: ["run", "build:lsp-tools-mcp"], deps: [] },
 	{ id: "lsp-daemon", command: "bun", args: ["run", "build:lsp-daemon"], deps: [] },
 	{ id: "codex-plugin", command: "bun", args: ["run", "build:codex-plugin"], deps: ["git-bash-mcp", "lsp-tools-mcp", "lsp-daemon"] },
-	{ id: "senpi-plugin", command: "bun", args: ["run", "build:senpi-plugin:stage"], deps: ["lsp-daemon"] },
+	{ id: "senpi-plugin", command: "bun", args: ["run", "build:senpi-plugin:stage"], deps: ["ast-grep-mcp", "lsp-daemon"] },
 	{ id: "index", command: "bun", args: ["build", "packages/omo-opencode/src/index.ts", "--outdir", "dist", "--target", "bun", "--format", "esm", "--external", "zod"], deps: [] },
 	{ id: "mailbox-worker-pr-wrapper", command: "bun", args: ["build", "packages/omo-opencode/src/features/cross-project-mailbox/lanes/worker-pr/run-worker.mjs", "--outdir", "dist/worker-pr", "--target", "bun", "--format", "esm"], deps: [] },
 	{ id: "tui-solid", command: "bun", args: ["run", "script/build-tui-solid.ts"], deps: [] },

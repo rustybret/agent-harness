@@ -854,9 +854,17 @@
         },
         "residency_max_children": {
           "default": 8,
-          "type": "integer",
-          "exclusiveMinimum": 0,
-          "maximum": 9007199254740991
+          "anyOf": [
+            {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "string",
+              "const": "unlimited"
+            }
+          ]
         },
         "ttl_ms": {
           "default": 86400000,
@@ -868,6 +876,10 @@
           "type": "string"
         },
         "reattach_on_reconcile": {
+          "type": "boolean"
+        },
+        "resume_children": {
+          "default": true,
           "type": "boolean"
         },
         "warnings": {
@@ -961,6 +973,7 @@
         "max_depth",
         "residency_max_children",
         "ttl_ms",
+        "resume_children",
         "warnings",
         "wait",
         "team"
@@ -12218,9 +12231,17 @@
               "maximum": 9007199254740991
             },
             "residency_max_children": {
-              "type": "integer",
-              "exclusiveMinimum": 0,
-              "maximum": 9007199254740991
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "string",
+                  "const": "unlimited"
+                }
+              ]
             },
             "ttl_ms": {
               "type": "integer",
@@ -12231,6 +12252,9 @@
               "type": "string"
             },
             "reattach_on_reconcile": {
+              "type": "boolean"
+            },
+            "resume_children": {
               "type": "boolean"
             },
             "warnings": {
@@ -13348,9 +13372,17 @@
               "maximum": 9007199254740991
             },
             "residency_max_children": {
-              "type": "integer",
-              "exclusiveMinimum": 0,
-              "maximum": 9007199254740991
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "string",
+                  "const": "unlimited"
+                }
+              ]
             },
             "ttl_ms": {
               "type": "integer",
@@ -13361,6 +13393,9 @@
               "type": "string"
             },
             "reattach_on_reconcile": {
+              "type": "boolean"
+            },
+            "resume_children": {
               "type": "boolean"
             },
             "warnings": {
@@ -14484,9 +14519,17 @@
                 "maximum": 9007199254740991
               },
               "residency_max_children": {
-                "type": "integer",
-                "exclusiveMinimum": 0,
-                "maximum": 9007199254740991
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "string",
+                    "const": "unlimited"
+                  }
+                ]
               },
               "ttl_ms": {
                 "type": "integer",
@@ -14497,6 +14540,9 @@
                 "type": "string"
               },
               "reattach_on_reconcile": {
+                "type": "boolean"
+              },
+              "resume_children": {
                 "type": "boolean"
               },
               "warnings": {
@@ -25797,9 +25843,17 @@
                     "maximum": 9007199254740991
                   },
                   "residency_max_children": {
-                    "type": "integer",
-                    "exclusiveMinimum": 0,
-                    "maximum": 9007199254740991
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      {
+                        "type": "string",
+                        "const": "unlimited"
+                      }
+                    ]
                   },
                   "ttl_ms": {
                     "type": "integer",
@@ -25810,6 +25864,9 @@
                     "type": "string"
                   },
                   "reattach_on_reconcile": {
+                    "type": "boolean"
+                  },
+                  "resume_children": {
                     "type": "boolean"
                   },
                   "warnings": {
@@ -26927,9 +26984,17 @@
                     "maximum": 9007199254740991
                   },
                   "residency_max_children": {
-                    "type": "integer",
-                    "exclusiveMinimum": 0,
-                    "maximum": 9007199254740991
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "exclusiveMinimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      {
+                        "type": "string",
+                        "const": "unlimited"
+                      }
+                    ]
                   },
                   "ttl_ms": {
                     "type": "integer",
@@ -26940,6 +27005,9 @@
                     "type": "string"
                   },
                   "reattach_on_reconcile": {
+                    "type": "boolean"
+                  },
+                  "resume_children": {
                     "type": "boolean"
                   },
                   "warnings": {
