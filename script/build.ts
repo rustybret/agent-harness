@@ -42,6 +42,8 @@ function killTree(child: ReturnType<typeof spawn>): void {
 // - codex-plugin's build-bundled-mcp-runtimes reads (and rebuilds when missing) the
 //   git-bash-mcp / lsp-tools-mcp / lsp-daemon dists, so those must finish first or the two
 //   builds race on the same vendored dist directory.
+// - senpi-plugin stages the Codex ulw-loop component and may run npm ci in that plugin
+//   workspace, so codex-plugin must finish its own npm ci before Senpi staging begins.
 type BuildNode = {
 	id: string;
 	command: string;
@@ -57,7 +59,7 @@ const nodes: BuildNode[] = [
 	{ id: "lsp-tools-mcp", command: "bun", args: ["run", "build:lsp-tools-mcp"], deps: [] },
 	{ id: "lsp-daemon", command: "bun", args: ["run", "build:lsp-daemon"], deps: [] },
 	{ id: "codex-plugin", command: "bun", args: ["run", "build:codex-plugin"], deps: ["git-bash-mcp", "lsp-tools-mcp", "lsp-daemon"] },
-	{ id: "senpi-plugin", command: "bun", args: ["run", "build:senpi-plugin:stage"], deps: ["ast-grep-mcp", "lsp-daemon"] },
+	{ id: "senpi-plugin", command: "bun", args: ["run", "build:senpi-plugin:stage"], deps: ["ast-grep-mcp", "lsp-daemon", "codex-plugin"] },
 	{ id: "index", command: "bun", args: ["build", "packages/omo-opencode/src/index.ts", "--outdir", "dist", "--target", "bun", "--format", "esm", "--external", "zod"], deps: [] },
 	{ id: "mailbox-worker-pr-wrapper", command: "bun", args: ["build", "packages/omo-opencode/src/features/cross-project-mailbox/lanes/worker-pr/run-worker.mjs", "--outdir", "dist/worker-pr", "--target", "bun", "--format", "esm"], deps: [] },
 	{ id: "tui-solid", command: "bun", args: ["run", "script/build-tui-solid.ts"], deps: [] },

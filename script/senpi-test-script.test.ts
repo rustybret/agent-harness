@@ -49,12 +49,13 @@ describe("Senpi compatibility test script", () => {
       "bun run build:materialize-frontend",
       "node packages/omo-senpi/plugin/scripts/stage-lsp-daemon-runtime.mjs",
       "node packages/omo-senpi/plugin/scripts/stage-ast-grep-mcp-runtime.mjs",
+      "node packages/omo-senpi/plugin/scripts/stage-agent-toolkit.mjs",
       "node packages/omo-senpi/plugin/scripts/build-extension.mjs",
       "node packages/omo-senpi/plugin/scripts/sync-skills.mjs",
       "node packages/omo-senpi/plugin/scripts/embed-directive.mjs --check",
       "node packages/omo-senpi/plugin/scripts/build-install.mjs",
     ].join(" && ")
-    const senpiNode = /id: "senpi-plugin"[\s\S]*?args: \["run", "build:senpi-plugin:stage"\][\s\S]*?deps: \["ast-grep-mcp", "lsp-daemon"\]/.test(
+    const senpiNode = /id: "senpi-plugin"[\s\S]*?args: \["run", "build:senpi-plugin:stage"\][\s\S]*?deps: \["ast-grep-mcp", "lsp-daemon", "codex-plugin"\]/.test(
       buildOrchestrator,
     )
 
@@ -68,7 +69,7 @@ describe("Senpi compatibility test script", () => {
     expect(buildOrchestrator, "the build orchestrator must generate Senpi plugin artifacts before publishing").toContain(
       "build:senpi-plugin:stage",
     )
-    expect(senpiNode, "build graph senpi-plugin must depend on ast-grep-mcp and lsp-daemon and call only the stage script").toBe(true)
+    expect(senpiNode, "build graph senpi-plugin must wait for every shared runtime and plugin dependency").toBe(true)
     expect(prepublishOnlyScript, "prepublishOnly must route through build, which includes the Senpi plugin build").toContain(
       "bun run build",
     )
@@ -107,6 +108,7 @@ describe("Senpi compatibility test script", () => {
       }
       await writeFile(join(pluginRoot, "package.json"), JSON.stringify({ name: "@code-yeongyu/omo-senpi" }))
       await writeFile(join(pluginRoot, "extensions", "omo.js"), "export default {}\n")
+      await writeFile(join(pluginRoot, "extensions", "reflection-persona.md"), "# reflection persona fixture\n")
       await mkdir(join(pluginRoot, "scripts"), { recursive: true })
       await writeFile(join(pluginRoot, "scripts", "install.mjs"), "#!/usr/bin/env node\n")
       await mkdir(join(pluginRoot, "runtime", "lsp-daemon", "dist"), { recursive: true })
@@ -117,6 +119,13 @@ describe("Senpi compatibility test script", () => {
       await writeFile(join(pluginRoot, "runtime", "lsp-daemon", "dist", "daemon-client.d.ts"), "export {}\n")
       await writeFile(join(pluginRoot, "runtime", "lsp-daemon", "dist", "package.json"), JSON.stringify({ version: "0.1.0" }))
       await writeFile(join(pluginRoot, "runtime", "lsp-daemon", "dist", ".omo-runtime-manifest.json"), "{}\n")
+      await mkdir(join(pluginRoot, "runtime", "agent-toolkit", "ulw-loop"), { recursive: true })
+      await writeFile(join(pluginRoot, "runtime", "agent-toolkit", "cli.js"), "console.log('agent-toolkit')\n")
+      await writeFile(join(pluginRoot, "runtime", "agent-toolkit", "ulw-loop", "cli.js"), "console.log('ulw-loop')\n")
+      const toolkitShim = join(pluginRoot, "runtime", "agent-toolkit", "omo-agent-toolkit")
+      await writeFile(toolkitShim, "#!/bin/sh\nexec node \"$(dirname \"$0\")/cli.js\" \"$@\"\n")
+      await chmod(toolkitShim, 0o755)
+      await writeFile(join(pluginRoot, "runtime", "agent-toolkit", "omo-agent-toolkit.cmd"), "@echo off\r\nnode \"%~dp0cli.js\" %*\r\n")
       await mkdir(join(pluginRoot, "runtime", "ast-grep-mcp"), { recursive: true })
       const astGrepRuntime = join(pluginRoot, "runtime", "ast-grep-mcp", "cli.js")
       const astGrepRuntimeContent = "console.log('ast-grep mcp')\n"

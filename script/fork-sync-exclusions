@@ -20,6 +20,7 @@
 # --- Upstream ops/workflow machinery: never restored (see commit
 # --- c11449af8 "Delete upstream actions, workflows and operations nonsense").
 # --- The fork runs no GitHub-hosted jobs; CI lives on cloudhome.
+keep-deleted: README*.md
 keep-deleted: .github/FUNDING.yml
 keep-deleted: .github/scripts/*
 keep-deleted: .github/workflows/*

@@ -7,6 +7,7 @@ import { dirname, join, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
 import { promisify } from "node:util"
 
+import { installLocalLauncher, uninstallLocalLauncher } from "./local-launcher"
 import {
   dedupePackages,
   isRecord,
@@ -44,6 +45,7 @@ export interface SenpiInstallResult {
 
 const REQUIRED_PLUGIN_ARTIFACTS = [
   join("extensions", "omo.js"),
+  join("extensions", "reflection-persona.md"),
   join("skills", "ast-grep", "SKILL.md"),
   join("skills", "coding-agent-sessions", "SKILL.md"),
   join("skills", "debugging", "SKILL.md"),
@@ -63,6 +65,10 @@ const REQUIRED_PLUGIN_ARTIFACTS = [
   join("skills", "ulw-research", "SKILL.md"),
   join("skills", "visual-qa", "SKILL.md"),
   join("runtime", "ast-grep-mcp", "cli.js"),
+  join("runtime", "agent-toolkit", "cli.js"),
+  join("runtime", "agent-toolkit", "ulw-loop", "cli.js"),
+  join("runtime", "agent-toolkit", "omo-agent-toolkit"),
+  join("runtime", "agent-toolkit", "omo-agent-toolkit.cmd"),
   join("runtime", "lsp-daemon", "dist", "cli.js"),
   join("runtime", "lsp-daemon", "dist", "index.js"),
   join("runtime", "lsp-daemon", "dist", "index.d.ts"),
@@ -90,6 +96,12 @@ export async function runSenpiInstaller(options: SenpiInstallOptions = {}): Prom
   if (!packages.includes(context.pluginPath)) packages.push(context.pluginPath)
   settings.packages = packages
   const backupPath = await writeSettingsAtomically(context.settingsPath, settings)
+  // The local route runs the user's own engine checkout, so it needs the same launcher the
+  // published package ships; without it this install would boot unbranded.
+  installLocalLauncher({
+    pluginPath: context.pluginPath,
+    senpiCliPath: join(context.repoRoot, "packages", "coding-agent", "dist", "cli.js"),
+  })
 
   return {
     ok: true,
@@ -110,6 +122,7 @@ export async function runSenpiUninstaller(options: SenpiInstallOptions = {}): Pr
   const nextPackages = packages.filter((entry) => entry !== context.pluginPath)
   settings.packages = nextPackages
   const backupPath = await writeSettingsAtomically(context.settingsPath, settings)
+  uninstallLocalLauncher()
 
   return {
     ok: true,
@@ -158,6 +171,7 @@ async function ensurePluginArtifacts(context: ReturnType<typeof resolveInstallCo
     await context.runCommand("node", [join(context.pluginPath, "scripts", "build-install.mjs")], { cwd: context.repoRoot })
     await context.runCommand("node", [join(context.pluginPath, "scripts", "stage-lsp-daemon-runtime.mjs")], { cwd: context.repoRoot })
     await context.runCommand("node", [join(context.pluginPath, "scripts", "stage-ast-grep-mcp-runtime.mjs")], { cwd: context.repoRoot })
+    await context.runCommand("node", [join(context.pluginPath, "scripts", "stage-agent-toolkit.mjs")], { cwd: context.repoRoot })
   }
 
   if (await hasMissingPluginArtifact(context.pluginPath)) {
