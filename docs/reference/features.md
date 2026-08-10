@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported
+> - **Notes**: Feature matrix for agents, hooks, and tools.
+
 # Oh-My-OpenAgent Features Reference
 
 ## Agents

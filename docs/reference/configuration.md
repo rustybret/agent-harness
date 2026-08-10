@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported (Fork-Customized)
+> - **Notes**: Configuration schema reference. Walked project configs live in `.omo/` in this fork.
+
 # Configuration Reference
 
 Complete reference for Oh My OpenCode plugin configuration. Every omo harness reads one unified config file, `omo.jsonc`; the legacy `oh-my-openagent.json[c]` / `oh-my-opencode.json[c]` files are imported once by the migration engine and are no longer read at runtime.

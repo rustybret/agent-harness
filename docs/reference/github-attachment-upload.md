@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported
+> - **Notes**: GitHub PR image upload reference.
+
 # GitHub PR Attachment Uploads
 
 Use this reference when a PR or issue body needs screenshots or other short-lived evidence images without committing them, creating a release asset, or using an external image host.

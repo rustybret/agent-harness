@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported (Fork-Customized)
+> - **Notes**: Project-scope skills and commands registry.
+
 # .agents/ — Project-Scope Skills & Commands (Migration Target)
 
 **Generated:** 2026-05-20

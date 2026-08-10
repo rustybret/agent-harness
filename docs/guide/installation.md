@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported (Fork-Customized)
+> - **Notes**: Ultimate Edition (OpenCode) is fully supported and primary. Codex Light Edition (`lazycodex-ai`) is unmaintained in this fork and omitted from active workspace builds (see fork scope policy in `AGENTS.md`).
+
 # Installation
 
 oh-my-openagent ships in **two editions** of the same product:

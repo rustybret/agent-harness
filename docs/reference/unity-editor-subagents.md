@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Fork-Local (`rustybret/agent-harness`)
+> - **Support Status**: Supported (Fork-Specific)
+> - **Notes**: Specialized Unity editor subagents reference.
+
 # Unity Editor Subagents
 
 This document describes the restricted Unity subagents, their permission model, invocation patterns, model fallback chains, and synchronization workflows.

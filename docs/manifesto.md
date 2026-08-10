@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported
+> - **Notes**: Core philosophy and principles of oh-my-openagent.
+
 # Manifesto
 
 The principles and philosophy behind oh-my-openagent (OmO).

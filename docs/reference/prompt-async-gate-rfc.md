@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported
+> - **Notes**: ADR for prompt-async-gate reservation guard.
+
 # ADR: prompt-async-gate - reservation-based duplicate-injection guard
 
 ## Status

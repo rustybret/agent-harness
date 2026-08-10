@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported
+> - **Notes**: Re-export shim tracking for package extraction.
+
 # Re-export Shim Inventory
 
 This inventory tracks adapter shims that preserve old `packages/omo-opencode/src/` and `packages/omo-codex/src/` import paths while the implementation lives in extracted packages. These files should stay thin: a shim re-exports from `@oh-my-opencode/*` and should not regain local logic.

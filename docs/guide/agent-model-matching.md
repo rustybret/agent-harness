@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported
+> - **Notes**: Guidance on matching models to specialized agents (Sisyphus, Hephaestus, etc.).
+
 # Agent-Model Matching Guide
 
 > **For agents and users**: Why each agent needs a specific model — and how to customize without breaking things.

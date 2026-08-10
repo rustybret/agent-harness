@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported (Fork-Customized)
+> - **Notes**: Overview of the agent harness system. `agent-harness` runs this OpenCode plugin with fork-specific configurations and direct `fork/local` git workflows.
+
 # What Is Oh My OpenAgent?
 
 Oh My OpenAgent is a multi-model agent orchestration harness for OpenCode. It transforms a single AI agent into a coordinated development team that actually ships code.

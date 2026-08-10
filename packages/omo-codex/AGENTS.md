@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Unsupported / Upstream-Only
+> - **Notes**: Codex CLI Light Edition (`lazycodex`). Unmaintained in this fork per fork scope policy.
+
 # packages/omo-codex/ - Codex CLI Light Edition (lazycodex)
 
 **Generated:** 2026-07-17

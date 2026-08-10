@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Fork-Local (`rustybret/agent-harness`)
+> - **Support Status**: Supported (Fork-Specific)
+> - **Notes**: Architectural roadmap for fork customizations in agent-harness.
+
 # agent-harness Fork Customizations Roadmap
 
 ## Status: MIGRATION COMPLETE — fork/local branch active as default

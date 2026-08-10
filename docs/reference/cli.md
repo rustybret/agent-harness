@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported
+> - **Notes**: CLI subcommands reference for `oh-my-openagent` / `omo`.
+
 # CLI Reference
 
 Complete reference for the published CLI package. During the rename transition, both package names work:

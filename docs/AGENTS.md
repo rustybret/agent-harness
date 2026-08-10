@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported (Fork-Customized)
+> - **Notes**: Overview of user-facing documentation structure in `docs/`.
+
 # docs/ — User-Facing Documentation
 
 **Generated:** 2026-07-17 / 7d664b96b

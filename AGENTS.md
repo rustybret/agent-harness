@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Fork-Local (`rustybret/agent-harness`)
+> - **Support Status**: Supported (Fork-Specific)
+> - **Notes**: Master repository instructions and architecture invariants for agent-harness fork.
+
 # oh-my-opencode — OpenCode Plugin
 
 > **HOLD THE FUCK UP. THIS ENTIRE GODDAMN CODEBASE IS BEING RIPPED APART AND REBUILT RIGHT NOW. A MASSIVE MULTI-HARNESS AGENT OS REFACTOR IS IN PROGRESS — WE ARE RESTRUCTURING EVERYTHING TO SUPPORT MULTIPLE AGENT HARNESSES (OPENCODE, CODEX, PI, AND OTHERS). DO NOT TRUST THE STRUCTURE BELOW AS STABLE OR SO HELP ME GOD.**

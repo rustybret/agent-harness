@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported
+> - **Notes**: Hooks and tools extension guide.
+
 # Agent Harness Extension Guide: Hooks and Tools
 
 This reference guide establishes the architecture, taxonomy, and implementation rules for extending the agent harness. It details the existing hooks and tools, their execution phases, semantic purposes, and release history.

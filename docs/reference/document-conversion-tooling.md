@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported
+> - **Notes**: Research survey for open-source document conversion.
+
 # Document-to-Markdown Conversion Tooling
 
 Research survey of current (2026) open-source and self-hostable tools for converting

@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Fork-Local (`rustybret/agent-harness`)
+> - **Support Status**: Supported (Fork-Specific)
+> - **Notes**: Unity subagent benchmarking procedure.
+
 # Unity Subagent Benchmark Procedure
 
 This document defines the standard, reusable benchmark procedure for comparing the performance and reliability of the single-agent `unity-editor` (Option A) against domain-specific subagents (Option B).

@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported
+> - **Notes**: Maintenance guide for static model capabilities cache.
+
 # Model Capabilities Maintenance
 
 This project treats model capability resolution as a layered system:

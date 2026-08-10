@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported
+> - **Notes**: Shared core package multi-PR extraction plan.
+
 # Shared Core Multi-PR Extraction
 
 This plan pins the shared core extraction work for OpenCode and Codex adapters.

@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Fork-Local (`rustybret/agent-harness`)
+> - **Support Status**: Supported (Fork-Customized)
+> - **Notes**: Monorepo package directory layout and architectural layering overview.
+
 # packages/ - Monorepo Packages
 
 **Generated:** 2026-07-17 / 7d664b96b

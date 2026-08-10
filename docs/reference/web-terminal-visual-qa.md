@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported
+> - **Notes**: Web terminal visual QA procedure using headless xterm.js in Chrome.
+
 # Web Terminal Visual QA
 
 Use `script/qa/web-terminal-visual-qa.mjs` whenever QA needs TUI visual evidence. It runs the command in a real pty (node-pty), renders it through a **real xterm.js terminal in headless Chrome**, drives scripted interaction through that browser terminal, and screenshots it. The color path is xterm.js, so truecolor, 256-color, box-drawing, and CJK width are faithful. **NEVER use `tmux capture-pane` for color/visual/layout/CJK TUI evidence** - it degrades truecolor and misaligns wide glyphs. tmux stays useful only for boot smoke ("did it render, did it accept a key"), never for the pixel evidence a reviewer trusts.

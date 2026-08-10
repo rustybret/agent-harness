@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported
+> - **Notes**: Documentation for Team Mode parallel multi-agent coordination.
+
 # Team Mode
 
 Parallel multi-agent coordination for omo, modeled after Claude Code's experimental Agent Teams.

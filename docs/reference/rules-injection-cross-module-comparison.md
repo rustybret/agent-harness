@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported
+> - **Notes**: Rules injection cross-module comparison report.
+
 # Rules Injection Modules — Cross-Module Comparison Report
 
 Comparison and porting record for the three rule injection implementations

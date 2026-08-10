@@ -67,7 +67,7 @@
         },
         "magic-context-6deb493e": {
           "access": "allow",
-          "intent_budget": "question"
+          "intent_budget": "plan"
         },
         "opencode-gemini-ec2cac67": {
           "access": "allow",
@@ -88,6 +88,22 @@
         "adv-685d7bc1": {
           "access": "allow",
           "intent_budget": "impl"
+        },
+        "anthropic-auth-1369fa0e": {
+          "access": "allow",
+          "intent_budget": "plan"
+        },
+        "opencode-release-watch-4543544f": {
+          "access": "allow",
+          "intent_budget": "plan"
+        },
+        "opencode-interceptor-d1f55155": {
+          "access": "allow",
+          "intent_budget": "plan"
+        },
+        "uc-studio-8ce41322": {
+          "access": "allow",
+          "intent_budget": "plan"
         }
       }
     },

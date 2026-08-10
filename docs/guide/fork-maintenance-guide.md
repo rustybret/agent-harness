@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Fork-Local (`rustybret/agent-harness`)
+> - **Support Status**: Supported (Fork-Specific)
+> - **Notes**: Mandatory fork maintenance procedure (merge-only sync via `script/fork-sync.sh`, no rebase/force-push).
+
 # Fork Maintenance Guide: Fast-Forward-or-Merge Model
 
 > This fork (rustybret/agent-harness) maintains upstream (code-yeongyu/oh-my-openagent)

@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported (Fork-Customized)
+> - **Notes**: OpenCode plugin source tree overview.
+
 # src/ - Plugin Source
 
 **Generated:** 2026-08-07 / 51ab1e5b6

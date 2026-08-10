@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Supported (Fork-Customized)
+> - **Notes**: Cross-project messaging system. Uses `.omo/` workspace paths in this fork.
+
 # Cross-Project Mailbox Runbook & Configuration Reference
 
 The Cross-Project Mailbox is an OmO feature that enables independent OpenCode repositories and agent sessions to coordinate asynchronously. It utilizes a file-based, atomic message-passing protocol to deliver structured notes across boundaries, gated by customizable trust policies and loop-prevention guards.

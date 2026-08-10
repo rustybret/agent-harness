@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Fork-Local (`rustybret/agent-harness`)
+> - **Support Status**: Supported (Fork-Specific)
+> - **Notes**: Workflow guide for integrating and syncing upstream changes.
+
 # Integration workflow
 
 Trigger an upstream sync (fetch latest upstream/dev → rebase fork/local)

@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Fork-Local (`rustybret/agent-harness`)
+> - **Support Status**: Supported (Fork-Specific)
+> - **Notes**: Classification inventory of upstream metadata and documentation for private fork maintenance.
+
 # Upstream Document & Metadata Inventory for Private Forks
 
 This document inventories the metadata, configuration files, workflows, and guidance documentation originally sourced from the upstream repository. It classifies their relevance and actions required when adapting the codebase for a private, fork-based development model.

@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Unsupported / Upstream-Only
+> - **Notes**: Upstream release process. Unmaintained in this fork (uses `script/fork-sync.sh` and direct commit to `fork/local`).
+
 # Release Process
 
 This reference records release gates that are not covered by CI alone.

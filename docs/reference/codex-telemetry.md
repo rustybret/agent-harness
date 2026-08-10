@@ -1,3 +1,8 @@
+> **DOCUMENTATION METADATA**
+> - **Origin**: Upstream (`code-yeongyu/oh-my-openagent`)
+> - **Support Status**: Unsupported / Upstream-Only
+> - **Notes**: Telemetry for Codex Light edition (`lazycodex`). Unmaintained in this fork per fork scope policy.
+
 # Codex Light Telemetry
 
 Codex Light, installed through `lazycodex-ai`, sends anonymous daily-active telemetry for the Codex adapter only. The public package alias is `lazycodex-ai`; the Codex marketplace identity remains `sisyphuslabs` / `omo`.
