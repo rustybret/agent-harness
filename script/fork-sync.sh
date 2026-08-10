@@ -11,6 +11,7 @@
 #   4. auto-resolve the fork's standing conflict classes from
 #      script/fork-sync-exclusions:
 #        - keep-deleted  -> upstream modifications/restorations are removed
+#        - keep-ours     -> fork-preferred generated artifacts keep our version
 #        - take-theirs   -> regenerable bundles take upstream's version
 #      and sweep any NEW upstream files that match keep-deleted globs out of
 #      the merge result
@@ -53,6 +54,7 @@ fi
 
 # --- parse the exclusion manifest ---------------------------------------------
 KEEP_DELETED=()
+KEEP_OURS=()
 TAKE_THEIRS=()
 while IFS= read -r line || [[ -n "$line" ]]; do
   line="${line%%#*}"                          # strip comments
@@ -60,6 +62,7 @@ while IFS= read -r line || [[ -n "$line" ]]; do
   [[ -z "$line" ]] && continue
   case "$line" in
     keep-deleted:*) KEEP_DELETED+=("${line#keep-deleted:}") ;;
+    keep-ours:*)    KEEP_OURS+=("${line#keep-ours:}") ;;
     take-theirs:*)  TAKE_THEIRS+=("${line#take-theirs:}") ;;
     *) echo "warning: unrecognized manifest line: $line" >&2 ;;
   esac
@@ -68,6 +71,14 @@ done < "$EXCLUSIONS"
 matches_keep_deleted() {
   local p="$1" g
   for g in "${KEEP_DELETED[@]}"; do
+    g="${g#"${g%%[![:space:]]*}"}"
+    [[ "$p" == $g ]] && return 0
+  done
+  return 1
+}
+matches_keep_ours() {
+  local p="$1" g
+  for g in "${KEEP_OURS[@]}"; do
     g="${g#"${g%%[![:space:]]*}"}"
     [[ "$p" == $g ]] && return 0
   done
@@ -117,6 +128,9 @@ else
           git rm -f --quiet "$f"
           echo "  removed (keep-deleted): $f"
         fi
+      elif matches_keep_ours "$f"; then
+        git checkout --ours --quiet -- "$f"
+        echo "  kept ours (fork-preferred generated bundle): $f"
       elif matches_take_theirs "$f"; then
         # checkout --theirs on an unmerged path stages the result itself
         git checkout --theirs --quiet -- "$f"

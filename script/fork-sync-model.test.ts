@@ -28,16 +28,18 @@ const FORBIDDEN_TOKENS: Array<{ token: RegExp; why: string }> = [
 
 // Parses the exclusion manifest exactly the way script/fork-sync.sh does:
 // strip `#` comments, trim, dispatch on the directive prefix.
-function parseManifest(text: string): { keepDeleted: string[]; takeTheirs: string[] } {
+function parseManifest(text: string): { keepDeleted: string[]; keepOurs: string[]; takeTheirs: string[] } {
   const keepDeleted: string[] = []
+  const keepOurs: string[] = []
   const takeTheirs: string[] = []
   for (const rawLine of text.split("\n")) {
     const line = rawLine.split("#")[0]!.trim()
     if (line === "") continue
     if (line.startsWith("keep-deleted:")) keepDeleted.push(line.slice("keep-deleted:".length).trim())
+    else if (line.startsWith("keep-ours:")) keepOurs.push(line.slice("keep-ours:".length).trim())
     else if (line.startsWith("take-theirs:")) takeTheirs.push(line.slice("take-theirs:".length).trim())
   }
-  return { keepDeleted, takeTheirs }
+  return { keepDeleted, keepOurs, takeTheirs }
 }
 
 // Returns only the code-fence segments of a markdown runbook (the executable
@@ -77,6 +79,7 @@ describe("#given the fork sync model", () => {
     expect(script).toContain("merge --ff-only")
     expect(script).toContain("fork/local")
     expect(script).toContain("fork-sync-exclusions")
+    expect(script).toContain("checkout --ours")
     expect(script).toContain("checkout --theirs")
   })
 
@@ -121,7 +124,7 @@ describe("#given the fork sync model", () => {
   test("exclusion manifest parses and covers every standing fork-exclusion path", () => {
     // given the manifest parsed with the same logic the sync script uses
     expect(existsSync(EXCLUSIONS)).toBe(true)
-    const { keepDeleted, takeTheirs } = parseManifest(readFileSync(EXCLUSIONS, "utf8"))
+    const { keepDeleted, keepOurs } = parseManifest(readFileSync(EXCLUSIONS, "utf8"))
     // then every standing deleted-by-us path from the 2026-08-07 sync must be
     // covered by a keep-deleted glob (missing glob = the next sync re-conflicts)
     for (const glob of [
@@ -138,12 +141,13 @@ describe("#given the fork sync model", () => {
     ]) {
       expect(keepDeleted, `missing keep-deleted glob: ${glob}`).toContain(glob)
     }
-    // and both regenerable senpi bundles must be take-theirs
+    // and regenerable extension & installer bundles must be keep-ours
     for (const glob of [
       "packages/omo-senpi/plugin/extensions/omo.js",
       "packages/omo-senpi/plugin/extensions/omo-member.js",
+      "packages/omo-codex/scripts/install-dist/install-local.mjs",
     ]) {
-      expect(takeTheirs, `missing take-theirs glob: ${glob}`).toContain(glob)
+      expect(keepOurs, `missing keep-ours glob: ${glob}`).toContain(glob)
     }
   })
 })

@@ -8,6 +8,9 @@
 #                          merge introduces (including brand-new upstream
 #                          files) is removed from the merge result.
 #
+#   keep-ours: <glob>      Fork-preferred generated artifacts. A both-modified
+#                          conflict on these is resolved to our version.
+#
 #   take-theirs: <glob>    Regenerable artifacts the fork does not maintain.
 #                          A both-modified conflict on these is resolved to
 #                          upstream's version (rebuild locally if the fork
@@ -37,7 +40,8 @@ keep-deleted: .opencode/skills/work-with-pr-workspace/*
 # --- Web package: excluded from the fork entirely (see AGENTS.md fork scope).
 keep-deleted: packages/web/*
 
-# --- Regenerable senpi extension bundles (built from packages/omo-senpi
-# --- sources, which the fork does not customize).
-take-theirs: packages/omo-senpi/plugin/extensions/omo.js
-take-theirs: packages/omo-senpi/plugin/extensions/omo-member.js
+# --- Regenerable generated extension & installer bundles (the fork prefers
+# --- our local build over upstream bundled outputs).
+keep-ours: packages/omo-senpi/plugin/extensions/omo.js
+keep-ours: packages/omo-senpi/plugin/extensions/omo-member.js
+keep-ours: packages/omo-codex/scripts/install-dist/install-local.mjs
