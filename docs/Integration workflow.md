@@ -31,4 +31,4 @@ script/fork-sync.sh
 - **NEVER force-push `origin/fork/local`**.
 - **NO GitHub Actions sync jobs** (`sync-upstream.yml` was permanently removed; syncs run via `script/fork-sync.sh`).
 
-For detailed architecture and conflict resolution rules, see [`docs/guide/fork-maintenance-guide.md`](docs/guide/fork-maintenance-guide.md).
+For detailed architecture and conflict resolution rules, see [Fork Maintenance Guide](./guide/fork-maintenance-guide.md).
