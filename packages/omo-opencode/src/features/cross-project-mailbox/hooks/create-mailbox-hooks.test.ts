@@ -238,7 +238,11 @@ describe("buildClassifyNote", () => {
       status: "completed" as const,
       sessionId: "child-session-id",
     }
-    const launch = async () => mockTask
+    let launchOptions: any
+    const launch = async (opts: any) => {
+      launchOptions = opts
+      return mockTask
+    }
     const getTask = () => mockTask
     const backgroundManager = {
       launch,
@@ -292,6 +296,7 @@ describe("buildClassifyNote", () => {
     const result = await classifyNote!(note, deps)
 
     // then
+    expect(launchOptions?.agent).toBe("Sisyphus-Junior")
     expect(result).toEqual({
       lane: "subagent",
       effectiveMode: "subagent",

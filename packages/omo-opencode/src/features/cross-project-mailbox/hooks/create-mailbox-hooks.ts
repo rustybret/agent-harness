@@ -1,5 +1,6 @@
 import path from "node:path"
 
+import { getAgentDisplayName } from "../../../shared/agent-display-names"
 import { log } from "../../../shared/logger"
 
 import { validatePluginConfig } from "../../../config/validate"
@@ -142,7 +143,7 @@ export function buildClassifyNote(
     const task = await backgroundManager.launch({
       description: "mailbox classification",
       prompt,
-      agent: "sisyphus-junior",
+      agent: getAgentDisplayName("sisyphus-junior"),
       category: CLASSIFIER_CATEGORY,
       parentSessionId,
       parentMessageId: "",
