@@ -13,6 +13,7 @@ export const MAILBOX_TRACE_PHASES = [
   "lane-end",
   "acked",
   "rolled-back",
+  "quarantined",
 ] as const
 
 export type MailboxTracePhase = (typeof MAILBOX_TRACE_PHASES)[number]

@@ -7,6 +7,7 @@ import { parseEnvelope, serializeEnvelope } from "../envelope/schema"
 import type { MailboxMessage } from "../envelope/schema"
 import { assertPathWithinRoot, safeMessageIdFilename } from "../envelope/path-guard"
 import { PendingDeliveryStore } from "./pending-delivery-store"
+import { DeliveryAttemptsStore } from "./delivery-attempts-store"
 import type { MailboxDir, PendingEntry, QuarantineReason, UnreadMessage } from "./types"
 
 const RESERVED_PREFIX = ".delivering-"
@@ -22,6 +23,7 @@ function isUnreadNoteFile(entry: Dirent): boolean {
 
 export class MailboxStore {
   private readonly pendingStore: PendingDeliveryStore
+  private readonly attemptsStore: DeliveryAttemptsStore
 
   constructor(
     private readonly targetRepoRoot: string,
@@ -29,6 +31,19 @@ export class MailboxStore {
     private readonly config: { reservation_ttl_ms: number },
   ) {
     this.pendingStore = new PendingDeliveryStore(this.targetRepoRoot)
+    this.attemptsStore = new DeliveryAttemptsStore(this.targetRepoRoot)
+  }
+
+  async getAttempts(messageId: string): Promise<number> {
+    return this.attemptsStore.getAttempts(messageId)
+  }
+
+  async incrementAttempts(messageId: string): Promise<number> {
+    return this.attemptsStore.incrementAttempts(messageId)
+  }
+
+  async clearAttempts(messageId: string): Promise<void> {
+    await this.attemptsStore.clearAttempts(messageId)
   }
 
   async markDispatched(entry: Omit<PendingEntry, "state">): Promise<void> {
@@ -127,6 +142,7 @@ export class MailboxStore {
       this.guard(sourcePath)
       try {
         await rename(sourcePath, targetPath)
+        await this.attemptsStore.clearAttempts(messageId)
         return
       } catch (error) {
         if (isMissingPathError(error)) continue
@@ -155,6 +171,7 @@ export class MailboxStore {
         throw error
       }
     }
+    await this.attemptsStore.clearAttempts(messageId)
     const reasonPath = path.join(rejected, `${messageId}.reason.json`)
     this.guard(reasonPath)
     await writeFile(reasonPath, `${JSON.stringify({ reason, detail, at: new Date().toISOString() }, null, 2)}\n`)

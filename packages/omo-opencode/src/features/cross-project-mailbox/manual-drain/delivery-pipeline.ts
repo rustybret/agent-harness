@@ -12,6 +12,9 @@ export interface MailboxStorePort {
   unreserve(messageId: string): Promise<void>
   quarantine(messageId: string, reason: QuarantineReason, detail?: string): Promise<void>
   markDispatched(entry: Omit<PendingEntry, "state">): Promise<void>
+  getAttempts?(messageId: string): Promise<number>
+  incrementAttempts?(messageId: string): Promise<number>
+  clearAttempts?(messageId: string): Promise<void>
 }
 
 export interface DigestStorePort {

@@ -52,6 +52,11 @@ const CrossProjectMailboxBoundsSchema = z
       .int()
       .default(120000)
       .describe("Milliseconds a delivery reservation is held before it expires"),
+    max_delivery_attempts: z
+      .number()
+      .int()
+      .default(3)
+      .describe("Maximum delivery attempts for a note before it is quarantined as max-retries-exceeded"),
   })
   .describe("Safety bounds that throttle and cap cross-project delivery")
 

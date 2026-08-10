@@ -41,3 +41,4 @@ export type QuarantineReason =
   | "hop-exceeded"
   | "malformed"
   | "duplicate-loop"
+  | "max-retries-exceeded"

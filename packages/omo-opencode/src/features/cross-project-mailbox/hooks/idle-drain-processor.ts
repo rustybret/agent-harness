@@ -13,6 +13,7 @@ import type { buildTriagePrompt } from "../triage/template"
 import type { validateInbound } from "../validation/validate-inbound"
 import type { RouteContext, RouteDecision } from "../router"
 import {
+  digestNoteFor,
   reserveValidatedDelivery,
   rollbackReservedDelivery,
   type DigestStorePort,
@@ -74,6 +75,7 @@ function buildDispatchArgs(
 
 async function dispatchLegacyTriage(input: {
   readonly deps: IdleDrainProcessorDeps
+  readonly config: CrossProjectMailboxConfig
   readonly sessionId: string
   readonly note: UnreadMessage
   readonly reservedPath: string
@@ -94,6 +96,30 @@ async function dispatchLegacyTriage(input: {
     queueBehavior: "defer",
   })
   if (!isInternalPromptDispatchAccepted(dispatchResult)) {
+    const attempts = (await input.store.incrementAttempts?.(input.note.messageId)) ?? 1
+    const maxAttempts = input.config.bounds.max_delivery_attempts ?? 3
+    if (attempts >= maxAttempts) {
+      log("[mailbox-idle-drain] dispatch rejection exceeded max attempts; quarantining note", {
+        messageId: input.note.messageId,
+        attempts,
+        maxAttempts,
+      })
+      await input.store.quarantine(
+        input.note.messageId,
+        "max-retries-exceeded",
+        `Dispatch rejected ${attempts} times`,
+      )
+      await input.digestStore.rollback(digestNoteFor(input.note)).catch(() => {})
+      input.deps.emitTrace?.({
+        phase: "quarantined",
+        ...traceIdentity(input.note),
+        ...(input.metadata ?? {}),
+        detail: "max-retries-exceeded",
+        at: Date.now(),
+      })
+      return false
+    }
+
     await rollbackReservedDelivery({
       store: input.store,
       digestStore: input.digestStore,
@@ -110,6 +136,8 @@ async function dispatchLegacyTriage(input: {
     return false
   }
 
+  await input.store.clearAttempts?.(input.note.messageId)
+
   await input.store.markDispatched({
     messageId: input.note.messageId,
     sessionId: input.sessionId,
@@ -122,6 +150,7 @@ async function dispatchLegacyTriage(input: {
 
 async function handleLaneException(input: {
   readonly error: unknown
+  readonly config: CrossProjectMailboxConfig
   readonly store: MailboxStorePort
   readonly digestStore: DigestStorePort
   readonly note: UnreadMessage
@@ -135,6 +164,24 @@ async function handleLaneException(input: {
     messageId: input.note.messageId,
   })
   input.fallbackIds.add(input.note.messageId)
+  const attempts = (await input.store.incrementAttempts?.(input.note.messageId)) ?? 1
+  const maxAttempts = input.config.bounds.max_delivery_attempts ?? 3
+  if (attempts >= maxAttempts) {
+    await input.store.quarantine(
+      input.note.messageId,
+      "max-retries-exceeded",
+      `Routed lane exception after ${attempts} attempts`,
+    )
+    await input.digestStore.rollback(digestNoteFor(input.note)).catch(() => {})
+    input.emitTrace?.({
+      phase: "quarantined",
+      ...traceIdentity(input.note),
+      lane: input.lane,
+      detail: "max-retries-exceeded",
+      at: Date.now(),
+    })
+    return
+  }
   await rollbackReservedDelivery({
     store: input.store,
     digestStore: input.digestStore,
@@ -176,6 +223,7 @@ async function finalizeHandledLane(input: {
 async function completeRouteExecution(input: {
   readonly result: RouteExecutionResult
   readonly deps: IdleDrainProcessorDeps
+  readonly config: CrossProjectMailboxConfig
   readonly sessionId: string
   readonly note: UnreadMessage
   readonly reservedPath: string
@@ -186,6 +234,7 @@ async function completeRouteExecution(input: {
 }): Promise<boolean> {
   switch (input.result.status) {
     case "handled":
+      await input.store.clearAttempts?.(input.note.messageId)
       await finalizeHandledLane({ ...input, emitTrace: input.deps.emitTrace })
       return true
     case "fallback-triage":
@@ -196,6 +245,7 @@ async function completeRouteExecution(input: {
       })
       return dispatchLegacyTriage({
         deps: input.deps,
+        config: input.config,
         sessionId: input.sessionId,
         note: input.note,
         reservedPath: input.reservedPath,
@@ -203,8 +253,26 @@ async function completeRouteExecution(input: {
         digestStore: input.digestStore,
         metadata: routeMetadata(input.note, input.decision),
       })
-    case "fallback-next-drain":
+    case "fallback-next-drain": {
       input.fallbackIds.add(input.note.messageId)
+      const attempts = (await input.store.incrementAttempts?.(input.note.messageId)) ?? 1
+      const maxAttempts = input.config.bounds.max_delivery_attempts ?? 3
+      if (attempts >= maxAttempts) {
+        await input.store.quarantine(
+          input.note.messageId,
+          "max-retries-exceeded",
+          `Lane deferred to next drain ${attempts} times`,
+        )
+        await input.digestStore.rollback(digestNoteFor(input.note)).catch(() => {})
+        input.deps.emitTrace?.({
+          phase: "quarantined",
+          ...traceIdentity(input.note),
+          ...routeMetadata(input.note, input.decision),
+          detail: "max-retries-exceeded",
+          at: Date.now(),
+        })
+        return false
+      }
       await rollbackReservedDelivery({
         store: input.store,
         digestStore: input.digestStore,
@@ -219,6 +287,7 @@ async function completeRouteExecution(input: {
         at: Date.now(),
       })
       return false
+    }
   }
 }
 
@@ -265,6 +334,7 @@ export async function processNote(input: {
   } catch (error) {
     await handleLaneException({
       error,
+      config: input.config,
       store: input.store,
       digestStore: input.digestStore,
       note: input.note,

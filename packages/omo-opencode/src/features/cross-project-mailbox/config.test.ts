@@ -42,6 +42,7 @@ describe("CrossProjectMailboxConfigSchema", () => {
           body_digest_ttl_min: 60,
           max_body_bytes: 32768,
           reservation_ttl_ms: 120000,
+          max_delivery_attempts: 3,
         })
       })
     })

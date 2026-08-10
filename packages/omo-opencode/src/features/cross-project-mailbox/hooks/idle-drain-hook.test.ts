@@ -705,6 +705,26 @@ describe("createIdleDrainHook", () => {
       expect(spies.unreserve).toHaveBeenCalledWith("11111111-1111-1111-1111-111111111111")
       expect(spies.markDispatched).not.toHaveBeenCalled()
     })
+
+    it("#then quarantines note with max-retries-exceeded when attempt count reaches max_delivery_attempts", async () => {
+      // given
+      let attemptCount = 0
+      const { deps, spies } = makeHarness({ primary: "sisyphus" })
+      spies.dispatchInternalPrompt.mockResolvedValue({ status: "reserved" })
+      const store = deps.makeMailboxStore("/repos/beta", "alpha-id")
+      store.incrementAttempts = jest.fn(async () => ++attemptCount)
+      const hook = createIdleDrainHook(deps)
+
+      // when 3 rejected attempts occur
+      await hook["session.idle"]({ sessionId: "ses_1" })
+      await hook["session.idle"]({ sessionId: "ses_1" })
+      await hook["session.idle"]({ sessionId: "ses_1" })
+
+      // then on the 3rd attempt, quarantine is called with max-retries-exceeded
+      expect(spies.quarantine).toHaveBeenCalledTimes(1)
+      expect(spies.quarantine.mock.calls[0][0]).toBe("11111111-1111-1111-1111-111111111111")
+      expect(spies.quarantine.mock.calls[0][1]).toBe("max-retries-exceeded")
+    })
   })
 
   describe("#given requested_mode answer with live presence", () => {
