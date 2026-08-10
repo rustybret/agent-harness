@@ -1,71 +1,34 @@
 > **DOCUMENTATION METADATA**
 > - **Origin**: Fork-Local (`rustybret/agent-harness`)
 > - **Support Status**: Supported (Fork-Specific)
-> - **Notes**: Workflow guide for integrating and syncing upstream changes.
+> - **Notes**: Canonical upstream synchronization procedure (`script/fork-sync.sh`).
 
-# Integration workflow
+# Fork Integration & Upstream Sync Workflow
 
-Trigger an upstream sync (fetch latest upstream/dev → rebase fork/local)
+`fork/local` is the internal Git working branch for the `rustybret/agent-harness` repository. It is **NOT** a published npm package or public release branch — upstream releases are published from `code-yeongyu/oh-my-openagent`, while this repository is consumed directly via Git commit pins (e.g. `github:rustybret/agent-harness#<commit-sha>`).
 
-## One-liner from inside ~/Git/agent-harness:
+## Canonical Sync Command
 
-```bash
-gh workflow run sync-upstream.yml -f upstream_branch=dev
-```
-
-Watch it: 
-```bash
-gh run watch or gh run list --workflow=sync-upstream.yml --limit=3
-```
-
-## What it does:
-
-1. Fast-forwards origin/dev to upstream/dev
-2. Rebases fork/local onto the new dev
-3. Force-pushes origin/fork/local
-
-If upstream touched .github/workflows/*.yml — the push is blocked by GitHub (GITHUB_TOKEN limitation). It logs a warning and exits clean. You then push manually:
+Syncing upstream (`code-yeongyu/oh-my-openagent`) into `fork/local` is performed locally or via cluster CI using **a single command**:
 
 ```bash
-git fetch upstream && git push origin upstream/dev:dev
+script/fork-sync.sh
 ```
 
-```bash
-git rebase dev && git push origin fork/local --force-with-lease
-```
+## What `script/fork-sync.sh` Does:
 
-## Trigger a local build (on your Mac Studio self-hosted runner)
+1. **Fetches** `upstream` (`code-yeongyu/oh-my-openagent`) and `origin` (`rustybret/agent-harness`).
+2. **Fast-forwards** `dev` mirror to `upstream/dev`.
+3. **Merges** `dev` into `fork/local` (fast-forward if clean, otherwise a real merge commit).
+4. **Auto-resolves** standing conflict classes defined in `script/fork-sync-exclusions`:
+   - `keep-deleted:` removes unneeded upstream files (e.g. `.github/workflows/*`, `packages/web/*`, `README*.md`).
+   - `keep-ours:` retains fork-preferred generated bundles.
+5. **Commits** (`--no-verify`) and **pushes** `fork/local` to `origin`.
 
-```bash
-gh repo dispatch local-build
-```
+## Strict Fork Invariants
 
-This fires local-build.yml via repository_dispatch — requires the self-hosted runner to be active on your Mac Studio. Start it if it's not running:
+- **NEVER rebase `fork/local`** (rewriting published Git history is strictly forbidden).
+- **NEVER force-push `origin/fork/local`**.
+- **NO GitHub Actions sync jobs** (`sync-upstream.yml` was permanently removed; syncs run via `script/fork-sync.sh`).
 
-# In ~/Git/agent-harness, one-time setup:
-
-- Settings → Actions → Runners → Add self-hosted runner, follow the token flow
-- Then on Mac Studio:
-
-```bash
-~/actions-runner/run.sh
-```
-
-- Do both in sequence
-
-```bash
-gh workflow run sync-upstream.yml -f upstream_branch=dev && sleep 5 && gh run watch
-```
-
-### After sync completes:
-
-```bash
-gh repo dispatch local-build
-```
-
-### Weekly automatic sync
-
-Runs every Monday at 10:00 UTC — no manual trigger needed. Check the last run:
-```bash
-gh run list --workflow=sync-upstream.yml --limit=5
-```
+For detailed architecture and conflict resolution rules, see [`docs/guide/fork-maintenance-guide.md`](docs/guide/fork-maintenance-guide.md).

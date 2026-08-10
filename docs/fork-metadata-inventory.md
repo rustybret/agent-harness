@@ -34,7 +34,7 @@ This document inventories the metadata, configuration files, workflows, and guid
 
 | File Path | Description | Relevance for Private Adaptation |
 | :--- | :--- | :--- |
-| **`sync-upstream.yml`** | Automatically merges upstream pristine branches into `fork/local`. | **Critical (Fork-Specific)**: Custom-tailored to run rebase-free merges (`git merge`) instead of destructive rebases, handling conflicts via a dedicated branch. |
+| **`sync-upstream.yml`** | Formerly ran automated syncs via GitHub Actions. | **Obsolete**: Deleted. The fork runs no GitHub Actions workflow jobs (`.github/workflows/*` are excluded); syncs are executed locally or in cluster CI via `script/fork-sync.sh`. |
 | **`ci.yml`** | Standard CI pipeline checking builds, types, and running tests. | **Relevant**: Streamlined to run tests on `fork/local` pushes while omitting upstream Codex compatibility checks and published package smoke tests. |
 | **`publish.yml`** | Workflow triggering NPM publishing and binary uploads. | **Low Relevance**: Gated to upstream's release channels. Private forks bypass NPM publishing, compiling binaries locally if needed. |
 | **`publish-platform.yml`** | Helper for cross-compiling platform-specific binaries. | **Low Relevance**: Upstream release automation. |
