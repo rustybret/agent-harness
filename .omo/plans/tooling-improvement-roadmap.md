@@ -79,7 +79,7 @@ the remainder and pick again. Items are only added here when a real session prod
   when the session's primary agent is absent from `intake_eligible_agents`.
 - **Impact:** looks identical to "no mail" from the receiving side, so nobody investigates.
 
-### 9. `senders` is undocumented as a dual-purpose (inbound + outbound) field
+### 9. `senders` is undocumented as a dual-purpose (inbound + outbound) field — DONE
 
 - **Source:** cloudhome `0fe070df-a47c-444d-8160-afb49a3c656b` — send to salvage returned
   `{"blocked":true,"reason":"unauthorized"}` despite salvage's own config granting cloudhome inbound
@@ -94,14 +94,14 @@ the remainder and pick again. Items are only added here when a real session prod
   nothing about whether cloudhome is willing to *send* to salvage. cloudhome needed its own
   `senders.salvage-4104bb5b = { access: "allow", ... }` entry, which its config never had.
 - **Secondary gap:** `mode="list"` (`readOutboundBudget` → `allowedSenderIds`,
-  `visibility/outbound-budget.ts:31-36`) only enumerates targets with an explicit `senders` entry —
-  it never falls back to `default_sender_access: "allow-all"`, so an unlisted-but-implicitly-allowed
-  target is invisible in the advisory table even though a send to it would succeed.
-- **Fix:** (a) rewrite `docs/reference/cross-project-mailbox.md` "Step 2" to state explicitly that the
+  `visibility/outbound-budget.ts:31-36`) only enumerated targets with an explicit `senders` entry —
+  it never fell back to `default_sender_access: "allow-all"`, so an unlisted-but-implicitly-allowed
+  target was invisible in the advisory table even though a send to it would succeed.
+- **Fix:** (a) rewritten `docs/reference/cross-project-mailbox.md` "Step 2" to state explicitly that the
   `senders` block on your own config is also your outbound contact list, not just an inbound
-  allowlist; (b) consider having `allowedSenderIds`/`readOutboundBudget` include
-  `default_sender_access: "allow-all"` implicit targets (bounded by registered projects) so `mode=list`
-  matches what `runSendPreflight` will actually allow.
+  allowlist; (b) updated `readOutboundBudget` (`visibility/outbound-budget.ts`) to include
+  `default_sender_access: "allow-all"` implicit targets from registered projects with `"question"` ceiling,
+  matching what `runSendPreflight` allows.
 
 ### 10. Review salvage's Prometheus plan for Unity subagents & iterate planning guidance
 
@@ -177,6 +177,7 @@ the remainder and pick again. Items are only added here when a real session prod
 
 - **P0-1** sidebar `isNoteFile()` stale-doc counting — envelope-validated count now matches the
   delivery path's definition of a note.
+- **P1-9** `senders` dual-purpose doc & implicit target alignment — documented `senders` block dual-purpose usage in `docs/reference/cross-project-mailbox.md`, and updated `readOutboundBudget` to include implicitly allowed registered projects when `default_sender_access` is `"allow-all"`.
 - **P1-10** Restricted Unity subagents (Option A & Option B) — Landed restricted subagent execution options (Option A router, six Option B specialists) with strict permission maps, fast model fallback chains, and a gated live A/B benchmark procedure. Linked plan: `.omo/plans/unity-supermcp-subagents.md`, evidence: `.omo/evidence/20260804-unity-subagents/`.
 - **P0-2** migrated `agents.*.models` silently dropped — canonical chain now unpacked before
   validation; preprocessed schemas no longer blind the unknown-key diagnostics.

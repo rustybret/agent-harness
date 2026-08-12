@@ -28,12 +28,6 @@ export interface ReadOutboundBudgetDeps {
   maxTargets?: number
 }
 
-function allowedSenderIds(config: CrossProjectMailboxConfig): string[] {
-  const senders = config.senders ?? {}
-  return Object.entries(senders)
-    .filter(([, sender]) => sender.access === "allow")
-    .map(([projectId]) => projectId)
-}
 
 async function resolvePresence(
   projectId: string,
@@ -52,25 +46,45 @@ export async function readOutboundBudget(
   deps: ReadOutboundBudgetDeps,
 ): Promise<OutboundBudgetRow[]> {
   const maxTargets = deps.maxTargets ?? OUTBOUND_BUDGET_MAX_TARGETS
-  const senderIds = allowedSenderIds(config).slice(0, maxTargets)
-  if (senderIds.length === 0) return []
-
   const projects = await registry.listProjects()
   const displayNameById = new Map(projects.map((entry) => [entry.projectId, entry.displayName]))
 
-  // Presence resolution is a per-target network probe with its own timeout, so these MUST run
-  // concurrently: serially, one unresponsive target delays every target behind it, and the cost is
-  // the SUM of the timeouts rather than the worst single one. This runs on the chat turn path.
-  const targets = senderIds.flatMap((projectId) => {
-    const sender = config.senders?.[projectId]
-    return sender === undefined ? [] : [{ projectId, sender }]
-  })
+  const senders = config.senders ?? {}
+  const targetMap = new Map<string, { projectId: string; displayName: string; grantedCeiling: string }>()
+
+  for (const [projectId, sender] of Object.entries(senders)) {
+    if (sender.access === "allow") {
+      targetMap.set(projectId, {
+        projectId,
+        displayName: displayNameById.get(projectId) ?? projectId,
+        grantedCeiling: sender.intent_budget,
+      })
+    }
+  }
+
+  if (config.default_sender_access === "allow-all") {
+    for (const entry of projects) {
+      if (targetMap.size >= maxTargets) break
+      const existingSender = senders[entry.projectId]
+      if (existingSender === undefined && !targetMap.has(entry.projectId)) {
+        targetMap.set(entry.projectId, {
+          projectId: entry.projectId,
+          displayName: entry.displayName,
+          grantedCeiling: "question",
+        })
+      }
+    }
+  }
+
+  const targets = Array.from(targetMap.values()).slice(0, maxTargets)
+  if (targets.length === 0) return []
+
   return await Promise.all(
-    targets.map(async ({ projectId, sender }) => ({
-      targetProjectId: projectId,
-      displayName: displayNameById.get(projectId) ?? projectId,
-      grantedCeiling: sender.intent_budget,
-      presence: await resolvePresence(projectId, deps.readPresence),
+    targets.map(async (target) => ({
+      targetProjectId: target.projectId,
+      displayName: target.displayName,
+      grantedCeiling: target.grantedCeiling,
+      presence: await resolvePresence(target.projectId, deps.readPresence),
     })),
   )
 }

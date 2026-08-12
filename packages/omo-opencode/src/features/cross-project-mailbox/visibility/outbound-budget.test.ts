@@ -112,6 +112,33 @@ describe("readOutboundBudget", () => {
     expect(z?.presence).toBe("offline")
   })
 
+  it("includes implicitly allowed registered targets with question ceiling when default_sender_access is allow-all", async () => {
+    // given
+    const config = cfg({
+      default_sender_access: "allow-all",
+      senders: {
+        "proj-b": { access: "allow", intent_budget: "plan" },
+        "proj-a": { access: "deny", intent_budget: "plan" },
+      },
+    })
+    const projects: ProjectEntry[] = [
+      { projectId: "proj-b", repoRoot: "/tmp/b", displayName: "Project B", lastSeen: 2 },
+      { projectId: "proj-a", repoRoot: "/tmp/a", displayName: "Project A", lastSeen: 1 },
+      { projectId: "proj-c", repoRoot: "/tmp/c", displayName: "Project C", lastSeen: 3 },
+    ]
+
+    // when
+    const rows = await readOutboundBudget(config, registryOf(projects), {
+      readPresence: async () => "offline",
+    })
+
+    // then
+    expect(rows.map((row) => row.targetProjectId).sort()).toEqual(["proj-b", "proj-c"])
+    const c = rows.find((row) => row.targetProjectId === "proj-c")
+    expect(c?.displayName).toBe("Project C")
+    expect(c?.grantedCeiling).toBe("question")
+  })
+
   it("maps an internal presence status straight through to the row presence field", async () => {
     // given
     const config = cfg({ senders: { "proj-b": { access: "allow", intent_budget: "plan" } } })
