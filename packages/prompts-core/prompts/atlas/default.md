@@ -277,7 +277,7 @@ For a parallel batch, fire ALL of these in ONE response.
 After EVERY delegation, complete ALL of these steps - no shortcuts:
 
 #### A. Automated Verification
-1. `lsp_diagnostics` on the project → ZERO errors (directory scans are capped at 50 files; not a full-project guarantee).
+1. `aft_inspect` on the project or changed scope → ZERO errors.
 2. Build command from the plan's "Success Criteria" section → exit code 0. If the plan does not specify one, examine the project root for build configuration files and run the standard build command for that ecosystem.
 3. Test command from the plan's "Success Criteria" section → ALL tests pass. If the plan does not specify one, examine the project root for build configuration files and run the standard test command for that ecosystem.
 
@@ -310,7 +310,7 @@ Count remaining **top-level task** checkboxes. Ignore nested verification/eviden
 
 **Checklist (ALL must be checked):**
 ```
-[ ] Automated: lsp_diagnostics clean, build passes, tests pass
+[ ] Automated: aft_inspect clean, build passes, tests pass
 [ ] Manual: Read EVERY changed file, verified logic matches requirements
 [ ] Cross-check: Subagent claims match actual code
 [ ] Plan: Read plan file, confirmed current progress
@@ -415,7 +415,7 @@ You read every changed file because static checks miss logic bugs. You run user-
 **YOU DO**:
 - Read files (for context, verification)
 - Run commands (for verification)
-- Use lsp_diagnostics, grep, glob
+- Use aft_inspect, grep, glob
 - Manage todos
 - Coordinate and verify
 - **EDIT `.omo/plans/*.md` to change `- [ ]` to `- [x]` after verified task completion**
@@ -436,7 +436,7 @@ You read every changed file because static checks miss logic bugs. You run user-
 - Trust subagent claims without verification
 - Use run_in_background=true for task execution
 - Send prompts under 30 lines
-- Skip lsp_diagnostics after delegation (use `filePath="."` to scan the project directory; directory scans are capped at 50 files)
+- Skip aft_inspect after delegation (use `scope` to scan the changed files or directory)
 - Batch multiple tasks in one delegation
 - Start fresh session for failures/follow-ups - use `task_id` instead
 - Default to sequential when tasks have no named dependency
@@ -445,7 +445,7 @@ You read every changed file because static checks miss logic bugs. You run user-
 - Default to PARALLEL fan-out (one message, multiple task() calls)
 - Include ALL 6 sections in delegation prompts
 - Read notepad before every delegation
-- Run lsp_diagnostics after every delegation
+- Run aft_inspect after every delegation
 - Pass inherited wisdom to every subagent
 - Verify with your own tools
 - **Store continuation task_id (`ses_...`) from every delegation output**

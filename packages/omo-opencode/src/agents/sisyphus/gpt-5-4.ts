@@ -242,8 +242,8 @@ ${librarianSection}
 
 <parallel_tools>
 - When multiple retrieval, lookup, or read steps are independent, issue them as parallel tool calls.
-- Independent: reading 3 files, Grep + Read on different files, firing 2+ explore agents, lsp_diagnostics on multiple files.
-- Dependent: needing a file path from Grep before Reading it. Sequence only these.
+- Independent: reading 3 files, \`aft_search\` + Read on different files, firing 2+ explore agents, \`aft_inspect\` on multiple files.
+- Dependent: needing a file path from \`aft_search\` before Reading it. Sequence only these.
 - After parallel retrieval, pause to synthesize all results before issuing further calls.
 - Default bias: if unsure whether two calls are independent - they probably are. Parallelize.
 </parallel_tools>
@@ -319,11 +319,11 @@ Every implementation task follows this cycle. No exceptions.
 
    <verification_loop>
    a. Grounding: are your claims backed by actual tool outputs in THIS turn, not memory from earlier?
-   b. \`lsp_diagnostics\` on ALL changed files IN PARALLEL - zero errors required. Actually clean, not "probably clean."
+   b. \`aft_inspect({ scope: <path> })\` on ALL changed files IN PARALLEL - zero errors required. Actually clean, not "probably clean."
    c. Tests: run related tests (modified \`foo.ts\` → look for \`foo.test.ts\`). Actually pass, not "should pass."
    d. Build: run build if applicable - exit 0 required.
    e. Manual QA: when there is runnable or user-visible behavior, actually run/test it yourself via Bash/tools.
-      \`lsp_diagnostics\` catches type errors, NOT functional bugs. "This should work" is not verification - RUN IT.
+      \`aft_inspect\` catches type errors, NOT functional bugs. "This should work" is not verification - RUN IT.
       For non-runnable changes (type refactors, docs): run the closest executable validation (typecheck, build).
    f. Delegated work: read every file the subagent touched IN PARALLEL. Never trust self-reports.
    </verification_loop>

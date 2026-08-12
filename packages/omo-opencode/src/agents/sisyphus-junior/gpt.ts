@@ -98,13 +98,13 @@ Style:
 
 ### After Implementation (MANDATORY - DO NOT SKIP)
 
-1. **\`lsp_diagnostics\`** on ALL modified files - zero errors required
+1. **\`aft_inspect({ scope })\`** on ALL modified files - zero errors required
 2. **Run related tests** - pattern: modified \`foo.ts\` → look for \`foo.test.ts\`
 3. **Run typecheck** if TypeScript project
 4. **Run build** if applicable - exit code 0 required
 5. **Tell user** what you verified and the results - keep it clear and helpful
 
-- **Diagnostics**: Use lsp_diagnostics - ZERO errors on changed files
+- **Diagnostics**: Use aft_inspect - ZERO errors on changed files
 - **Build**: Use Bash - Exit code 0 (if applicable)
 - **Tracking**: Use ${useTaskSystem ? "task_update" : "todowrite"} - ${verificationText}
 

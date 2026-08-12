@@ -658,18 +658,18 @@ Hashline IDs use characters from `ZPMQVRWSNKTXJBYH`.
 
 ### LSP Tools (IDE Features for Agents)
 
-All 8 aliases below are served by the built-in `lsp` MCP rather than the native tool registry.
+> Note: Legacy `lsp_*` tools are retired from the active OpenCode plugin runtime in favor of the Agentic Framework Toolchain (AFT) primary toolset. See [AFT Primary Toolset Reference](aft-primary-toolset.md) for details.
 
 | Tool                    | Description                                 |
 | ----------------------- | ------------------------------------------- |
-| **lsp_status**          | List configured and active LSP servers      |
-| **lsp_diagnostics**     | Get errors/warnings before build            |
-| **lsp_prepare_rename**  | Validate rename operation                   |
-| **lsp_rename**          | Rename symbol across workspace              |
-| **lsp_goto_definition** | Jump to symbol definition                   |
-| **lsp_find_references** | Find all usages across workspace            |
-| **lsp_symbols**         | Get file outline or workspace symbol search |
-| **lsp_install_decision** | Record allow/decline decisions for missing LSP installation |
+| **lsp_status**          | List configured and active LSP servers (Retired in OpenCode, see AFT) |
+| **lsp_diagnostics**     | Get errors/warnings before build (Retired in OpenCode, see `aft_inspect`) |
+| **lsp_prepare_rename**  | Validate rename operation (Retired in OpenCode, see AFT) |
+| **lsp_rename**          | Rename symbol across workspace (Retired in OpenCode, see `aft_refactor`) |
+| **lsp_goto_definition** | Jump to symbol definition (Retired in OpenCode, see `aft_zoom`) |
+| **lsp_find_references** | Find all usages across workspace (Retired in OpenCode, see `aft_callgraph`) |
+| **lsp_symbols**         | Get file outline or workspace symbol search (Retired in OpenCode, see `aft_outline`/`aft_search`) |
+| **lsp_install_decision** | Record allow/decline decisions for missing LSP installation (Retired in OpenCode, see AFT) |
 
 ### AST-Grep Skill
 

@@ -3,8 +3,15 @@ import { buildCodegraphEnv, resolveCodegraphCommand, resolveCodegraphNodeSupport
 import { resolvePinnedCodegraphBin } from "@oh-my-opencode/utils/codegraph"
 import type { ResolveCodegraphCommandOptions } from "@oh-my-opencode/utils"
 import type { CodegraphConfig } from "../config/schema/codegraph"
-import type { LocalMcpConfig } from "./lsp"
 import { resolveRuntimeExecutable, type RuntimeExecutableResolver } from "./runtime-executable"
+
+export type LocalMcpConfig = {
+  type: "local"
+  command: string[]
+  enabled: boolean
+  cwd?: string
+  environment?: Record<string, string>
+}
 
 export type CodegraphMcpConfigOptions = {
   readonly config?: Partial<CodegraphConfig>

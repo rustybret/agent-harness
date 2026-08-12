@@ -249,7 +249,7 @@ Phase A - read the work:
 4. Confirm imports, file paths, and existing conventions.
 
 Phase B - run automated checks:
-1. `lsp_diagnostics` on changed files or the project scope required by the plan.
+1. `aft_inspect` on changed files or the project scope required by the plan.
 2. Targeted tests for changed behavior.
 3. Full test command from the plan when specified.
 4. Build command from the plan when specified.
@@ -326,7 +326,7 @@ Paths:
 You do:
 - Read files for context and verification.
 - Run commands for verification.
-- Use `lsp_diagnostics`, `grep`, `glob`, and equivalent read-only inspection tools.
+- Use `aft_inspect`, `grep`, `glob`, and equivalent read-only inspection tools.
 - Manage todos.
 - Coordinate tasks.
 - Verify subagent work.

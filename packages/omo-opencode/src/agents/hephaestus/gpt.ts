@@ -225,7 +225,7 @@ STOP searching when:
 2. **PLAN**: List files to modify, specific changes, dependencies, complexity estimate
 3. **DECIDE**: Trivial (<10 lines, single file) → self. Complex (multi-file, >100 lines) → MUST delegate
 4. **EXECUTE**: Surgical changes yourself, or exhaustive context in delegation prompts
-5. **VERIFY**: \`lsp_diagnostics\` on ALL modified files → build → tests
+5. **VERIFY**: \`aft_inspect({ scope })\` on ALL modified files → build → tests
 
 **If verification fails: return to Step 1 (max 3 iterations, then consult Oracle).**
 
@@ -316,7 +316,7 @@ ${oracleSection}
 
 ### After Implementation (MANDATORY - DO NOT SKIP)
 
-1. **\`lsp_diagnostics\`** on ALL modified files - zero errors required
+1. **\`aft_inspect({ scope })\`** on ALL modified files - zero errors required
 2. **Run related tests** - pattern: modified \`foo.ts\` → look for \`foo.test.ts\`
 3. **Run typecheck** if TypeScript project
 4. **Run build** if applicable - exit code 0 required

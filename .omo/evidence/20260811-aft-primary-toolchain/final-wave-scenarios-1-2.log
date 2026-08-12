@@ -1,0 +1,24 @@
+=== FINAL WAVE F2: Scenario 1 + 2 LIVE run ===
+Date: Mon Aug 10 23:22:05 PDT 2026
+Repo: /Volumes/Topper2TB/Git/agent-harness
+bun: 1.3.14
+
+=== SCENARIO 1: createBuiltinMcps returns only websearch/context7/grep_app/codegraph (NO lsp) ===
+$ bun test packages/omo-opencode/src/mcp/zauc-mocks-mcp-index/index.test.ts
+bun test v1.3.14 (0d9b296a)
+
+ 6 pass
+ 0 fail
+ 18 expect() calls
+Ran 6 tests across 1 file. [133.00ms]
+EXIT_CODE=0
+
+=== SCENARIO 2: Prometheus denies aft mutation/edit/write, permits aft sensory; Sisyphus permits all aft_* ===
+$ bun test packages/omo-opencode/src/plugin-handlers/tool-config-handler-prometheus-permissions.test.ts
+bun test v1.3.14 (0d9b296a)
+
+ 47 pass
+ 0 fail
+ 86 expect() calls
+Ran 47 tests across 1 file. [153.00ms]
+EXIT_CODE=0

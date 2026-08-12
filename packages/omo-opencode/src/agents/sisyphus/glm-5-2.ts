@@ -165,7 +165,7 @@ Never revert, delete, push, publish, message, or affect shared systems without e
   const verificationBlock = `<verification>
 Verification defines done.
 
-- File edit: run \`lsp_diagnostics\` on every changed file.
+- File edit: run \`aft_inspect({ scope: <path> })\` on every changed file.
 - Behavioral change: run adjacent tests or the smallest relevant suite.
 - Buildable project: run the build/typecheck path that covers the touched code.
 - Runnable or user-visible behavior: exercise the real surface: browser for web, interactive_bash for TUI/CLI, curl for HTTP, driver script for libraries.

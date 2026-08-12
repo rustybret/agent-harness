@@ -1,8 +1,7 @@
 import { createWebsearchConfig } from "./websearch"
 import { context7 } from "./context7"
 import { grep_app } from "./grep-app"
-import { createCodegraphMcpConfig, type CodegraphMcpConfigOptions } from "./codegraph"
-import { createLspMcpConfig, type LocalMcpConfig } from "./lsp"
+import { createCodegraphMcpConfig, type CodegraphMcpConfigOptions, type LocalMcpConfig } from "./codegraph"
 import type { RuntimeExecutableResolver } from "./runtime-executable"
 import type { CodegraphConfig } from "../config/schema/codegraph"
 
@@ -49,13 +48,6 @@ export function createBuiltinMcps(disabledMcps: string[] = [], config?: BuiltinM
 
   if (!disabledMcps.includes("grep_app")) {
     mcps.grep_app = grep_app
-  }
-
-  if (!disabledMcps.includes("lsp")) {
-    mcps.lsp = createLspMcpConfig({
-      cwd: options.cwd,
-      resolveExecutable: options.resolveExecutable,
-    })
   }
 
   if (!disabledMcps.includes("codegraph") && config?.codegraph?.enabled !== false) {

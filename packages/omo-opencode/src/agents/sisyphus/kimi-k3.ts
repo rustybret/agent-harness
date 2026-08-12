@@ -158,7 +158,7 @@ ${librarianSection}
 
 Use tools whenever they improve correctness — your memory of file contents is unreliable. Prefer them over internal knowledge for anything specific, and read the full cluster of related files rather than one at a time. If a tool returns empty or partial results, retry with a different strategy before concluding.
 
-Issue independent calls together: three file reads, a grep plus a read, two explore agents, diagnostics across files — one response. Sequence only when one call needs another's output. When you are unsure whether two calls are independent, assume they are and parallelize.
+Issue independent calls together: three file reads, an \`aft_search\` plus a read, two explore agents, diagnostics across files — one response. Sequence only when one call needs another's output. When you are unsure whether two calls are independent, assume they are and parallelize.
 
 ${KIMI_TOOL_LOOP_GUARD}
 
@@ -186,7 +186,7 @@ If any available skill's domain touches the task, load it now via \`skill\` and 
 **Verify.** Scope the rigor to the change; never skip it.
 
 <verification>
-- Trivial change (one file, under ~10 lines, no behavior change): \`lsp_diagnostics\` on the file.
+- Trivial change (one file, under ~10 lines, no behavior change): \`aft_inspect({ scope: <path> })\` on the file.
 - Local behavioral change (a few files, one domain): diagnostics across the changed files in parallel; run the tests that import the changed module and watch them actually pass; if an entry point is affected, run it once.
 - Cross-cutting change, or ANY delegated work: diagnostics clean on every changed file; related tests actually pass; the build exits 0 where there is one; and when behavior is runnable or user-visible, RUN IT through its real surface — interactive_bash for a TUI or CLI, a real browser for the web, curl for an HTTP API, a driver script for a library. Read every file a subagent touched and check it against the contract; a subagent's self-report is not evidence.
 

@@ -104,6 +104,20 @@ export function applyToolConfig(params: {
       "task_*": "allow",
       teammate: "allow",
       ...denyTodoTools,
+      // Atlas is a pure orchestrator: its system prompt asserts "You never write
+      // code yourself. You orchestrate specialists who do." Enforce that boundary
+      // in CODE (stronger than prompt text) by flat-denying the mutation surface —
+      // flat "deny" hides each tool entirely. Read-only sensory/discovery tools
+      // (aft_search/aft_outline/aft_zoom/aft_callgraph/aft_inspect) are intentionally
+      // left unlisted: they are allow-by-default and Atlas needs them to survey work.
+      edit: "deny",
+      write: "deny",
+      aft_refactor: "deny",
+      aft_import: "deny",
+      aft_move: "deny",
+      aft_delete: "deny",
+      aft_safety: "deny",
+      ast_grep_replace: "deny",
     };
   }
   const sisyphus = agentByKey(params.agentResult, "sisyphus", params.pluginConfig);
@@ -167,18 +181,20 @@ export function applyToolConfig(params: {
       },
       interactive_bash: "deny",
       // Flat deny hides these mutators entirely (their own permission keys, not remapped).
-      // aft_* / ast_grep_replace / aft_safety use non-filePath arg shapes; lsp_rename applies
-      // a workspace edit and lsp_install_decision writes state. apply_patch is NOT here: it
-      // asserts the "edit" permission (which Prometheus needs for .omo/*.md), so it is gated
-      // by path in the prometheus-md-only hook instead.
+      // aft_* / ast_grep_replace / aft_safety use non-filePath arg shapes.
+      //
+      // edit/write/apply_patch are DELIBERATELY absent from this flat-deny block: Prometheus
+      // legitimately needs `edit`/`write` for .omo/*.md plan files (repo convention), so a flat
+      // deny would break planning. They are instead PATH-GATED by the prometheus-md-only hook
+      // (BLOCKED_TOOLS=[Write,Edit,write,edit] + apply_patch patchText target parsing), which
+      // confines every write to .omo/*.md. The plan's "deny edit/write" intent is satisfied by
+      // that path-scoped hook, not a tool-level deny — a stronger, file-aware guarantee.
       aft_delete: "deny",
       aft_move: "deny",
       aft_refactor: "deny",
       aft_import: "deny",
       ast_grep_replace: "deny",
       aft_safety: "deny",
-      lsp_rename: "deny",
-      lsp_install_decision: "deny",
     };
   }
   const junior = agentByKey(params.agentResult, "sisyphus-junior", params.pluginConfig);

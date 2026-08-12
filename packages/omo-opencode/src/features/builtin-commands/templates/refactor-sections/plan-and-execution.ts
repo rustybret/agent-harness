@@ -72,15 +72,18 @@ For EACH refactoring step:
 ### Pre-Step
 1. Mark step todo as \`in_progress\`
 2. Read current file state
-3. Verify lsp_diagnostics is baseline
+3. Verify aft_inspect is baseline
 
 ### Execute Step
 Use appropriate tool:
 
-**For Symbol Renames:**
+**For Symbol Moves / Extract / Inline:**
 \`\`\`typescript
-lsp_prepare_rename(filePath, line, character)  // Validate rename is possible
-lsp_rename(filePath, line, character, newName)  // Execute rename
+aft_refactor({ op: "move", ... })  // Cross-file symbol move, updates imports workspace-wide
+aft_refactor({ op: "extract", ... })  // Extract a line range into a new function
+aft_refactor({ op: "inline", ... })  // Inline a function call
+// AFT has no dedicated in-place rename op. For an in-place symbol rename,
+// verify current LSP tool availability rather than assuming a rename tool exists.
 \`\`\`
 
 **For Pattern Transformations:**
@@ -102,7 +105,7 @@ edit(filePath, oldString, newString)
 
 \`\`\`typescript
 // 1. Check diagnostics
-lsp_diagnostics(filePath)  // Must be clean or same as baseline
+aft_inspect({ scope: filePath })  // Must be clean or same as baseline
 
 // 2. Run tests
 bash("bun test")  // Or appropriate test command

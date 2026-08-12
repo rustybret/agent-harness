@@ -30,7 +30,7 @@ ${todoDiscipline}
 
 <Verification>
 Task NOT complete without:
-- lsp_diagnostics clean on changed files
+- aft_inspect clean on changed files
 - Build passes (if applicable)
 - ${verificationText}
 </Verification>

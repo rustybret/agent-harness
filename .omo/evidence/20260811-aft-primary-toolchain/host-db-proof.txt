@@ -1,0 +1,17 @@
+Host SQLite isolation proof — Scenario 4 (Isolated OpenCode Runtime QA)
+======================================================================
+DB path (host, plain shell): /Users/brethoffman/.local/share/opencode/opencode.db
+
+BEFORE (baseline, before sourcing qa-sandbox.sh): 7752
+AFTER  (fresh host shell, XDG_* unset, after all sandboxed runs): 7752
+
+RESULT: UNCHANGED (7752 == 7752). The three sandboxed `opencode run`
+invocations wrote their sessions into the isolated XDG_DATA_HOME under
+$OMO_QA_ROOT, never the host DB. Isolation gate PASSED.
+
+=== FOLLOW-UP RUN (aft_* execution proof) 2026-08-11 ===
+Host DB session count BEFORE follow-up window: 7757
+Host DB session count AFTER  follow-up window: 7757
+Delta: 0 (no host pollution)
+Sandbox DB (XDG_DATA_HOME/opencode/opencode.db) session count: 1
+  -> proves the opencode run session was written to the isolated sandbox, NOT the host DB.

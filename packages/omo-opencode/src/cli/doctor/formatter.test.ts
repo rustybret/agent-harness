@@ -19,10 +19,6 @@ function createDoctorResult(): DoctorResult {
       isLocalDev: false,
     },
     tools: {
-      lspServers: [
-        { id: "typescript", extensions: [".ts", ".tsx", ".js", ".jsx"] },
-        { id: "pyright", extensions: [".py", ".pyi"] },
-      ],
       astGrepCli: true,
       commentChecker: true,
       ghCli: { installed: true, authenticated: true, username: "yeongyu" },
@@ -151,7 +147,7 @@ describe("formatDoctorOutput", () => {
       const output = stripAnsi(formatDoctorOutput(result, "status"))
 
       //#then
-      expect(output).toContain("LSP")
+      expect(output).toContain("AST-Grep")
       expect(output).toContain("context7")
     })
 

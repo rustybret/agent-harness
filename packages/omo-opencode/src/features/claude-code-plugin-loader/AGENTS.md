@@ -6,6 +6,8 @@
 
 This module is the full Claude Code plugin compatibility layer. It discovers and loads ALL plugin components (commands, agents, skills, hooks, MCP servers, LSP servers) from `.opencode/plugins/` and `~/.claude/plugins/`. Shared manifest/discovery/load primitives are extracted to [`packages/claude-code-compat-core/`](../../../../../packages/claude-code-compat-core); this directory keeps OpenCode-specific integration and error surfacing.
 
+Note: Third-party Claude Code plugin LSP server manifests loaded via `loadPluginLspServers()` are handled by the plugin compatibility pipeline, while native OmO code intelligence is served primarily via the Agentic Framework Toolchain (AFT).
+
 ## WHY IT EXISTS
 
 Claude Code plugins ship commands/agents/skills as separate files with `plugin.json` manifest. OmO uses this loader to ingest them into its own registry so existing Claude Code plugins work unchanged under OmO.

@@ -1,6 +1,6 @@
-# src/cli/doctor/ — Health Diagnostics (25 Check Files)
+# src/cli/doctor/ — Health Diagnostics (24 Check Files)
 
-**Generated:** 2026-08-10 / 38d268995
+**Generated:** 2026-08-11 / 38d268995
 
 ## OVERVIEW
 
@@ -25,7 +25,7 @@ Registered by `getAllCheckDefinitions()` (8):
 | **CONFIG** | `checks/config.ts` | JSONC validity, Zod schema passes, no unknown keys, model override syntax correct |
 | **TUI_PLUGIN** | `checks/tui-plugin-config.ts` | TUI sidebar plugin entry resolvable |
 | `deprecated-reasoning-keys` | `checks/deprecated-reasoning-keys.ts` | Scans `~/.omo/omo.json[c]` for deprecated `variant` / `reasoningEffort` / `thinking` / `textVerbosity` / `fallback_models` keys, reporting file + dotted path and a `config migrate` hint. Skips the `[opencode]` block and passthrough containers (`provider_options`). Registered with a literal id, NOT in `CHECK_IDS`. |
-| **TOOLS** | `checks/tools.ts` | AST-Grep CLI + NAPI, comment-checker binary, LSP servers reachable, GitHub CLI auth, built-in MCP reachability |
+| **TOOLS** | `checks/tools.ts` | AST-Grep CLI + NAPI, comment-checker binary, GitHub CLI auth, built-in MCP reachability |
 | **MODELS** | `checks/model-resolution.ts` | models.json cache exists, per-agent fallback resolution, category overrides valid, provider availability |
 | **TELEMETRY** | `checks/telemetry.ts` | Telemetry configuration state |
 | **TEAM_MODE** | `checks/team-mode.ts` | Team-mode dependencies |
@@ -34,7 +34,7 @@ Registered by `getCodexCheckDefinitions()` (3): **CODEX** (critical, `checks/cod
 
 `checks/legacy-config-leftovers.ts` is not registered standalone; the Config aggregator invokes it.
 
-## SUPPORTING CHECK FILES (25 total)
+## SUPPORTING CHECK FILES (24 total)
 
 ```
 checks/
@@ -47,7 +47,6 @@ checks/
 ├── tools.ts                               # Main Tools aggregator
 ├── dependencies.ts                        # AST-Grep CLI/NAPI + comment-checker presence
 ├── tools-gh.ts                            # gh cli install + auth status
-├── tools-lsp.ts                           # LSP server enumeration
 ├── tools-mcp.ts                           # Built-in + user MCP reachability
 ├── model-resolution.ts                    # Main Models aggregator
 ├── model-resolution-cache.ts              # models.json presence + freshness

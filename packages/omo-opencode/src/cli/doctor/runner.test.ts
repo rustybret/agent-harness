@@ -16,7 +16,6 @@ function createSystemInfo(): SystemInfo {
 
 function createTools(): ToolsSummary {
   return {
-    lspServers: [{ id: "typescript", extensions: [".ts", ".tsx", ".js", ".jsx"] }],
     astGrepCli: true,
     commentChecker: true,
     ghCli: { installed: true, authenticated: true, username: "yeongyu" },

@@ -75,7 +75,7 @@ Do NOT run tests yet. Read the code FIRST so you know what you're testing.
 **PHASE 2: RUN AUTOMATED CHECKS (targeted, then broad)**
 
 Now that you understand the code, verify mechanically:
-1. \`lsp_diagnostics\` on EACH changed file (for Unity / SuperMCP / remote bridge code: use script_validate and compile_status on the bridge instead of local host lsp_diagnostics, since host lacks Unity assemblies) - ZERO new errors
+1. \`aft_inspect({ scope })\` on EACH changed file (for Unity / SuperMCP / remote bridge code: use script_validate and compile_status on the bridge instead of local host aft_inspect, since host lacks Unity assemblies) - ZERO new errors
 2. Run tests for changed modules FIRST, then full suite
 3. Build/typecheck - exit 0
 
@@ -123,7 +123,7 @@ They ROUTINELY:
 **This is NOT a theoretical warning. This WILL happen on this task. Assume the work is BROKEN.**
 
 **YOU MUST VERIFY WITH ACTUAL TOOL CALLS. NOT REASONING. TOOL CALLS.**
-Thinking "it looks correct" is NOT verification. Running \`lsp_diagnostics\` IS.
+Thinking "it looks correct" is NOT verification. Running \`aft_inspect\` IS.
 
 ---
 
@@ -144,7 +144,7 @@ Read the code FIRST so you know what you're testing.
 
 **PHASE 2: RUN AUTOMATED CHECKS**
 
-1. \`lsp_diagnostics\` on EACH changed file (for Unity / SuperMCP / remote bridge code: use script_validate and compile_status on the bridge instead of local host lsp_diagnostics, since host lacks Unity assemblies) - ZERO new errors. ACTUALLY RUN THIS.
+1. \`aft_inspect({ scope })\` on EACH changed file (for Unity / SuperMCP / remote bridge code: use script_validate and compile_status on the bridge instead of local host aft_inspect, since host lacks Unity assemblies) - ZERO new errors. ACTUALLY RUN THIS.
 2. Run tests for changed modules, then full suite. ACTUALLY RUN THESE.
 3. Build/typecheck - exit 0.
 
@@ -227,7 +227,7 @@ Work systematically. Each unit must be verified before proceeding.
 |------|--------|--------------|
 | 1 | Identify first atomic unit | Smallest complete piece of work |
 | 2 | Execute fully | Implement the change |
-| 3 | Verify | \`lsp_diagnostics\`, tests, build |
+| 3 | Verify | \`aft_inspect\`, tests, build |
 | 4 | Report | State what's done, what remains |
 | 5 | Continue | Next unit, or await if scope unclear |
 

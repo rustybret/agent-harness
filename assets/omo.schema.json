@@ -11260,7 +11260,8 @@
                 "same_pair_rate_limit_per_min": 6,
                 "body_digest_ttl_min": 60,
                 "max_body_bytes": 32768,
-                "reservation_ttl_ms": 120000
+                "reservation_ttl_ms": 120000,
+                "max_delivery_attempts": 3
               },
               "type": "object",
               "properties": {
@@ -11305,6 +11306,13 @@
                   "type": "integer",
                   "minimum": -9007199254740991,
                   "maximum": 9007199254740991
+                },
+                "max_delivery_attempts": {
+                  "default": 3,
+                  "description": "Maximum delivery attempts for a note before it is quarantined as max-retries-exceeded",
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
                 }
               },
               "required": [
@@ -11313,7 +11321,8 @@
                 "same_pair_rate_limit_per_min",
                 "body_digest_ttl_min",
                 "max_body_bytes",
-                "reservation_ttl_ms"
+                "reservation_ttl_ms",
+                "max_delivery_attempts"
               ],
               "additionalProperties": false,
               "description": "Safety bounds that throttle and cap cross-project delivery"
@@ -25442,7 +25451,8 @@
                       "same_pair_rate_limit_per_min": 6,
                       "body_digest_ttl_min": 60,
                       "max_body_bytes": 32768,
-                      "reservation_ttl_ms": 120000
+                      "reservation_ttl_ms": 120000,
+                      "max_delivery_attempts": 3
                     },
                     "type": "object",
                     "properties": {
@@ -25487,6 +25497,13 @@
                         "type": "integer",
                         "minimum": -9007199254740991,
                         "maximum": 9007199254740991
+                      },
+                      "max_delivery_attempts": {
+                        "default": 3,
+                        "description": "Maximum delivery attempts for a note before it is quarantined as max-retries-exceeded",
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
                       }
                     },
                     "required": [
@@ -25495,7 +25512,8 @@
                       "same_pair_rate_limit_per_min",
                       "body_digest_ttl_min",
                       "max_body_bytes",
-                      "reservation_ttl_ms"
+                      "reservation_ttl_ms",
+                      "max_delivery_attempts"
                     ],
                     "additionalProperties": false,
                     "description": "Safety bounds that throttle and cap cross-project delivery"

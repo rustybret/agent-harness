@@ -1,6 +1,5 @@
 import { checkAstGrepCli, checkCommentChecker } from "./dependencies"
 import { getGhCliInfo } from "./tools-gh"
-import { getInstalledLspServers } from "./tools-lsp"
 import { getBuiltinMcpInfo, getUserMcpInfo } from "./tools-mcp"
 import { CHECK_IDS, CHECK_NAMES } from "../framework/constants"
 import type { CheckResult, DoctorIssue, ToolsSummary } from "../framework/types"
@@ -12,12 +11,10 @@ export async function gatherToolsSummary(): Promise<ToolsSummary> {
     getGhCliInfo(),
   ])
 
-  const lspServers = getInstalledLspServers()
   const builtinMcp = getBuiltinMcpInfo()
   const userMcp = getUserMcpInfo()
 
   return {
-    lspServers,
     astGrepCli: astGrepCliInfo.installed,
     commentChecker: commentCheckerInfo.installed,
     ghCli: {
@@ -50,15 +47,6 @@ export function buildToolIssues(summary: ToolsSummary): DoctorIssue[] {
       fix: "Install @code-yeongyu/comment-checker",
       severity: "warning",
       affects: ["comment-checker hook"],
-    })
-  }
-
-  if (summary.lspServers.length === 0) {
-    issues.push({
-      title: "No LSP servers detected",
-      description: "LSP-dependent tools will be limited until at least one server is installed.",
-      severity: "warning",
-      affects: ["lsp diagnostics", "rename", "references"],
     })
   }
 
@@ -105,7 +93,6 @@ export async function checkTools(): Promise<CheckResult> {
     details: [
       `AST-Grep CLI: ${summary.astGrepCli ? "yes" : "no"}`,
       `Comment checker: ${summary.commentChecker ? "yes" : "no"}`,
-      `LSP: ${summary.lspServers.length > 0 ? `${summary.lspServers.length} server(s)` : "none"}`,
       `GH CLI: ${summary.ghCli.installed ? "installed" : "missing"}${summary.ghCli.authenticated ? " (authenticated)" : ""}`,
       `MCP: builtin=${summary.mcpBuiltin.length}, user=${summary.mcpUser.length}`,
     ],

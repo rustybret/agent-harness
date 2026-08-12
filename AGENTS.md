@@ -86,7 +86,7 @@ oh-my-opencode/                      # workspace root (no root src/ — it moved
 │   │       └── generated/ help/ locales/ testing/ __tests__/  # model-capabilities, CLI help schemas, i18n, test factory, perf benchmarks
 │   ├── omo-codex/                   # Codex CLI Light edition (lazycodex); vendored Codex plugin `omo` + TS installer + telemetry
 │   ├── utils/ model-core/ prompts-core/ rules-engine/ agents-md-core/ comment-checker-core/ hashline-core/ boulder-state/ telemetry-core/ lsp-core/ mcp-stdio-core/ tmux-core/ claude-code-compat-core/ skills-loader-core/ mcp-client-core/ openclaw-core/ team-core/ delegate-core/   # 18 Core (pure-TS) pkgs
-│   ├── lsp-tools-mcp/ git-bash-mcp/ lsp-daemon/   # 3 MCP-layer pkgs (stdio); LSP packages consume lsp-core + mcp-stdio-core
+│   ├── lsp-tools-mcp/ git-bash-mcp/ lsp-daemon/   # 3 MCP-layer pkgs (stdio); lsp-tools-mcp and lsp-daemon are retired from the active OpenCode plugin runtime (AFT is now the sole LSP engine) but are retained for Codex Light edition compatibility. LSP packages consume lsp-core + mcp-stdio-core
 │   ├── shared-skills/               # Cross-harness SKILL.md bundle shared by OpenCode + Codex
 │   ├── web/                         # Marketing site (Next.js 15 + Cloudflare Workers); own bun.lock; only @/* alias zone in the repo
 │   └── oh-my-opencode-<os>-<arch>[-variant]/   # 12 platform binaries (bin/ + package.json only; generated, never hand-edited)
@@ -151,9 +151,11 @@ pluginModule.server(input, options)   # serverPlugin() in packages/omo-opencode/
 
 ## TOOL CATALOG (config-gated)
 
-**Always on (18):** `lsp_goto_definition`, `lsp_find_references`, `lsp_symbols`, `lsp_diagnostics`, `lsp_prepare_rename`, `lsp_rename`, `grep`, `glob`, `session_list`, `session_read`, `session_search`, `session_info`, `background_output`, `background_cancel`, `call_omo_agent`, `task` (delegate), `skill`, `skill_mcp`.
+**Always on (12):** `grep`, `glob`, `session_list`, `session_read`, `session_search`, `session_info`, `background_output`, `background_cancel`, `call_omo_agent`, `task` (delegate), `skill`, `skill_mcp`.
 
-> Note: `lsp_*` tool names are served by the built-in `lsp` MCP via `packages/lsp-tools-mcp`. Structural search and rewrite is provided by the `ast-grep` skill using `sg`.
+> Note: Code intelligence and navigation are served by the Agentic Framework Toolchain (AFT) primary toolset (e.g., `aft_search`, `aft_outline`, `aft_zoom`, `aft_callgraph`, `aft_inspect`). Structural search and rewrite is provided by the `ast-grep` skill using `sg`.
+>
+> **POST-EDIT DIAGNOSTIC GATE MANDATE:** After any edit, agents MUST run `aft_inspect({ scope })` and verify the AFT status-bar headers (`[AFT E<errors> W<warnings> ...]`) as the authoritative compilation and typecheck diagnostic gate.
 
 **Conditional:** `look_at` (+1, multimodal-looker not disabled), `interactive_bash` (+1, `tmux` binary available on PATH via `isInteractiveBashEnabled()`), `task_create`/`task_get`/`task_list`/`task_update` (+4, `experimental.task_system`), `edit` (+1, `hashline_edit`), `team_create`/`team_delete`/`team_shutdown_request`/`team_approve_shutdown`/`team_reject_shutdown`/`team_send_message`/`team_task_create`/`team_task_list`/`team_task_update`/`team_task_get`/`team_status`/`team_list` (+12, `team_mode.enabled`), `project_mailbox_peek`/`project_mailbox_drain`/`project_message`/`project_note` (+4, `cross_project_mailbox.enabled`).
 
@@ -256,10 +258,11 @@ Schema autocomplete: `"$schema": "https://raw.githubusercontent.com/code-yeongyu
 | Reactive provider error recovery | `packages/omo-opencode/src/hooks/runtime-fallback/` | Distinct from `model-fallback` (proactive, chat.params) |
 | External notifications | `packages/omo-opencode/src/openclaw/` | Bidirectional: outbound (event → HTTP/shell), inbound (Discord/Telegram daemon → tmux send-keys) |
 | Skill-embedded MCP | `packages/omo-opencode/src/features/skill-mcp-manager/` | Tier-3 MCPs (per-session, stdio + HTTP) |
-| Shared per-user LSP daemon (Codex) | `packages/lsp-daemon/` | Unix-socket / named-pipe daemon + stdio MCP proxy consuming `packages/lsp-core/` + `packages/mcp-stdio-core/` |
+| Shared per-user LSP daemon (Codex) | `packages/lsp-daemon/` | Unix-socket / named-pipe daemon + stdio MCP proxy consuming `packages/lsp-core/` + `packages/mcp-stdio-core/` (retained for Codex Light edition compatibility) |
 
 ## ARCHITECTURE INVARIANTS
 
+- **AFT as Sole LSP/Navigation Engine:** AFT is the sole LSP and navigation engine for the OpenCode plugin's native agents. Legacy `lsp_*` tools are retired from the active OpenCode plugin runtime. SuperMCP bridge tools (such as `compile_status` and `script_validate`) remain the correct choice for remote VM and Unity workflows where local AFT language servers cannot see remote assemblies.
 - **Canonical agent order:** Sisyphus → Hephaestus → Prometheus → Atlas. Enforced by `installAgentSortShim()` (patches `Array.prototype.toSorted`/`.sort` narrowly when the array contains ≥2 canonical core agents). See [`packages/omo-opencode/src/plugin-handlers/AGENTS.md`](packages/omo-opencode/src/plugin-handlers/AGENTS.md) for the full history of why this exists.
 - **Hashline edit + read pairing:** Every `Read` tool output is tagged with `LINE#ID` content hashes; `hashline_edit` validates the hash before applying. Stale hash → reject.
 - **5-tier hook composition:** Session (23) + ToolGuard (17) + Transform (4) + Continuation (7) + Skill (2) = 53 base. With `team_mode.enabled`: +1 ToolGuard (`team-tool-gating`), +2 Transform (`team-mode-status-injector`, `team-mailbox-injector`), +4 direct event handlers in `packages/omo-opencode/src/plugin/event.ts` (`team-session-events/*`) = 60 total. Composed by `createCoreHooks()` + `createContinuationHooks()` + `createSkillHooks()`.

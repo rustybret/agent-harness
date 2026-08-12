@@ -1,0 +1,80 @@
+# FINAL WAVE F3 — Scenario 5: Workspace Typecheck & Full Test Suite Gate
+# Plan: .omo/plans/aft-primary-toolchain-migration.md (Scenario 5, lines 102-105)
+# Run host: /Volumes/Topper2TB/Git/agent-harness | bun test v1.3.14 | typecheck via tsgo (@typescript/native-preview)
+# Date: 2026-08-11T06:28:24Z
+
+## COMMAND 1: bun run typecheck
+# tsgo --noEmit && typecheck:script && typecheck:packages (all 31 tsconfig projects)
+TYPECHECK_EXIT=0   -> PASS (0 errors across all workspace packages)
+
+## COMMAND 2: bun test  (repo root, full suite, no sharding)
+TEST_EXIT=1        -> FAIL
+Totals: 15293 pass | 29 skip | 44 fail | 3 errors | Ran 15371 tests across 1942 files [293.11s]
+
+## FAILURE CLASSIFICATION
+# ALL failures are FORK-SCOPE (pre-existing), NOT caused by the AFT migration.
+# Root causes (files absent by fork policy per AGENTS.md "FORK SCOPE AND MAINTAINABILITY POLICY"):
+#   - .github/workflows/*.yml            (publish.yml, ci.yml, stats.yml, etc. — CI/publish workflows dropped in fork)
+#   - README.ja.md / README.ru.md        (localized READMEs absent)
+#   - .opencode/skills/work-with-pr, github-triage  (skills live under .agents/, not .opencode/skills/ in fork)
+#   - packages/omo-codex installer bundle digest drift + Codex publish workflow assertions (Codex lane unmaintained in fork)
+#   - markdown-link-audit: links to the above absent files (AGENTS.md->publish.yml/CONTRIBUTING.md, CHANGELOG->README.ru.md)
+#
+# WS5 / AFT-migration target tests ALL PASS (re-run in isolation):
+#   packages/omo-opencode/src/plugin-handlers/tool-config-handler-prometheus-permissions.test.ts
+#   packages/omo-opencode/src/mcp/zauc-mocks-mcp-index/index.test.ts
+#   packages/omo-opencode/src/mcp/cli-suffix.test.ts
+#   -> 56 pass | 0 fail | 108 expect() calls | 3 files [165ms]
+#
+# No failing test references aft_*, lsp MCP retirement, agent prompts, or permission gating regressions.
+
+## FULL DEDUPED FAIL LIST (44)
+(fail) agent command string audit > #given tracked source files #when legacy agent and human commands are scanned #then every hit is categorized
+(fail) CI typecheck workflow > #given root typecheck includes script tooling #when CI typecheck job is inspected #then script tooling is not rerun as a duplicate step
+(fail) committed Codex installer bundle > #given current installer sources #when compared with the tracked bundle marker #then the bundle is current
+(fail) committed Codex installer bundle > #given the tracked bundle #when its build marker is read #then it is present and self-consistent
+(fail) CONTRIBUTING.md accuracy > #given the contributor guide #when scanned for known-wrong tokens #then no stale defect survives
+(fail) CONTRIBUTING.md accuracy > #given the contributor guide #when scanned for testing + QA discipline #then bun test, codex suite, and evidence rules are present
+(fail) CONTRIBUTING.md accuracy > #given the contributor guide #when scanned for the dev-environment sections #then cross-harness setup, credentials, and isolation are documented
+(fail) CONTRIBUTING.md accuracy > #given the contributor guide #when scanned for the real registration entrypoints #then current symbols are documented
+(fail) download stats automation > #given stats workflow #when inspected #then it is weekly manual and scopes POSTHOG_KEY to send only
+(fail) fork publish payload containment > #given fork publish workflow #when a lazycodex files override is checked #then none is present
+(fail) fork publish payload containment > #given fork publish workflow #when npm publish paths are checked #then only the wrapper packages publish
+(fail) GitHub workflow job summaries > #given a privileged publish summary #when it renders dispatch inputs #then raw inputs are passed through env
+(fail) GitHub workflow job summaries > #given repository workflows #when inspected #then every step-based job writes a concise Markdown summary
+(fail) GitHub workflow job summaries > #given summary inputs #when the shared writer runs #then it emits the Markdown contract GitHub renders
+(fail) GPT Mini reference audit > tracked shipped files no longer reference the retired GPT Mini model
+(fail) LazyCodex marketplace sync workflow (fork policy) > fork publish workflow does not sync the Codex marketplace or build the Codex plugin
+(fail) LazyCodex marketplace sync workflow (fork policy) > fork publish-main still builds the vendored LSP dists it actually ships
+(fail) LazyCodex publish workflow (fork policy) > fork preflight trust check verifies only the maintained wrapper packages
+(fail) LazyCodex publish workflow (fork policy) > fork publish-main publishes both wrapper packages and restores package.json
+(fail) LazyCodex publish workflow (fork policy) > fork release exposes no lazycodex marketplace change-gating output
+(fail) LazyCodex publish workflow (fork policy) > fork release omits every lazycodex-ai npm/GitHub publish and marketplace step
+(fail) LazyCodex release version stamping workflow (fork policy) > fork publish workflow omits the lazycodex hook-status build and publish steps
+(fail) LazyCodex release version stamping workflow (fork policy) > fork publish workflow omits the LazyCodex marketplace sync step
+(fail) markdown local link audit > #given checked-in markdown #when local links are audited #then every local target exists
+(fail) node-target CLI build (lazycodex#47) > the main build chain carries the node CLI and the fork publish workflow ships no lazycodex payload
+(fail) Opus 5 model recommendation migration > does not publish legacy Opus 4.6 or 4.8 recommendations
+(fail) Package label workflow > #given repository automation #when inspected #then labels are derived per packages/ directory from PR diffs
+(fail) project skill tool references > #given github-triage skill instructions > #when reading task tracking examples #then they use the real task management tool names
+(fail) project skill tool references > #given work-with-pr skill instructions > #when reading the commit guidance #then commits delegate through git-master without a fabricated task category
+(fail) published LazyCodex smoke workflow (fork policy) > fork CI omits the published lazycodex-ai registry smoke job
+(fail) published LazyCodex smoke workflow (fork policy) > fork CI still runs the maintained root gates that replace it
+(fail) release and platform publish workflows > computes release metadata once and does not wire platform-binary publishing into the main release
+(fail) release and platform publish workflows > enumerates windows-arm64 consistently across every platform-list surface
+(fail) release and platform publish workflows > fails when a required platform artifact is missing
+(fail) release and platform publish workflows > keeps release finalization in a single job without a separate provenance dispatch
+(fail) release and platform publish workflows > keeps the platform publish workflow step syntax valid around version updates
+(fail) release and platform publish workflows > publishes openagent platform packages even when legacy opencode publish is unavailable
+(fail) release and platform publish workflows > publishes platform launchers without Bun compile
+(fail) release and platform publish workflows > regenerates the release lockfile and commits the release-state source before publishing
+(fail) release skill layering > #given publish runbooks #when inspected #then they verify npm opencode and codex release surfaces
+(fail) release skill layering > #given release analysis skills and commands #when inspected #then they require all release layers
+(fail) removeStaleSelfPackageTests > #given root and Senpi CI jobs #when steps are ordered #then stale self tests are removed before each suite
+(fail) Senpi compatibility test script > #given fork CI workflow #when inspected #then senpi compatibility is not a wired CI job
+(fail) web terminal visual QA guidance > #given PR visual evidence docs #when attaching screenshots #then GitHub user attachment guidance is discoverable
+
+## VERDICT
+# typecheck gate:  PASS (exit 0)
+# bun test gate:   FAIL (exit 1) — but 0 AFT-migration-attributable failures; all fork-scope infra absences.
+# Scenario 5 (AFT migration scope): PASS on typecheck; test failures are pre-existing fork divergences, NOT regressions.

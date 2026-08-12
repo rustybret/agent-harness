@@ -173,32 +173,6 @@ describe("applyToolConfig prometheus granular permissions", () => {
     })
   })
 
-  describe("#given prometheus agent — non-bash mutation tools hidden (reviewer-caught holes)", () => {
-    // apply_patch is intentionally NOT here: it asserts the "edit" permission (not its own
-    // key), so a permission deny is inert and disabled() remaps it to "edit". It is gated by
-    // the prometheus-md-only hook parsing patchText targets (see that hook's test suite).
-    const HIDDEN_EXTRA = [
-      "lsp_rename",
-      "lsp_install_decision",
-    ] as const
-
-    describe("#when applying tool config", () => {
-      for (const toolKey of HIDDEN_EXTRA) {
-        it(`#then ${toolKey} is flat-denied (hidden — it mutates, planner must not have it)`, () => {
-          // given
-          const params = createParams(["prometheus"])
-
-          // when
-          applyToolConfig(params)
-
-          // then
-          const permission = requirePermission(params.agentResult, "prometheus")
-          expect(permission[toolKey]).toBe("deny")
-          expect(isHiddenByRuleset(permission, toolKey)).toBe(true)
-        })
-      }
-    })
-  })
 
   describe("#given prometheus bash ruleset — shell-injection shapes denied (whole-command match)", () => {
     // OpenCode's bash tool passes the WHOLE raw command string as the single permission
@@ -331,6 +305,35 @@ describe("applyToolConfig prometheus granular permissions", () => {
         expect(permission.task).toBe("allow")
         expect(permission.bash).toBeUndefined()
         expect(permission.aft_delete).toBeUndefined()
+      })
+
+      it("#then atlas (orchestrator) flat-denies the mutation surface but keeps sensory tools visible", () => {
+        // given
+        const params = createParams(["atlas"])
+
+        // when
+        applyToolConfig(params)
+
+        // then — orchestrator boundary enforced in code: no writing, no mutation
+        const permission = requirePermission(params.agentResult, "atlas")
+        const MUTATION = [
+          "edit",
+          "write",
+          "aft_refactor",
+          "aft_import",
+          "aft_move",
+          "aft_delete",
+          "aft_safety",
+          "ast_grep_replace",
+        ] as const
+        for (const toolKey of MUTATION) {
+          expect(permission[toolKey]).toBe("deny")
+          expect(isHiddenByRuleset(permission, toolKey)).toBe(true)
+        }
+        // sensory/discovery tools stay visible (allow-by-default, never denied)
+        for (const toolKey of ["aft_search", "aft_outline", "aft_zoom", "aft_callgraph", "aft_inspect"]) {
+          expect(isHiddenByRuleset(permission, toolKey)).toBe(false)
+        }
       })
 
       it("#then sisyphus-junior permission block is unchanged by the prometheus edit", () => {

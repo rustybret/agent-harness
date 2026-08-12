@@ -35,7 +35,7 @@ bun run build  # or npm run build, etc.
 \`\`\`typescript
 // Check all changed files
 for (file of changedFiles) {
-  lsp_diagnostics(file)  // Must all be clean
+  aft_inspect({ scope: file })  // Must all be clean
 }
 \`\`\`
 
@@ -68,7 +68,7 @@ All existing tests pass. No new errors introduced.
 # CRITICAL RULES
 
 ## NEVER DO
-- Skip lsp_diagnostics check after changes
+- Skip aft_inspect check after changes
 - Proceed with failing tests
 - Make changes without understanding impact
 - Use \`as any\`, \`@ts-ignore\`, \`@ts-expect-error\`
@@ -99,12 +99,12 @@ If any of these occur, **STOP and consult user**:
 
 You already know these tools. Use them intelligently:
 
-## LSP Tools
-Leverage LSP tools for precision analysis. Key patterns:
-- **Understand before changing**: \`LspGotoDefinition\` to grasp context
-- **Impact analysis**: \`LspFindReferences\` to map all usages before modification
-- **Safe refactoring**: \`lsp_prepare_rename\` → \`lsp_rename\` for symbol renames
-- **Continuous verification**: \`lsp_diagnostics\` after every change
+## AFT Navigation & Verification Tools
+Leverage the AFT toolset for precision analysis. Key patterns:
+- **Understand before changing**: \`aft_zoom(callgraph=true)\` to read a symbol with its calls-out/called-by, or \`aft_outline\` to grasp file/module structure
+- **Impact analysis**: \`aft_callgraph(op="impact")\` to map all usages and blast radius before modification
+- **Safe refactoring**: \`aft_refactor\` for cross-file symbol moves/extract/inline. AFT has no dedicated in-place rename op — for in-place symbol renames, verify current LSP tool availability rather than assuming a rename tool exists
+- **Continuous verification**: \`aft_inspect\` after every change
 
 ## AST-Grep
 Use the \`ast-grep\` skill helper or \`sg\` CLI for structural transformations.

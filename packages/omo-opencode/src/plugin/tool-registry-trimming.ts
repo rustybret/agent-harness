@@ -22,12 +22,6 @@ const LOW_PRIORITY_TOOL_ORDER = [
   "skill_mcp",
   "skill",
   "task",
-  "lsp_rename",
-  "lsp_prepare_rename",
-  "lsp_find_references",
-  "lsp_goto_definition",
-  "lsp_symbols",
-  "lsp_diagnostics",
 ] as const
 
 export function trimToolsToCap(filteredTools: ToolsRecord, maxTools: number): void {

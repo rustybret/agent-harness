@@ -13,6 +13,8 @@
 
 **"It typechecks" is NOT QA. "`bun test` is green" is NOT QA.** YOU MUST DRIVE REAL OPENCODE AND RECORD THE EVIDENCE TO DISK. NO EVIDENCE == NO QA == NO COMMIT == NO PUSH.
 
+> **POST-EDIT DIAGNOSTIC GATE MANDATE:** After any edit, agents MUST run `aft_inspect({ scope })` and verify the AFT status-bar headers (`[AFT E<errors> W<warnings> ...]`) as the authoritative compilation and typecheck diagnostic gate.
+
 **ALWAYS RUN THE `opencode-qa` SKILL** (`.agents/skills/opencode-qa/`) to map the EXPECTED IMPACT and the FULL CHANGE SCOPE of your edit:
 
 1. **MAP THE BLAST RADIUS** with the skill router (CLI / server + SSE hook proof / TUI smoke / DB inspection), BEFORE and AFTER your change.
@@ -124,7 +126,7 @@ Total: 53 base, 60 with team-mode. Each tier produces an object whose values are
 | `plugin-handlers/` | 6-phase config loading pipeline | yes |
 | `openclaw/` | Bidirectional Discord/Telegram/HTTP integration | yes |
 | `__tests__/` | Plugin-level integration tests + perf fixtures | yes |
-| `mcp/` | 5 built-in MCPs (3 remote + local stdio lsp + codegraph) | yes |
+| `mcp/` | 5 built-in MCPs (3 remote + local stdio lsp + codegraph; note that lsp is retired from active OpenCode plugin runtime in favor of AFT) | yes |
 | `testing/` | Test utilities + `create-plugin-module.ts` | yes |
 | `config-migration/` | Legacy config discovery + transform plans (consumed by senpi config-startup + codex startup) | yes |
 | `types/` | Ambient `.d.ts` declarations (markdown modules) | no |

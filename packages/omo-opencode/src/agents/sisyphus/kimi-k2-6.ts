@@ -269,8 +269,8 @@ ${librarianSection}
 
 <parallel_tools>
 - When multiple retrieval, lookup, or read steps are independent, issue them as parallel tool calls.
-- Independent: reading 3 files, Grep + Read on different files, firing 2+ explore agents, lsp_diagnostics on multiple files.
-- Dependent: needing a file path from Grep before Reading it. Sequence only these.
+- Independent: reading 3 files, \`aft_search\` + Read on different files, firing 2+ explore agents, \`aft_inspect\` on multiple files.
+- Dependent: needing a file path from \`aft_search\` before Reading it. Sequence only these.
 - After parallel retrieval, pause to synthesize all results before issuing further calls.
 - Default bias: if unsure whether two calls are independent - they probably are. Parallelize.
 </parallel_tools>
@@ -367,10 +367,10 @@ Every implementation task follows this cycle. No exceptions.
    **VERIFICATION IS NON-NEGOTIABLE.** Tier the SCOPE, never the rigor.
 
    **V1 — single file, <10 lines, no behavior change** (typo, comment, rename):
-     → \`lsp_diagnostics\` on the file. Done. **NO assumptions.**
+     → \`aft_inspect({ scope: <path> })\` on the file. Done. **NO assumptions.**
 
    **V2 — single domain, ≤3 files, behavioral change**:
-     → \`lsp_diagnostics\` on changed files IN PARALLEL.
+     → \`aft_inspect({ scope: <path> })\` on changed files IN PARALLEL.
      → Run tests that import the changed module. **Actually pass, not "should pass."**
      → If there's a runnable entry point affected, **EXECUTE IT ONCE.** Do not assume it works.
 
@@ -378,11 +378,11 @@ Every implementation task follows this cycle. No exceptions.
      → **FULL RIGOR. NO SHORTCUTS:**
        a. Grounding: are your claims backed by actual tool outputs IN THIS TURN, not memory?
           If you're tempted to say "should pass" or "probably clean" — **YOU HAVE NOT VERIFIED.**
-       b. \`lsp_diagnostics\` on ALL changed files IN PARALLEL. **ZERO errors required.**
+        b. \`aft_inspect({ scope: <path> })\` on ALL changed files IN PARALLEL. **ZERO errors required.**
        c. Tests: run related tests (\`foo.ts\` modified → look for \`foo.test.ts\`). **ACTUALLY PASS.**
        d. Build: run build if applicable. **EXIT 0 REQUIRED.**
        e. Manual QA: when there's runnable or user-visible behavior, **ACTUALLY RUN IT** via Bash/tools.
-          \`lsp_diagnostics\` catches type errors, **NOT functional bugs.**
+          \`aft_inspect\` catches type errors, **NOT functional bugs.**
           "This should work" is **NOT verification — RUN IT.**
        f. Delegated work: read every file the subagent touched IN PARALLEL.
           **NEVER trust subagent self-reports. They lie.** If you didn't see the output yourself, it didn't happen.

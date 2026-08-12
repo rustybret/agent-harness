@@ -163,21 +163,24 @@ call_omo_agent(
 
 While background agents are running, use direct tools:
 
-### LSP Tools for Precise Analysis:
+### AFT Tools for Precise Analysis:
 
 \`\`\`typescript
-// Find definition(s)
-LspGotoDefinition(filePath, line, character)  // Where is it defined?
+// Read a symbol with its calls-out/called-by
+aft_zoom({ symbols: "[target_symbol]", callgraph: true })  // What is it, what does it call?
 
-// Find ALL usages across workspace
-LspFindReferences(filePath, line, character, includeDeclaration=true)
+// Find the shortest call path that reaches a definition
+aft_callgraph({ op: "trace_to_symbol", toSymbol: "[target_symbol]" })  // How is it reached?
 
-// Get file structure
-LspDocumentSymbols(filePath)  // Hierarchical outline
-LspWorkspaceSymbols(filePath, query="[target_symbol]")  // Search by name
+// Find ALL usages / call sites across workspace
+aft_callgraph({ op: "callers", symbol: "[target_symbol]" })
+
+// Get file/module structure
+aft_outline({ target: filePath })  // Hierarchical outline
+aft_search({ query: "[target_symbol]" })  // Search by name/concept/regex
 
 // Get current diagnostics
-lsp_diagnostics(filePath)  // Errors, warnings before we start
+aft_inspect({ scope: filePath })  // Errors, warnings before we start
 \`\`\`
 
 ### AST-Grep Skill for Pattern Analysis:

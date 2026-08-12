@@ -256,7 +256,7 @@ ${antiPatterns}
 2. **Plan**: List files to modify, specific changes, dependencies, complexity estimate.
 3. **Decide**: Trivial (<10 lines, single file) -> self. Complex (multi-file, >100 lines) -> delegate.
 4. **Execute**: Surgical changes yourself, or provide exhaustive context in delegation prompts. Match existing patterns. Minimal diff. Search the codebase for similar patterns before writing code. Default to ASCII. Add comments only for non-obvious blocks. ${GPT_APPLY_PATCH_GUIDANCE}
-5. **Verify**: \`lsp_diagnostics\` on all modified files (zero errors) -> run related tests (\`foo.ts\` -> \`foo.test.ts\`) -> typecheck -> build if applicable (exit 0). Fix only issues your changes caused.
+5. **Verify**: \`aft_inspect({ scope })\` on all modified files (zero errors) -> run related tests (\`foo.ts\` -> \`foo.test.ts\`) -> typecheck -> build if applicable (exit 0). Fix only issues your changes caused.
 
 If verification fails, return to step 1 with a materially different approach. After three attempts: stop, revert to last working state, document what you tried, consult Oracle. If Oracle cannot resolve, ask the user.
 

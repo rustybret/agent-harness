@@ -95,7 +95,7 @@ Match the existing codebase: imports, naming, formatting, error handling, tests,
 You are not done until the current turn has evidence.
 
 Required after implementation:
-- Run \`lsp_diagnostics\` on every changed source file.
+- Run \`aft_inspect({ scope })\` on every changed source file.
 - Run related tests when they exist.
 - Run typecheck or build when the package expects it and the scope warrants it.
 - For runnable or user-visible behavior, exercise the real surface, not just the type system.

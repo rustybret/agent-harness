@@ -7,7 +7,6 @@ function completeSummary(overrides: Partial<ToolsSummary> = {}): ToolsSummary {
       astGrepCli: true,
       commentChecker: true,
     ghCli: { authenticated: true, installed: true, username: "octocat" },
-    lspServers: [{ extensions: [".ts"], id: "typescript" }],
     mcpBuiltin: [],
     mcpUser: [],
     ...overrides,

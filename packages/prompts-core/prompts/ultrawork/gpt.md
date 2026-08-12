@@ -109,7 +109,7 @@ deep_context = background_output(task_id=...)
 **Verify (per-scenario, not just "at the end"):**
 - RED→GREEN proof captured (test id + assertion msg in both states)
 - Real-surface artifact (tmux / curl / browser / Playwright / computer-use / CLI / DB diff)
-- `lsp_diagnostics` clean on modified files
+- `aft_inspect` clean on modified files
 - Full suite green, regression scenarios still PASS
 
 ## DURABLE NOTEPAD
@@ -154,12 +154,12 @@ Commit one atomic commit per verified increment; never one end-of-run omnibus. B
 | Surface | Exercise real user path | Artifact path (tmux/curl/browser/...) |
 | Build | Run build command | Exit code 0 |
 | Suite | Full test run | All green; no skip/.only/xfail added |
-| Lint  | lsp_diagnostics on changed files | Zero new errors |
+| Lint  | aft_inspect on changed files | Zero new errors |
 
 <MANUAL_QA_MANDATE>
-### MANUAL QA IS MANDATORY. lsp_diagnostics IS NOT ENOUGH.
+### MANUAL QA IS MANDATORY. aft_inspect IS NOT ENOUGH.
 
-lsp_diagnostics catches type errors only. Logic bugs, missing behavior, broken features survive a clean LSP. After every change, exercise the real surface:
+aft_inspect catches type errors only. Logic bugs, missing behavior, broken features survive a clean LSP. After every change, exercise the real surface:
 
 | If your change... | YOU MUST... |
 |---|---|
@@ -182,7 +182,7 @@ Trigger if user said "엄밀"/"strictly"/"rigorously"/"properly review", or task
 ## STOP RULES
 
 - After each result, ask whether the user's core request can now be answered with useful evidence in hand. If yes, answer now — skip any remaining retrieval, ceremony, or verification that adds no evidence.
-- The STOP GOAL: every scenario PASSES with RED→GREEN proof AND real-surface artifact captured; full suite green and `lsp_diagnostics` clean on changed files; QA teardown receipts recorded; no scope creep; and (if triggered) the reviewer gate approved unconditionally. Above ALL of that, the decisive test — outranking every other consideration — is: is the user's problem ACTUALLY SOLVED in observable behavior? If no, you are NOT done, whatever the checklist says. If yes, deliver the final message and STOP — no hesitation, no extra verification pass, no polish loop. Work past the stop goal is scope creep, not diligence.
+- The STOP GOAL: every scenario PASSES with RED→GREEN proof AND real-surface artifact captured; full suite green and `aft_inspect` clean on changed files; QA teardown receipts recorded; no scope creep; and (if triggered) the reviewer gate approved unconditionally. Above ALL of that, the decisive test — outranking every other consideration — is: is the user's problem ACTUALLY SOLVED in observable behavior? If no, you are NOT done, whatever the checklist says. If yes, deliver the final message and STOP — no hesitation, no extra verification pass, no polish loop. Work past the stop goal is scope creep, not diligence.
 - After 2 identical failed attempts at one step, surface what was tried and ask the user before another retry.
 - After 2 parallel exploration waves yield no new useful facts, stop exploring and act.
 

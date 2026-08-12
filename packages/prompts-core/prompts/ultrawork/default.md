@@ -240,14 +240,14 @@ Every scenario requires TWO captured artifacts — both mandatory:
 | **RED→GREEN proof** | Test runner output before AND after the change | Test id + assertion message in both states |
 | **Real-surface artifact** | tmux / curl / browser / Playwright / computer-use / CLI / DB | What the user actually sees |
 
-Supporting (necessary, not sufficient): build exit 0, full suite green, lsp_diagnostics clean on changed files, regression scenarios still PASS.
+Supporting (necessary, not sufficient): build exit 0, full suite green, aft_inspect clean on changed files, regression scenarios still PASS.
 
 The real-surface artifact is always required. A test is required only where a code seam exists. "tests pass" alone is NOT done, and a test pinning prose or visual text is NOT evidence.
 
 <MANUAL_QA_MANDATE>
 ### YOU MUST EXECUTE MANUAL QA YOURSELF. THIS IS NOT OPTIONAL.
 
-**YOUR FAILURE MODE**: You finish coding, run lsp_diagnostics, and declare "done" without actually TESTING the feature. lsp_diagnostics catches type errors, NOT functional bugs. Your work is NOT verified until you MANUALLY test it.
+**YOUR FAILURE MODE**: You finish coding, run aft_inspect, and declare "done" without actually TESTING the feature. aft_inspect catches type/compile errors, NOT functional bugs. Your work is NOT verified until you MANUALLY test it.
 
 **WHAT MANUAL QA MEANS - execute ALL that apply:**
 
@@ -265,7 +265,7 @@ The real-surface artifact is always required. A test is required only where a co
 **UNACCEPTABLE QA CLAIMS:**
 - "This should work" - RUN IT.
 - "The types check out" - Types don't catch logic bugs. RUN IT.
-- "lsp_diagnostics is clean" - That's a TYPE check, not a FUNCTIONAL check. RUN IT.
+- "aft_inspect is clean" - That's a TYPE/compile check, not a FUNCTIONAL check. RUN IT.
 - "Tests pass" - Tests cover known cases. Does the ACTUAL FEATURE work as the user expects? RUN IT.
 
 **You have Bash, you have tools. There is ZERO excuse for not running manual QA.**

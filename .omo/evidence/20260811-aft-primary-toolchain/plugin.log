@@ -1,0 +1,199 @@
+[2026-08-11T05:52:03.663Z] [oh-my-openagent] ENTRY - plugin loading {"directory":"/Volumes/Topper2TB/Git/agent-harness"}
+[2026-08-11T05:52:03.667Z] [legacy-workspace-migration] Checked legacy workspace directory {"legacyDirectory":"/Volumes/Topper2TB/Git/agent-harness/.sisyphus","targetDirectory":"/Volumes/Topper2TB/Git/agent-harness/.omo","migrated":false,"skipped":[".omo/.DS_Store",".omo/plans/exa-research-skill.md",".omo/plans/game-native-lsp-integration.md",".omo/plans/subagent-output-command.md",".omo/plans/provider-quirks-normalizer.md",".omo/boulder.json",".omo/notepads/.DS_Store",".omo/notepads/exa-research-skill/issues.md",".omo/notepads/exa-research-skill/learnings.md",".omo/notepads/exa-research-skill/decisions.md",".omo/notepads/provider-quirks-normalizer/learnings.md"]}
+[2026-08-11T05:52:03.692Z] [config-migration] startup completed {"journalResumed":false,"migratedFrom":[],"skippedConflictCount":0}
+[2026-08-11T05:52:03.695Z] lsp-daemon stale-version sweep skipped: current lsp-daemon version is unknown 
+[2026-08-11T05:52:03.701Z] [live-server-route] registered {"directory":"/Volumes/Topper2TB/Git/agent-harness","hasServerUrl":true,"registrationCount":1}
+[2026-08-11T05:52:03.756Z] [tmux-session-manager] initialized {"configEnabled":true,"tmuxConfig":{"enabled":true,"layout":"main-vertical","main_pane_size":80,"main_pane_min_width":80,"agent_pane_min_width":40,"isolation":"inline"},"projectDirectory":"/Volumes/Topper2TB/Git/agent-harness","serverUrl":"http://localhost:4096/"}
+[2026-08-11T05:52:03.815Z] [tool-registry] Built tool registry {"totalTools":30,"teamModeEnabled":true,"teamToolCount":12}
+[2026-08-11T05:52:03.819Z] directory-agents-injector auto-disabled due to native OpenCode support {"currentVersion":"1.17.18+bec7f1c","nativeVersion":"1.1.37"}
+[2026-08-11T05:52:05.124Z] [agent-source-loader] Agent sources loaded {"user":0,"project":0,"opencodeGlobal":0,"opencodeProject":8,"plugin":0,"agentDefinitions":0,"opencodeConfig":0,"config":8}
+[2026-08-11T05:52:05.125Z] [connected-providers-cache] Cache file not found {"cacheFile":"/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/cache/oh-my-opencode/connected-providers.json"}
+[2026-08-11T05:52:05.125Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":true}
+[2026-08-11T05:52:05.125Z] [fetchAvailableModels] connected providers unknown, returning empty set for fallback resolution 
+[2026-08-11T05:52:05.130Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":true}
+[2026-08-11T05:52:05.130Z] [fetchAvailableModels] connected providers unknown, returning empty set for fallback resolution 
+[2026-08-11T05:52:05.130Z] [config-handler] agents loaded {"agentKeys":["Sisyphus - ultraworker","Hephaestus - Deep Agent","Prometheus - Plan Builder","Atlas - Plan Executor","build","explore","librarian","Metis - Plan Consultant","Momus - Plan Critic","multimodal-looker","oracle","plan","Sisyphus-Junior","unity-asset","unity-bridge-bootstrap","unity-build","unity-editor","unity-gamedev","unity-runtime","unity-scene","unity-script-roslyn"]}
+[2026-08-11T05:52:05.300Z] [config-handler] config handler applied {"agentCount":21,"commandCount":40}
+[2026-08-11T05:52:05.661Z] [background-agent] Shutting down BackgroundManager 
+[2026-08-11T05:52:05.662Z] [tmux-session-manager] cleanup complete 
+[2026-08-11T05:52:05.662Z] [background-agent] Shutdown complete 
+[2026-08-11T05:52:05.138Z] Loaded MCP server "codegraph" from project {"path":"/Volumes/Topper2TB/Git/agent-harness/.mcp.json"}
+[2026-08-11T05:52:17.408Z] [oh-my-openagent] ENTRY - plugin loading {"directory":"/Volumes/Topper2TB/Git/agent-harness"}
+[2026-08-11T05:52:17.410Z] [legacy-workspace-migration] Checked legacy workspace directory {"legacyDirectory":"/Volumes/Topper2TB/Git/agent-harness/.sisyphus","targetDirectory":"/Volumes/Topper2TB/Git/agent-harness/.omo","migrated":false,"skipped":[".omo/.DS_Store",".omo/plans/exa-research-skill.md",".omo/plans/game-native-lsp-integration.md",".omo/plans/subagent-output-command.md",".omo/plans/provider-quirks-normalizer.md",".omo/boulder.json",".omo/notepads/.DS_Store",".omo/notepads/exa-research-skill/issues.md",".omo/notepads/exa-research-skill/learnings.md",".omo/notepads/exa-research-skill/decisions.md",".omo/notepads/provider-quirks-normalizer/learnings.md"]}
+[2026-08-11T05:52:17.432Z] [config-migration] startup completed {"journalResumed":false,"migratedFrom":[],"skippedConflictCount":0}
+[2026-08-11T05:52:17.435Z] lsp-daemon stale-version sweep skipped: current lsp-daemon version is unknown 
+[2026-08-11T05:52:17.439Z] [live-server-route] registered {"directory":"/Volumes/Topper2TB/Git/agent-harness","hasServerUrl":true,"registrationCount":1}
+[2026-08-11T05:52:17.478Z] [tmux-session-manager] initialized {"configEnabled":true,"tmuxConfig":{"enabled":true,"layout":"main-vertical","main_pane_size":80,"main_pane_min_width":80,"agent_pane_min_width":40,"isolation":"inline"},"projectDirectory":"/Volumes/Topper2TB/Git/agent-harness","serverUrl":"http://localhost:4096/"}
+[2026-08-11T05:52:17.548Z] [tool-registry] Built tool registry {"totalTools":30,"teamModeEnabled":true,"teamToolCount":12}
+[2026-08-11T05:52:17.552Z] directory-agents-injector auto-disabled due to native OpenCode support {"currentVersion":"1.17.18+bec7f1c","nativeVersion":"1.1.37"}
+[2026-08-11T05:52:20.687Z] [oh-my-openagent] ENTRY - plugin loading {"directory":"/Volumes/Topper2TB/Git/agent-harness"}
+[2026-08-11T05:52:20.688Z] [legacy-workspace-migration] Checked legacy workspace directory {"legacyDirectory":"/Volumes/Topper2TB/Git/agent-harness/.sisyphus","targetDirectory":"/Volumes/Topper2TB/Git/agent-harness/.omo","migrated":false,"skipped":[".omo/.DS_Store",".omo/plans/exa-research-skill.md",".omo/plans/game-native-lsp-integration.md",".omo/plans/subagent-output-command.md",".omo/plans/provider-quirks-normalizer.md",".omo/boulder.json",".omo/notepads/.DS_Store",".omo/notepads/exa-research-skill/issues.md",".omo/notepads/exa-research-skill/learnings.md",".omo/notepads/exa-research-skill/decisions.md",".omo/notepads/provider-quirks-normalizer/learnings.md"]}
+[2026-08-11T05:52:20.710Z] [config-migration] startup completed {"journalResumed":false,"migratedFrom":[],"skippedConflictCount":0}
+[2026-08-11T05:52:20.712Z] lsp-daemon stale-version sweep skipped: current lsp-daemon version is unknown 
+[2026-08-11T05:52:20.715Z] [live-server-route] registered {"directory":"/Volumes/Topper2TB/Git/agent-harness","hasServerUrl":true,"registrationCount":1}
+[2026-08-11T05:52:20.739Z] [tmux-session-manager] initialized {"configEnabled":true,"tmuxConfig":{"enabled":true,"layout":"main-vertical","main_pane_size":80,"main_pane_min_width":80,"agent_pane_min_width":40,"isolation":"inline"},"projectDirectory":"/Volumes/Topper2TB/Git/agent-harness","serverUrl":"http://localhost:4096/"}
+[2026-08-11T05:52:20.834Z] [tool-registry] Built tool registry {"totalTools":30,"teamModeEnabled":true,"teamToolCount":12}
+[2026-08-11T05:52:20.837Z] directory-agents-injector auto-disabled due to native OpenCode support {"currentVersion":"1.17.18+bec7f1c","nativeVersion":"1.1.37"}
+[2026-08-11T05:52:21.206Z] [agent-source-loader] Agent sources loaded {"user":0,"project":0,"opencodeGlobal":0,"opencodeProject":8,"plugin":0,"agentDefinitions":0,"opencodeConfig":0,"config":8}
+[2026-08-11T05:52:21.207Z] [connected-providers-cache] Cache file not found {"cacheFile":"/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/cache/oh-my-opencode/connected-providers.json"}
+[2026-08-11T05:52:21.208Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":true}
+[2026-08-11T05:52:21.208Z] [fetchAvailableModels] connected providers unknown, returning empty set for fallback resolution 
+[2026-08-11T05:52:21.216Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":true}
+[2026-08-11T05:52:21.216Z] [fetchAvailableModels] connected providers unknown, returning empty set for fallback resolution 
+[2026-08-11T05:52:21.217Z] [config-handler] agents loaded {"agentKeys":["Sisyphus - ultraworker","Hephaestus - Deep Agent","Prometheus - Plan Builder","Atlas - Plan Executor","build","explore","librarian","Metis - Plan Consultant","Momus - Plan Critic","multimodal-looker","oracle","plan","Sisyphus-Junior","unity-asset","unity-bridge-bootstrap","unity-build","unity-editor","unity-gamedev","unity-runtime","unity-scene","unity-script-roslyn"]}
+[2026-08-11T05:52:21.364Z] [config-handler] config handler applied {"agentCount":21,"commandCount":40}
+[2026-08-11T05:52:21.695Z] [background-agent] Shutting down BackgroundManager 
+[2026-08-11T05:52:21.696Z] [tmux-session-manager] cleanup complete 
+[2026-08-11T05:52:21.696Z] [background-agent] Shutdown complete 
+[2026-08-11T05:52:21.233Z] Loaded MCP server "codegraph" from project {"path":"/Volumes/Topper2TB/Git/agent-harness/.mcp.json"}
+[2026-08-11T05:52:22.990Z] [oh-my-openagent] ENTRY - plugin loading {"directory":"/Volumes/Topper2TB/Git/agent-harness"}
+[2026-08-11T05:52:22.991Z] [legacy-workspace-migration] Checked legacy workspace directory {"legacyDirectory":"/Volumes/Topper2TB/Git/agent-harness/.sisyphus","targetDirectory":"/Volumes/Topper2TB/Git/agent-harness/.omo","migrated":false,"skipped":[".omo/.DS_Store",".omo/plans/exa-research-skill.md",".omo/plans/game-native-lsp-integration.md",".omo/plans/subagent-output-command.md",".omo/plans/provider-quirks-normalizer.md",".omo/boulder.json",".omo/notepads/.DS_Store",".omo/notepads/exa-research-skill/issues.md",".omo/notepads/exa-research-skill/learnings.md",".omo/notepads/exa-research-skill/decisions.md",".omo/notepads/provider-quirks-normalizer/learnings.md"]}
+[2026-08-11T05:52:23.015Z] [config-migration] startup completed {"journalResumed":false,"migratedFrom":[],"skippedConflictCount":0}
+[2026-08-11T05:52:23.017Z] lsp-daemon stale-version sweep skipped: current lsp-daemon version is unknown 
+[2026-08-11T05:52:23.020Z] [live-server-route] registered {"directory":"/Volumes/Topper2TB/Git/agent-harness","hasServerUrl":true,"registrationCount":1}
+[2026-08-11T05:52:23.043Z] [tmux-session-manager] initialized {"configEnabled":true,"tmuxConfig":{"enabled":true,"layout":"main-vertical","main_pane_size":80,"main_pane_min_width":80,"agent_pane_min_width":40,"isolation":"inline"},"projectDirectory":"/Volumes/Topper2TB/Git/agent-harness","serverUrl":"http://localhost:4096/"}
+[2026-08-11T05:52:23.108Z] [tool-registry] Built tool registry {"totalTools":30,"teamModeEnabled":true,"teamToolCount":12}
+[2026-08-11T05:52:23.111Z] directory-agents-injector auto-disabled due to native OpenCode support {"currentVersion":"1.17.18+bec7f1c","nativeVersion":"1.1.37"}
+[2026-08-11T05:52:23.437Z] [agent-source-loader] Agent sources loaded {"user":0,"project":0,"opencodeGlobal":0,"opencodeProject":8,"plugin":0,"agentDefinitions":0,"opencodeConfig":0,"config":8}
+[2026-08-11T05:52:23.438Z] [connected-providers-cache] Cache file not found {"cacheFile":"/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/cache/oh-my-opencode/connected-providers.json"}
+[2026-08-11T05:52:23.438Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":true}
+[2026-08-11T05:52:23.438Z] [fetchAvailableModels] connected providers unknown, returning empty set for fallback resolution 
+[2026-08-11T05:52:23.442Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":true}
+[2026-08-11T05:52:23.442Z] [fetchAvailableModels] connected providers unknown, returning empty set for fallback resolution 
+[2026-08-11T05:52:23.443Z] [config-handler] agents loaded {"agentKeys":["Sisyphus - ultraworker","Hephaestus - Deep Agent","Prometheus - Plan Builder","Atlas - Plan Executor","build","explore","librarian","Metis - Plan Consultant","Momus - Plan Critic","multimodal-looker","oracle","plan","Sisyphus-Junior","unity-asset","unity-bridge-bootstrap","unity-build","unity-editor","unity-gamedev","unity-runtime","unity-scene","unity-script-roslyn"]}
+[2026-08-11T05:52:41.367Z] [oh-my-openagent] ENTRY - plugin loading {"directory":"/Volumes/Topper2TB/Git/agent-harness"}
+[2026-08-11T05:52:41.368Z] [legacy-workspace-migration] Checked legacy workspace directory {"legacyDirectory":"/Volumes/Topper2TB/Git/agent-harness/.sisyphus","targetDirectory":"/Volumes/Topper2TB/Git/agent-harness/.omo","migrated":false,"skipped":[".omo/.DS_Store",".omo/plans/exa-research-skill.md",".omo/plans/game-native-lsp-integration.md",".omo/plans/subagent-output-command.md",".omo/plans/provider-quirks-normalizer.md",".omo/boulder.json",".omo/notepads/.DS_Store",".omo/notepads/exa-research-skill/issues.md",".omo/notepads/exa-research-skill/learnings.md",".omo/notepads/exa-research-skill/decisions.md",".omo/notepads/provider-quirks-normalizer/learnings.md"]}
+[2026-08-11T05:52:41.392Z] [config-migration] startup completed {"journalResumed":false,"migratedFrom":[],"skippedConflictCount":0}
+[2026-08-11T05:52:41.394Z] lsp-daemon stale-version sweep skipped: current lsp-daemon version is unknown 
+[2026-08-11T05:52:41.397Z] [live-server-route] registered {"directory":"/Volumes/Topper2TB/Git/agent-harness","hasServerUrl":true,"registrationCount":1}
+[2026-08-11T05:52:41.441Z] [tmux-session-manager] initialized {"configEnabled":true,"tmuxConfig":{"enabled":true,"layout":"main-vertical","main_pane_size":80,"main_pane_min_width":80,"agent_pane_min_width":40,"isolation":"inline"},"projectDirectory":"/Volumes/Topper2TB/Git/agent-harness","serverUrl":"http://localhost:4096/"}
+[2026-08-11T05:52:41.513Z] [tool-registry] Built tool registry {"totalTools":30,"teamModeEnabled":true,"teamToolCount":12}
+[2026-08-11T05:52:41.516Z] directory-agents-injector auto-disabled due to native OpenCode support {"currentVersion":"1.17.18+bec7f1c","nativeVersion":"1.1.37"}
+[2026-08-11T05:52:43.415Z] [oh-my-openagent] ENTRY - plugin loading {"directory":"/Volumes/Topper2TB/Git/agent-harness"}
+[2026-08-11T05:52:43.416Z] [legacy-workspace-migration] Checked legacy workspace directory {"legacyDirectory":"/Volumes/Topper2TB/Git/agent-harness/.sisyphus","targetDirectory":"/Volumes/Topper2TB/Git/agent-harness/.omo","migrated":false,"skipped":[".omo/.DS_Store",".omo/plans/exa-research-skill.md",".omo/plans/game-native-lsp-integration.md",".omo/plans/subagent-output-command.md",".omo/plans/provider-quirks-normalizer.md",".omo/boulder.json",".omo/notepads/.DS_Store",".omo/notepads/exa-research-skill/issues.md",".omo/notepads/exa-research-skill/learnings.md",".omo/notepads/exa-research-skill/decisions.md",".omo/notepads/provider-quirks-normalizer/learnings.md"]}
+[2026-08-11T05:52:43.440Z] [config-migration] startup completed {"journalResumed":false,"migratedFrom":[],"skippedConflictCount":0}
+[2026-08-11T05:52:43.442Z] lsp-daemon stale-version sweep skipped: current lsp-daemon version is unknown 
+[2026-08-11T05:52:43.446Z] [live-server-route] registered {"directory":"/Volumes/Topper2TB/Git/agent-harness","hasServerUrl":true,"registrationCount":1}
+[2026-08-11T05:52:43.469Z] [tmux-session-manager] initialized {"configEnabled":true,"tmuxConfig":{"enabled":true,"layout":"main-vertical","main_pane_size":80,"main_pane_min_width":80,"agent_pane_min_width":40,"isolation":"inline"},"projectDirectory":"/Volumes/Topper2TB/Git/agent-harness","serverUrl":"http://localhost:4096/"}
+[2026-08-11T05:52:43.514Z] [tool-registry] Built tool registry {"totalTools":30,"teamModeEnabled":true,"teamToolCount":12}
+[2026-08-11T05:52:43.539Z] directory-agents-injector auto-disabled due to native OpenCode support {"currentVersion":"1.17.18+bec7f1c","nativeVersion":"1.1.37"}
+[2026-08-11T05:52:43.870Z] [agent-source-loader] Agent sources loaded {"user":0,"project":0,"opencodeGlobal":0,"opencodeProject":8,"plugin":0,"agentDefinitions":0,"opencodeConfig":0,"config":8}
+[2026-08-11T05:52:43.870Z] [connected-providers-cache] Cache file not found {"cacheFile":"/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/cache/oh-my-opencode/connected-providers.json"}
+[2026-08-11T05:52:43.871Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":true}
+[2026-08-11T05:52:43.871Z] [fetchAvailableModels] connected providers unknown, returning empty set for fallback resolution 
+[2026-08-11T05:52:43.875Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":true}
+[2026-08-11T05:52:43.875Z] [fetchAvailableModels] connected providers unknown, returning empty set for fallback resolution 
+[2026-08-11T05:52:43.876Z] [config-handler] agents loaded {"agentKeys":["Sisyphus - ultraworker","Hephaestus - Deep Agent","Prometheus - Plan Builder","Atlas - Plan Executor","build","explore","librarian","Metis - Plan Consultant","Momus - Plan Critic","multimodal-looker","oracle","plan","Sisyphus-Junior","unity-asset","unity-bridge-bootstrap","unity-build","unity-editor","unity-gamedev","unity-runtime","unity-scene","unity-script-roslyn"]}
+[2026-08-11T05:53:07.111Z] [oh-my-openagent] ENTRY - plugin loading {"directory":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch"}
+[2026-08-11T05:53:07.137Z] [config-migration] startup completed {"journalResumed":false,"migratedFrom":[],"skippedConflictCount":0}
+[2026-08-11T05:53:07.141Z] lsp-daemon stale-version sweep skipped: current lsp-daemon version is unknown 
+[2026-08-11T05:53:07.144Z] [live-server-route] registered {"directory":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch","hasServerUrl":true,"registrationCount":1}
+[2026-08-11T05:53:07.223Z] [tmux-session-manager] initialized {"configEnabled":true,"tmuxConfig":{"enabled":true,"layout":"main-vertical","main_pane_size":80,"main_pane_min_width":80,"agent_pane_min_width":40,"isolation":"inline"},"projectDirectory":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch","serverUrl":"http://localhost:4096/"}
+[2026-08-11T05:53:07.298Z] [tool-registry] Built tool registry {"totalTools":30,"teamModeEnabled":true,"teamToolCount":12}
+[2026-08-11T05:53:07.301Z] directory-agents-injector auto-disabled due to native OpenCode support {"currentVersion":"1.17.18+bec7f1c","nativeVersion":"1.1.37"}
+[2026-08-11T05:53:07.601Z] [agent-source-loader] Agent sources loaded {"user":0,"project":0,"opencodeGlobal":0,"opencodeProject":0,"plugin":0,"agentDefinitions":0,"opencodeConfig":0,"config":0}
+[2026-08-11T05:53:07.602Z] [connected-providers-cache] Cache file not found {"cacheFile":"/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/cache/oh-my-opencode/connected-providers.json"}
+[2026-08-11T05:53:07.602Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":true}
+[2026-08-11T05:53:07.602Z] [fetchAvailableModels] connected providers unknown, returning empty set for fallback resolution 
+[2026-08-11T05:53:07.606Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":true}
+[2026-08-11T05:53:07.606Z] [fetchAvailableModels] connected providers unknown, returning empty set for fallback resolution 
+[2026-08-11T05:53:07.607Z] [config-handler] agents loaded {"agentKeys":["Sisyphus - ultraworker","Hephaestus - Deep Agent","Prometheus - Plan Builder","Atlas - Plan Executor","build","explore","librarian","Metis - Plan Consultant","Momus - Plan Critic","multimodal-looker","oracle","plan","Sisyphus-Junior"]}
+[2026-08-11T05:53:07.686Z] [config-handler] config handler applied {"agentCount":13,"commandCount":18}
+[2026-08-11T05:53:07.931Z] [tmux-session-manager] onSessionCreated called {"enabled":false,"tmuxConfigEnabled":true,"isInsideTmux":false,"eventType":"session.created","infoId":"ses_0109e42caffeU7yMSncFtsGZrn"}
+[2026-08-11T05:53:08.004Z] [codegraph-bootstrap] CodeGraph unsupported on this Node runtime; skipping bootstrap {"major":0,"projectRoot":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch","reason":"too-old"}
+[2026-08-11T05:53:08.123Z] [connected-providers-cache] Provider-models cache file not found {"cacheFile":"/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/cache/oh-my-opencode/provider-models.json"}
+[2026-08-11T05:53:08.258Z] [mailbox-mode] detected {"mode":"internal","sessionId":"ses_0109e42caffeU7yMSncFtsGZrn","trigger":"start","reason":"no-listener-record"}
+[2026-08-11T05:53:08.260Z] [mailbox-idle-drain] skipped: session is active {"sessionId":"ses_0109e42caffeU7yMSncFtsGZrn"}
+[2026-08-11T05:53:18.346Z] [oh-my-openagent] ENTRY - plugin loading {"directory":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch"}
+[2026-08-11T05:53:18.368Z] [config-migration] startup completed {"journalResumed":false,"migratedFrom":[],"skippedConflictCount":0}
+[2026-08-11T05:53:18.371Z] lsp-daemon stale-version sweep skipped: current lsp-daemon version is unknown 
+[2026-08-11T05:53:18.375Z] [live-server-route] registered {"directory":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch","hasServerUrl":true,"registrationCount":1}
+[2026-08-11T05:53:18.410Z] [tmux-session-manager] initialized {"configEnabled":true,"tmuxConfig":{"enabled":true,"layout":"main-vertical","main_pane_size":80,"main_pane_min_width":80,"agent_pane_min_width":40,"isolation":"inline"},"projectDirectory":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch","serverUrl":"http://localhost:4096/"}
+[2026-08-11T05:53:18.470Z] [tool-registry] Built tool registry {"totalTools":30,"teamModeEnabled":true,"teamToolCount":12}
+[2026-08-11T05:53:18.473Z] directory-agents-injector auto-disabled due to native OpenCode support {"currentVersion":"1.17.18+bec7f1c","nativeVersion":"1.1.37"}
+[2026-08-11T05:53:18.784Z] [agent-source-loader] Agent sources loaded {"user":0,"project":0,"opencodeGlobal":0,"opencodeProject":0,"plugin":0,"agentDefinitions":0,"opencodeConfig":0,"config":0}
+[2026-08-11T05:53:18.785Z] [connected-providers-cache] Cache file not found {"cacheFile":"/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/cache/oh-my-opencode/connected-providers.json"}
+[2026-08-11T05:53:18.785Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":true}
+[2026-08-11T05:53:18.785Z] [fetchAvailableModels] connected providers unknown, returning empty set for fallback resolution 
+[2026-08-11T05:53:18.789Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":true}
+[2026-08-11T05:53:18.789Z] [fetchAvailableModels] connected providers unknown, returning empty set for fallback resolution 
+[2026-08-11T05:53:18.790Z] [config-handler] agents loaded {"agentKeys":["Sisyphus - ultraworker","Hephaestus - Deep Agent","Prometheus - Plan Builder","Atlas - Plan Executor","build","explore","librarian","Metis - Plan Consultant","Momus - Plan Critic","multimodal-looker","oracle","plan","Sisyphus-Junior"]}
+[2026-08-11T05:53:18.862Z] [config-handler] config handler applied {"agentCount":13,"commandCount":18}
+[2026-08-11T05:53:19.073Z] [tmux-session-manager] onSessionCreated called {"enabled":false,"tmuxConfigEnabled":true,"isInsideTmux":false,"eventType":"session.created","infoId":"ses_0109e1740ffehww9F24LaSI2Y9"}
+[2026-08-11T05:53:19.134Z] [codegraph-bootstrap] CodeGraph unsupported on this Node runtime; skipping bootstrap {"major":0,"projectRoot":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch","reason":"too-old"}
+[2026-08-11T05:53:19.272Z] [connected-providers-cache] Provider-models cache file not found {"cacheFile":"/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/cache/oh-my-opencode/provider-models.json"}
+[2026-08-11T05:53:19.409Z] [mailbox-mode] detected {"mode":"internal","sessionId":"ses_0109e1740ffehww9F24LaSI2Y9","trigger":"start","reason":"no-listener-record"}
+[2026-08-11T05:53:19.416Z] [mailbox-idle-drain] skipped: session is active {"sessionId":"ses_0109e1740ffehww9F24LaSI2Y9"}
+[2026-08-11T05:53:24.277Z] [connected-providers-cache] Fetched connected providers {"count":3,"providers":["google","opencode","nvidia"]}
+[2026-08-11T05:53:24.277Z] [connected-providers-cache] Cache written {"count":3,"updatedAt":"2026-08-11T05:53:24.277Z"}
+[2026-08-11T05:53:24.278Z] [connected-providers-cache] Extracted models from provider list {"providerCount":3,"totalModels":111}
+[2026-08-11T05:53:24.279Z] [connected-providers-cache] Provider-models cache written {"providerCount":3,"updatedAt":"2026-08-11T05:53:24.278Z"}
+[2026-08-11T05:53:24.279Z] [auto-update-checker] Connected providers cache created on first run 
+[2026-08-11T05:53:24.498Z] [model-capabilities-cache] Cache written {"modelCount":2839,"generatedAt":"2026-08-11T05:53:24.494Z"}
+[2026-08-11T05:53:24.499Z] [auto-update-checker] Plugin not found in config 
+[2026-08-11T05:53:29.074Z] [mailbox-idle-drain] skipped: session is active {"sessionId":"ses_0109e1740ffehww9F24LaSI2Y9"}
+[2026-08-11T05:53:29.790Z] [auto-update-checker] Startup toast shown: v5.0.0-beta.5 
+[2026-08-11T05:53:42.295Z] [oh-my-openagent] ENTRY - plugin loading {"directory":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch"}
+[2026-08-11T05:53:42.316Z] [config-migration] startup completed {"journalResumed":false,"migratedFrom":[],"skippedConflictCount":0}
+[2026-08-11T05:53:42.320Z] lsp-daemon stale-version sweep skipped: current lsp-daemon version is unknown 
+[2026-08-11T05:53:42.324Z] [live-server-route] registered {"directory":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch","hasServerUrl":true,"registrationCount":1}
+[2026-08-11T05:53:42.364Z] [tmux-session-manager] initialized {"configEnabled":true,"tmuxConfig":{"enabled":true,"layout":"main-vertical","main_pane_size":80,"main_pane_min_width":80,"agent_pane_min_width":40,"isolation":"inline"},"projectDirectory":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch","serverUrl":"http://localhost:4096/"}
+[2026-08-11T05:53:42.422Z] [tool-registry] Built tool registry {"totalTools":30,"teamModeEnabled":true,"teamToolCount":12}
+[2026-08-11T05:53:42.425Z] directory-agents-injector auto-disabled due to native OpenCode support {"currentVersion":"1.17.18+bec7f1c","nativeVersion":"1.1.37"}
+[2026-08-11T05:53:42.711Z] [agent-source-loader] Agent sources loaded {"user":0,"project":0,"opencodeGlobal":0,"opencodeProject":0,"plugin":0,"agentDefinitions":0,"opencodeConfig":0,"config":0}
+[2026-08-11T05:53:42.711Z] [connected-providers-cache] Read cache {"count":3,"updatedAt":"2026-08-11T05:53:24.277Z"}
+[2026-08-11T05:53:42.712Z] [connected-providers-cache] Read provider-models cache {"providerCount":3,"updatedAt":"2026-08-11T05:53:24.278Z"}
+[2026-08-11T05:53:42.712Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":false,"connectedProviders":["google","opencode","nvidia"]}
+[2026-08-11T05:53:42.712Z] [fetchAvailableModels] using provider-models cache (whitelist-filtered) 
+[2026-08-11T05:53:42.712Z] [fetchAvailableModels] parsed from provider-models cache {"count":111,"connectedProviders":["google","opencode","nvidia"]}
+[2026-08-11T05:53:42.716Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":false,"connectedProviders":["google","opencode","nvidia"]}
+[2026-08-11T05:53:42.716Z] [fetchAvailableModels] using provider-models cache (whitelist-filtered) 
+[2026-08-11T05:53:42.716Z] [fetchAvailableModels] parsed from provider-models cache {"count":111,"connectedProviders":["google","opencode","nvidia"]}
+[2026-08-11T05:53:42.717Z] [config-handler] agents loaded {"agentKeys":["Sisyphus - ultraworker","Hephaestus - Deep Agent","Prometheus - Plan Builder","Atlas - Plan Executor","build","explore","librarian","Metis - Plan Consultant","Momus - Plan Critic","multimodal-looker","oracle","plan","Sisyphus-Junior"]}
+[2026-08-11T05:53:42.791Z] [config-handler] config handler applied {"agentCount":13,"commandCount":18}
+[2026-08-11T05:53:43.005Z] [tmux-session-manager] onSessionCreated called {"enabled":false,"tmuxConfigEnabled":true,"isInsideTmux":false,"eventType":"session.created","infoId":"ses_0109db9c4ffeqgwhrStsIH2hAp"}
+[2026-08-11T05:53:43.066Z] [codegraph-bootstrap] CodeGraph unsupported on this Node runtime; skipping bootstrap {"major":0,"projectRoot":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch","reason":"too-old"}
+[2026-08-11T05:53:43.332Z] [mailbox-mode] detected {"mode":"internal","sessionId":"ses_0109db9c4ffeqgwhrStsIH2hAp","trigger":"start","reason":"no-listener-record"}
+[2026-08-11T05:53:43.334Z] [mailbox-idle-drain] skipped: session is active {"sessionId":"ses_0109db9c4ffeqgwhrStsIH2hAp"}
+[2026-08-11T05:53:47.983Z] [auto-update-checker] Connected providers cache exists, updating in background 
+[2026-08-11T05:53:48.215Z] [connected-providers-cache] Fetched connected providers {"count":3,"providers":["google","opencode","nvidia"]}
+[2026-08-11T05:53:48.215Z] [connected-providers-cache] Cache written {"count":3,"updatedAt":"2026-08-11T05:53:48.215Z"}
+[2026-08-11T05:53:48.217Z] [connected-providers-cache] Extracted models from provider list {"providerCount":3,"totalModels":111}
+[2026-08-11T05:53:48.217Z] [connected-providers-cache] Provider-models cache written {"providerCount":3,"updatedAt":"2026-08-11T05:53:48.217Z"}
+[2026-08-11T05:53:48.246Z] [model-capabilities-cache] Cache written {"modelCount":2839,"generatedAt":"2026-08-11T05:53:48.241Z"}
+[2026-08-11T05:53:48.247Z] [auto-update-checker] Plugin not found in config 
+[2026-08-11T05:54:23.767Z] [oh-my-openagent] ENTRY - plugin loading {"directory":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch"}
+[2026-08-11T05:54:23.794Z] [config-migration] startup completed {"journalResumed":false,"migratedFrom":[],"skippedConflictCount":0}
+[2026-08-11T05:54:23.798Z] lsp-daemon stale-version sweep skipped: current lsp-daemon version is unknown 
+[2026-08-11T05:54:23.803Z] [live-server-route] registered {"directory":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch","hasServerUrl":true,"registrationCount":1}
+[2026-08-11T05:54:23.841Z] [tmux-session-manager] initialized {"configEnabled":true,"tmuxConfig":{"enabled":true,"layout":"main-vertical","main_pane_size":80,"main_pane_min_width":80,"agent_pane_min_width":40,"isolation":"inline"},"projectDirectory":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch","serverUrl":"http://localhost:4096/"}
+[2026-08-11T05:54:23.901Z] [tool-registry] Built tool registry {"totalTools":30,"teamModeEnabled":true,"teamToolCount":12}
+[2026-08-11T05:54:23.904Z] directory-agents-injector auto-disabled due to native OpenCode support {"currentVersion":"1.17.18+bec7f1c","nativeVersion":"1.1.37"}
+[2026-08-11T05:54:24.197Z] [agent-source-loader] Agent sources loaded {"user":0,"project":0,"opencodeGlobal":0,"opencodeProject":0,"plugin":0,"agentDefinitions":0,"opencodeConfig":0,"config":0}
+[2026-08-11T05:54:24.197Z] [connected-providers-cache] Read cache {"count":3,"updatedAt":"2026-08-11T05:53:48.215Z"}
+[2026-08-11T05:54:24.198Z] [connected-providers-cache] Read provider-models cache {"providerCount":3,"updatedAt":"2026-08-11T05:53:48.217Z"}
+[2026-08-11T05:54:24.198Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":false,"connectedProviders":["google","opencode","nvidia"]}
+[2026-08-11T05:54:24.198Z] [fetchAvailableModels] using provider-models cache (whitelist-filtered) 
+[2026-08-11T05:54:24.198Z] [fetchAvailableModels] parsed from provider-models cache {"count":111,"connectedProviders":["google","opencode","nvidia"]}
+[2026-08-11T05:54:24.203Z] [fetchAvailableModels] CALLED {"connectedProvidersUnknown":false,"connectedProviders":["google","opencode","nvidia"]}
+[2026-08-11T05:54:24.203Z] [fetchAvailableModels] using provider-models cache (whitelist-filtered) 
+[2026-08-11T05:54:24.203Z] [fetchAvailableModels] parsed from provider-models cache {"count":111,"connectedProviders":["google","opencode","nvidia"]}
+[2026-08-11T05:54:24.203Z] [config-handler] agents loaded {"agentKeys":["Sisyphus - ultraworker","Hephaestus - Deep Agent","Prometheus - Plan Builder","Atlas - Plan Executor","build","explore","librarian","Metis - Plan Consultant","Momus - Plan Critic","multimodal-looker","oracle","plan","Sisyphus-Junior"]}
+[2026-08-11T05:54:24.277Z] [config-handler] config handler applied {"agentCount":13,"commandCount":18}
+[2026-08-11T05:54:24.496Z] [tmux-session-manager] onSessionCreated called {"enabled":false,"tmuxConfigEnabled":true,"isInsideTmux":false,"eventType":"session.created","infoId":"ses_0109d17b4ffedz8cyAsE6BImD4"}
+[2026-08-11T05:54:24.572Z] [codegraph-bootstrap] CodeGraph unsupported on this Node runtime; skipping bootstrap {"major":0,"projectRoot":"/private/var/folders/9f/hp9ydfwn7wxcm48907jlpm3c0000gn/T/omo-qa-sandbox.XXXXXX.Rd28dSRtqY/scratch","reason":"too-old"}
+[2026-08-11T05:54:24.830Z] [mailbox-mode] detected {"mode":"internal","sessionId":"ses_0109d17b4ffedz8cyAsE6BImD4","trigger":"start","reason":"no-listener-record"}
+[2026-08-11T05:54:24.832Z] [mailbox-idle-drain] skipped: session is active {"sessionId":"ses_0109d17b4ffedz8cyAsE6BImD4"}
+[2026-08-11T05:54:29.467Z] [auto-update-checker] Connected providers cache exists, updating in background 
+[2026-08-11T05:54:29.782Z] [connected-providers-cache] Fetched connected providers {"count":3,"providers":["google","opencode","nvidia"]}
+[2026-08-11T05:54:29.782Z] [connected-providers-cache] Cache written {"count":3,"updatedAt":"2026-08-11T05:54:29.782Z"}
+[2026-08-11T05:54:29.784Z] [connected-providers-cache] Extracted models from provider list {"providerCount":3,"totalModels":111}
+[2026-08-11T05:54:29.785Z] [connected-providers-cache] Provider-models cache written {"providerCount":3,"updatedAt":"2026-08-11T05:54:29.784Z"}
+[2026-08-11T05:54:29.811Z] [model-capabilities-cache] Cache written {"modelCount":2839,"generatedAt":"2026-08-11T05:54:29.808Z"}
+[2026-08-11T05:54:29.812Z] [auto-update-checker] Plugin not found in config 
+[2026-08-11T05:54:34.502Z] [mailbox-idle-drain] skipped: session is active {"sessionId":"ses_0109d17b4ffedz8cyAsE6BImD4"}
+[2026-08-11T05:54:35.054Z] [auto-update-checker] Startup toast shown: v5.0.0-beta.5 
+[2026-08-11T05:54:44.498Z] [mailbox-idle-drain] skipped: session is active {"sessionId":"ses_0109d17b4ffedz8cyAsE6BImD4"}
+[2026-08-11T05:54:46.749Z] [category-skill-reminder] Reminder queued {"sessionID":"ses_0109d17b4ffedz8cyAsE6BImD4","toolCallCount":3}
+[2026-08-11T05:54:46.834Z] [category-skill-reminder] Reminder injected {"sessionID":"ses_0109d17b4ffedz8cyAsE6BImD4"}
+[2026-08-11T05:54:54.500Z] [mailbox-idle-drain] skipped: session is active {"sessionId":"ses_0109d17b4ffedz8cyAsE6BImD4"}

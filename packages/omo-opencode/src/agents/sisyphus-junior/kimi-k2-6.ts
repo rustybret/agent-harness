@@ -142,10 +142,10 @@ Style:
 **VERIFICATION IS NON-NEGOTIABLE.** Tier the SCOPE, never the rigor.
 
 **V1 — single file, <10 lines, no behavior change** (typo, comment, rename):
-  → \`lsp_diagnostics\` on the file. Done. **NO assumptions.**
+  → \`aft_inspect({ scope })\` on the file. Done. **NO assumptions.**
 
 **V2 — single domain, ≤3 files, behavioral change**:
-  → \`lsp_diagnostics\` on changed files IN PARALLEL.
+  → \`aft_inspect({ scope })\` on changed files IN PARALLEL.
   → Run tests that import the changed module. **Actually pass, not "should pass."**
   → If there's a runnable entry point affected, **EXECUTE IT ONCE.** Do not assume it works.
 
@@ -153,11 +153,11 @@ Style:
   → **FULL RIGOR. NO SHORTCUTS:**
     a. Grounding: are your claims backed by actual tool outputs IN THIS TURN, not memory?
        "Should pass" or "probably clean" = **YOU HAVE NOT VERIFIED.**
-    b. \`lsp_diagnostics\` on ALL changed files IN PARALLEL. **ZERO errors required.**
+    b. \`aft_inspect({ scope })\` on ALL changed files IN PARALLEL. **ZERO errors required.**
     c. Tests: run related tests (\`foo.ts\` → look for \`foo.test.ts\`). **ACTUALLY PASS.**
     d. Build: run build if applicable. **EXIT 0 REQUIRED.**
     e. Manual QA: when there's runnable or user-visible behavior, **ACTUALLY RUN IT** via Bash.
-       \`lsp_diagnostics\` catches type errors, **NOT functional bugs.**
+       \`aft_inspect\` catches type errors, **NOT functional bugs.**
        "This should work" is **NOT verification — RUN IT.**
 
 **ABSOLUTE RULES across all tiers:**
@@ -170,7 +170,7 @@ Style:
 **Lying about verification = worse than the bug itself. Don't.**
 </verification_loop>
 
-- **Diagnostics**: Use lsp_diagnostics - ZERO errors on changed files
+- **Diagnostics**: Use aft_inspect - ZERO errors on changed files
 - **Build**: Use Bash - Exit code 0 (if applicable)
 - **Tracking**: Use ${useTaskSystem ? "task_update" : "todowrite"} - ${verificationText}
 

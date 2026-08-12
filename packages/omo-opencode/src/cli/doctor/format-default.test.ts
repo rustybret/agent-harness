@@ -20,7 +20,6 @@ function createBaseResult(): DoctorResult {
       isLocalDev: false,
     },
     tools: {
-      lspServers: [],
       astGrepCli: false,
       commentChecker: false,
       ghCli: { installed: false, authenticated: false, username: null },

@@ -77,7 +77,7 @@ const allTools = {
   ...hashlineToolsRecord,             // +1 conditional
 }
 
-// lsp_* tools are supplied by the built-in MCP server "lsp"
+// Code intelligence and navigation tools are supplied by the primary AFT toolset (aft_*)
 ```
 
 ## KEY PATTERNS

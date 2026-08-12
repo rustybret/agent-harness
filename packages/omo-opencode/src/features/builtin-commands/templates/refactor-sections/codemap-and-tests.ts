@@ -123,7 +123,7 @@ Which approach do you prefer?
 
 ### Verification Checkpoints
 After each refactoring step:
-1. lsp_diagnostics → zero new errors
+1. aft_inspect → zero new errors
 2. Run test command → all pass
 3. Type check → clean
 

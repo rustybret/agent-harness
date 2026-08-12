@@ -18,7 +18,7 @@ const TRUNCATABLE_TOOLS = [
   "glob",
   "Glob",
   "safe_glob",
-  "lsp_diagnostics",
+  "aft_inspect",
   "interactive_bash",
   "Interactive_bash",
   "skill_mcp",

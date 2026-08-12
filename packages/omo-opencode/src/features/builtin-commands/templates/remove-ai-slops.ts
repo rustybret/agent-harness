@@ -138,7 +138,7 @@ Team mode is enabled for this session. The rules below **override Phase 2-4** of
     {
       "kind": "category",
       "category": "quick",
-      "prompt": "You run $omo:remove-ai-slops on ONE file per task. Load $omo:remove-ai-slops via the skill tool. Read the task description for the file path. Apply the skill's detection criteria verbatim. After edits: run lsp_diagnostics on the file. Report via team_send_message(teamRunId=<id>, to=\"lead\", summary=<change count>, body=<full $omo:remove-ai-slops report>) + team_task_update(status=completed). On ambiguity: send team_send_message(teamRunId=<id>, to=\"lead\", summary=\"UNCLEAR\", body=<reason>) + team_task_update(status=pending). Never git add, never run tests, never touch other files."
+      "prompt": "You run $omo:remove-ai-slops on ONE file per task. Load $omo:remove-ai-slops via the skill tool. Read the task description for the file path. Apply the skill's detection criteria verbatim. After edits: run aft_inspect on the file. Report via team_send_message(teamRunId=<id>, to=\"lead\", summary=<change count>, body=<full $omo:remove-ai-slops report>) + team_task_update(status=completed). On ambiguity: send team_send_message(teamRunId=<id>, to=\"lead\", summary=\"UNCLEAR\", body=<reason>) + team_task_update(status=pending). Never git add, never run tests, never touch other files."
     },
     { "kind": "category", "category": "quick", "prompt": "Same contract as peer quick worker." },
     { "kind": "category", "category": "quick", "prompt": "Same contract as peer quick worker." },

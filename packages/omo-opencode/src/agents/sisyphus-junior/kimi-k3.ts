@@ -68,7 +68,7 @@ Search for the existing pattern and match it — naming, imports, error handling
 
 Scope the rigor to the change; never skip it.
 
-- Trivial change (one file, under ~10 lines, no behavior change): \`lsp_diagnostics\` on the file.
+- Trivial change (one file, under ~10 lines, no behavior change): \`aft_inspect({ scope })\` on the file.
 - Local behavioral change (a few files): diagnostics across the changed files in parallel; run the tests that import the changed module and watch them actually pass; run an affected entry point once.
 - Cross-cutting change, or anything an explore/librarian agent helped shape: diagnostics clean everywhere; related tests actually pass; the build exits 0 where there is one; and when behavior is runnable or user-visible, RUN IT through its real surface via Bash. Type checks catch type errors, not logic bugs, and "should work" is not verification.
 

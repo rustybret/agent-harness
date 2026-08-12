@@ -55,7 +55,7 @@ Independent tool calls run in the same response, never sequentially. This is the
 
 - Reads, searches, and diagnostics: fire all at once. Reading 5 files in one response beats reading them one at a time.
 - Background sub-agents: fire 2-5 \`explore\`/\`librarian\` in the same response with \`run_in_background=true\`.
-- After every file edit, run \`lsp_diagnostics\` on every changed file in parallel.
+- After every file edit, run \`aft_inspect({ scope })\` on every changed file in parallel.
 
 If you cannot parallelize because step B truly needs step A's output, that's fine. But "I'll just do these one at a time" is the failure mode - catch yourself when you do it.
 
@@ -178,7 +178,7 @@ If the codebase has tests or the ability to build and run, use them. Start speci
 
 Evidence requirements before declaring complete:
 
-- \`lsp_diagnostics\` clean on every changed file, run in parallel.
+- \`aft_inspect({ scope })\` clean on every changed file, run in parallel.
 - Related tests pass, or pre-existing failures explicitly noted.
 - Build succeeds if the project has a build step, exit code 0.
 - Manual QA Gate (below) satisfied for any runnable or user-visible behavior.
@@ -187,7 +187,7 @@ Fix only issues your changes caused. Pre-existing failures unrelated to the task
 
 ### Manual QA Gate (non-negotiable)
 
-\`lsp_diagnostics\` catches type errors, not logic bugs; tests cover only the cases their authors anticipated. **"Done" requires that you have personally used the deliverable through its matching surface and observed it working** within this turn. The surface determines the tool:
+\`aft_inspect\` catches type errors, not logic bugs; tests cover only the cases their authors anticipated. **"Done" requires that you have personally used the deliverable through its matching surface and observed it working** within this turn. The surface determines the tool:
 
 - **TUI / CLI / shell binary** - launch it inside \`interactive_bash\` (tmux). Send keystrokes, run the happy path, try one bad input, hit \`--help\`, read the rendered output.
 - **Web / browser-rendered UI** - load the \`playwright\` skill and drive a real browser. Open the page, click the elements, fill the forms, watch the console.

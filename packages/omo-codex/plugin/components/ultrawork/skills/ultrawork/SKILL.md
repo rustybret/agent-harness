@@ -227,7 +227,7 @@ or native artifacts / citations must be preserved.
 - Architecture / flow / blast radius → `codegraph_explore` first when
   `codegraph_*` exists; if unavailable, continue with repo tools and LSP.
 - **SYMBOLS REQUIRE LSP** — definitions, references, rename impact,
-  workspace symbols, and diagnostics use the available `lsp_*` tools, not
+  workspace symbols, and diagnostics use the available `aft_inspect` tool, not
   text search. Run diagnostics after edits and treat errors as blocking.
 - Repo text / filenames / history / bounded shell output → `rg`,
   `rg --files`, `git`, and native utilities; narrow output in-program.

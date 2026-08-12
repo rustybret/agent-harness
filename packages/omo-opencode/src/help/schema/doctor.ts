@@ -38,13 +38,6 @@ export const SystemInfoSchema = z
   })
   .meta({ ref: "SystemInfo" })
 
-export const LspServerInfoSchema = z
-  .object({
-    id: z.string().describe("LSP server identifier"),
-    extensions: z.array(z.string()).describe("File extensions handled"),
-  })
-  .meta({ ref: "LspServerInfo" })
-
 export const GhCliInfoSchema = z
   .object({
     installed: z.boolean().describe("Whether GitHub CLI is installed"),
@@ -55,7 +48,6 @@ export const GhCliInfoSchema = z
 
 export const ToolsSummarySchema = z
   .object({
-    lspServers: z.array(LspServerInfoSchema).describe("Detected LSP servers"),
     astGrepCli: z.boolean().describe("AST-Grep CLI availability"),
     astGrepNapi: z.boolean().describe("AST-Grep NAPI availability"),
     commentChecker: z.boolean().describe("Comment checker availability"),
@@ -89,7 +81,6 @@ export const DoctorResultSchema = z
 export type DoctorIssue = z.infer<typeof DoctorIssueSchema>
 export type CheckResult = z.infer<typeof CheckResultSchema>
 export type SystemInfo = z.infer<typeof SystemInfoSchema>
-export type LspServerInfo = z.infer<typeof LspServerInfoSchema>
 export type GhCliInfo = z.infer<typeof GhCliInfoSchema>
 export type ToolsSummary = z.infer<typeof ToolsSummarySchema>
 export type DoctorSummary = z.infer<typeof DoctorSummarySchema>

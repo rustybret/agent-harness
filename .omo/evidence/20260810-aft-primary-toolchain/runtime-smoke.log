@@ -1,0 +1,2 @@
+{"type":"error","timestamp":1786425409598,"sessionID":"ses_010bf80aaffeoJgvlxtEtCSCpN","error":{"name":"UnknownError","data":{"message":"Unexpected server error. Check server logs for details.","ref":"err_989a77c7"}}}
+{"type":"error","timestamp":1786425409666,"sessionID":"ses_010bf80aaffeoJgvlxtEtCSCpN","error":{"name":"UnknownError","data":{"message":"Model not found: anthropic/claude-sonnet-5. Did you mean: claude-sonnet-5, claude-sonnet-4-5, claude-sonnet-4-5-20250929?"}}}

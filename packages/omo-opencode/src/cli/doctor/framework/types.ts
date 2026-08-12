@@ -47,7 +47,6 @@ export interface SystemInfo {
 }
 
 export interface ToolsSummary {
-  lspServers: Array<{ id: string; extensions: string[] }>
   astGrepCli: boolean
   commentChecker: boolean
   ghCli: { installed: boolean; authenticated: boolean; username: string | null }
