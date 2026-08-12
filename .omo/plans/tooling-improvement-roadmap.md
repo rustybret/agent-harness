@@ -103,11 +103,12 @@ the remainder and pick again. Items are only added here when a real session prod
   `default_sender_access: "allow-all"` implicit targets from registered projects with `"question"` ceiling,
   matching what `runSendPreflight` allows.
 
-### 10. Review salvage's Prometheus plan for Unity subagents & iterate planning guidance
+### 10. Review salvage's Prometheus plan for Unity subagents & iterate planning guidance — DONE
 
 - **Source:** User directive (2026-08-05), following salvage's adoption of the 8 Unity subagents.
 - **Task:** Once salvage writes their Prometheus work plan for utilizing Unity subagents in their prototype work, perform a thorough review of the generated plan structure, task routing, and subagent allocations.
 - **Action:** Based on observed plan quality, update `AGENTS.md` guidance for Unity-related projects and/or update Prometheus planner system instructions (`packages/omo-opencode/src/agents/prometheus.ts` and `ulw-plan` skill references) to explicitly teach Prometheus that task-specific domain subagents (`unity-script-roslyn`, `unity-scene`, `unity-asset`, `unity-build`, `unity-runtime`, `unity-bridge-bootstrap`, `unity-editor`) exist and should be planned for specialized work instead of relying solely on generic OMO agents or `sisyphus-junior` categories.
+- **Fix:** (a) updated Prometheus prompt (`packages/prompts-core/prompts/prometheus/default.md`) to recognize Unity codebases and route Unity work to the 7 domain subagents in `Recommended task executor category:` fields; (b) updated `ulw-plan` (`packages/shared-skills/skills/ulw-plan/SKILL.md` + `references/full-workflow.md`) to codify the full Unity subagent routing table and the dual-layer rule (AFT read-only for code intelligence, SuperMCP bridge for engine mutations); (c) added content-pin regression tests (`packages/prompts-core/src/prometheus-prompts.test.ts`, `packages/shared-skills/ulw-plan-unity-routing.test.ts`). Evidence: `.omo/evidence/20260812-unity-planning-guidance/`.
 
 ### 11. Review salvage's Atlas execution session & refine subagent capability instructions
 
@@ -174,6 +175,7 @@ the remainder and pick again. Items are only added here when a real session prod
 
 ## Done
 
+- **P1-10 (planning guidance)** Prometheus Unity domain-subagent routing & dual-layer rule — Prometheus prompt (`packages/prompts-core/prompts/prometheus/default.md`) and `ulw-plan` skill (`packages/shared-skills/skills/ulw-plan/SKILL.md` + `references/full-workflow.md`) updated to recognize Unity codebases, allocate the 7 specialized Unity domain subagents (`unity-script-roslyn`, `unity-scene`, `unity-asset`, `unity-build`, `unity-runtime`, `unity-bridge-bootstrap`, `unity-editor`) in plan task annotations, and codify the AFT-read / SuperMCP-mutate dual-layer rule. Evidence: `.omo/evidence/20260812-unity-planning-guidance/`.
 - **P2-5** Cross-batch supersession & protocol versioning (v2) — `MailboxStore` quarantines unread superseded notes and archives processed ones to `processed/superseded/`; envelope version updated to `2` with lenient backward/forward compatibility and presence protocol version broadcasting.
 - **P0-1** sidebar `isNoteFile()` stale-doc counting — envelope-validated count now matches the
   delivery path's definition of a note.
