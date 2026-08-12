@@ -1,0 +1,9 @@
+$ bun test packages/omo-opencode/src/shared/dist-bundle-prompt-content.test.ts
+bun test v1.3.14 (0d9b296a)
+ 1 pass
+ 0 fail
+ 11 expect() calls
+Ran 1 test across 1 file. [155.00ms]
+
+$ bun -e 'const t=await Bun.file("dist/index.js").text(); console.log(t.includes("unity-script-roslyn"))'
+true

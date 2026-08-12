@@ -1,0 +1,3 @@
+$ bun -e 'import { discoverSharedSkills } from "./packages/skills-loader-core/src/features/opencode-skill-loader/loader.ts"; import { readFileSync } from "node:fs"; import { join } from "node:path"; const skills = await discoverSharedSkills(); const ulwPlan = skills.find(s => s.name === "ulw-plan"); const workflow = readFileSync(join(ulwPlan.resolvedPath, "references", "full-workflow.md"), "utf8"); console.log("has_section:", workflow.includes("Domain-specialized executor routing (Unity)")); console.log("has_roslyn:", workflow.includes("subagent_type: \"unity-script-roslyn\""));'
+has_section: true
+has_roslyn: true
