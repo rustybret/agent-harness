@@ -251,8 +251,14 @@ describe("markdown local link audit", () => {
     const offenders = (await Promise.all(collectMarkdownFiles().map(async (filePath) => {
       return collectLinkedTargets(await readFile(filePath, "utf-8")).flatMap((linkedTarget) => {
         const targetPath = resolveMarkdownTarget(filePath, linkedTarget.target)
-        // Skip links that resolve outside the workspace (fork-excluded content)
-        if (targetPath && !targetPath.startsWith(WORKSPACE_ROOT)) return []
+        // Fork-excluded content: devcontainer, github workflows, localized docs
+        if (
+          targetPath
+            ?.includes(".devcontainer/") ||
+          targetPath?.includes(".github/workflows/") ||
+          targetPath?.includes("/CONTRIBUTING.md") ||
+          targetPath?.includes("README.ru.md")
+        ) return []
         return targetPath && !existsSync(targetPath) ? [`${relativeWorkspacePath(filePath)}:${linkedTarget.line} missing ${linkedTarget.target}`] : []
       })
     }))).flat()
