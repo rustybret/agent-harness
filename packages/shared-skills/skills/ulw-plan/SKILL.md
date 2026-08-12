@@ -78,6 +78,7 @@ When producing the plan, encode every executable item as a column-zero Markdown 
 - **Approval is not execution.** Approval authorizes writing the plan ONLY, never implementation. ONE request -> ONE plan, however large.
 - **The durable draft is the resume point.** Record `intent`, `review_required`, decisions, the approval gate, and the ledgers to `.omo/drafts/<slug>.md` as you go; on any later turn read it and resume from those fields instead of rerouting from memory.
 - **Agent-executed QA per todo** (happy + failure, exact tool + invocation, evidence path). Zero human-intervention verification. Confirm test strategy every time (TDD / tests-after / none - agent-executed QA is always included).
+- **Domain-specialized executors when the codebase warrants it.** In a Unity codebase, route Unity engine/scene/asset/script/build/runtime todos to the Unity domain subagents (`unity-script-roslyn`, `unity-scene`, `unity-asset`, `unity-build`, `unity-runtime`, `unity-bridge-bootstrap`, `unity-editor`) via the `Recommended task executor category:` line (e.g. `subagent_type: "unity-script-roslyn"`), never to generic `sisyphus-junior` categories; and codify the dual-layer rule in every Unity todo - read-only AFT tools for code intelligence, SuperMCP bridge tools for engine/asset mutations. Full routing table: `references/full-workflow.md`.
 
 ## Approval gate
 

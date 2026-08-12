@@ -156,6 +156,25 @@ No Metis, no plan file, no execution until the user approves. The UNCLEAR path a
 ```
 > Target 5-8 todos per wave; fewer than 3 (except the final) means under-splitting. Implementation + Test = ONE todo. Each todo carries: exhaustive References (the executor has no interview context), agent-executable Acceptance criteria, happy + failure QA scenarios each with an evidence path, a Commit line, and a `Recommended task executor category:` line - the routing verdict the executor follows, with a one-line reason, in the omo category vocabulary: `quick` (mechanical / single-file - the default for every splittable piece), `unspecified-low` (small misc), `unspecified-high` (standard multi-file feature), `visual-engineering` (frontend/UI), `writing` (docs), `git` (git ops), `deep` (hairy debugging or cross-module reasoning), `ultrabrain` (ONE genuinely hard cohesive problem, delegated whole). Prefer many small `quick`-routable todos spread across parallel waves; when splitting would sever shared reasoning, keep ONE todo routed to `deep`/`ultrabrain` - never force-split work whose parts share one insight. Harnesses without categories map by difficulty: quick/unspecified-low/writing/git = low, unspecified-high/visual-engineering = medium, deep/ultrabrain = high.
 
+### Domain-specialized executor routing (Unity)
+
+When the target workspace is a Unity project (any of `Assets/`, `ProjectSettings/`, `Packages/manifest.json`, or `*.unity` scenes) AND the harness registers the Unity domain subagents, annotate Unity engine/scene/asset/script/build/runtime todos with the specialist instead of a generic category, on the same annotation line, e.g.:
+
+`Recommended task executor category: subagent_type: "unity-script-roslyn"` - C# gameplay script plus compile gate.
+
+Specialists and their domains:
+- `unity-script-roslyn` - C# script create/edit/validate/delete plus the compile gate (Roslyn pre-flight, compile status, console logs, test runs).
+- `unity-scene` - scene load/create/mutate, GameObjects, prefabs, components, hierarchy, spatial queries.
+- `unity-asset` - asset import/find/create/assign, materials, UI Toolkit (UXML/USS), VFX.
+- `unity-build` - build-target selection, synchronous player builds, structured build reports.
+- `unity-runtime` - play mode control, pause/step, profiler capture, gameplay verification.
+- `unity-bridge-bootstrap` - bridge health, package install, project settings, editor menu items, checkpoints.
+- `unity-editor` - ONE atomic Unity goal with a named domain when no single specialist fits cleanly.
+
+Generic categories (`quick`, `unspecified-high`, ...) stay correct for non-engine work in the same repo (docs, CI, harness-side TypeScript). Never route a Unity engine or asset mutation to a generic implementer.
+
+Dual-layer tooling rule - bake it into every Unity todo's instructions: code intelligence and search go through read-only AFT tools (`aft_search`, `aft_outline`, `aft_zoom`, `aft_callgraph`); every engine or asset mutation goes through SuperMCP bridge tools (`script_create`, `script_edit`, `scene_create`, `material_create`, and the other bridge mutation tools) so Roslyn pre-flight validation, Unity's compile loop, and AssetDatabase serialization run. Plain-file writes to `.cs`, `.unity`, `.prefab`, or `.meta` content are forbidden in Unity todos.
+
 ## Plan artifact producer contract
 
 When producing the plan, encode every executable item as a column-zero Markdown task row: implementation rows MUST match `- [ ] N. <title>` (where `N` is a positive decimal integer), and final-verifier rows MUST match `- [ ] F<number>. <title>`. Prose headings, numbered paragraphs, and ordinary bullets are not task substitutes and MUST NOT be counted as implementation or final-verifier tasks. Before handoff, run a structural self-check over the plan: verify that every implementation row and final-verifier row is column-zero, matches its required grammar, and appears in the intended `## Todos` or `## Final verification wave` section; verify that no prose heading or bullet is being used as a task; verify that every implementation row carries a nested `Recommended task executor category:` line (final-verifier rows default to `unspecified-high` when unannotated); and repair the plan before handoff if any check fails.
