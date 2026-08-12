@@ -1,10 +1,4 @@
-declare const describe: (name: string, fn: () => void) => void
-declare const it: (name: string, fn: () => void | Promise<void>) => void
-declare const expect: <T>(value: T) => {
-  toBe(expected: T): void
-  toEqual(expected: unknown): void
-  toHaveLength(expected: number): void
-}
+import { describe, expect, it } from "bun:test"
 
 import { createProviderQuirksNormalizerHook } from "./hook"
 
@@ -36,7 +30,7 @@ async function runTransform(messages: TestMessage[]): Promise<void> {
 
 describe("createProviderQuirksNormalizerHook", () => {
   it("Cerebras strips reasoning parts (nested model.providerID)", async () => {
-    //#given
+    // given
     const messages = [
       {
         info: { role: "user" },
@@ -51,15 +45,15 @@ describe("createProviderQuirksNormalizerHook", () => {
       },
     ] satisfies TestMessage[]
 
-    //#when
+    // when
     await runTransform(messages)
 
-    //#then
+    // then
     expect(messages[1]?.parts).toEqual([{ type: "text", text: "response" }])
   })
 
   it("Cerebras strips reasoning parts (flat providerID — OpenCode API shape)", async () => {
-    //#given
+    // given
     const messages = [
       {
         info: { role: "user" },
@@ -74,15 +68,15 @@ describe("createProviderQuirksNormalizerHook", () => {
       },
     ] satisfies TestMessage[]
 
-    //#when
+    // when
     await runTransform(messages)
 
-    //#then
+    // then
     expect(messages[1]?.parts).toEqual([{ type: "text", text: "response" }])
   })
 
   it("Cerebras strips reasoning across the full history (not just the latest)", async () => {
-    //#given
+    // given
     const messages = [
       {
         info: { role: "user" },
@@ -108,16 +102,16 @@ describe("createProviderQuirksNormalizerHook", () => {
       },
     ] satisfies TestMessage[]
 
-    //#when
+    // when
     await runTransform(messages)
 
-    //#then
+    // then
     expect(messages[1]?.parts).toEqual([{ type: "text", text: "old response" }])
     expect(messages[3]?.parts).toEqual([{ type: "text", text: "newer response" }])
   })
 
   it("Cerebras injects text when all parts stripped", async () => {
-    //#given
+    // given
     const messages = [
       {
         info: { role: "user" },
@@ -129,17 +123,17 @@ describe("createProviderQuirksNormalizerHook", () => {
       },
     ] satisfies TestMessage[]
 
-    //#when
+    // when
     await runTransform(messages)
 
-    //#then
+    // then
     expect(messages[1]?.parts).toHaveLength(1)
     expect(messages[1]?.parts[0]?.type).toBe("text")
     expect(messages[1]?.parts[0]?.text).toBe("")
   })
 
   it("Groq injects reasoning for tool-use messages", async () => {
-    //#given
+    // given
     const messages = [
       {
         info: { role: "user" },
@@ -151,10 +145,10 @@ describe("createProviderQuirksNormalizerHook", () => {
       },
     ] satisfies TestMessage[]
 
-    //#when
+    // when
     await runTransform(messages)
 
-    //#then
+    // then
     expect(messages[1]?.parts).toHaveLength(2)
     expect(messages[1]?.parts[0]?.type).toBe("reasoning")
     expect((messages[1]?.parts[0] as TestPart)?.text).toBe("")
@@ -162,7 +156,7 @@ describe("createProviderQuirksNormalizerHook", () => {
   })
 
   it("Moonshot injects reasoning for tool-use messages", async () => {
-    //#given
+    // given
     const messages = [
       {
         info: { role: "user" },
@@ -174,10 +168,10 @@ describe("createProviderQuirksNormalizerHook", () => {
       },
     ] satisfies TestMessage[]
 
-    //#when
+    // when
     await runTransform(messages)
 
-    //#then
+    // then
     expect(messages[1]?.parts).toHaveLength(2)
     expect(messages[1]?.parts[0]?.type).toBe("reasoning")
     expect((messages[1]?.parts[0] as TestPart)?.text).toBe("")
@@ -185,7 +179,7 @@ describe("createProviderQuirksNormalizerHook", () => {
   })
 
   it("Groq does NOT inject when reasoning already present", async () => {
-    //#given
+    // given
     const messages = [
       {
         info: { role: "user" },
@@ -200,10 +194,10 @@ describe("createProviderQuirksNormalizerHook", () => {
       },
     ] satisfies TestMessage[]
 
-    //#when
+    // when
     await runTransform(messages)
 
-    //#then
+    // then
     expect(messages[1]?.parts).toEqual([
       { type: "reasoning", text: "thinking" },
       { type: "tool_use" },
@@ -211,7 +205,7 @@ describe("createProviderQuirksNormalizerHook", () => {
   })
 
   it("Anthropic passthrough", async () => {
-    //#given
+    // given
     const messages = [
       {
         info: { role: "user" },
@@ -226,10 +220,10 @@ describe("createProviderQuirksNormalizerHook", () => {
       },
     ] satisfies TestMessage[]
 
-    //#when
+    // when
     await runTransform(messages)
 
-    //#then
+    // then
     expect(messages[1]?.parts).toEqual([
       { type: "reasoning", text: "thinking" },
       { type: "tool_use" },
@@ -237,7 +231,7 @@ describe("createProviderQuirksNormalizerHook", () => {
   })
 
   it("OpenAI passthrough", async () => {
-    //#given
+    // given
     const messages = [
       {
         info: { role: "user" },
@@ -252,10 +246,10 @@ describe("createProviderQuirksNormalizerHook", () => {
       },
     ] satisfies TestMessage[]
 
-    //#when
+    // when
     await runTransform(messages)
 
-    //#then
+    // then
     expect(messages[1]?.parts).toEqual([
       { type: "reasoning", text: "thinking" },
       { type: "tool_use" },
@@ -263,7 +257,7 @@ describe("createProviderQuirksNormalizerHook", () => {
   })
 
   it("No providerID passthrough", async () => {
-    //#given
+    // given
     const messages = [
       {
         info: { role: "user" },
@@ -278,10 +272,10 @@ describe("createProviderQuirksNormalizerHook", () => {
       },
     ] satisfies TestMessage[]
 
-    //#when
+    // when
     await runTransform(messages)
 
-    //#then
+    // then
     expect(messages[1]?.parts).toEqual([
       { type: "reasoning", text: "thinking" },
       { type: "tool_use" },
@@ -289,7 +283,7 @@ describe("createProviderQuirksNormalizerHook", () => {
   })
 
   it("Non-tool assistant messages on Groq are untouched", async () => {
-    //#given
+    // given
     const messages = [
       {
         info: { role: "user" },
@@ -301,15 +295,15 @@ describe("createProviderQuirksNormalizerHook", () => {
       },
     ] satisfies TestMessage[]
 
-    //#when
+    // when
     await runTransform(messages)
 
-    //#then
+    // then
     expect(messages[1]?.parts).toEqual([{ type: "text", text: "response" }])
   })
 
   it("Cerebras strips reasoning_content from info object", async () => {
-    //#given
+    // given
     const messages = [
       {
         info: { role: "user" },
@@ -325,10 +319,10 @@ describe("createProviderQuirksNormalizerHook", () => {
       },
     ] satisfies TestMessage[]
 
-    //#when
+    // when
     await runTransform(messages)
 
-    //#then
+    // then
     expect("reasoning_content" in messages[1]?.info).toBe(false)
     expect(messages[1]?.parts).toEqual([{ type: "text", text: "response" }])
   })

@@ -9,7 +9,7 @@ export interface PromptRetryOptions {
   checkToolState?: boolean
 }
 
-export const PROMPT_TIMEOUT_MS = 120000
+export const PROMPT_TIMEOUT_MS = 300000
 
 export function createPromptTimeoutContext(args: PromptTimeoutArgs, timeoutMs: number): {
   signal: AbortSignal

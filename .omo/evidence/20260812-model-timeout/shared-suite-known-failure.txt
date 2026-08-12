@@ -1,0 +1,31 @@
+$ bun test packages/omo-opencode/src/shared
+bun test v1.3.14 (0d9b296a)
+
+packages/omo-opencode/src/shared/markdown-link-audit.test.ts:
+252 |       return collectLinkedTargets(await readFile(filePath, "utf-8")).flatMap((linkedTarget) => {
+253 |         const targetPath = resolveMarkdownTarget(filePath, linkedTarget.target)
+254 |         return targetPath && !existsSync(targetPath) ? [`${relativeWorkspacePath(filePath)}:${linkedTarget.line} missing ${linkedTarget.target}`] : []
+255 |       })
+256 |     }))).flat()
+257 |     expect(offenders.sort()).toEqual([])
+                                   ^
+error: expect(received).toEqual(expected)
+
+- []
++ [
++   ".devcontainer/README.md:68 missing ../CONTRIBUTING.md",
++   "AGENTS.md:207 missing .github/workflows/publish.yml",
++   "AGENTS.md:348 missing CONTRIBUTING.md",
++   "CHANGELOG.md:292 missing README.ru.md",
++ ]
+
+- Expected  - 1
++ Received  + 6
+
+      at <anonymous> (/Volumes/Topper2TB/Git/agent-harness/packages/omo-opencode/src/shared/markdown-link-audit.test.ts:257:30)
+(fail) markdown local link audit > #given checked-in markdown #when local links are audited #then every local target exists [122.42ms]
+
+ 1084 pass
+ 1 fail
+ 1922 expect() calls
+Ran 1085 tests across 124 files. [9.17s]
