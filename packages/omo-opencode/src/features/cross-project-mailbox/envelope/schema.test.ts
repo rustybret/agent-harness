@@ -16,7 +16,7 @@ import type { MailboxMessage, MailboxMode } from "./schema"
 
 function makeEnvelope(overrides: Partial<MailboxMessage> = {}): MailboxMessage {
   return MailboxMessageSchema.parse({
-    version: 1,
+    version: 2,
     messageId: "11111111-1111-4111-8111-111111111111",
     timestamp: 1719500000000,
     correlationId: "22222222-2222-4222-8222-222222222222",
@@ -209,6 +209,60 @@ describe("requested_mode field", () => {
 })
 
 describe("tolerant parse", () => {
+  test("#given frontmatter with a version 2 or future version 3 #when parse #then parses cleanly without throwing", () => {
+    // given
+    const fileContentV1 = [
+      "---",
+      "version: 1",
+      "messageId: 11111111-1111-4111-8111-111111111111",
+      "timestamp: 1719500000000",
+      "correlationId: 22222222-2222-4222-8222-222222222222",
+      "inReplyToMessageId: null",
+      "fromProject: A",
+      "toProject: B",
+      "fromProjectId: a-1",
+      "toProjectId: b-2",
+      "intent: impl",
+      "priority: 0",
+      "hopCount: 0",
+      "hopPath:",
+      "  - a-1",
+      "supersedes: null",
+      "---",
+      "body v1",
+    ].join("\n")
+
+    const fileContentV3 = [
+      "---",
+      "version: 3",
+      "messageId: 11111111-1111-4111-8111-111111111111",
+      "timestamp: 1719500000000",
+      "correlationId: 22222222-2222-4222-8222-222222222222",
+      "inReplyToMessageId: null",
+      "fromProject: A",
+      "toProject: B",
+      "fromProjectId: a-1",
+      "toProjectId: b-2",
+      "intent: impl",
+      "priority: 0",
+      "hopCount: 0",
+      "hopPath:",
+      "  - a-1",
+      "supersedes: null",
+      "future_v3_feature: active",
+      "---",
+      "body v3",
+    ].join("\n")
+
+    // when / then
+    const parsedV1 = parseEnvelope(fileContentV1)
+    expect(parsedV1.envelope.version).toBe(1)
+
+    const parsedV3 = parseEnvelope(fileContentV3)
+    expect(parsedV3.envelope.version).toBe(3)
+    expect(parsedV3.body).toBe("body v3")
+  })
+
   test("#given frontmatter with an unknown key #when parse #then does not throw and strips the unknown key", () => {
     // given
     const fileContent = [

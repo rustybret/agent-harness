@@ -178,7 +178,58 @@ export class MailboxStore {
   }
 
   /**
-   * Whether a message has already been handed to the receiver, i.e. acked into `processed/`.
+   * Marks/quarantines a superseded note across batches.
+   *
+   * If the superseded note is sitting unread or reserved in `inbox`, it is quarantined to `rejected/`
+   * with reason `"superseded"` so it never drains.
+   * If the superseded note was already delivered to `processed/`, it is moved to `processed/superseded/`
+   * with a `.superseded.json` metadata record preserving auditability.
+   */
+  async markSuperseded(supersededMessageId: string, supersedingMessageId = ""): Promise<void> {
+    const { inbox, processed } = this.dirs()
+    const fileName = safeMessageIdFilename(supersededMessageId)
+    const inboxPath = path.join(inbox, fileName)
+    const reservedInboxPath = path.join(inbox, `${RESERVED_PREFIX}${supersededMessageId}${NOTE_SUFFIX}`)
+    const processedPath = path.join(processed, fileName)
+    const supersededDir = path.join(processed, "superseded")
+    const targetSupersededPath = path.join(supersededDir, fileName)
+
+    for (const src of [inboxPath, reservedInboxPath]) {
+      this.guard(src)
+      try {
+        await stat(src)
+        await this.quarantine(
+          supersededMessageId,
+          "superseded",
+          `Superseded by message ${supersedingMessageId}`,
+        )
+        return
+      } catch (error) {
+        if (!isMissingPathError(error)) throw error
+      }
+    }
+
+    this.guard(processedPath)
+    try {
+      await stat(processedPath)
+      await mkdir(supersededDir, { recursive: true, mode: 0o700 })
+      this.guard(targetSupersededPath)
+      await rename(processedPath, targetSupersededPath)
+      const recordPath = path.join(supersededDir, `${supersededMessageId}.superseded.json`)
+      this.guard(recordPath)
+      await writeFile(
+        recordPath,
+        `${JSON.stringify({ supersededBy: supersedingMessageId, at: new Date().toISOString() }, null, 2)}\n`,
+      )
+      return
+    } catch (error) {
+      if (!isMissingPathError(error)) throw error
+    }
+  }
+
+  /**
+   * Whether a message has already been handed to the receiver, i.e. acked into `processed/` or
+   * moved to `processed/superseded/`.
    *
    * Used to tell the two supersession cases apart: superseding a note still sitting unread is a
    * silent replacement, while superseding one already consumed is a correction the receiver has to
@@ -186,15 +237,20 @@ export class MailboxStore {
    */
   private async wasDelivered(messageId: string): Promise<boolean> {
     const { processed } = this.dirs()
-    const candidate = path.join(processed, safeMessageIdFilename(messageId))
-    this.guard(candidate)
-    try {
-      await stat(candidate)
-      return true
-    } catch (error) {
-      if (isMissingPathError(error)) return false
-      throw error
+    const fileName = safeMessageIdFilename(messageId)
+    const candidateProcessed = path.join(processed, fileName)
+    const candidateSuperseded = path.join(processed, "superseded", fileName)
+    this.guard(candidateProcessed)
+    this.guard(candidateSuperseded)
+    for (const candidate of [candidateProcessed, candidateSuperseded]) {
+      try {
+        await stat(candidate)
+        return true
+      } catch (error) {
+        if (!isMissingPathError(error)) throw error
+      }
     }
+    return false
   }
 
   async drainUnread(maxNotes: number): Promise<UnreadMessage[]> {
@@ -204,6 +260,13 @@ export class MailboxStore {
         .map((message) => message.envelope.supersedes)
         .filter((value): value is string => value !== null),
     )
+
+    for (const msg of unread) {
+      if (msg.envelope.supersedes) {
+        await this.markSuperseded(msg.envelope.supersedes, msg.messageId)
+      }
+    }
+
     const latest = unread.filter((message) => !supersededIds.has(message.messageId))
     latest.sort(
       (left, right) =>

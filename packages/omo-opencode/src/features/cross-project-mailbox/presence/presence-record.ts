@@ -3,6 +3,8 @@ import { randomUUID } from "node:crypto"
 import os from "node:os"
 import path from "node:path"
 
+import { CURRENT_PROTOCOL_VERSION } from "../envelope/schema"
+
 export const PRESENCE_TTL_MS = 30_000
 export const PRESENCE_INTERVAL_MS = 10_000
 
@@ -18,6 +20,7 @@ export interface PresenceRecord {
   sessionId: string
   pid: number
   heartbeatTs: number
+  protocolVersion?: number
 }
 
 export function presenceDir(homeDir: string = os.homedir()): string {
@@ -37,7 +40,11 @@ export async function writePresenceRecord(
 
   const finalPath = presenceRecordPath(record.projectId, homeDir)
   const tmpPath = path.join(dir, `.${record.projectId}.${randomUUID()}.tmp`)
-  const content = `${JSON.stringify(record, null, 2)}\n`
+  const recordToWrite: PresenceRecord = {
+    protocolVersion: CURRENT_PROTOCOL_VERSION,
+    ...record,
+  }
+  const content = `${JSON.stringify(recordToWrite, null, 2)}\n`
 
   try {
     const fileHandle = await open(tmpPath, "wx", PRESENCE_FILE_MODE)

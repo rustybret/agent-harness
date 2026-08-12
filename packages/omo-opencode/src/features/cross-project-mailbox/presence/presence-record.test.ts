@@ -20,6 +20,7 @@ function makeRecord(overrides: Partial<PresenceRecord> = {}): PresenceRecord {
     sessionId: "ses_abc",
     pid: 4242,
     heartbeatTs: 1_000_000,
+    protocolVersion: 2,
     ...overrides,
   }
 }

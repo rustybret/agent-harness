@@ -119,13 +119,12 @@ the remainder and pick again. Items are only added here when a real session prod
 
 ## P2 — feature gaps with stand-ins
 
-### 5. Cross-batch supersession
+### 5. Cross-batch supersession & protocol versioning — DONE
 
 - **Source:** art3d-pipeline `3cf4fe37-650a-4c9d-839e-3eb6032f20c6`, and cloudhome independently.
-- **Observed:** `supersedes` only dedupes within a single drain batch. A correction sent after the
-  original already drained does not invalidate the work in flight.
-- **Stand-in:** `requested_mode: "interrupt"` queue-jumps and nudges a drain, which covers the urgent
-  case but does not mark the superseded note as invalid.
+- **Observed:** `supersedes` originally deduped only within a single drain batch. A correction sent after the
+  original already drained did not invalidate the work in flight.
+- **Fix:** (Item 5) Extended `MailboxStore` to quarantine unread superseded notes to `rejected/` with reason `"superseded"`, and move previously delivered notes from `processed/` to `processed/superseded/` with audit metadata (`<id>.superseded.json`). (Item 5.5) Updated `MailboxMessageSchema` default version to `2` (`CURRENT_PROTOCOL_VERSION = 2`), added `protocolVersion` to presence records/heartbeats, and implemented lenient version parsing for backward and forward compatibility.
 
 ### 6. Per-message tier escalation
 
@@ -175,6 +174,7 @@ the remainder and pick again. Items are only added here when a real session prod
 
 ## Done
 
+- **P2-5** Cross-batch supersession & protocol versioning (v2) — `MailboxStore` quarantines unread superseded notes and archives processed ones to `processed/superseded/`; envelope version updated to `2` with lenient backward/forward compatibility and presence protocol version broadcasting.
 - **P0-1** sidebar `isNoteFile()` stale-doc counting — envelope-validated count now matches the
   delivery path's definition of a note.
 - **P1-9** `senders` dual-purpose doc & implicit target alignment — documented `senders` block dual-purpose usage in `docs/reference/cross-project-mailbox.md`, and updated `readOutboundBudget` to include implicitly allowed registered projects when `default_sender_access` is `"allow-all"`.

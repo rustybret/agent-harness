@@ -21,6 +21,7 @@ function makeRecord(overrides: Partial<PresenceRecord> = {}): PresenceRecord {
     sessionId: "ses_abc",
     pid: 4242,
     heartbeatTs: Date.now(),
+    protocolVersion: 2,
     ...overrides,
   }
 }
@@ -461,7 +462,7 @@ describe("readPresenceDetail", () => {
       const detail = await readPresenceDetail(record.projectId, homeDir, deps)
 
       // then
-      expect(detail).toEqual({ status: "live", heartbeatTs: now })
+      expect(detail).toEqual({ status: "live", heartbeatTs: now, protocolVersion: 2 })
       expect(probeSession).toHaveBeenCalledTimes(1)
     })
   })
@@ -479,7 +480,7 @@ describe("readPresenceDetail", () => {
       const detail = await readPresenceDetail(record.projectId, homeDir, deps)
 
       // then
-      expect(detail).toEqual({ status: "stale", heartbeatTs: now })
+      expect(detail).toEqual({ status: "stale", heartbeatTs: now, protocolVersion: 2 })
     })
   })
 
@@ -496,7 +497,7 @@ describe("readPresenceDetail", () => {
       const detail = await readPresenceDetail(record.projectId, homeDir, deps)
 
       // then
-      expect(detail).toEqual({ status: "offline", heartbeatTs: oldTs })
+      expect(detail).toEqual({ status: "offline", heartbeatTs: oldTs, protocolVersion: 2 })
       expect(probeSession).not.toHaveBeenCalled()
     })
   })
@@ -514,8 +515,34 @@ describe("readPresenceDetail", () => {
       const detail = await readPresenceDetail(record.projectId, homeDir, deps)
 
       // then
-      expect(detail).toEqual({ status: "internal", heartbeatTs: now })
+      expect(detail).toEqual({ status: "internal", heartbeatTs: now, protocolVersion: 2 })
       expect(probeSession).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("#given a legacy unversioned presence record file", () => {
+    it("#then it defaults protocolVersion to 1", async () => {
+      // given
+      const now = Date.now()
+      const rawLegacy = {
+        projectId: "alpha-id",
+        repoRoot: "/repos/alpha",
+        mode: "internal",
+        serverUrl: null,
+        sessionId: "ses_legacy",
+        pid: 1234,
+        heartbeatTs: now,
+      }
+      const dir = path.join(homeDir, ".omo", "presence")
+      const { mkdirSync, writeFileSync } = await import("node:fs")
+      mkdirSync(dir, { recursive: true })
+      writeFileSync(path.join(dir, "alpha-id.json"), JSON.stringify(rawLegacy))
+
+      // when
+      const detail = await readPresenceDetail("alpha-id", homeDir)
+
+      // then
+      expect(detail).toEqual({ status: "internal", heartbeatTs: now, protocolVersion: 1 })
     })
   })
 })

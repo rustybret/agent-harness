@@ -16,6 +16,7 @@ export type PresenceStatus = "live" | "stale" | "offline" | "internal"
 export interface PresenceDetail {
   status: PresenceStatus | "missing"
   heartbeatTs: number | null
+  protocolVersion?: number
 }
 
 const DEFAULT_PROBE_TIMEOUT_MS = 2_000
@@ -35,12 +36,14 @@ export function isPresenceRecord(value: unknown): value is PresenceRecord {
   const record = value as Record<string, unknown>
   const mode = record["mode"]
   const serverUrl = record["serverUrl"]
+  const protocolVersion = record["protocolVersion"]
   return (
     typeof record["projectId"] === "string" &&
     (mode === "internal" || mode === "external") &&
     (typeof serverUrl === "string" || serverUrl === null) &&
     typeof record["sessionId"] === "string" &&
-    typeof record["heartbeatTs"] === "number"
+    typeof record["heartbeatTs"] === "number" &&
+    (protocolVersion === undefined || typeof protocolVersion === "number")
   )
 }
 
@@ -122,21 +125,22 @@ export async function readPresenceDetail(
 ): Promise<PresenceDetail> {
   const record = await readRecord(projectId, homeDir)
   if (record === null) {
-    return { status: "missing", heartbeatTs: null }
+    return { status: "missing", heartbeatTs: null, protocolVersion: undefined }
   }
 
+  const protocolVersion = record.protocolVersion ?? 1
   const age = Date.now() - record.heartbeatTs
   if (age > PRESENCE_TTL_MS) {
-    return { status: "offline", heartbeatTs: record.heartbeatTs }
+    return { status: "offline", heartbeatTs: record.heartbeatTs, protocolVersion }
   }
 
   if (record.mode === "internal") {
-    return { status: "internal", heartbeatTs: record.heartbeatTs }
+    return { status: "internal", heartbeatTs: record.heartbeatTs, protocolVersion }
   }
 
   const timeoutMs = deps.probeTimeoutMs ?? DEFAULT_PROBE_TIMEOUT_MS
   const alive = await raceProbe(record, deps.probeSession, timeoutMs)
-  return { status: alive ? "live" : "stale", heartbeatTs: record.heartbeatTs }
+  return { status: alive ? "live" : "stale", heartbeatTs: record.heartbeatTs, protocolVersion }
 }
 
 export async function readPresenceStatus(

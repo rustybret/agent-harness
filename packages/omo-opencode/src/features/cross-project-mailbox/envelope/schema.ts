@@ -7,6 +7,7 @@ import { log } from "../../../shared/logger"
 import { canonicalizeLegacyIntent } from "../permission-tiers"
 
 export const MAX_BODY_BYTES = 32768
+export const CURRENT_PROTOCOL_VERSION = 2
 
 export const MAILBOX_INTENTS = ["question", "quick", "impl", "review", "work-loop", "plan"] as const
 
@@ -22,7 +23,7 @@ export const MAILBOX_MODES = [
 export type MailboxMode = (typeof MAILBOX_MODES)[number]
 
 export const MailboxMessageSchema = z.object({
-  version: z.literal(1).default(1),
+  version: z.number().int().positive().default(CURRENT_PROTOCOL_VERSION),
   messageId: z.string().uuid(),
   timestamp: z.number().int().positive(),
   correlationId: z.string().uuid(),

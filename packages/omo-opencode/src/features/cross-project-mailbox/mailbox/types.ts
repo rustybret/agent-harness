@@ -42,3 +42,4 @@ export type QuarantineReason =
   | "malformed"
   | "duplicate-loop"
   | "max-retries-exceeded"
+  | "superseded"

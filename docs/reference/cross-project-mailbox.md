@@ -289,7 +289,7 @@ The tool writes an envelope-wrapped Markdown file to `<target>/coordination_note
 
 ```markdown
 ---
-version: 1
+version: 2
 messageId: "2eb4a19c-851f-4d94-a4f7-7b2a95c9603f"
 timestamp: 1782523200000
 correlationId: "5d9f3f4c-1122-3344-5566-778899aabbcc"
@@ -306,6 +306,18 @@ supersedes: null
 ---
 Implement new SDXL fallback route.
 ```
+
+### 4. Cross-Batch Supersession & Protocol Versioning
+
+#### Cross-Batch Supersession
+When Note B supersedes Note A (`supersedes: "<note-A-id>"`):
+- If Note A is sitting unread in `inbox`, `MailboxStore` quarantines Note A to `rejected/` with reason `"superseded"`, preventing it from draining or remaining orphaned.
+- If Note A was already delivered in a prior batch and resides in `processed/`, `MailboxStore` moves Note A to `processed/superseded/<note-A-id>.md` and writes `<note-A-id>.superseded.json` to preserve auditability while indicating state transition. Note B retains `supersedesDelivered: true` to inject the `CORRECTION:` notice into the active session.
+
+#### Protocol Versioning
+- **Current Protocol Version**: `2` (`CURRENT_PROTOCOL_VERSION = 2`). Envelopes default to version `2`.
+- **Backwards & Forwards Compatibility**: The envelope schema accepts `version: 1`, `2`, or higher. Unknown future fields from higher protocol versions are stripped safely without raising validation errors.
+- **Presence Handshake**: Heartbeats broadcast `protocolVersion: 2`, allowing peer sessions to verify capabilities before transmitting version-specific envelope features.
 
 ---
 
@@ -403,6 +415,7 @@ A JSON file located at `~/.omo/presence/<projectId>.json` is updated every 10 se
 * `sessionId`: The unique identifier of the active session.
 * `pid`: The process ID of the session.
 * `heartbeatTs`: The timestamp of the last update.
+* `protocolVersion`: The mailbox protocol version (e.g. `2`, defaulting to `1` for legacy unversioned presence files).
 
 ### Reachability Liveness Check
 
